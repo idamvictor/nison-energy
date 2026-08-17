@@ -1,111 +1,137 @@
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/reveal";
+import { cn } from "@/lib/utils";
 
-const trustPoints = [
-  "Certified installers",
-  "5-day install turnaround",
-  "OZEV grant support",
+const IMG = "https://ocunioenergy.com/wp-content/uploads";
+
+const slides = [
+  {
+    eyebrow: "EV Home Charging",
+    headline: "Premium chargers, installed properly.",
+    copy: "Instant online quotes and expert installation from certified engineers. Fitted in days, not weeks.",
+    cta: "Browse home chargers",
+    image: `${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`,
+  },
+  {
+    eyebrow: "Workplace Charging",
+    headline: "Power up your fleet on-site.",
+    copy: "Scalable commercial installations for offices, depots and car parks, backed by OZEV workplace funding.",
+    cta: "Explore workplace charging",
+    image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
+  },
+  {
+    eyebrow: "EV Accessories",
+    headline: "Cables, adapters and everything else.",
+    copy: "Type 2 cables, holsters and portable chargers to round out your setup.",
+    cta: "Shop accessories",
+    image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
+  },
 ];
 
 export function Hero() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 6000);
+    return () => clearInterval(id);
+  }, []);
+
+  const slide = slides[index];
+
   return (
-    <section className="relative overflow-hidden bg-secondary">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 55% at 15% 20%, color-mix(in oklch, var(--primary) 22%, transparent) 0%, transparent 70%), radial-gradient(55% 50% at 90% 15%, color-mix(in oklch, var(--accent) 20%, transparent) 0%, transparent 70%)",
-        }}
-      />
+    <section className="relative overflow-hidden bg-primary">
+      <div className="relative h-[560px] sm:h-[520px]">
+        {slides.map((s, i) => (
+          <div
+            key={s.headline}
+            className={cn(
+              "absolute inset-0 transition-opacity duration-700 ease-out",
+              i === index ? "opacity-100" : "opacity-0"
+            )}
+            aria-hidden={i !== index}
+          >
+            <Image
+              src={s.image}
+              alt=""
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[color-mix(in_oklch,var(--primary),black_15%)] via-[color-mix(in_oklch,var(--primary),black_15%)]/85 to-transparent" />
+          </div>
+        ))}
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28 lg:px-8">
-        <Reveal>
-          <div>
-            <span className="inline-flex items-center rounded-full border border-primary/20 bg-background/80 px-3 py-1 text-xs font-semibold tracking-wide text-primary uppercase">
-              EV Home Charging
+        <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
+          <div className="max-w-xl text-white">
+            <span className="inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide uppercase">
+              {slide.eyebrow}
             </span>
-            <h1 className="mt-5 text-4xl leading-[1.1] font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Premium EV chargers,{" "}
-              <span className="text-primary">installed properly.</span>
+            <h1 className="mt-5 text-4xl leading-[1.1] font-semibold tracking-tight sm:text-5xl">
+              {slide.headline}
             </h1>
-            <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Instant online quotes and expert installation from certified
-              engineers. Get your home charger fitted in days, not weeks —
-              and claim up to £500 toward the cost.
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-white/80">
+              {slide.copy}
             </p>
-
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button
                 size="lg"
                 className="h-12 gap-2 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
               >
-                Browse chargers
+                {slide.cta}
                 <ArrowRight className="size-4" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 border-primary/30 px-6 text-base text-primary hover:bg-primary/5"
+                className="h-12 border-white/30 bg-transparent px-6 text-base text-white hover:bg-white/10"
               >
                 Check grant eligibility
               </Button>
             </div>
-
-            <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-2">
-              {trustPoints.map((point) => (
-                <li
-                  key={point}
-                  className="flex items-center gap-1.5 text-sm font-medium text-foreground/70"
-                >
-                  <CheckCircle2 className="size-4 text-success" />
-                  {point}
-                </li>
-              ))}
-            </ul>
           </div>
-        </Reveal>
+        </div>
 
-        <Reveal delay={150}>
-          <div className="relative mx-auto aspect-square w-full max-w-md">
-            <div
-              className="absolute inset-0 rounded-[2rem] opacity-90"
-              style={{
-                background:
-                  "conic-gradient(from 210deg at 50% 50%, var(--primary), color-mix(in oklch, var(--primary) 40%, var(--accent)), var(--accent), var(--primary))",
-              }}
+        <button
+          type="button"
+          onClick={() =>
+            setIndex((i) => (i - 1 + slides.length) % slides.length)
+          }
+          className="absolute top-1/2 left-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/25 sm:left-6"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="size-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIndex((i) => (i + 1) % slides.length)}
+          className="absolute top-1/2 right-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/25 sm:right-6"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="size-5" />
+        </button>
+
+        <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
+          {slides.map((s, i) => (
+            <button
+              key={s.headline}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={cn(
+                "h-1.5 rounded-full transition-all",
+                i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
+              )}
             />
-            <div className="absolute inset-[6px] rounded-[calc(2rem-6px)] bg-background/95 backdrop-blur-sm" />
-            <svg
-              viewBox="0 0 200 200"
-              className="absolute inset-0 h-full w-full p-12"
-              aria-hidden
-            >
-              <rect
-                x="60"
-                y="30"
-                width="80"
-                height="140"
-                rx="16"
-                className="fill-none stroke-primary"
-                strokeWidth="4"
-              />
-              <circle cx="100" cy="52" r="6" className="fill-accent" />
-              <path
-                d="M96 78 L84 112 L100 112 L92 150 L124 100 L106 100 Z"
-                className="fill-primary"
-              />
-              <path
-                d="M140 120 q30 0 30 30 v20"
-                className="fill-none stroke-accent"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-        </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

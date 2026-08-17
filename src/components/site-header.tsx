@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sheet";
 
 const navLinks = [
-  { href: "#chargers", label: "Home Charging" },
+  { href: "/home-charging", label: "Home Charging" },
   { href: "#workplace", label: "Workplace Charging" },
   { href: "#accessories", label: "EV Accessories" },
   { href: "#about", label: "About Us" },
@@ -35,13 +35,13 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-7 lg:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -75,13 +75,13 @@ export function SiteHeader() {
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-4">
                 {navLinks.map((link) => (
-                  <a
+                  <Link
                     key={link.href}
                     href={link.href}
                     className="rounded-md px-2 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">

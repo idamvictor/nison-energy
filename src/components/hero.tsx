@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,18 +15,21 @@ const slides = [
     headline: "Premium chargers, installed properly.",
     copy: "Instant online quotes and expert installation from certified engineers. Fitted in days, not weeks.",
     cta: "Browse home chargers",
+    href: "/home-charging",
     image: `${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`,
   },
   {
     headline: "Power up your fleet on-site.",
     copy: "Scalable commercial installations for offices, depots and car parks, backed by OZEV workplace funding.",
     cta: "Explore workplace charging",
+    href: "#",
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
   },
   {
     headline: "Cables, adapters and everything else.",
     copy: "Type 2 cables, holsters and portable chargers to round out your setup.",
     cta: "Shop accessories",
+    href: "#",
     image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
   },
 ];
@@ -85,6 +89,7 @@ export function Hero() {
               <Button
                 size="lg"
                 className="h-12 gap-2 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
+                render={<Link href={slide.href} />}
               >
                 {slide.cta}
                 <ArrowRight className="size-4" />

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
@@ -11,6 +12,7 @@ const categories = [
     title: "Home Charging",
     description: "Chargers for your driveway or garage, fitted in days.",
     image: `${IMG}/2025/05/Home-Charging-Image.jpg`,
+    href: "/home-charging",
     span: "lg:col-span-2 lg:row-span-2",
     text: "text-2xl sm:text-3xl",
   },
@@ -18,6 +20,7 @@ const categories = [
     title: "Workplace Charging",
     description: null,
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
+    href: "#",
     span: "lg:col-span-1 lg:row-span-1",
     text: "text-lg",
   },
@@ -25,6 +28,7 @@ const categories = [
     title: "EV Accessories",
     description: null,
     image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
+    href: "#",
     span: "lg:col-span-1 lg:row-span-1",
     text: "text-lg",
   },
@@ -32,6 +36,7 @@ const categories = [
     title: "OZEV Grants",
     description: "See what you're eligible to claim.",
     image: `${IMG}/2025/05/side-view-man-charging-his-car-min-scaled.webp`,
+    href: "#grants",
     span: "lg:col-span-2 lg:row-span-1",
     text: "text-lg",
   },
@@ -43,15 +48,15 @@ export function CategoryCards() {
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <Reveal>
           <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
-            Shop by category
+            Shop By Category
           </h2>
         </Reveal>
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:auto-rows-65 lg:grid-cols-4">
           {categories.map((category, index) => (
             <Reveal key={category.title} delay={index * 60} className={category.span}>
-              <a
-                href="#"
+              <Link
+                href={category.href}
                 className="group relative flex h-full min-h-64 flex-col justify-end overflow-hidden rounded-2xl"
               >
                 <Image
@@ -88,7 +93,7 @@ export function CategoryCards() {
                     <ArrowUpRight className="size-3.5" />
                   </span>
                 </div>
-              </a>
+              </Link>
             </Reveal>
           ))}
         </div>

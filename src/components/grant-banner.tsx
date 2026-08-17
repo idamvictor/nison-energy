@@ -10,7 +10,7 @@ export function GrantBanner() {
         <Reveal>
           <div className="text-center">
             <h2 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Are you eligible for £500 off?
+              Are You Eligible For £500 Off?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">
               Most homes and workplaces qualify. Run a free eligibility

@@ -1,4 +1,4 @@
-import { ClipboardCheck, ShieldCheck, Sparkles } from "lucide-react";
+import { ClipboardCheck, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
@@ -9,11 +9,7 @@ export function GrantBanner() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
           <div className="text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide uppercase">
-              <Sparkles className="size-3.5" />
-              OZEV grant scheme
-            </span>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
               Are you eligible for £500 off?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">

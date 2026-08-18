@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Phone, Zap } from "lucide-react";
+import Image from "next/image";
+import { Menu, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,13 +25,15 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-sm supports-backdrop-filter:bg-background/70">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Zap className="size-5" strokeWidth={2.25} />
-          </span>
-          <span className="font-heading text-lg font-semibold tracking-tight text-foreground">
-            Nison Energy
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo.png"
+            alt="Nison Energy"
+            width={3264}
+            height={1273}
+            priority
+            className="h-9 w-auto"
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">

@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/sheet";
 
 const priceBuckets = [
-  { key: "under-700", label: "Under £700", test: (p: number) => p < 700 },
-  { key: "700-800", label: "£700 – £800", test: (p: number) => p >= 700 && p < 800 },
-  { key: "800-900", label: "£800 – £900", test: (p: number) => p >= 800 && p <= 900 },
+  { key: "under-1000", label: "Under £1,000", test: (p: number) => p < 1000 },
+  { key: "1000-1060", label: "£1,000 – £1,060", test: (p: number) => p >= 1000 && p < 1060 },
+  { key: "1060-plus", label: "£1,060+", test: (p: number) => p >= 1060 },
 ];
 
 const sortOptions = [

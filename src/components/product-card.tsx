@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import {
@@ -16,24 +17,14 @@ import type { Product } from "@/lib/products";
 const tagStyles: Record<string, string> = {
   "Nison recommends": "bg-primary text-primary-foreground border-transparent",
   "Free UK delivery": "bg-success text-success-foreground border-transparent",
-  "5 year guarantee": "bg-success text-success-foreground border-transparent",
+  "3 year warranty": "bg-success text-success-foreground border-transparent",
 };
 
-function tagClass(tag: string) {
-  if (tagStyles[tag]) return tagStyles[tag];
-  if (tag.startsWith("Save"))
-    return "bg-accent text-accent-foreground border-transparent";
-  return "bg-background/90 text-foreground";
+export function tagClass(tag: string) {
+  return tagStyles[tag] ?? "bg-background/90 text-foreground";
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const discountPct = product.compareAtPrice
-    ? Math.round(
-        ((product.compareAtPrice - product.price) / product.compareAtPrice) *
-          100
-      )
-    : null;
-
   return (
     <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
       <CardHeader className="p-0">
@@ -54,33 +45,23 @@ export function ProductCard({ product }: { product: Product }) {
               ))}
             </div>
           )}
-          {discountPct !== null && (
-            <Badge className="absolute top-3 right-3 border-transparent bg-destructive text-white">
-              Save {discountPct}%
-            </Badge>
-          )}
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <p className="text-sm text-muted-foreground">{product.spec}</p>
         <Stars rating={product.rating} reviewCount={product.reviewCount} />
-        <div className="mt-1 flex items-baseline gap-2">
-          <p className="text-2xl font-semibold text-foreground">
-            £{product.price}
-          </p>
-          {product.compareAtPrice && (
-            <p className="text-sm text-muted-foreground line-through">
-              £{product.compareAtPrice}
-            </p>
-          )}
-        </div>
+        <p className="mt-1 text-2xl font-semibold text-foreground">
+          £{product.price}
+        </p>
       </CardContent>
       <CardFooter className="border-t-0 bg-transparent p-5 pt-3">
         <Button
           variant="outline"
           size="lg"
+          nativeButton={false}
           className="w-full justify-between border-primary/25 text-primary hover:bg-primary/5"
+          render={<Link href={`/home-charging/${product.id}`} />}
         >
           Learn more
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />

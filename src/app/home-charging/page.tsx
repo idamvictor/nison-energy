@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { SiteHeader } from "@/components/site-header";
 import { TrustBar } from "@/components/trust-bar";
-import { ProductGrid } from "@/components/product-grid";
+import { CategoryHero } from "@/components/category-hero";
+import { HomeChargingCatalog } from "@/components/home-charging-catalog";
 import { HelpSection } from "@/components/help-section";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -12,27 +13,20 @@ export const metadata: Metadata = {
     "Browse our full range of OZEV-approved home EV chargers, professionally installed by certified engineers.",
 };
 
+const IMG = "https://ocunioenergy.com/wp-content/uploads";
+
 export default function HomeChargingPage() {
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <div className="bg-secondary">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              Home Charging
-            </h1>
-            <p className="mt-3 max-w-xl text-muted-foreground">
-              Our full range of OZEV-approved home chargers, professionally
-              installed by certified engineers.
-            </p>
-          </div>
-        </div>
-        <ProductGrid
-          title="All Home Chargers"
-          subtitle="Every charger is professionally installed and backed by our certified engineer network."
+        <CategoryHero
+          title="Home Charging"
+          subtitle="Our full range of OZEV-approved home chargers, professionally installed by certified engineers."
+          image={`${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`}
         />
+        <HomeChargingCatalog />
         <HelpSection />
       </main>
       <SiteFooter />

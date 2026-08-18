@@ -26,7 +26,7 @@ const slides = [
     headline: "Power up your fleet on-site.",
     copy: "Scalable commercial installations for offices, depots and car parks, backed by OZEV workplace funding.",
     cta: "Explore workplace charging",
-    href: "#",
+    href: "/workplace-charging",
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
   },
   {

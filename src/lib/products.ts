@@ -1,7 +1,12 @@
 export type Product = {
   id: string;
   name: string;
+  brand: string;
   spec: string;
+  connectionType: "Tethered" | "Untethered";
+  cableLength?: string;
+  colour: string;
+  powerOutput: string;
   price: number;
   compareAtPrice?: number;
   rating: number;
@@ -16,7 +21,11 @@ export const products: Product[] = [
   {
     id: "easee-one",
     name: "Easee One 7.4kW Smart Charger",
+    brand: "Easee",
     spec: "7.4kW · Type 2 · Untethered · WiFi & 4G",
+    connectionType: "Untethered",
+    colour: "Black",
+    powerOutput: "7.4kW",
     price: 799,
     compareAtPrice: 899,
     rating: 4.8,
@@ -27,7 +36,12 @@ export const products: Product[] = [
   {
     id: "hypervolt-white",
     name: "Hypervolt Home Pro 3",
+    brand: "Hypervolt",
     spec: "7.4kW · Type 2 tethered · 5m cable · White",
+    connectionType: "Tethered",
+    cableLength: "5m",
+    colour: "White",
+    powerOutput: "7.4kW",
     price: 749,
     rating: 4.7,
     reviewCount: 118,
@@ -37,7 +51,12 @@ export const products: Product[] = [
   {
     id: "hypervolt-grey",
     name: "Hypervolt Home Pro 3",
+    brand: "Hypervolt",
     spec: "7.4kW · Type 2 tethered · 5m cable · Space Grey",
+    connectionType: "Tethered",
+    cableLength: "5m",
+    colour: "Space Grey",
+    powerOutput: "7.4kW",
     price: 749,
     compareAtPrice: 829,
     rating: 4.7,
@@ -48,7 +67,12 @@ export const products: Product[] = [
   {
     id: "indra-lux-black",
     name: "Indra Smart LUX",
+    brand: "Indra",
     spec: "7.4kW · Type 2 tethered · 6m cable · Black",
+    connectionType: "Tethered",
+    cableLength: "6m",
+    colour: "Black",
+    powerOutput: "7.4kW",
     price: 899,
     rating: 4.9,
     reviewCount: 34,
@@ -58,7 +82,12 @@ export const products: Product[] = [
   {
     id: "indra-lux-white",
     name: "Indra Smart LUX",
+    brand: "Indra",
     spec: "7.4kW · Type 2 tethered · 6m cable · White",
+    connectionType: "Tethered",
+    cableLength: "6m",
+    colour: "White",
+    powerOutput: "7.4kW",
     price: 899,
     rating: 4.9,
     reviewCount: 34,
@@ -68,7 +97,11 @@ export const products: Product[] = [
   {
     id: "indra-pro-black",
     name: "Indra Pro Untethered",
+    brand: "Indra",
     spec: "7.4kW · Type 2 socket · Black · App control",
+    connectionType: "Untethered",
+    colour: "Black",
+    powerOutput: "7.4kW",
     price: 649,
     compareAtPrice: 729,
     rating: 4.6,
@@ -79,7 +112,12 @@ export const products: Product[] = [
   {
     id: "ohme-home-pro",
     name: "Ohme Home Pro",
-    spec: "7.4kW · Type 2 tethered · Smart tariff ready",
+    brand: "Ohme",
+    spec: "7.4kW · Type 2 tethered · 6m cable · Smart tariff ready",
+    connectionType: "Tethered",
+    cableLength: "6m",
+    colour: "Black",
+    powerOutput: "7.4kW",
     price: 649,
     rating: 4.8,
     reviewCount: 203,
@@ -89,7 +127,11 @@ export const products: Product[] = [
   {
     id: "ohme-epod",
     name: "Ohme ePod",
-    spec: "7.4kW · Compact wall unit · Type 2",
+    brand: "Ohme",
+    spec: "7.4kW · Compact wall unit · Type 2 · Untethered",
+    connectionType: "Untethered",
+    colour: "Black",
+    powerOutput: "7.4kW",
     price: 549,
     rating: 4.5,
     reviewCount: 87,

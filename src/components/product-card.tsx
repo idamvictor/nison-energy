@@ -37,7 +37,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
       <CardHeader className="p-0">
-        <div className="relative aspect-4/3 w-full bg-muted">
+        <div className="relative aspect-4/3 w-full bg-white">
           <Image
             src={product.image}
             alt={product.name}

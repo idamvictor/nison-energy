@@ -11,7 +11,7 @@ const categories = [
   {
     title: "Home Charging",
     description: "Chargers for your driveway or garage, fitted in days.",
-    image: `${IMG}/2025/05/Home-Charging-Image.jpg`,
+    image: `${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`,
     href: "/home-charging",
     span: "lg:col-span-2 lg:row-span-2",
     text: "text-2xl sm:text-3xl",
@@ -20,7 +20,7 @@ const categories = [
     title: "Workplace Charging",
     description: null,
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
-    href: "#",
+    href: "/workplace-charging",
     span: "lg:col-span-1 lg:row-span-1",
     text: "text-lg",
   },

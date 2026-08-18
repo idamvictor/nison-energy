@@ -4,6 +4,7 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import { products as allProducts } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/reveal";
+import { SectionKicker } from "@/components/section-kicker";
 import { Button } from "@/components/ui/button";
 
 export function ProductGrid({
@@ -24,7 +25,8 @@ export function ProductGrid({
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
+            <SectionKicker center />
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
               {title}
             </h2>
             <p className="mt-3 text-muted-foreground">{subtitle}</p>

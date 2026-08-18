@@ -2,6 +2,7 @@ import { ClipboardCheck, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
+import { SectionKicker } from "@/components/section-kicker";
 
 export function GrantBanner() {
   return (
@@ -9,7 +10,8 @@ export function GrantBanner() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
           <div className="text-center">
-            <h2 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
+            <SectionKicker center tone="invert" />
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
               Are You Eligible For £500 Off?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">

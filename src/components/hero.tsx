@@ -123,7 +123,7 @@ export function Hero() {
       ref={containerRef}
       className="relative overflow-hidden bg-foreground"
     >
-      <div className="relative h-[600px] sm:h-[540px]">
+      <div className="relative h-[680px] sm:h-[640px]">
         <div
           ref={imageRef}
           key={index}

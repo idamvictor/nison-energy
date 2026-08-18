@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
+import { SectionKicker } from "@/components/section-kicker";
 import { cn } from "@/lib/utils";
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";
@@ -47,7 +48,8 @@ export function CategoryCards() {
     <section className="bg-background">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <Reveal>
-          <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
+          <SectionKicker />
+          <h2 className="mt-4 text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
             Shop By Category
           </h2>
         </Reveal>

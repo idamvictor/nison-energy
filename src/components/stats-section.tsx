@@ -1,5 +1,6 @@
 import { AnimatedNumber } from "@/components/animated-number";
 import { Reveal } from "@/components/reveal";
+import { SectionKicker } from "@/components/section-kicker";
 
 const stats = [
   { value: 500, prefix: "£", label: "OZEV grant available per home charger" },
@@ -12,7 +13,8 @@ export function StatsSection() {
     <section className="bg-primary text-primary-foreground">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
-          <h2 className="text-center text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
+          <SectionKicker center tone="invert" />
+          <h2 className="mt-4 text-center text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
             At A Glance
           </h2>
         </Reveal>

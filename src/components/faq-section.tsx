@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Reveal } from "@/components/reveal";
+import { SectionKicker } from "@/components/section-kicker";
 import { faqCategories } from "@/lib/faqs";
 
 export function FaqSection() {
@@ -12,7 +13,8 @@ export function FaqSection() {
     <section className="bg-secondary">
       <div className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
         <Reveal>
-          <h2 className="text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
+          <SectionKicker center />
+          <h2 className="mt-4 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
             Common Questions, Straight Answers
           </h2>
         </Reveal>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Reveal } from "@/components/reveal";
+import { SectionKicker } from "@/components/section-kicker";
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads/2025/05";
 
@@ -22,7 +23,8 @@ export function TrustedInstallers() {
     <section className="bg-secondary">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
-          <h2 className="text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
+          <SectionKicker center />
+          <h2 className="mt-4 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
             Our Trusted Installers
           </h2>
         </Reveal>

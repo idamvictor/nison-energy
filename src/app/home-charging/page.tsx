@@ -21,7 +21,7 @@ export default function HomeChargingPage() {
         <div className="bg-secondary">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              Home charging
+              Home Charging
             </h1>
             <p className="mt-3 max-w-xl text-muted-foreground">
               Our full range of OZEV-approved home chargers, professionally
@@ -30,7 +30,7 @@ export default function HomeChargingPage() {
           </div>
         </div>
         <ProductGrid
-          title="All home chargers"
+          title="All Home Chargers"
           subtitle="Every charger is professionally installed and backed by our certified engineer network."
         />
         <HelpSection />

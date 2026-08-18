@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 export function ProductGrid({
   limit,
   viewAllHref,
-  title = "Home charging units",
+  title = "Home Charging Units",
   subtitle = "Every charger is professionally installed and backed by our certified engineer network.",
 }: {
   limit?: number;
@@ -45,6 +45,7 @@ export function ProductGrid({
               <Button
                 size="lg"
                 variant="outline"
+                nativeButton={false}
                 className="gap-2 border-primary/25 text-primary hover:bg-primary/5"
                 render={<Link href={viewAllHref} />}
               >

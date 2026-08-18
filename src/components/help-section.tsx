@@ -12,7 +12,7 @@ export function HelpSection() {
             <div className="grid gap-8 p-8 sm:p-10 lg:grid-cols-[1fr_auto_auto] lg:items-center lg:gap-10">
               <div>
                 <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Get help and advice
+                  Get Help And Advice
                 </h2>
                 <p className="mt-2 text-primary-foreground/75">
                   Our team is on hand to talk through chargers, installs, and

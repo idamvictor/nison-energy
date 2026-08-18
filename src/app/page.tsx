@@ -2,10 +2,11 @@ import { SiteHeader } from "@/components/site-header";
 import { TrustBar } from "@/components/trust-bar";
 import { Hero } from "@/components/hero";
 import { CategoryCards } from "@/components/category-cards";
-import { ThreeSteps } from "@/components/three-steps";
-import { GrantBanner } from "@/components/grant-banner";
 import { TrustedInstallers } from "@/components/trusted-installers";
+import { ThreeSteps } from "@/components/three-steps";
+import { StatsSection } from "@/components/stats-section";
 import { ProductGrid } from "@/components/product-grid";
+import { GrantBanner } from "@/components/grant-banner";
 import { FaqSection } from "@/components/faq-section";
 import { HelpSection } from "@/components/help-section";
 import { SiteFooter } from "@/components/site-footer";
@@ -18,15 +19,16 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <CategoryCards />
-        <ThreeSteps />
-        <GrantBanner />
         <TrustedInstallers />
+        <ThreeSteps />
+        <StatsSection />
         <ProductGrid
-          limit={4}
+          limit={3}
           viewAllHref="/home-charging"
-          title="Featured home chargers"
+          title="Featured Home Chargers"
           subtitle="A few favourites from our home charging range."
         />
+        <GrantBanner />
         <FaqSection />
         <HelpSection />
       </main>

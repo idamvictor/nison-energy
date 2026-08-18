@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+gsap.registerPlugin(useGSAP);
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";
 
@@ -34,73 +38,149 @@ const slides = [
   },
 ];
 
+const SLIDE_DURATION = 7000;
+
 export function Hero() {
   const [index, setIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const id = setInterval(() => {
       setIndex((i) => (i + 1) % slides.length);
-    }, 7000);
+    }, SLIDE_DURATION);
     return () => clearInterval(id);
   }, []);
 
+  useGSAP(
+    () => {
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (reduceMotion) {
+        gsap.set(".hero-word", { yPercent: 0, autoAlpha: 1 });
+        gsap.set([".hero-copy", ".hero-cta"], { y: 0, autoAlpha: 1 });
+        gsap.set(imageRef.current, { scale: 1, autoAlpha: 1 });
+        return;
+      }
+
+      gsap
+        .timeline()
+        .fromTo(
+          imageRef.current,
+          { scale: 1.12, autoAlpha: 0 },
+          { scale: 1, autoAlpha: 1, duration: 1.4, ease: "power2.out" }
+        )
+        .to(
+          imageRef.current,
+          {
+            scale: 1.06,
+            duration: SLIDE_DURATION / 1000 - 1.4,
+            ease: "none",
+          },
+          "<"
+        )
+        .fromTo(
+          ".hero-word",
+          { yPercent: 110, autoAlpha: 0 },
+          {
+            yPercent: 0,
+            autoAlpha: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            stagger: 0.035,
+          },
+          0.3
+        )
+        .fromTo(
+          ".hero-copy",
+          { y: 14, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.6, ease: "power2.out" },
+          0.55
+        )
+        .fromTo(
+          ".hero-cta",
+          { y: 14, autoAlpha: 0 },
+          {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.6,
+            ease: "power2.out",
+            stagger: 0.08,
+          },
+          0.68
+        );
+    },
+    { scope: containerRef, dependencies: [index], revertOnUpdate: true }
+  );
+
   const slide = slides[index];
+  const words = slide.headline.split(" ");
 
   return (
-    <section className="relative overflow-hidden bg-foreground">
+    <section
+      ref={containerRef}
+      className="relative overflow-hidden bg-foreground"
+    >
       <div className="relative h-[600px] sm:h-[540px]">
-        {slides.map((s, i) => (
+        <div
+          ref={imageRef}
+          key={index}
+          className="absolute inset-0 origin-center"
+        >
+          <Image
+            src={slide.image}
+            alt=""
+            fill
+            priority={index === 0}
+            sizes="100vw"
+            className="object-cover"
+          />
           <div
-            key={s.headline}
-            className={cn(
-              "absolute inset-0 transition-opacity duration-1000 ease-out",
-              i === index ? "opacity-100" : "opacity-0"
-            )}
-            aria-hidden={i !== index}
-          >
-            <Image
-              src={s.image}
-              alt=""
-              fill
-              priority={i === 0}
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(90deg, color-mix(in oklch, black 88%, var(--primary) 12%) 0%, color-mix(in oklch, black 88%, var(--primary) 12%) 30%, transparent 75%)",
-                opacity: 0.8,
-              }}
-            />
-          </div>
-        ))}
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, color-mix(in oklch, black 88%, var(--primary) 12%) 0%, color-mix(in oklch, black 88%, var(--primary) 12%) 30%, transparent 75%)",
+              opacity: 0.8,
+            }}
+          />
+        </div>
 
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-lg text-white">
             <h1 className="text-4xl leading-[1.08] font-semibold tracking-[-0.02em] sm:text-5xl">
-              {slide.headline}
+              {words.map((word, i) => (
+                <span key={i} className="inline-block overflow-hidden pb-1">
+                  <span className="hero-word inline-block">
+                    {word}
+                    {i < words.length - 1 ? " " : ""}
+                  </span>
+                </span>
+              ))}
             </h1>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-white/70">
+            <p className="hero-copy mt-5 max-w-md text-lg leading-relaxed text-white/70">
               {slide.copy}
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3">
+            <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button
                 size="lg"
-                className="h-12 gap-2 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
+                nativeButton={false}
+                className="hero-cta h-12 gap-2 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
                 render={<Link href={slide.href} />}
               >
                 {slide.cta}
                 <ArrowRight className="size-4" />
               </Button>
-              <a
-                href="#grants"
-                className="group inline-flex items-center gap-1.5 text-sm font-medium text-white/85 transition-colors hover:text-white"
+              <Button
+                size="lg"
+                variant="outline"
+                nativeButton={false}
+                className="hero-cta h-12 border-white/40 bg-transparent px-6 text-base text-white hover:border-white hover:bg-white/10"
+                render={<Link href="#grants" />}
               >
                 Check grant eligibility
-                <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </a>
+              </Button>
             </div>
           </div>
         </div>

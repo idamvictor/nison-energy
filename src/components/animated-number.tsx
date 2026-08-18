@@ -20,12 +20,13 @@ export function AnimatedNumber({
     const node = ref.current;
     if (!node) return;
 
-    if (
+    const skipAnimation =
       typeof IntersectionObserver === "undefined" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setDisplay(value);
-      return;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (skipAnimation) {
+      const id = requestAnimationFrame(() => setDisplay(value));
+      return () => cancelAnimationFrame(id);
     }
 
     const observer = new IntersectionObserver(

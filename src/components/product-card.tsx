@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 import {
   Card,
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Stars } from "@/components/stars";
 import type { Product } from "@/lib/products";
+import { cn } from "@/lib/utils";
 
 const tagStyles: Record<string, string> = {
   "Nison recommends": "bg-primary text-primary-foreground border-transparent",
@@ -24,7 +25,15 @@ export function tagClass(tag: string) {
   return tagStyles[tag] ?? "bg-background/90 text-foreground";
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({
+  product,
+  compareSelected,
+  onToggleCompare,
+}: {
+  product: Product;
+  compareSelected?: boolean;
+  onToggleCompare?: (id: string) => void;
+}) {
   return (
     <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
       <CardHeader className="p-0">
@@ -44,6 +53,27 @@ export function ProductCard({ product }: { product: Product }) {
                 </Badge>
               ))}
             </div>
+          )}
+          {onToggleCompare && (
+            <label className="absolute top-3 right-3 flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 py-1 pr-2.5 pl-1.5 text-xs font-medium text-foreground shadow-sm ring-1 ring-border">
+              <span
+                className={cn(
+                  "flex size-4 items-center justify-center rounded-sm border transition-colors",
+                  compareSelected
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-input bg-background"
+                )}
+              >
+                {compareSelected && <Check className="size-3" />}
+              </span>
+              <input
+                type="checkbox"
+                checked={Boolean(compareSelected)}
+                onChange={() => onToggleCompare(product.id)}
+                className="sr-only"
+              />
+              Compare
+            </label>
           )}
         </div>
       </CardHeader>

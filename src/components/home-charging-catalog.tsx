@@ -5,6 +5,8 @@ import { SlidersHorizontal } from "lucide-react";
 
 import { products, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
+import { CompareBar } from "@/components/compare-bar";
+import { CompareDialog } from "@/components/compare-dialog";
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,6 +73,16 @@ export function HomeChargingCatalog() {
   const [buckets, setBuckets] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<SortValue>("featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((current) => {
+      if (current.includes(id)) return current.filter((c) => c !== id);
+      if (current.length >= 3) return current;
+      return [...current, id];
+    });
+  };
 
   const brandCounts = useCounts(products.map((p) => p.brand));
   const connectionCounts = useCounts(products.map((p) => p.connectionType));
@@ -252,10 +264,14 @@ export function HomeChargingCatalog() {
                 No chargers match those filters. Try clearing one or two.
               </p>
             ) : (
-              <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-8 grid grid-cols-1 gap-7 pb-20 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((product, index) => (
                   <Reveal key={product.id} delay={(index % 3) * 60}>
-                    <ProductCard product={product} />
+                    <ProductCard
+                      product={product}
+                      compareSelected={compareIds.includes(product.id)}
+                      onToggleCompare={toggleCompare}
+                    />
                   </Reveal>
                 ))}
               </div>
@@ -263,6 +279,19 @@ export function HomeChargingCatalog() {
           </div>
         </div>
       </div>
+
+      <CompareBar
+        productIds={compareIds}
+        onRemove={toggleCompare}
+        onClear={() => setCompareIds([])}
+        onCompare={() => setCompareOpen(true)}
+      />
+      <CompareDialog
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        productIds={compareIds}
+        onRemove={toggleCompare}
+      />
     </section>
   );
 }

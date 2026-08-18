@@ -1,7 +1,6 @@
 import { SiteHeader } from "@/components/site-header";
 import { TrustBar } from "@/components/trust-bar";
-import { Hero } from "@/components/hero";
-import { CategoryCards } from "@/components/category-cards";
+import { HeroReveal } from "@/components/hero-reveal";
 import { TrustedInstallers } from "@/components/trusted-installers";
 import { ThreeSteps } from "@/components/three-steps";
 import { StatsSection } from "@/components/stats-section";
@@ -17,8 +16,7 @@ export default function Home() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <Hero />
-        <CategoryCards />
+        <HeroReveal />
         <TrustedInstallers />
         <ThreeSteps />
         <StatsSection />

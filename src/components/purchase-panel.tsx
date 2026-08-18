@@ -134,7 +134,9 @@ export function PurchasePanel({
             }
             className={selectClass}
           >
-            <option value="standard">Standard installation (included)</option>
+            <option value="standard">
+              Standard installation (+£{INSTALL_FEE})
+            </option>
             <option value="none">No installation (device only)</option>
           </select>
         </label>

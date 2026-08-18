@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Menu, Phone } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ArrowRight, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
@@ -14,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 
 const navLinks = [
+  { href: "/", label: "Home" },
   { href: "/home-charging", label: "Home Charging" },
   { href: "/workplace-charging", label: "Workplace Charging" },
   { href: "#accessories", label: "EV Accessories" },
@@ -22,6 +25,10 @@ const navLinks = [
 ];
 
 export function SiteHeader() {
+  const pathname = usePathname();
+  const isActive = (href: string) =>
+    href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 shadow-sm backdrop-blur-sm supports-backdrop-filter:bg-background/70">
       <div
@@ -41,28 +48,31 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="group relative py-1 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
-            >
-              {link.label}
-              <span className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-linear-to-r from-primary to-accent transition-transform duration-200 ease-out group-hover:scale-x-100" />
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "group relative py-1 text-sm font-medium transition-colors hover:text-foreground",
+                  active ? "text-foreground" : "text-foreground/70"
+                )}
+              >
+                {link.label}
+                <span
+                  className={cn(
+                    "absolute inset-x-0 -bottom-0.5 h-0.5 origin-left rounded-full bg-linear-to-r from-primary to-accent transition-transform duration-200 ease-out group-hover:scale-x-100",
+                    active ? "scale-x-100" : "scale-x-0"
+                  )}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
-            href="tel:03306330252"
-            className="hidden items-center gap-2 rounded-full py-1.5 pr-3 pl-1.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground md:flex"
-          >
-            <span className="flex size-7 items-center justify-center rounded-full bg-secondary text-primary">
-              <Phone className="size-3.5" />
-            </span>
-            033 0633 0252
-          </a>
           <Button
             className="hidden gap-1.5 bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 sm:inline-flex"
             size="lg"
@@ -85,27 +95,29 @@ export function SiteHeader() {
                 <SheetTitle>Nison Energy</SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="rounded-md px-2 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {navLinks.map((link) => {
+                  const active = isActive(link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "rounded-md px-2 py-2.5 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground",
+                        active
+                          ? "bg-secondary text-foreground"
+                          : "text-foreground/80"
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">
                 <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
                   Get a quote
                 </Button>
-                <a
-                  href="tel:03306330252"
-                  className="flex items-center justify-center gap-1.5 text-sm font-medium text-foreground/70"
-                >
-                  <Phone className="size-4" />
-                  033 0633 0252
-                </a>
               </div>
             </SheetContent>
           </Sheet>

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { CreditCard, Mail, ShieldCheck, Zap } from "lucide-react";
+import Image from "next/image";
+import { CreditCard, Mail, Phone, ShieldCheck } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -43,18 +44,28 @@ export function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr]">
           <div>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="flex size-9 items-center justify-center rounded-lg bg-white/10">
-                <Zap className="size-5" strokeWidth={2.25} />
-              </span>
-              <span className="font-heading text-lg font-semibold">
-                Nison Energy
-              </span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.png"
+                alt="Nison Energy"
+                width={3264}
+                height={1273}
+                className="h-9 w-auto brightness-0 invert"
+              />
             </Link>
             <p className="mt-4 max-w-xs text-sm text-white/60">
               Premium EV charger sales and installation for homes and
               workplaces across the UK.
             </p>
+            <a
+              href="tel:03306330252"
+              className="mt-4 flex w-fit items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
+            >
+              <span className="flex size-7 items-center justify-center rounded-full bg-white/10">
+                <Phone className="size-3.5" />
+              </span>
+              033 0633 0252
+            </a>
             <div className="mt-5 flex items-center gap-3">
               {[FacebookIcon, InstagramIcon, LinkedinIcon].map((Icon, i) => (
                 <a

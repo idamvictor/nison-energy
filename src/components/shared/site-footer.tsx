@@ -14,22 +14,25 @@ import {
 } from "@/components/shared/social-icons";
 
 const quickLinks = [
-  "Home",
-  "About Us",
-  "Contact Us",
-  "OZEV Grant Eligibility",
-  "Workplace Grant Eligibility",
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "#about" },
+  { label: "Contact Us", href: "#" },
+  { label: "OZEV Grant Eligibility", href: "#grants" },
+  { label: "Workplace Grant Eligibility", href: "#grants" },
 ];
 
 const productLinks = [
-  "Residential Chargers",
-  "Commercial Chargers",
-  "Accessories",
-  "OZEV Grants",
-  "Delivery Information",
+  { label: "Residential Chargers", href: "/home-charging" },
+  { label: "Commercial Chargers", href: "/workplace-charging" },
+  { label: "Accessories", href: "/accessories" },
+  { label: "OZEV Grants", href: "#grants" },
+  { label: "Delivery Information", href: "#" },
 ];
 
-const legalLinks = ["Terms & Conditions", "Privacy Policy"];
+const legalLinks = [
+  { label: "Terms & Conditions", href: "#" },
+  { label: "Privacy Policy", href: "#" },
+];
 
 const paymentMethods = ["Visa", "Mastercard", "PayPal", "Stripe", "Apple Pay"];
 
@@ -144,7 +147,13 @@ export function SiteFooter() {
   );
 }
 
-function FooterColumn({ title, items }: { title: string; items: string[] }) {
+function FooterColumn({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; href: string }[];
+}) {
   return (
     <div>
       <p className="font-heading text-sm font-semibold text-white">
@@ -152,13 +161,13 @@ function FooterColumn({ title, items }: { title: string; items: string[] }) {
       </p>
       <ul className="mt-4 flex flex-col gap-2.5">
         {items.map((item) => (
-          <li key={item}>
-            <a
-              href="#"
+          <li key={item.label}>
+            <Link
+              href={item.href}
               className="text-sm text-white/60 transition-colors hover:text-white"
             >
-              {item}
-            </a>
+              {item.label}
+            </Link>
           </li>
         ))}
       </ul>

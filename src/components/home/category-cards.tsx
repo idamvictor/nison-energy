@@ -29,7 +29,7 @@ const categories = [
     title: "Accessories",
     description: null,
     image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
-    href: "#",
+    href: "/accessories",
     span: "lg:col-span-1 lg:row-span-1",
     text: "text-lg",
   },

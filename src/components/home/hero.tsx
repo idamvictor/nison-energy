@@ -33,7 +33,7 @@ const slides = [
     headline: "Cables, adapters and everything else.",
     copy: "Type 2 cables, holsters and portable chargers to round out your setup.",
     cta: "Shop accessories",
-    href: "#",
+    href: "/accessories",
     image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
   },
 ];

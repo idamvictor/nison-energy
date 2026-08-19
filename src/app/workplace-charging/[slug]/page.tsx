@@ -3,16 +3,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { products } from "@/lib/products";
-import { productDetails, standardInstallation } from "@/lib/product-details";
+import { commercialProducts } from "@/lib/commercial-products";
+import {
+  commercialProductDetails,
+  commercialStandardInstallation,
+} from "@/lib/commercial-product-details";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
-import { PurchasePanel } from "@/components/home-charging/purchase-panel";
-import { TariffBadges } from "@/components/home-charging/tariff-badges";
-import { ProductCard, tagClass } from "@/components/shared/product-card";
+import { CommercialPurchasePanel } from "@/components/workplace-charging/commercial-purchase-panel";
+import {
+  CommercialProductCard,
+  tagClass,
+} from "@/components/workplace-charging/commercial-product-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,
@@ -22,7 +27,7 @@ import {
 } from "@/components/ui/tabs";
 
 export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.id }));
+  return commercialProducts.map((product) => ({ slug: product.id }));
 }
 
 export async function generateMetadata({
@@ -31,27 +36,27 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = products.find((p) => p.id === slug);
+  const product = commercialProducts.find((p) => p.id === slug);
   if (!product) return {};
 
   return {
     title: `${product.name} | Nison Energy`,
-    description: productDetails[slug]?.tagline,
+    description: commercialProductDetails[slug]?.tagline,
   };
 }
 
-export default async function ProductDetailPage({
+export default async function CommercialProductDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = products.find((p) => p.id === slug);
-  const detail = productDetails[slug];
+  const product = commercialProducts.find((p) => p.id === slug);
+  const detail = commercialProductDetails[slug];
 
   if (!product || !detail) notFound();
 
-  const similar = products
+  const similar = commercialProducts
     .filter(
       (p) =>
         p.id !== product.id &&
@@ -73,8 +78,8 @@ export default async function ProductDetailPage({
               Home
             </Link>
             <ChevronRight className="size-3.5" />
-            <Link href="/home-charging" className="hover:text-foreground">
-              Residential Chargers
+            <Link href="/workplace-charging" className="hover:text-foreground">
+              Commercial Chargers
             </Link>
             <ChevronRight className="size-3.5" />
             <span className="text-foreground">{product.name}</span>
@@ -106,9 +111,10 @@ export default async function ProductDetailPage({
                 </div>
               )}
 
-              <TariffBadges tariffs={product.compatibleTariffs} />
-
-              <PurchasePanel product={product} warranty={detail.warranty} />
+              <CommercialPurchasePanel
+                product={product}
+                warranty={detail.warranty}
+              />
             </div>
           </div>
         </section>
@@ -164,11 +170,11 @@ export default async function ProductDetailPage({
 
             <TabsContent value="installation" className="max-w-2xl py-6">
               <p className="text-foreground/80">
-                Every charger includes a standard installation carried out by
-                a NICEIC-qualified engineer:
+                Every commercial charger includes a standard installation
+                carried out by a NICEIC-qualified engineer:
               </p>
               <ul className="mt-4 flex flex-col gap-2">
-                {standardInstallation.map((item) => (
+                {commercialStandardInstallation.map((item) => (
                   <li
                     key={item}
                     className="flex items-start gap-2 text-sm text-foreground/80"
@@ -190,7 +196,7 @@ export default async function ProductDetailPage({
               </h2>
               <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {similar.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <CommercialProductCard key={p.id} product={p} />
                 ))}
               </div>
             </div>

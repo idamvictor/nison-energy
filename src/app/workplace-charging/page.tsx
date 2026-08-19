@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Banknote, Building2, ClipboardCheck } from "lucide-react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { CategoryHero } from "@/components/shared/category-hero";
+import { CommercialCatalog } from "@/components/workplace-charging/commercial-catalog";
 import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
 import { HelpSection } from "@/components/shared/help-section";
@@ -17,24 +17,6 @@ export const metadata: Metadata = {
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";
 
-const benefits = [
-  {
-    icon: Banknote,
-    title: "Up to £20,000 in grants",
-    copy: "The OZEV Workplace Charging Scheme covers up to £500 per socket, for up to 40 sockets. We handle the application for you.",
-  },
-  {
-    icon: Building2,
-    title: "Any site size",
-    copy: "From a two-socket car park to a multi-bay commercial hub, we design a solution that fits your site and budget.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Free site assessment",
-    copy: "Our engineers carry out a free assessment of your site's power supply and layout before any work begins.",
-  },
-];
-
 export default function WorkplaceChargingPage() {
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -47,27 +29,7 @@ export default function WorkplaceChargingPage() {
           image={`${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`}
         />
 
-        <section className="bg-background">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8">
-              {benefits.map((benefit, index) => (
-                <Reveal key={benefit.title} delay={index * 90}>
-                  <div className="flex flex-col items-start">
-                    <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary">
-                      <benefit.icon className="size-6 text-primary" />
-                    </div>
-                    <p className="mt-5 font-heading text-lg font-semibold text-foreground">
-                      {benefit.title}
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {benefit.copy}
-                    </p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
+        <CommercialCatalog />
 
         <section className="bg-primary text-primary-foreground">
           <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">

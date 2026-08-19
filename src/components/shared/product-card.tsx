@@ -107,7 +107,7 @@ export function ProductCard({
           className="w-full justify-between border-primary/25 text-primary hover:bg-primary/5"
           render={<Link href={`/home-charging/${product.id}`} />}
         >
-          Learn more
+          Add to Cart
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Button>
       </CardFooter>

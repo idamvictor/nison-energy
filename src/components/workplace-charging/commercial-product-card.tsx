@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Heart } from "lucide-react";
+import { ArrowRight, Check, Heart } from "lucide-react";
 
 import {
   Card,
@@ -20,8 +20,12 @@ import { tagClass } from "@/components/workplace-charging/commercial-product-tag
 
 export function CommercialProductCard({
   product,
+  compareSelected,
+  onToggleCompare,
 }: {
   product: CommercialProduct;
+  compareSelected?: boolean;
+  onToggleCompare?: (id: string) => void;
 }) {
   const [wishlisted, setWishlisted] = useState(false);
 
@@ -45,24 +49,47 @@ export function CommercialProductCard({
               ))}
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => setWishlisted((w) => !w)}
-            aria-pressed={wishlisted}
-            aria-label={
-              wishlisted ? "Remove from wishlist" : "Add to wishlist"
-            }
-            className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/95 shadow-sm ring-1 ring-border transition-colors hover:bg-white"
-          >
-            <Heart
-              className={cn(
-                "size-4",
-                wishlisted
-                  ? "fill-accent text-accent"
-                  : "fill-none text-foreground/60"
-              )}
-            />
-          </button>
+          <div className="absolute top-3 right-3 flex items-center gap-2">
+            {onToggleCompare && (
+              <label className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 py-1 pr-2.5 pl-1.5 text-xs font-medium text-foreground shadow-sm ring-1 ring-border">
+                <span
+                  className={cn(
+                    "flex size-4 items-center justify-center rounded-sm border transition-colors",
+                    compareSelected
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-input bg-background"
+                  )}
+                >
+                  {compareSelected && <Check className="size-3" />}
+                </span>
+                <input
+                  type="checkbox"
+                  checked={Boolean(compareSelected)}
+                  onChange={() => onToggleCompare(product.id)}
+                  className="sr-only"
+                />
+                Compare
+              </label>
+            )}
+            <button
+              type="button"
+              onClick={() => setWishlisted((w) => !w)}
+              aria-pressed={wishlisted}
+              aria-label={
+                wishlisted ? "Remove from wishlist" : "Add to wishlist"
+              }
+              className="flex size-8 items-center justify-center rounded-full bg-white/95 shadow-sm ring-1 ring-border transition-colors hover:bg-white"
+            >
+              <Heart
+                className={cn(
+                  "size-4",
+                  wishlisted
+                    ? "fill-accent text-accent"
+                    : "fill-none text-foreground/60"
+                )}
+              />
+            </button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
@@ -80,7 +107,7 @@ export function CommercialProductCard({
           className="w-full justify-between border-primary/25 text-primary hover:bg-primary/5"
           render={<Link href={`/workplace-charging/${product.id}`} />}
         >
-          Learn more
+          Add to Cart
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Button>
       </CardFooter>

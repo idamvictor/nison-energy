@@ -5,6 +5,8 @@ import { SlidersHorizontal } from "lucide-react";
 
 import { accessoryProducts, type AccessoryProduct } from "@/lib/accessory-products";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
+import { AccessoryCompareBar } from "@/components/accessories/accessory-compare-bar";
+import { AccessoryCompareDialog } from "@/components/accessories/accessory-compare-dialog";
 import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +54,16 @@ export function AccessoriesCatalog() {
   const [lengths, setLengths] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<SortValue>("featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((current) => {
+      if (current.includes(id)) return current.filter((c) => c !== id);
+      if (current.length >= 3) return current;
+      return [...current, id];
+    });
+  };
 
   const colourCounts = useCounts(accessoryProducts.map((p) => p.colour));
   const styleCounts = useCounts(accessoryProducts.map((p) => p.style));
@@ -182,10 +194,14 @@ export function AccessoriesCatalog() {
                 No accessories match those filters. Try clearing one or two.
               </p>
             ) : (
-              <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-8 grid grid-cols-1 gap-7 pb-20 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((product, index) => (
                   <Reveal key={product.id} delay={(index % 3) * 60}>
-                    <AccessoryProductCard product={product} />
+                    <AccessoryProductCard
+                      product={product}
+                      compareSelected={compareIds.includes(product.id)}
+                      onToggleCompare={toggleCompare}
+                    />
                   </Reveal>
                 ))}
               </div>
@@ -193,6 +209,19 @@ export function AccessoriesCatalog() {
           </div>
         </div>
       </div>
+
+      <AccessoryCompareBar
+        productIds={compareIds}
+        onRemove={toggleCompare}
+        onClear={() => setCompareIds([])}
+        onCompare={() => setCompareOpen(true)}
+      />
+      <AccessoryCompareDialog
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        productIds={compareIds}
+        onRemove={toggleCompare}
+      />
     </section>
   );
 }

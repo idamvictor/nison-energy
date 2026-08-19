@@ -5,6 +5,8 @@ import { SlidersHorizontal } from "lucide-react";
 
 import { commercialProducts, type CommercialProduct } from "@/lib/commercial-products";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
+import { CommercialCompareBar } from "@/components/workplace-charging/commercial-compare-bar";
+import { CommercialCompareDialog } from "@/components/workplace-charging/commercial-compare-dialog";
 import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,6 +64,16 @@ export function CommercialCatalog() {
   const [buckets, setBuckets] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<SortValue>("featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((current) => {
+      if (current.includes(id)) return current.filter((c) => c !== id);
+      if (current.length >= 3) return current;
+      return [...current, id];
+    });
+  };
 
   const brandCounts = useCounts(commercialProducts.map((p) => p.brand));
   const connectionCounts = useCounts(
@@ -217,10 +229,14 @@ export function CommercialCatalog() {
                 No chargers match those filters. Try clearing one or two.
               </p>
             ) : (
-              <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-8 grid grid-cols-1 gap-7 pb-20 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((product, index) => (
                   <Reveal key={product.id} delay={(index % 3) * 60}>
-                    <CommercialProductCard product={product} />
+                    <CommercialProductCard
+                      product={product}
+                      compareSelected={compareIds.includes(product.id)}
+                      onToggleCompare={toggleCompare}
+                    />
                   </Reveal>
                 ))}
               </div>
@@ -228,6 +244,19 @@ export function CommercialCatalog() {
           </div>
         </div>
       </div>
+
+      <CommercialCompareBar
+        productIds={compareIds}
+        onRemove={toggleCompare}
+        onClear={() => setCompareIds([])}
+        onCompare={() => setCompareOpen(true)}
+      />
+      <CommercialCompareDialog
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        productIds={compareIds}
+        onRemove={toggleCompare}
+      />
     </section>
   );
 }

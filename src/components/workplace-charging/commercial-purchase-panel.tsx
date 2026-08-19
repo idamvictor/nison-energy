@@ -46,7 +46,7 @@ export function CommercialPurchasePanel({
         </p>
       </div>
 
-      {colourSiblings.length > 1 && (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Colour / connection
           <select
@@ -63,7 +63,14 @@ export function CommercialPurchasePanel({
             ))}
           </select>
         </label>
-      )}
+
+        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+          Cable length
+          <select value="10m" disabled className={cn(selectClass, "text-muted-foreground")}>
+            <option value="10m">10m (charger to fuse box)</option>
+          </select>
+        </label>
+      </div>
 
       <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />

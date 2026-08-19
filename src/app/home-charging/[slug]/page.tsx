@@ -12,7 +12,8 @@ import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { PurchasePanel } from "@/components/home-charging/purchase-panel";
 import { TariffBadges } from "@/components/home-charging/tariff-badges";
-import { ProductCard, tagClass } from "@/components/shared/product-card";
+import { ProductCard } from "@/components/shared/product-card";
+import { tagClass } from "@/components/shared/product-tag";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,

@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 
 import {
   Card,
@@ -12,22 +15,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CommercialProduct } from "@/lib/commercial-products";
-
-const tagStyles: Record<string, string> = {
-  "Nison recommends": "bg-primary text-primary-foreground border-transparent",
-  "Dual outlet": "bg-accent text-accent-foreground border-transparent",
-  "5 year warranty": "bg-success text-success-foreground border-transparent",
-};
-
-export function tagClass(tag: string) {
-  return tagStyles[tag] ?? "bg-background/90 text-foreground";
-}
+import { cn } from "@/lib/utils";
+import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
 
 export function CommercialProductCard({
   product,
 }: {
   product: CommercialProduct;
 }) {
+  const [wishlisted, setWishlisted] = useState(false);
+
   return (
     <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
       <CardHeader className="p-0">
@@ -48,6 +45,24 @@ export function CommercialProductCard({
               ))}
             </div>
           )}
+          <button
+            type="button"
+            onClick={() => setWishlisted((w) => !w)}
+            aria-pressed={wishlisted}
+            aria-label={
+              wishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
+            className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/95 shadow-sm ring-1 ring-border transition-colors hover:bg-white"
+          >
+            <Heart
+              className={cn(
+                "size-4",
+                wishlisted
+                  ? "fill-accent text-accent"
+                  : "fill-none text-foreground/60"
+              )}
+            />
+          </button>
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">

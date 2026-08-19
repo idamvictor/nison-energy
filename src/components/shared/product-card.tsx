@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Heart } from "lucide-react";
 
 import {
   Card,
@@ -13,16 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/lib/products";
 import { cn } from "@/lib/utils";
-
-const tagStyles: Record<string, string> = {
-  "Nison recommends": "bg-primary text-primary-foreground border-transparent",
-  "Free UK delivery": "bg-success text-success-foreground border-transparent",
-  "3 year warranty": "bg-success text-success-foreground border-transparent",
-};
-
-export function tagClass(tag: string) {
-  return tagStyles[tag] ?? "bg-background/90 text-foreground";
-}
+import { tagClass } from "@/components/shared/product-tag";
 
 export function ProductCard({
   product,
@@ -33,6 +27,8 @@ export function ProductCard({
   compareSelected?: boolean;
   onToggleCompare?: (id: string) => void;
 }) {
+  const [wishlisted, setWishlisted] = useState(false);
+
   return (
     <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
       <CardHeader className="p-0">
@@ -53,27 +49,47 @@ export function ProductCard({
               ))}
             </div>
           )}
-          {onToggleCompare && (
-            <label className="absolute top-3 right-3 flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 py-1 pr-2.5 pl-1.5 text-xs font-medium text-foreground shadow-sm ring-1 ring-border">
-              <span
+          <div className="absolute top-3 right-3 flex items-center gap-2">
+            {onToggleCompare && (
+              <label className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 py-1 pr-2.5 pl-1.5 text-xs font-medium text-foreground shadow-sm ring-1 ring-border">
+                <span
+                  className={cn(
+                    "flex size-4 items-center justify-center rounded-sm border transition-colors",
+                    compareSelected
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-input bg-background"
+                  )}
+                >
+                  {compareSelected && <Check className="size-3" />}
+                </span>
+                <input
+                  type="checkbox"
+                  checked={Boolean(compareSelected)}
+                  onChange={() => onToggleCompare(product.id)}
+                  className="sr-only"
+                />
+                Compare
+              </label>
+            )}
+            <button
+              type="button"
+              onClick={() => setWishlisted((w) => !w)}
+              aria-pressed={wishlisted}
+              aria-label={
+                wishlisted ? "Remove from wishlist" : "Add to wishlist"
+              }
+              className="flex size-8 items-center justify-center rounded-full bg-white/95 shadow-sm ring-1 ring-border transition-colors hover:bg-white"
+            >
+              <Heart
                 className={cn(
-                  "flex size-4 items-center justify-center rounded-sm border transition-colors",
-                  compareSelected
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-input bg-background"
+                  "size-4",
+                  wishlisted
+                    ? "fill-accent text-accent"
+                    : "fill-none text-foreground/60"
                 )}
-              >
-                {compareSelected && <Check className="size-3" />}
-              </span>
-              <input
-                type="checkbox"
-                checked={Boolean(compareSelected)}
-                onChange={() => onToggleCompare(product.id)}
-                className="sr-only"
               />
-              Compare
-            </label>
-          )}
+            </button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">

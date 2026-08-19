@@ -11,10 +11,8 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { AccessoryPurchasePanel } from "@/components/accessories/accessory-purchase-panel";
-import {
-  AccessoryProductCard,
-  tagClass,
-} from "@/components/accessories/accessory-product-card";
+import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
+import { tagClass } from "@/components/accessories/accessory-product-tag";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,

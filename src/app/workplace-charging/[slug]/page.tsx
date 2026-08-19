@@ -14,10 +14,8 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { CommercialPurchasePanel } from "@/components/workplace-charging/commercial-purchase-panel";
-import {
-  CommercialProductCard,
-  tagClass,
-} from "@/components/workplace-charging/commercial-product-card";
+import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
+import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,

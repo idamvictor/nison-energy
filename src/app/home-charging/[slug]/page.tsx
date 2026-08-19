@@ -5,14 +5,14 @@ import { ChevronRight } from "lucide-react";
 
 import { products } from "@/lib/products";
 import { productDetails, standardInstallation } from "@/lib/product-details";
-import { SiteHeader } from "@/components/site-header";
-import { TrustBar } from "@/components/trust-bar";
-import { SiteFooter } from "@/components/site-footer";
-import { HelpSection } from "@/components/help-section";
-import { ProductGallery } from "@/components/product-gallery";
-import { PurchasePanel } from "@/components/purchase-panel";
-import { TariffBadges } from "@/components/tariff-badges";
-import { ProductCard, tagClass } from "@/components/product-card";
+import { SiteHeader } from "@/components/shared/site-header";
+import { TrustBar } from "@/components/shared/trust-bar";
+import { SiteFooter } from "@/components/shared/site-footer";
+import { HelpSection } from "@/components/shared/help-section";
+import { ProductGallery } from "@/components/home-charging/product-gallery";
+import { PurchasePanel } from "@/components/home-charging/purchase-panel";
+import { TariffBadges } from "@/components/home-charging/tariff-badges";
+import { ProductCard, tagClass } from "@/components/shared/product-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,

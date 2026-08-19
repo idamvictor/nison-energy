@@ -4,8 +4,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Reveal } from "@/components/reveal";
-import { SectionKicker } from "@/components/section-kicker";
+import { Reveal } from "@/components/shared/reveal";
+import { SectionKicker } from "@/components/shared/section-kicker";
 import { faqCategories } from "@/lib/faqs";
 
 export function FaqSection() {

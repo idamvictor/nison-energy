@@ -1,8 +1,8 @@
 import { ClipboardCheck, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/reveal";
-import { SectionKicker } from "@/components/section-kicker";
+import { Reveal } from "@/components/shared/reveal";
+import { SectionKicker } from "@/components/shared/section-kicker";
 
 export function GrantBanner() {
   return (

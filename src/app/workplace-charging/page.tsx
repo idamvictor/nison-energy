@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Banknote, Building2, ClipboardCheck } from "lucide-react";
 
-import { SiteHeader } from "@/components/site-header";
-import { TrustBar } from "@/components/trust-bar";
-import { CategoryHero } from "@/components/category-hero";
-import { Reveal } from "@/components/reveal";
+import { SiteHeader } from "@/components/shared/site-header";
+import { TrustBar } from "@/components/shared/trust-bar";
+import { CategoryHero } from "@/components/shared/category-hero";
+import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
-import { HelpSection } from "@/components/help-section";
-import { SiteFooter } from "@/components/site-footer";
+import { HelpSection } from "@/components/shared/help-section";
+import { SiteFooter } from "@/components/shared/site-footer";
 
 export const metadata: Metadata = {
   title: "Commercial Chargers | Nison Energy",

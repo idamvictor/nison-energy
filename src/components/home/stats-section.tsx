@@ -1,6 +1,6 @@
-import { AnimatedNumber } from "@/components/animated-number";
-import { Reveal } from "@/components/reveal";
-import { SectionKicker } from "@/components/section-kicker";
+import { AnimatedNumber } from "@/components/home/animated-number";
+import { Reveal } from "@/components/shared/reveal";
+import { SectionKicker } from "@/components/shared/section-kicker";
 
 const stats = [
   { value: 500, prefix: "£", label: "OZEV grant available per home charger" },

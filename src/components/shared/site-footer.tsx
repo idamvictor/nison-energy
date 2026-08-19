@@ -11,7 +11,7 @@ import {
   FacebookIcon,
   InstagramIcon,
   LinkedinIcon,
-} from "@/components/social-icons";
+} from "@/components/shared/social-icons";
 
 const quickLinks = [
   "Home",

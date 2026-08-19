@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
-import { SiteLoader } from "@/components/site-loader";
+import { SiteLoader } from "@/components/shared/site-loader";
 import "./globals.css";
 
 const inter = Inter({

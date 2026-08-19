@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
 import { products, type Product } from "@/lib/products";
-import { ProductCard } from "@/components/product-card";
-import { CompareBar } from "@/components/compare-bar";
-import { CompareDialog } from "@/components/compare-dialog";
-import { Reveal } from "@/components/reveal";
+import { ProductCard } from "@/components/shared/product-card";
+import { CompareBar } from "@/components/home-charging/compare-bar";
+import { CompareDialog } from "@/components/home-charging/compare-dialog";
+import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,

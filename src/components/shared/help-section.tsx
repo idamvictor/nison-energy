@@ -1,7 +1,7 @@
 import { Phone, PhoneCall } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/reveal";
+import { Reveal } from "@/components/shared/reveal";
 
 export function HelpSection() {
   return (

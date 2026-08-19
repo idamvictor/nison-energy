@@ -5,8 +5,8 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import { Hero } from "@/components/hero";
-import { CategoryCards } from "@/components/category-cards";
+import { Hero } from "@/components/home/hero";
+import { CategoryCards } from "@/components/home/category-cards";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 

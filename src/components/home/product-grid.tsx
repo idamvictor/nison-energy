@@ -2,9 +2,9 @@ import Link from "next/link";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 import { products as allProducts } from "@/lib/products";
-import { ProductCard } from "@/components/product-card";
-import { Reveal } from "@/components/reveal";
-import { SectionKicker } from "@/components/section-kicker";
+import { ProductCard } from "@/components/shared/product-card";
+import { Reveal } from "@/components/shared/reveal";
+import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
 
 export function ProductGrid({

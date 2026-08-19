@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
-import { Reveal } from "@/components/reveal";
-import { SectionKicker } from "@/components/section-kicker";
+import { Reveal } from "@/components/shared/reveal";
+import { SectionKicker } from "@/components/shared/section-kicker";
 import { cn } from "@/lib/utils";
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";

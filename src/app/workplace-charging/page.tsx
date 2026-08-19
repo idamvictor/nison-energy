@@ -10,7 +10,7 @@ import { HelpSection } from "@/components/help-section";
 import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
-  title: "Workplace Charging | Nison Energy",
+  title: "Commercial Chargers | Nison Energy",
   description:
     "Commercial EV charger installation for offices, depots and car parks, backed by the OZEV Workplace Charging Scheme.",
 };
@@ -42,7 +42,7 @@ export default function WorkplaceChargingPage() {
       <TrustBar />
       <main className="flex-1">
         <CategoryHero
-          title="Workplace Charging"
+          title="Commercial Chargers"
           subtitle="Scalable commercial EV charger installations for offices, depots and car parks, backed by OZEV workplace funding."
           image={`${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`}
         />

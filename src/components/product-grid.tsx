@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 export function ProductGrid({
   limit,
   viewAllHref,
-  title = "Home Charging Units",
+  title = "Residential Charging Units",
   subtitle = "Every charger is professionally installed and backed by our certified engineer network.",
 }: {
   limit?: number;
@@ -51,7 +51,7 @@ export function ProductGrid({
                 className="gap-2 border-primary/25 text-primary hover:bg-primary/5"
                 render={<Link href={viewAllHref} />}
               >
-                View all home chargers
+                View all residential chargers
                 <ArrowRight className="size-4" />
               </Button>
             </div>

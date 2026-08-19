@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Minus, Plus, ShieldCheck } from "lucide-react";
+import { Heart, Minus, Plus } from "lucide-react";
 
 import { products, type Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
@@ -58,18 +58,6 @@ export function PurchasePanel({
         <p className="text-sm text-muted-foreground">
           £{totalExVat} <span>ex VAT</span>
         </p>
-      </div>
-
-      <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-        <div>
-          <p className="text-sm font-medium text-foreground">
-            Price match promise
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Found a cheaper price elsewhere? Get in touch.
-          </p>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

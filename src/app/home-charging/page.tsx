@@ -8,7 +8,7 @@ import { HelpSection } from "@/components/help-section";
 import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
-  title: "Home Charging | Nison Energy",
+  title: "Residential Chargers | Nison Energy",
   description:
     "Browse our full range of OZEV-approved home EV chargers, professionally installed by certified engineers.",
 };
@@ -22,7 +22,7 @@ export default function HomeChargingPage() {
       <TrustBar />
       <main className="flex-1">
         <CategoryHero
-          title="Home Charging"
+          title="Residential Chargers"
           subtitle="Our full range of OZEV-approved home chargers, professionally installed by certified engineers."
           image={`${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`}
         />

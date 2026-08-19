@@ -11,8 +11,6 @@ export type Product = {
   variantGroup?: string;
   compatibleTariffs?: string[];
   price: number;
-  rating: number;
-  reviewCount: number;
   tags: string[];
   image: string;
 };
@@ -29,8 +27,6 @@ export const products: Product[] = [
     colour: "Black",
     powerOutput: "7.4kW",
     price: 980,
-    rating: 4.8,
-    reviewCount: 62,
     tags: ["Nison recommends", "Free UK delivery"],
     image: `${IMG}/2025/05/easee-one-ev-charger-8.jpg`,
   },
@@ -47,8 +43,6 @@ export const products: Product[] = [
     variantGroup: "hypervolt-home-pro-3",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1064,
-    rating: 4.7,
-    reviewCount: 118,
     tags: ["Free UK delivery"],
     image: `${IMG}/2025/05/hypervolt-7kw-5m-ev-charger-white.webp`,
   },
@@ -65,8 +59,6 @@ export const products: Product[] = [
     variantGroup: "hypervolt-home-pro-3",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1079,
-    rating: 4.7,
-    reviewCount: 118,
     tags: ["Free UK delivery"],
     image: `${IMG}/2025/05/hypervolt-7kw-ev-charger-space-grey-3.webp`,
   },
@@ -83,8 +75,6 @@ export const products: Product[] = [
     variantGroup: "indra-smart-lux",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1050,
-    rating: 4.9,
-    reviewCount: 34,
     tags: ["Nison recommends", "3 year warranty"],
     image: `${IMG}/2025/05/indra-smart-lux-ev-charger-black.webp`,
   },
@@ -101,8 +91,6 @@ export const products: Product[] = [
     variantGroup: "indra-smart-lux",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1050,
-    rating: 4.9,
-    reviewCount: 34,
     tags: ["3 year warranty"],
     image: `${IMG}/2025/08/indra-smart-lux-white-4.webp`,
   },
@@ -116,8 +104,6 @@ export const products: Product[] = [
     powerOutput: "7.4kW",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 902,
-    rating: 4.6,
-    reviewCount: 21,
     tags: ["Free UK delivery"],
     image: `${IMG}/2025/08/Indra-black-Front-view-scaled.jpg`,
   },
@@ -133,8 +119,6 @@ export const products: Product[] = [
     powerOutput: "7.4kW",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1077,
-    rating: 4.8,
-    reviewCount: 203,
     tags: ["Nison recommends", "Free UK delivery"],
     image: `${IMG}/2025/05/Ohme-home_pro_1.png`,
   },
@@ -147,8 +131,6 @@ export const products: Product[] = [
     colour: "Matte Black",
     powerOutput: "7.4kW",
     price: 957,
-    rating: 4.5,
-    reviewCount: 87,
     tags: ["Free UK delivery"],
     image: `${IMG}/2025/05/Ohme-epod.jpg`,
   },

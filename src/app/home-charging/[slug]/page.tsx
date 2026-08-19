@@ -13,7 +13,6 @@ import { ProductGallery } from "@/components/product-gallery";
 import { PurchasePanel } from "@/components/purchase-panel";
 import { TariffBadges } from "@/components/tariff-badges";
 import { ProductCard, tagClass } from "@/components/product-card";
-import { Stars } from "@/components/stars";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,
@@ -75,7 +74,7 @@ export default async function ProductDetailPage({
             </Link>
             <ChevronRight className="size-3.5" />
             <Link href="/home-charging" className="hover:text-foreground">
-              Home Charging
+              Residential Chargers
             </Link>
             <ChevronRight className="size-3.5" />
             <span className="text-foreground">{product.name}</span>
@@ -95,12 +94,6 @@ export default async function ProductDetailPage({
                   {product.name}
                 </h1>
                 <p className="mt-2 text-muted-foreground">{detail.tagline}</p>
-                <div className="mt-3">
-                  <Stars
-                    rating={product.rating}
-                    reviewCount={product.reviewCount}
-                  />
-                </div>
               </div>
 
               {product.tags.length > 0 && (

@@ -22,9 +22,9 @@ const quickLinks = [
 ];
 
 const productLinks = [
-  "Home Charging",
-  "Workplace Charging",
-  "EV Accessories",
+  "Residential Chargers",
+  "Commercial Chargers",
+  "Accessories",
   "OZEV Grants",
   "Delivery Information",
 ];

@@ -33,7 +33,6 @@ const sortOptions = [
   { value: "featured", label: "Featured" },
   { value: "price-asc", label: "Price: Low to High" },
   { value: "price-desc", label: "Price: High to Low" },
-  { value: "rating", label: "Highest Rated" },
 ] as const;
 
 type SortValue = (typeof sortOptions)[number]["value"];
@@ -126,7 +125,6 @@ export function HomeChargingCatalog() {
     list = [...list].sort((a, b) => {
       if (sort === "price-asc") return a.price - b.price;
       if (sort === "price-desc") return b.price - a.price;
-      if (sort === "rating") return b.rating - a.rating;
       return 0;
     });
 

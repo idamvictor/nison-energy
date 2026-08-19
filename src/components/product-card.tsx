@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Stars } from "@/components/stars";
 import type { Product } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
@@ -80,7 +79,6 @@ export function ProductCard({
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <p className="text-sm text-muted-foreground">{product.spec}</p>
-        <Stars rating={product.rating} reviewCount={product.reviewCount} />
         <p className="mt-1 text-2xl font-semibold text-foreground">
           £{product.price}
         </p>

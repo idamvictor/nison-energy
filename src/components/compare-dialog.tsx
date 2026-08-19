@@ -13,11 +13,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Stars } from "@/components/stars";
 
 const rows: { label: string; value: (p: Product) => React.ReactNode }[] = [
   { label: "Price", value: (p) => `£${p.price}` },
-  { label: "Rating", value: (p) => <Stars rating={p.rating} reviewCount={p.reviewCount} /> },
   { label: "Brand", value: (p) => p.brand },
   { label: "Connection type", value: (p) => p.connectionType },
   { label: "Cable length", value: (p) => p.cableLength ?? "—" },

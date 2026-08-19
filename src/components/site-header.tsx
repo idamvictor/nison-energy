@@ -17,9 +17,9 @@ import {
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/home-charging", label: "Home Charging" },
-  { href: "/workplace-charging", label: "Workplace Charging" },
-  { href: "#accessories", label: "EV Accessories" },
+  { href: "/home-charging", label: "Residential Chargers" },
+  { href: "/workplace-charging", label: "Commercial Chargers" },
+  { href: "#accessories", label: "Accessories" },
   { href: "#about", label: "About Us" },
   { href: "#grants", label: "OZEV Grants" },
 ];

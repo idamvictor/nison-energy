@@ -3,7 +3,7 @@ export type FaqCategory = { category: string; items: Faq[] };
 
 export const faqCategories: FaqCategory[] = [
   {
-    category: "Home Charging",
+    category: "Residential Chargers",
     items: [
       {
         question: "How much does it cost to install a home EV charger?",

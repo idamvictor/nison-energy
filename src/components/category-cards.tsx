@@ -10,7 +10,7 @@ const IMG = "https://ocunioenergy.com/wp-content/uploads";
 
 const categories = [
   {
-    title: "Home Charging",
+    title: "Residential Chargers",
     description: "Chargers for your driveway or garage, fitted in days.",
     image: `${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`,
     href: "/home-charging",
@@ -18,7 +18,7 @@ const categories = [
     text: "text-2xl sm:text-3xl",
   },
   {
-    title: "Workplace Charging",
+    title: "Commercial Chargers",
     description: null,
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
     href: "/workplace-charging",
@@ -26,7 +26,7 @@ const categories = [
     text: "text-lg",
   },
   {
-    title: "EV Accessories",
+    title: "Accessories",
     description: null,
     image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
     href: "#",

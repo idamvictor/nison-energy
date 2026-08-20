@@ -4,6 +4,8 @@ import { HeroReveal } from "@/components/home/hero-reveal";
 import { TrustedInstallers } from "@/components/home/trusted-installers";
 import { StatsSection } from "@/components/home/stats-section";
 import { ProductGrid } from "@/components/home/product-grid";
+import { FeaturedCommercial } from "@/components/home/featured-commercial";
+import { FeaturedAccessories } from "@/components/home/featured-accessories";
 import { GrantBanner } from "@/components/home/grant-banner";
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
@@ -22,6 +24,8 @@ export default function Home() {
           title="Featured Residential Chargers"
           subtitle="A few favourites from our home charging range."
         />
+        <FeaturedCommercial limit={3} />
+        <FeaturedAccessories limit={3} />
         <TrustedInstallers />
         <StatsSection />
         <GrantBanner />

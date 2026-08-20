@@ -1,4 +1,4 @@
-import { AnimatedNumber } from "@/components/home/animated-number";
+import { AnimatedNumber } from "@/components/shared/animated-number";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 

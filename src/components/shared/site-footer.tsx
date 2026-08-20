@@ -16,7 +16,7 @@ import {
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about-us" },
-  { label: "Contact Us", href: "#" },
+  { label: "Contact Us", href: "/contact-us" },
   { label: "OZEV Grant Eligibility", href: "#grants" },
   { label: "Workplace Grant Eligibility", href: "#grants" },
 ];

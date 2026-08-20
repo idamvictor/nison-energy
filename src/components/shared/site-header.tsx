@@ -76,8 +76,10 @@ export function SiteHeader() {
           <Button
             className="hidden gap-1.5 bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 sm:inline-flex"
             size="lg"
+            nativeButton={false}
+            render={<Link href="/contact-us" />}
           >
-            Get a quote
+            Contact Us
             <ArrowRight className="size-4" />
           </Button>
 
@@ -115,8 +117,12 @@ export function SiteHeader() {
                 })}
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-                  Get a quote
+                <Button
+                  className="bg-accent text-accent-foreground hover:bg-accent/90"
+                  nativeButton={false}
+                  render={<Link href="/contact-us" />}
+                >
+                  Contact Us
                 </Button>
               </div>
             </SheetContent>

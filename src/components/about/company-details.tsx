@@ -1,6 +1,7 @@
 import { MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { MapEmbed, getMapsDirectionsUrl } from "@/components/shared/map-embed";
 
 const details = [
   { label: "Legal name", value: "Nison Limited, trading as Nison Energy" },
@@ -9,9 +10,7 @@ const details = [
   { label: "VAT number", value: "495472057" },
 ];
 
-const ADDRESS_QUERY = "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ";
-const MAPS_DIRECTIONS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS_QUERY)}`;
-const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${encodeURIComponent(ADDRESS_QUERY)}&output=embed`;
+const ADDRESS = "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ";
 
 export function CompanyDetails() {
   return (
@@ -41,7 +40,7 @@ export function CompanyDetails() {
               nativeButton={false}
               render={
                 <a
-                  href={MAPS_DIRECTIONS_URL}
+                  href={getMapsDirectionsUrl(ADDRESS)}
                   target="_blank"
                   rel="noopener noreferrer"
                 />
@@ -53,13 +52,10 @@ export function CompanyDetails() {
           </div>
 
           <div className="relative min-h-64 w-full lg:min-h-full">
-            <iframe
-              src={MAPS_EMBED_URL}
+            <MapEmbed
+              address={ADDRESS}
               title="Nison Energy registered office location"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
               className="absolute inset-0 size-full grayscale-[0.3]"
-              style={{ border: 0 }}
             />
           </div>
         </div>

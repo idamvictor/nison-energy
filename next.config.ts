@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         hostname: "ocunioenergy.com",
         pathname: "/wp-content/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+        pathname: "/photos/**",
+      },
     ],
   },
 };

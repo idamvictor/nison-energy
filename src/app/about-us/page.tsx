@@ -5,6 +5,8 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { AboutHero } from "@/components/about/about-hero";
 import { OriginStory } from "@/components/about/origin-story";
 import { WhatWeDo } from "@/components/about/what-we-do";
+import { OurProcess } from "@/components/about/our-process";
+import { OurTeam } from "@/components/about/our-team";
 import { WhyChooseUs } from "@/components/about/why-choose-us";
 import { CompanyDetails } from "@/components/about/company-details";
 import { HelpSection } from "@/components/shared/help-section";
@@ -25,6 +27,8 @@ export default function AboutUsPage() {
         <AboutHero />
         <OriginStory />
         <WhatWeDo />
+        <OurProcess />
+        <OurTeam />
         <WhyChooseUs />
         <CompanyDetails />
         <HelpSection />

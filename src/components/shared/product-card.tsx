@@ -29,9 +29,13 @@ export function ProductCard({
 }) {
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
+  const href = `/home-charging/${product.id}`;
 
   return (
-    <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
+    <Card className="group relative h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
+      <Link href={href} className="absolute inset-0 z-0" aria-label={product.name}>
+        <span className="sr-only">View {product.name}</span>
+      </Link>
       <CardHeader className="p-0">
         <div className="relative aspect-4/3 w-full bg-white">
           <Image
@@ -50,7 +54,7 @@ export function ProductCard({
               ))}
             </div>
           )}
-          <div className="absolute top-3 right-3 flex items-center gap-2">
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
             {onToggleCompare && (
               <label className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 py-1 pr-2.5 pl-1.5 text-xs font-medium text-foreground shadow-sm ring-1 ring-border">
                 <span
@@ -100,15 +104,15 @@ export function ProductCard({
           £{product.price}
         </p>
       </CardContent>
-      <CardFooter className="border-t-0 bg-transparent p-5 pt-3">
+      <CardFooter className="relative z-10 border-t-0 bg-transparent p-5 pt-3">
         <Button
           variant="outline"
           size="lg"
           nativeButton={false}
           className="w-full justify-between border-primary/25 text-primary hover:bg-primary/5"
-          render={<Link href={`/home-charging/${product.id}`} />}
+          render={<Link href={href} />}
         >
-          Add to Cart
+          View Details
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Button>
       </CardFooter>

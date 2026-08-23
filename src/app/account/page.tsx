@@ -1,0 +1,9 @@
+import type { Metadata } from "next";
+
+import { AccountOverview } from "@/components/account/account-overview";
+
+export const metadata: Metadata = { title: "Overview" };
+
+export default function AccountOverviewPage() {
+  return <AccountOverview />;
+}

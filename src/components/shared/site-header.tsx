@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu } from "lucide-react";
+import { ArrowRight, Menu, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,16 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <Button
+            variant="outline"
+            size="icon"
+            className="hidden sm:inline-flex"
+            nativeButton={false}
+            render={<Link href="/account" aria-label="My account" />}
+          >
+            <User className="size-4.5" />
+          </Button>
+
+          <Button
             className="hidden gap-1.5 bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 sm:inline-flex"
             size="lg"
             nativeButton={false}
@@ -117,6 +127,15 @@ export function SiteHeader() {
                 })}
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">
+                <Button
+                  variant="outline"
+                  className="gap-1.5"
+                  nativeButton={false}
+                  render={<Link href="/account" />}
+                >
+                  <User className="size-4" />
+                  My Account
+                </Button>
                 <Button
                   className="bg-accent text-accent-foreground hover:bg-accent/90"
                   nativeButton={false}

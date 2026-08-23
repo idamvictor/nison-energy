@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LeadTable } from "@/components/admin/lead-table";
+import { LeadTable } from "@/components/admin/shared/lead-table";
 import { adminLeads, leadStatuses, type LeadStatus } from "@/lib/admin-leads";
 
 export default function AdminLeadsPage() {

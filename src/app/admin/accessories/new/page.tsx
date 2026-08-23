@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { ProductForm } from "@/components/admin/product-form";
+import { AccessoryProductForm } from "@/components/admin/accessories/accessory-product-form";
 
 export const metadata: Metadata = { title: "Add accessory | Admin" };
 
 export default function NewAccessoryProductPage() {
   return (
     <div className="mx-auto max-w-4xl">
-      <ProductForm category="accessories" />
+      <AccessoryProductForm />
     </div>
   );
 }

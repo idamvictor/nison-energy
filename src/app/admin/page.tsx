@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Cable, Inbox, MailWarning, Package, Zap } from "lucide-react";
 
-import { StatCard } from "@/components/admin/stat-card";
-import { LeadTable } from "@/components/admin/lead-table";
+import { StatCard } from "@/components/admin/dashboard/stat-card";
+import { LeadTable } from "@/components/admin/shared/lead-table";
 import { Button } from "@/components/ui/button";
 import { products } from "@/lib/products";
 import { commercialProducts } from "@/lib/commercial-products";

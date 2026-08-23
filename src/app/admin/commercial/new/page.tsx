@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { ProductForm } from "@/components/admin/product-form";
+import { CommercialProductForm } from "@/components/admin/commercial/commercial-product-form";
 
 export const metadata: Metadata = { title: "Add commercial charger | Admin" };
 
 export default function NewCommercialProductPage() {
   return (
     <div className="mx-auto max-w-4xl">
-      <ProductForm category="commercial" />
+      <CommercialProductForm />
     </div>
   );
 }

@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
-import { Cable } from "lucide-react";
 
-import { CategoryProductsPage } from "@/components/admin/category-products-page";
+import { AccessoryProductsPage } from "@/components/admin/accessories/accessory-products-page";
 
 export const metadata: Metadata = { title: "Accessories | Admin" };
 
 export default function AdminAccessoriesPage() {
-  return (
-    <CategoryProductsPage
-      category="accessories"
-      title="Accessories"
-      description="charging cables"
-      icon={<Cable className="size-5" />}
-      tone="success"
-    />
-  );
+  return <AccessoryProductsPage />;
 }

@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { StatusBadge } from "@/components/admin/status-badge";
+import { StatusBadge } from "@/components/admin/shared/status-badge";
 import type { AdminLead } from "@/lib/admin-leads";
 
 function formatDate(iso: string) {

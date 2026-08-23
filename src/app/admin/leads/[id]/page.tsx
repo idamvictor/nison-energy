@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Building2, Mail, MapPin, Phone } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LeadStatusSelect } from "@/components/admin/lead-status-select";
+import { LeadStatusSelect } from "@/components/admin/leads/lead-status-select";
 import { adminLeads } from "@/lib/admin-leads";
 
 export async function generateMetadata({

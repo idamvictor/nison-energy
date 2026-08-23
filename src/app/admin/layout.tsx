@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { AdminTopbar } from "@/components/admin/admin-topbar";
+import { AdminSidebar } from "@/components/admin/shared/admin-sidebar";
+import { AdminTopbar } from "@/components/admin/shared/admin-topbar";
 
 export const metadata: Metadata = {
   title: "Admin | Nison Energy",

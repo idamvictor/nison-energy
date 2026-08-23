@@ -16,31 +16,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductGallery } from "@/components/shared/product-gallery";
+import { productDetails } from "@/lib/product-details";
 import type { Product } from "@/lib/products";
-import type { CommercialProduct } from "@/lib/commercial-products";
-import type { AccessoryProduct } from "@/lib/accessory-products";
-import {
-  catalogCategoryLabels,
-  getCatalogItemGallery,
-  type CatalogCategory,
-  type CatalogItem,
-} from "@/lib/admin-catalog";
 
-export function ProductForm({
-  category,
-  item,
-}: {
-  category: CatalogCategory;
-  item?: CatalogItem;
-}) {
+export function ResidentialProductForm({ product }: { product?: Product }) {
   const [saved, setSaved] = useState(false);
   const [images, setImages] = useState<string[]>(() => {
-    const initial = item ? getCatalogItemGallery(item) : [];
-    return initial.length > 0 ? initial : [""];
+    if (!product) return [""];
+    const gallery = productDetails[product.id]?.gallery;
+    return gallery && gallery.length > 0 ? gallery : [product.image];
   });
-
-  const residential = category !== "accessories" ? (item?.raw as Product | CommercialProduct | undefined) : undefined;
-  const accessory = category === "accessories" ? (item?.raw as AccessoryProduct | undefined) : undefined;
 
   const nonEmptyImages = images.filter((src) => src.trim() !== "");
 
@@ -64,11 +49,11 @@ export function ProductForm({
     >
       <div className="flex items-center justify-between gap-4">
         <Link
-          href={`/admin/${category}`}
+          href="/admin/residential"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Back to {catalogCategoryLabels[category].toLowerCase()}
+          Back to residential chargers
         </Link>
         {saved && (
           <p className="text-sm font-medium text-success">
@@ -83,7 +68,7 @@ export function ProductForm({
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
           {nonEmptyImages.length > 0 ? (
-            <ProductGallery images={nonEmptyImages} name={item?.name ?? "Product preview"} />
+            <ProductGallery images={nonEmptyImages} name={product?.name ?? "Product preview"} />
           ) : (
             <div className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-border bg-muted">
               <ImageOff className="size-8 text-muted-foreground" />
@@ -131,100 +116,58 @@ export function ProductForm({
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Product name">
-            <Input required defaultValue={item?.name} placeholder="Product name" />
+            <Input required defaultValue={product?.name} placeholder="Product name" />
           </Field>
           <Field label="Brand">
-            <Input required defaultValue={item?.brand} placeholder="Brand" />
+            <Input required defaultValue={product?.brand} placeholder="Brand" />
           </Field>
           <Field label="Category">
-            <Input disabled defaultValue={catalogCategoryLabels[category]} />
+            <Input disabled defaultValue="Residential Chargers" />
           </Field>
           <Field label="Colour">
-            <Input defaultValue={item?.colour} placeholder="Colour" />
+            <Input defaultValue={product?.colour} placeholder="Colour" />
           </Field>
         </CardContent>
       </Card>
 
-      {category !== "accessories" ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Specification</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Spec summary" className="sm:col-span-2">
-              <Input
-                defaultValue={residential?.spec}
-                placeholder="e.g. 7.4kW · Type 2 tethered · 5m cable"
-              />
-            </Field>
-            <Field label="Connection type">
-              <Select defaultValue={residential?.connectionType}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select connection type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Tethered">Tethered</SelectItem>
-                  <SelectItem value="Untethered">Untethered</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Cable length (optional)">
-              <Input defaultValue={residential?.cableLength} placeholder="e.g. 5m" />
-            </Field>
-            <Field label="Power output">
-              <Input defaultValue={residential?.powerOutput} placeholder="e.g. 7.4kW" />
-            </Field>
-            <Field label="Price (£, inc. VAT)">
-              <Input
-                type="number"
-                min={0}
-                defaultValue={residential?.price}
-                placeholder="e.g. 980"
-              />
-            </Field>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Cable options</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Style">
-              <Select defaultValue={accessory?.style}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select style" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Coiled">Coiled</SelectItem>
-                  <SelectItem value="Straight">Straight</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Phase">
-              <Select defaultValue={accessory?.phase}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select phase" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Single Phase">Single Phase</SelectItem>
-                  <SelectItem value="3 Phase">3 Phase</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Length options (comma separated)" className="sm:col-span-2">
-              <Input
-                defaultValue={accessory?.lengthOptions.join(", ")}
-                placeholder="e.g. 5m, 10m"
-              />
-            </Field>
-            <p className="text-xs text-muted-foreground sm:col-span-2">
-              Accessories show &ldquo;Request a quote&rdquo; on the storefront —
-              there&apos;s no price field for this category.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Specification</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Spec summary" className="sm:col-span-2">
+            <Input
+              defaultValue={product?.spec}
+              placeholder="e.g. 7.4kW · Type 2 tethered · 5m cable"
+            />
+          </Field>
+          <Field label="Connection type">
+            <Select defaultValue={product?.connectionType}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select connection type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Tethered">Tethered</SelectItem>
+                <SelectItem value="Untethered">Untethered</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Cable length (optional)">
+            <Input defaultValue={product?.cableLength} placeholder="e.g. 5m" />
+          </Field>
+          <Field label="Power output">
+            <Input defaultValue={product?.powerOutput} placeholder="e.g. 7.4kW" />
+          </Field>
+          <Field label="Price (£, inc. VAT)">
+            <Input
+              type="number"
+              min={0}
+              defaultValue={product?.price}
+              placeholder="e.g. 980"
+            />
+          </Field>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -233,7 +176,7 @@ export function ProductForm({
         <CardContent className="flex flex-col gap-4">
           <Field label="Tags (comma separated)">
             <Input
-              defaultValue={item?.tags.join(", ")}
+              defaultValue={product?.tags.join(", ")}
               placeholder="e.g. Nison recommends, Free UK delivery"
             />
           </Field>
@@ -244,7 +187,7 @@ export function ProductForm({
       </Card>
 
       <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm supports-backdrop-filter:bg-background/80 sm:-mx-6 sm:px-6">
-        <Button type="button" variant="outline" render={<Link href={`/admin/${category}`} />}>
+        <Button type="button" variant="outline" render={<Link href="/admin/residential" />}>
           Cancel
         </Button>
         <Button type="submit">Save changes</Button>

@@ -30,14 +30,8 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { tagClass as residentialTagClass } from "@/components/shared/product-tag";
-import { tagClass as commercialTagClass } from "@/components/workplace-charging/commercial-product-tag";
-import { tagClass as accessoryTagClass } from "@/components/accessories/accessory-product-tag";
-import {
-  catalogCategoryHrefs,
-  type CatalogCategory,
-  type CatalogItem,
-} from "@/lib/admin-catalog";
+import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
+import type { CommercialProduct } from "@/lib/commercial-products";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -45,23 +39,9 @@ const currency = new Intl.NumberFormat("en-GB", {
   maximumFractionDigits: 0,
 });
 
-function getTagClass(category: CatalogCategory, tag: string) {
-  if (category === "residential") return residentialTagClass(tag);
-  if (category === "commercial") return commercialTagClass(tag);
-  return accessoryTagClass();
-}
-
-export function ProductTable({
-  category,
-  items,
-}: {
-  category: CatalogCategory;
-  items: CatalogItem[];
-}) {
+export function CommercialProductTable({ items }: { items: CommercialProduct[] }) {
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
-  const [pendingDelete, setPendingDelete] = useState<CatalogItem | null>(
-    null
-  );
+  const [pendingDelete, setPendingDelete] = useState<CommercialProduct | null>(null);
 
   const visible = items.filter((item) => !removedIds.has(item.id));
 
@@ -107,7 +87,7 @@ export function ProductTable({
                     </div>
                     <div>
                       <Link
-                        href={`/admin/${item.category}/${item.id}`}
+                        href={`/admin/commercial/${item.id}`}
                         className="font-medium text-foreground hover:text-primary hover:underline"
                       >
                         {item.name}
@@ -122,16 +102,13 @@ export function ProductTable({
                   {item.colour}
                 </TableCell>
                 <TableCell className="font-heading font-semibold text-primary">
-                  {item.price != null ? currency.format(item.price) : "Quote"}
+                  {currency.format(item.price)}
                 </TableCell>
                 <TableCell>
                   {item.tags.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {item.tags.slice(0, 2).map((tag) => (
-                        <Badge
-                          key={tag}
-                          className={getTagClass(category, tag)}
-                        >
+                        <Badge key={tag} className={tagClass(tag)}>
                           {tag}
                         </Badge>
                       ))}
@@ -155,7 +132,7 @@ export function ProductTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        render={<Link href={`/admin/${item.category}/${item.id}`} />}
+                        render={<Link href={`/admin/commercial/${item.id}`} />}
                       >
                         <Pencil />
                         Edit
@@ -163,7 +140,7 @@ export function ProductTable({
                       <DropdownMenuItem
                         render={
                           <Link
-                            href={`${catalogCategoryHrefs[item.category]}/${item.id}`}
+                            href={`/workplace-charging/${item.id}`}
                             target="_blank"
                           />
                         }

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { CategoryProductEdit } from "@/components/admin/category-product-edit";
-import { getCatalogItem } from "@/lib/admin-catalog";
+import { AccessoryProductForm } from "@/components/admin/accessories/accessory-product-form";
+import { accessoryProducts } from "@/lib/accessory-products";
 
 export async function generateMetadata({
   params,
@@ -9,8 +10,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const item = getCatalogItem("accessories", slug);
-  return { title: item ? `${item.name} | Admin` : "Product | Admin" };
+  const product = accessoryProducts.find((p) => p.id === slug);
+  return { title: product ? `${product.name} | Admin` : "Product | Admin" };
 }
 
 export default async function EditAccessoryProductPage({
@@ -19,5 +20,13 @@ export default async function EditAccessoryProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <CategoryProductEdit category="accessories" slug={slug} />;
+  const product = accessoryProducts.find((p) => p.id === slug);
+
+  if (!product) notFound();
+
+  return (
+    <div className="mx-auto max-w-4xl">
+      <AccessoryProductForm product={product} />
+    </div>
+  );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Heart } from "lucide-react";
@@ -17,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import type { CommercialProduct } from "@/lib/commercial-products";
 import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
+import { useWishlist } from "@/hooks/use-wishlist";
 
 export function CommercialProductCard({
   product,
@@ -27,7 +27,8 @@ export function CommercialProductCard({
   compareSelected?: boolean;
   onToggleCompare?: (id: string) => void;
 }) {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isWishlisted, toggle } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
 
   return (
     <Card className="group h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
@@ -73,7 +74,7 @@ export function CommercialProductCard({
             )}
             <button
               type="button"
-              onClick={() => setWishlisted((w) => !w)}
+              onClick={() => toggle(product.id, "commercial")}
               aria-pressed={wishlisted}
               aria-label={
                 wishlisted ? "Remove from wishlist" : "Add to wishlist"

@@ -8,6 +8,7 @@ const details = [
   { label: "Registered in", value: "England and Wales, No. 16371062" },
   { label: "Registered address", value: "71–75 Shelton Street, Covent Garden, London, WC2H 9JQ" },
   { label: "VAT number", value: "495472057" },
+  { label: "OZEV Installer No.", value: "13528" },
 ];
 
 const ADDRESS = "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ";

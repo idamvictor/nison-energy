@@ -49,7 +49,7 @@ const navLinks = [
   { href: "/workplace-charging", label: "Commercial Chargers" },
   { href: "/accessories", label: "Accessories" },
   { href: "/about-us", label: "About Us" },
-  { href: "#grants", label: "OZEV Grants" },
+  { href: "/ozev-grants", label: "OZEV Grants" },
 ];
 
 export function SiteHeader() {

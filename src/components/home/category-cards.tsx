@@ -37,7 +37,7 @@ const categories = [
     title: "OZEV Grants",
     description: "See what you're eligible to claim.",
     image: `${IMG}/2025/05/side-view-man-charging-his-car-min-scaled.webp`,
-    href: "#grants",
+    href: "/ozev-grants",
     span: "lg:col-span-2 lg:row-span-1",
     text: "text-lg",
   },
@@ -45,7 +45,7 @@ const categories = [
 
 export function CategoryCards() {
   return (
-    <section className="bg-background">
+    <section className="bg-secondary">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <Reveal>
           <SectionKicker />

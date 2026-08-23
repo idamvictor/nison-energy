@@ -35,11 +35,11 @@ export function AccessoryProductsPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" render={<Link href="/accessories" target="_blank" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/accessories" target="_blank" />}>
             <ArrowUpRight />
             View storefront
           </Button>
-          <Button render={<Link href="/admin/accessories/new" />}>
+          <Button nativeButton={false} render={<Link href="/admin/accessories/new" />}>
             <Plus />
             Add product
           </Button>

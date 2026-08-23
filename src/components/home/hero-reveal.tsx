@@ -6,11 +6,10 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { Hero } from "@/components/home/hero";
-import { CategoryCards } from "@/components/home/category-cards";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-export function HeroReveal() {
+export function HeroReveal({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroWrapRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +49,7 @@ export function HeroReveal() {
         <Hero />
       </div>
       <div className="relative z-10 bg-background lg:overflow-hidden lg:rounded-t-[2.5rem] lg:shadow-[0_-24px_48px_rgba(0,0,0,0.18)]">
-        <CategoryCards />
+        {children}
       </div>
     </div>
   );

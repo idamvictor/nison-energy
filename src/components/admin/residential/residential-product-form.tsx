@@ -187,7 +187,7 @@ export function ResidentialProductForm({ product }: { product?: Product }) {
       </Card>
 
       <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm supports-backdrop-filter:bg-background/80 sm:-mx-6 sm:px-6">
-        <Button type="button" variant="outline" render={<Link href="/admin/residential" />}>
+        <Button type="button" variant="outline" nativeButton={false} render={<Link href="/admin/residential" />}>
           Cancel
         </Button>
         <Button type="submit">Save changes</Button>

@@ -35,11 +35,11 @@ export function ResidentialProductsPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" render={<Link href="/home-charging" target="_blank" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/home-charging" target="_blank" />}>
             <ArrowUpRight />
             View storefront
           </Button>
-          <Button render={<Link href="/admin/residential/new" />}>
+          <Button nativeButton={false} render={<Link href="/admin/residential/new" />}>
             <Plus />
             Add product
           </Button>

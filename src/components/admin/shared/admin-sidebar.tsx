@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { adminLeads } from "@/lib/admin-leads";
 
 const overviewLinks = [
@@ -30,6 +31,13 @@ const catalogLinks = [
   { href: "/admin/commercial", label: "Commercial Chargers", icon: Package },
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
 ];
+
+function navItemClass(active: boolean) {
+  return cn(
+    "border-l-2",
+    active ? "border-primary" : "border-transparent"
+  );
+}
 
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -49,9 +57,9 @@ export function AdminSidebar() {
             alt="Nison Energy"
             width={3264}
             height={1273}
-            className="h-6 w-auto brightness-0 invert"
+            className="h-6 w-auto"
           />
-          <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.65rem] font-semibold tracking-wide text-white/80 uppercase">
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[0.65rem] font-semibold tracking-wide text-primary uppercase">
             Admin
           </span>
         </Link>
@@ -61,17 +69,21 @@ export function AdminSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {overviewLinks.map((link) => (
-                <SidebarMenuItem key={link.href}>
-                  <SidebarMenuButton
-                    isActive={isActive(link.href)}
-                    render={<Link href={link.href} />}
-                  >
-                    <link.icon />
-                    <span>{link.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {overviewLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <SidebarMenuItem key={link.href}>
+                    <SidebarMenuButton
+                      isActive={active}
+                      className={navItemClass(active)}
+                      render={<Link href={link.href} />}
+                    >
+                      <link.icon />
+                      <span>{link.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -82,17 +94,21 @@ export function AdminSidebar() {
           <SidebarGroupLabel>Catalog</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {catalogLinks.map((link) => (
-                <SidebarMenuItem key={link.href}>
-                  <SidebarMenuButton
-                    isActive={isActive(link.href)}
-                    render={<Link href={link.href} />}
-                  >
-                    <link.icon />
-                    <span>{link.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {catalogLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <SidebarMenuItem key={link.href}>
+                    <SidebarMenuButton
+                      isActive={active}
+                      className={navItemClass(active)}
+                      render={<Link href={link.href} />}
+                    >
+                      <link.icon />
+                      <span>{link.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -106,13 +122,14 @@ export function AdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive("/admin/leads")}
+                  className={navItemClass(isActive("/admin/leads"))}
                   render={<Link href="/admin/leads" />}
                 >
                   <Inbox />
                   <span>Leads</span>
                 </SidebarMenuButton>
                 {newLeads > 0 && (
-                  <SidebarMenuBadge className="text-sidebar-foreground">
+                  <SidebarMenuBadge className="text-primary">
                     {newLeads}
                   </SidebarMenuBadge>
                 )}

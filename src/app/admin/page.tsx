@@ -69,7 +69,12 @@ export default function AdminDashboardPage() {
           <h2 className="font-heading text-base font-semibold text-foreground">
             Recent leads
           </h2>
-          <Button variant="outline" size="sm" render={<Link href="/admin/leads" />}>
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/admin/leads" />}
+          >
             <Inbox />
             View all leads
             <ArrowRight />

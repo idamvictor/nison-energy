@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Phone, PhoneCall } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,8 @@ export function HelpSection() {
                 size="lg"
                 variant="outline"
                 className="h-auto gap-3 border-white/20 bg-transparent px-5 py-4 text-primary-foreground hover:bg-white/10"
+                nativeButton={false}
+                render={<Link href="/contact-us" />}
               >
                 <PhoneCall className="size-5" />
                 Request a callback

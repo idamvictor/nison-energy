@@ -1,4 +1,5 @@
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Clock, Mail, MapPin, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { MapEmbed, getMapsDirectionsUrl } from "@/components/shared/map-embed";
@@ -19,6 +20,21 @@ const hours = [
 export function ContactInfo() {
   return (
     <div className="flex flex-col gap-6">
+      <Link
+        href="/get-a-quote"
+        className="group flex items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-5 py-4 transition-colors hover:bg-primary/10"
+      >
+        <div>
+          <p className="text-sm font-medium text-foreground">
+            Already know which charger you want?
+          </p>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Get a priced quote in a couple of minutes instead.
+          </p>
+        </div>
+        <ArrowRight className="size-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+      </Link>
+
       <div className="flex flex-col gap-4 rounded-2xl border border-border p-6">
         <a
           href="tel:03306330252"

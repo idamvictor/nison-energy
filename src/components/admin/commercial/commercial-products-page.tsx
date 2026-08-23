@@ -37,12 +37,13 @@ export function CommercialProductsPage() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
+            nativeButton={false}
             render={<Link href="/workplace-charging" target="_blank" />}
           >
             <ArrowUpRight />
             View storefront
           </Button>
-          <Button render={<Link href="/admin/commercial/new" />}>
+          <Button nativeButton={false} render={<Link href="/admin/commercial/new" />}>
             <Plus />
             Add product
           </Button>

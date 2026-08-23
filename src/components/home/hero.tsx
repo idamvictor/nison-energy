@@ -177,7 +177,7 @@ export function Hero() {
                 variant="outline"
                 nativeButton={false}
                 className="hero-cta h-12 border-white/40 bg-transparent px-6 text-base text-white hover:border-white hover:bg-white/10"
-                render={<Link href="#grants" />}
+                render={<Link href="/ozev-grants" />}
               >
                 Check grant eligibility
               </Button>

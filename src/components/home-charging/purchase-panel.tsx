@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Heart } from "lucide-react";
 
@@ -175,6 +176,13 @@ export function PurchasePanel({
         />
         {wishlisted ? "Saved to wishlist" : "Add to wishlist"}
       </button>
+
+      <Link
+        href="/get-a-quote"
+        className="text-center text-sm font-medium text-primary hover:underline"
+      >
+        Prefer a quote first?
+      </Link>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ClipboardCheck, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ export function GrantBanner() {
               <Button
                 size="lg"
                 className="h-11 gap-2 bg-accent px-5 text-accent-foreground hover:bg-accent/90"
+                nativeButton={false}
+                render={<Link href="/ozev-grants" />}
               >
                 <ShieldCheck className="size-4" />
                 OZEV eligibility checker
@@ -31,6 +34,8 @@ export function GrantBanner() {
                 size="lg"
                 variant="outline"
                 className="h-11 border-white/25 bg-transparent px-5 text-primary-foreground hover:bg-white/10"
+                nativeButton={false}
+                render={<Link href="/ozev-grants/workplace-charging-scheme" />}
               >
                 <ClipboardCheck className="size-4" />
                 Workplace eligibility checker
@@ -41,6 +46,8 @@ export function GrantBanner() {
               <Button
                 variant="outline"
                 className="h-11 w-full border-white/25 bg-transparent text-sm text-primary-foreground hover:bg-white/10"
+                nativeButton={false}
+                render={<Link href="/contact-us" />}
               >
                 Start your home survey · pick a charger · claim your £500 grant
               </Button>

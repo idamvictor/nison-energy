@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { SiteLoader } from "@/components/shared/site-loader";
-import { WishlistHydration } from "@/components/shared/wishlist-hydration";
-import { CartHydration } from "@/components/shared/cart-hydration";
+import { AppHydration } from "@/components/shared/app-hydration";
 import { CartSheet } from "@/components/shared/cart-sheet";
 import "./globals.css";
 
@@ -30,8 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <SiteLoader />
-        <WishlistHydration />
-        <CartHydration />
+        <AppHydration />
         <CartSheet />
         {children}
       </body>

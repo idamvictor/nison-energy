@@ -6,7 +6,8 @@ import { ArrowRight, Heart, Mail, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/hooks/use-wishlist";
-import { accountCustomer, accountEnquiries } from "@/lib/account-mock";
+import { accountCustomer } from "@/lib/account-mock";
+import { adminLeads } from "@/lib/admin-leads";
 
 const tiles = [
   { href: "/account/profile", label: "Profile", icon: User },
@@ -16,11 +17,14 @@ const tiles = [
 
 export function AccountOverview() {
   const { items } = useWishlist();
+  const enquiryCount = adminLeads.filter(
+    (lead) => lead.email === accountCustomer.email
+  ).length;
 
   const counts: Record<(typeof tiles)[number]["href"], string> = {
     "/account/profile": "Saved details",
     "/account/wishlist": `${items.length} saved`,
-    "/account/enquiries": `${accountEnquiries.length} submitted`,
+    "/account/enquiries": `${enquiryCount} submitted`,
   };
 
   return (

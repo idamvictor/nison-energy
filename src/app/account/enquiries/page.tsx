@@ -5,12 +5,14 @@ import { Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { accountEnquiries, type AccountEnquiryStatus } from "@/lib/account-mock";
+import { EnquiryStageTracker } from "@/components/account/enquiry-stage-tracker";
+import { accountCustomer } from "@/lib/account-mock";
+import { adminLeads, type LeadStatus } from "@/lib/admin-leads";
 
 export const metadata: Metadata = { title: "My Enquiries" };
 
 const statusVariant: Record<
-  AccountEnquiryStatus,
+  LeadStatus,
   "default" | "secondary" | "outline" | "success" | "destructive"
 > = {
   New: "default",
@@ -29,7 +31,14 @@ function formatDate(iso: string) {
 }
 
 export default function AccountEnquiriesPage() {
-  if (accountEnquiries.length === 0) {
+  const enquiries = adminLeads
+    .filter((lead) => lead.email === accountCustomer.email)
+    .sort(
+      (a, b) =>
+        new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+    );
+
+  if (enquiries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
         <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -50,27 +59,33 @@ export default function AccountEnquiriesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      {accountEnquiries.map((enquiry) => (
+      {enquiries.map((enquiry) => (
         <Card key={enquiry.id}>
-          <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-foreground">
-                  {enquiry.reasonForEnquiry}
+          <CardContent>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-foreground">
+                    {enquiry.reasonForEnquiry}
+                  </p>
+                  <Badge variant={statusVariant[enquiry.status]}>
+                    {enquiry.status}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {enquiry.areaOfEnquiry} · Submitted {formatDate(enquiry.submittedAt)}
                 </p>
-                <Badge variant={statusVariant[enquiry.status]}>
-                  {enquiry.status}
-                </Badge>
+                {enquiry.additionalInformation && (
+                  <p className="mt-2 max-w-2xl text-sm text-foreground/80">
+                    {enquiry.additionalInformation}
+                  </p>
+                )}
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {enquiry.areaOfEnquiry} · Submitted {formatDate(enquiry.submittedAt)}
-              </p>
-              {enquiry.additionalInformation && (
-                <p className="mt-2 max-w-2xl text-sm text-foreground/80">
-                  {enquiry.additionalInformation}
-                </p>
-              )}
             </div>
+
+            {enquiry.installation && (
+              <EnquiryStageTracker installation={enquiry.installation} />
+            )}
           </CardContent>
         </Card>
       ))}

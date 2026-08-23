@@ -1,5 +1,37 @@
 export type LeadStatus = "New" | "Contacted" | "Quoted" | "Won" | "Lost";
 
+export type InstallationStage =
+  | "Enquiry Received"
+  | "Survey Booked"
+  | "Grant Application"
+  | "Installation Scheduled"
+  | "Installed";
+
+export type GrantStatus = "Not applicable" | "Not eligible" | "Submitted" | "Approved";
+
+export type InstallationDetails = {
+  stage: InstallationStage;
+  surveyDate?: string;
+  grantStatus?: GrantStatus;
+  installDate?: string;
+  engineer?: string;
+};
+
+export const installationStages: InstallationStage[] = [
+  "Enquiry Received",
+  "Survey Booked",
+  "Grant Application",
+  "Installation Scheduled",
+  "Installed",
+];
+
+export const grantStatuses: GrantStatus[] = [
+  "Not applicable",
+  "Not eligible",
+  "Submitted",
+  "Approved",
+];
+
 export type AdminLead = {
   id: string;
   firstName: string;
@@ -16,6 +48,9 @@ export type AdminLead = {
   additionalInformation?: string;
   status: LeadStatus;
   submittedAt: string;
+  // Only present once a lead is Won — tracks the OZEV grant/installation
+  // journey that follows the sale, separate from the sales-pipeline status.
+  installation?: InstallationDetails;
 };
 
 export const leadStatuses: LeadStatus[] = [
@@ -131,6 +166,12 @@ export const adminLeads: AdminLead[] = [
       "Boutique hotel car park, guests increasingly asking about charging — want to future-proof with 8 bays.",
     status: "Won",
     submittedAt: "2026-08-04T13:10:00Z",
+    installation: {
+      stage: "Installation Scheduled",
+      surveyDate: "2026-08-11",
+      grantStatus: "Approved",
+      engineer: "Dave Prentice",
+    },
   },
   {
     id: "lead-07",
@@ -197,5 +238,28 @@ export const adminLeads: AdminLead[] = [
       "NICEIC-registered electrician, based in York, interested in becoming an installer partner.",
     status: "New",
     submittedAt: "2026-08-17T15:56:00Z",
+  },
+  {
+    id: "lead-11",
+    firstName: "Sarah",
+    lastName: "Whitfield",
+    phone: "07700 900123",
+    email: "sarah.whitfield@gmail.com",
+    postcode: "SW11 4RT",
+    areaOfEnquiry: "House",
+    reasonForEnquiry: "Home EV Installation",
+    paidServicePlans: "No",
+    futureCommunications: "Yes",
+    additionalInformation:
+      "Original enquiry — Ohme Home Pro for the driveway, before the Tesla Model Y purchase.",
+    status: "Won",
+    submittedAt: "2026-04-02T10:15:00Z",
+    installation: {
+      stage: "Installed",
+      surveyDate: "2026-04-09",
+      grantStatus: "Approved",
+      installDate: "2026-04-23",
+      engineer: "Dave Prentice",
+    },
   },
 ];

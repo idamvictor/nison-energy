@@ -5,6 +5,7 @@ import { ArrowLeft, Building2, Mail, MapPin, Phone } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadStatusSelect } from "@/components/admin/leads/lead-status-select";
+import { InstallationTracker } from "@/components/admin/leads/installation-tracker";
 import { adminLeads } from "@/lib/admin-leads";
 
 export async function generateMetadata({
@@ -115,6 +116,15 @@ export default async function LeadDetailPage({
                   </dd>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Installation &amp; grant tracking</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InstallationTracker installation={lead.installation} />
             </CardContent>
           </Card>
         </div>

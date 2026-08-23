@@ -26,7 +26,7 @@ const enquiryReasons = [
 ];
 
 const selectClass =
-  "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+  "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground outline-none invalid:text-muted-foreground/45 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);

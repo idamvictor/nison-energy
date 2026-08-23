@@ -1,0 +1,137 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Cable, Inbox, LayoutDashboard, Zap, Package } from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+} from "@/components/ui/sidebar";
+import { adminLeads } from "@/lib/admin-leads";
+
+const overviewLinks = [
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+];
+
+const catalogLinks = [
+  { href: "/admin/residential", label: "Residential Chargers", icon: Zap },
+  { href: "/admin/commercial", label: "Commercial Chargers", icon: Package },
+  { href: "/admin/accessories", label: "Accessories", icon: Cable },
+];
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+  const isActive = (href: string) =>
+    href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+  const newLeads = adminLeads.filter((lead) => lead.status === "New").length;
+
+  return (
+    <Sidebar collapsible="offcanvas" className="border-sidebar-border">
+      <SidebarHeader>
+        <Link
+          href="/admin"
+          className="flex items-center gap-2 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80"
+        >
+          <Image
+            src="/logo.png"
+            alt="Nison Energy"
+            width={3264}
+            height={1273}
+            className="h-6 w-auto brightness-0 invert"
+          />
+          <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.65rem] font-semibold tracking-wide text-white/80 uppercase">
+            Admin
+          </span>
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {overviewLinks.map((link) => (
+                <SidebarMenuItem key={link.href}>
+                  <SidebarMenuButton
+                    isActive={isActive(link.href)}
+                    render={<Link href={link.href} />}
+                  >
+                    <link.icon />
+                    <span>{link.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Catalog</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {catalogLinks.map((link) => (
+                <SidebarMenuItem key={link.href}>
+                  <SidebarMenuButton
+                    isActive={isActive(link.href)}
+                    render={<Link href={link.href} />}
+                  >
+                    <link.icon />
+                    <span>{link.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Enquiries</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/admin/leads")}
+                  render={<Link href="/admin/leads" />}
+                >
+                  <Inbox />
+                  <span>Leads</span>
+                </SidebarMenuButton>
+                {newLeads > 0 && (
+                  <SidebarMenuBadge className="text-sidebar-foreground">
+                    {newLeads}
+                  </SidebarMenuBadge>
+                )}
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton render={<Link href="/" target="_blank" />}>
+              <ArrowUpRight />
+              <span>View live site</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}

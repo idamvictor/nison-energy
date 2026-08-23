@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, User } from "lucide-react";
+import { ArrowRight, Menu, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/use-cart";
 import {
   Sheet,
   SheetContent,
@@ -28,6 +29,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const isActive = (href: string) =>
     href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
+  const cartCount = useCart((s) =>
+    s.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
+  const openCart = useCart((s) => s.openCart);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 shadow-sm backdrop-blur-sm supports-backdrop-filter:bg-background/70">
@@ -73,6 +78,21 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            className="relative"
+            aria-label="Open cart"
+            onClick={openCart}
+          >
+            <ShoppingCart className="size-4.5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex size-4.5 items-center justify-center rounded-full bg-accent text-[0.65rem] font-semibold text-accent-foreground">
+                {cartCount}
+              </span>
+            )}
+          </Button>
+
           <Button
             variant="outline"
             size="icon"

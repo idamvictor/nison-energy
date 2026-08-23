@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Minus, Plus } from "lucide-react";
+import { Check, Heart } from "lucide-react";
 
 import {
   accessoryProducts,
   type AccessoryProduct,
 } from "@/lib/accessory-products";
 import { Button } from "@/components/ui/button";
+import { QuantityStepper } from "@/components/shared/quantity-stepper";
+import { useCart } from "@/hooks/use-cart";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
 
 const selectClass =
@@ -22,7 +25,10 @@ export function AccessoryPurchasePanel({
   const router = useRouter();
   const [length, setLength] = useState(product.lengthOptions[0]);
   const [quantity, setQuantity] = useState(1);
-  const [wishlisted, setWishlisted] = useState(false);
+  const [added, setAdded] = useState(false);
+  const addItem = useCart((s) => s.addItem);
+  const { isWishlisted, toggle } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
 
   const variantSiblings = accessoryProducts.filter(
     (p) => p.variantGroup === product.variantGroup
@@ -73,39 +79,33 @@ export function AccessoryPurchasePanel({
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>
-        <div className="mt-1.5 flex h-10 w-32 items-stretch overflow-hidden rounded-lg border border-input">
-          <button
-            type="button"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            aria-label="Decrease quantity"
-            className="flex w-10 items-center justify-center text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <Minus className="size-3.5" />
-          </button>
-          <div className="flex flex-1 items-center justify-center text-sm font-medium text-foreground">
-            {quantity}
-          </div>
-          <button
-            type="button"
-            onClick={() => setQuantity((q) => q + 1)}
-            aria-label="Increase quantity"
-            className="flex w-10 items-center justify-center text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <Plus className="size-3.5" />
-          </button>
+        <div className="mt-1.5">
+          <QuantityStepper quantity={quantity} onChange={setQuantity} />
         </div>
       </div>
 
       <Button
         size="lg"
-        className="h-12 w-full bg-accent text-base text-accent-foreground hover:bg-accent/90"
+        className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
+        onClick={() => {
+          addItem(product.id, "accessories", quantity);
+          setAdded(true);
+          window.setTimeout(() => setAdded(false), 2000);
+        }}
       >
-        Request a quote
+        {added ? (
+          <>
+            <Check className="size-4" />
+            Added to cart
+          </>
+        ) : (
+          "Add to Cart"
+        )}
       </Button>
 
       <button
         type="button"
-        onClick={() => setWishlisted((w) => !w)}
+        onClick={() => toggle(product.id, "accessories")}
         className="flex items-center justify-center gap-1.5 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
       >
         <Heart

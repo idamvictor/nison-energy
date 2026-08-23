@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { SiteLoader } from "@/components/shared/site-loader";
 import { WishlistHydration } from "@/components/shared/wishlist-hydration";
+import { CartHydration } from "@/components/shared/cart-hydration";
+import { CartSheet } from "@/components/shared/cart-sheet";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,6 +31,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <SiteLoader />
         <WishlistHydration />
+        <CartHydration />
+        <CartSheet />
         {children}
       </body>
     </html>

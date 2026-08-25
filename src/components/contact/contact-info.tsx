@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Clock, Mail, MapPin, Phone } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { MapEmbed, getMapsDirectionsUrl } from "@/components/shared/map-embed";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -96,34 +94,13 @@ export function ContactInfo() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border">
-        <div className="relative h-56 w-full">
-          <MapEmbed
-            address={ADDRESS}
-            title="Nison Energy office location"
-            className="absolute inset-0 size-full grayscale-[0.3]"
-          />
-        </div>
-        <div className="p-4">
-          <p className="text-sm text-foreground">
-            71–75 Shelton Street, Covent Garden, London, WC2H 9JQ
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3 gap-1.5 border-primary/25 text-primary hover:bg-primary/5"
-            nativeButton={false}
-            render={
-              <a
-                href={getMapsDirectionsUrl(ADDRESS)}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
-          >
-            <MapPin className="size-3.5" />
-            View on Google Maps
-          </Button>
+      <div className="flex items-start gap-3 rounded-2xl border border-border p-6">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
+          <MapPin className="size-4" />
+        </span>
+        <div>
+          <p className="text-xs text-muted-foreground">Our address</p>
+          <p className="text-sm font-medium text-foreground">{ADDRESS}</p>
         </div>
       </div>
     </div>

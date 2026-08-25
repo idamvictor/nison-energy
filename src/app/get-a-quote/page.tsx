@@ -10,6 +10,10 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { PostcodeInput } from "@/components/shared/postcode-input";
+import {
+  AddressAutocomplete,
+  type AddressSuggestion,
+} from "@/components/shared/address-autocomplete";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -32,19 +36,26 @@ export default function GetAQuotePage() {
   const [selectedId, setSelectedId] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
-  function fillSampleData() {
+  function setField(name: string, value: string) {
     const form = formRef.current;
     if (!form) return;
-    const set = (name: string, value: string) => {
-      const field = form.elements.namedItem(name);
-      if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-        field.value = value;
-        // PostcodeInput is a controlled component — a direct DOM value
-        // assignment won't trigger its onChange, so dispatch a real input
-        // event to sync its React state (and kick off validation).
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-    };
+    const field = form.elements.namedItem(name);
+    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+      field.value = value;
+      // PostcodeInput and AddressAutocomplete are controlled components —
+      // a direct DOM value assignment won't trigger their onChange, so
+      // dispatch a real input event to sync their React state.
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  }
+
+  function handleAddressSelect(suggestion: AddressSuggestion) {
+    if (suggestion.city) setField("townCity", suggestion.city);
+    if (suggestion.postcode) setField("postcode", suggestion.postcode);
+  }
+
+  function fillSampleData() {
+    const set = setField;
     set("fullName", `${accountCustomer.firstName} ${accountCustomer.lastName}`);
     set("email", accountCustomer.email);
     set("addressLine1", accountCustomer.address);
@@ -158,10 +169,10 @@ export default function GetAQuotePage() {
                     />
                   </Field>
                   <Field label="Address line 1" className="sm:col-span-2">
-                    <Input
+                    <AddressAutocomplete
                       name="addressLine1"
                       required
-                      placeholder="Address line 1"
+                      onSelect={handleAddressSelect}
                     />
                   </Field>
                   <Field

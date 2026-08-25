@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
@@ -29,6 +29,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PostcodeInput } from "@/components/shared/postcode-input";
+import {
+  AddressAutocomplete,
+  type AddressSuggestion,
+} from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem } from "@/hooks/use-cart";
 import { generateReferenceCode } from "@/lib/reference-code";
 
@@ -85,6 +89,19 @@ export default function CheckoutPage() {
   const [reference, setReference] = useState("");
   const [extraIds, setExtraIds] = useState<ExtraId[]>([]);
   const [pendingExtra, setPendingExtra] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  function handleAddressSelect(suggestion: AddressSuggestion) {
+    if (!suggestion.postcode) return;
+    const form = formRef.current;
+    const field = form?.elements.namedItem("postcode");
+    if (field instanceof HTMLInputElement) {
+      field.value = suggestion.postcode;
+      // PostcodeInput is controlled — dispatch a real input event so its
+      // React state (and validation) picks up the programmatic change.
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  }
 
   const lines = items
     .map((item) => resolveCartItem(item))
@@ -151,6 +168,7 @@ export default function CheckoutPage() {
           ) : (
             <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
               <form
+                ref={formRef}
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -267,7 +285,11 @@ export default function CheckoutPage() {
                         <Input required type="tel" placeholder="Phone number" />
                       </Field>
                       <Field label="Installation address" className="sm:col-span-2">
-                        <Input required placeholder="Address" />
+                        <AddressAutocomplete
+                          name="address"
+                          required
+                          onSelect={handleAddressSelect}
+                        />
                       </Field>
                       <Field label="Postcode">
                         <PostcodeInput required />

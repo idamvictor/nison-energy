@@ -68,9 +68,13 @@ export function ProductGrid({
                   Tesla, Podpoint, Wallbox and more.
                 </p>
               </div>
-              <Button className="shrink-0 gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button
+                className="shrink-0 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                nativeButton={false}
+                render={<Link href="/contact-us" />}
+              >
                 <MessageCircle className="size-4" />
-                Request a quote
+                Contact us
               </Button>
             </div>
           </Reveal>

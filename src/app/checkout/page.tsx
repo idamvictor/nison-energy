@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowRight,
   Cable,
   CheckCircle2,
   ShoppingCart,
@@ -131,6 +132,28 @@ export default function CheckoutPage() {
           <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
             Checkout
           </h1>
+
+          {!submitted && (
+            <Link
+              href="/ozev-grant-guide"
+              className="group mt-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-5 py-4 transition-colors hover:bg-primary/10"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Zap className="size-4.5" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Did you know you could get up to £500 off with an OZEV grant?
+                  </p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    Answer 3 quick questions to check your eligibility.
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="size-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          )}
 
           {submitted ? (
             <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-border bg-secondary px-6 py-16 text-center">

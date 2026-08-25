@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -44,8 +45,10 @@ export default function WorkplaceChargingPage() {
               <Button
                 size="lg"
                 className="mt-8 h-12 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
+                nativeButton={false}
+                render={<Link href="/contact-us" />}
               >
-                Get a workplace quote
+                Talk to our team
               </Button>
             </Reveal>
           </div>

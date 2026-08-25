@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  Download,
   ExternalLink,
   FileCheck2,
   Video,
@@ -29,13 +30,18 @@ import { EligibilityQuiz } from "@/components/grant-guide/eligibility-quiz";
 import { GrantApplicationTracker } from "@/components/grant-guide/grant-application-tracker";
 import { OnStreetIntakeForm } from "@/components/grant-guide/on-street-intake-form";
 import { QuoteRequestForm } from "@/components/shared/quote-request-form";
+import { getGrantScheme } from "@/lib/grants";
+import { generatePermissionLetterPdf } from "@/lib/generate-permission-letter-pdf";
+import { generateApplicationGuidePdf } from "@/lib/generate-application-guide-pdf";
 import { cn } from "@/lib/utils";
 
 const OPENQUOTE_URL = "https://app.openquote.net/company/ocunioenergy?category=EV";
+const scheme = getGrantScheme("renters-and-flat-owners")!;
 
 const wizardSteps = [
   { title: "Get Your Quote" },
   { title: "Tell Us You've Applied" },
+  { title: "Submit Application" },
   { title: "Authorisation Code" },
 ];
 
@@ -121,11 +127,7 @@ export default function OzevGrantGuidePage() {
                 </Reveal>
 
                 <Reveal>
-                  <StepIndicator
-                    current={wizardStep}
-                    steps={wizardSteps}
-                    onSelect={setWizardStep}
-                  />
+                  <StepIndicator current={wizardStep} steps={wizardSteps} />
                 </Reveal>
 
                 <Reveal>
@@ -178,7 +180,91 @@ export default function OzevGrantGuidePage() {
 
                       {wizardStep === 2 && (
                         <>
-                          <StepHead number={3} title="Once Your Authorisation Code Arrives" />
+                          <StepHead number={3} title="Submit Your Grant Application" />
+                          <p className="text-sm text-foreground/80">
+                            Before you apply, make sure you have these
+                            documents ready:
+                          </p>
+                          <ul className="mt-2 flex flex-col gap-1.5">
+                            {scheme.documentation?.map((item) => (
+                              <li
+                                key={item}
+                                className="flex items-start gap-2 text-sm text-foreground/80"
+                              >
+                                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+
+                          <button
+                            type="button"
+                            onClick={generatePermissionLetterPdf}
+                            className="mt-4 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                          >
+                            <Download className="size-4 shrink-0" />
+                            <span className="flex-1 font-medium">
+                              Landlord / freeholder permission letter template
+                            </span>
+                            <span className="text-xs text-muted-foreground">PDF</span>
+                          </button>
+
+                          <p className="mt-4 text-sm text-foreground/80">
+                            Download our free OZEV Application Guide — a
+                            quick walkthrough of the Government portal so
+                            you know exactly what to expect before you
+                            start.
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={generateApplicationGuidePdf}
+                            className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                          >
+                            <Download className="size-4 shrink-0" />
+                            <span className="flex-1 font-medium">OZEV Application Guide</span>
+                            <span className="text-xs text-muted-foreground">PDF</span>
+                          </button>
+
+                          <p className="mt-4 text-sm text-foreground/80">
+                            Once you have your quote and documents,
+                            you&apos;re ready to apply.
+                          </p>
+                          <ul className="mt-2 flex flex-col gap-1.5">
+                            <li className="flex items-start gap-2 text-sm text-foreground/80">
+                              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                              Normal turnaround: pre-approval within 10 working days
+                            </li>
+                            <li className="flex items-start gap-2 text-sm text-foreground/80">
+                              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                              Right now, due to demand, pre-approval can take longer — apply sooner rather than later
+                            </li>
+                            <li className="flex items-start gap-2 text-sm text-foreground/80">
+                              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                              Scheme rules mean we can&apos;t book your installation until your grant has been pre-approved
+                            </li>
+                          </ul>
+
+                          <Button
+                            className="mt-4 gap-1.5"
+                            nativeButton={false}
+                            render={
+                              <a
+                                href="https://www.find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-grant-for-renters-and-flat-owners-2"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              />
+                            }
+                          >
+                            Apply for Your £500 Grant
+                            <ExternalLink className="size-4" />
+                          </Button>
+                        </>
+                      )}
+
+                      {wizardStep === 3 && (
+                        <>
+                          <StepHead number={4} title="Once Your Authorisation Code Arrives" />
                           <p className="mb-4 text-sm text-foreground/80">
                             As soon as OZEV issues your authorisation code,
                             we move things forward in three steps:
@@ -299,11 +385,9 @@ export default function OzevGrantGuidePage() {
 function StepIndicator({
   current,
   steps,
-  onSelect,
 }: {
   current: number;
   steps: { title: string }[];
-  onSelect: (index: number) => void;
 }) {
   return (
     <ol className="flex items-center">
@@ -312,11 +396,7 @@ function StepIndicator({
         const active = index === current;
         return (
           <li key={step.title} className="flex flex-1 items-center last:flex-none">
-            <button
-              type="button"
-              onClick={() => onSelect(index)}
-              className="flex flex-col items-center gap-1.5 text-center"
-            >
+            <div className="flex flex-col items-center gap-1.5 text-center">
               <span
                 className={cn(
                   "flex size-7 shrink-0 items-center justify-center rounded-full font-heading text-sm font-semibold transition-colors",
@@ -335,7 +415,7 @@ function StepIndicator({
               >
                 {step.title}
               </span>
-            </button>
+            </div>
             {index < steps.length - 1 && (
               <span
                 className={cn("mx-2 h-0.5 flex-1 rounded-full", done ? "bg-primary" : "bg-muted")}

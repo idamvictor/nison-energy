@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Check, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,13 +60,6 @@ export function EligibilityQuiz({
           ? "warn"
           : "pass"
       : null;
-
-  // Matches the original behaviour: a "pass" reveals the full guide
-  // immediately, no extra click needed — warn/fail need an explicit choice.
-  useEffect(() => {
-    if (result === "pass") onPass();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result]);
 
   function handleAnswer<T>(setter: (v: T) => void, value: T) {
     setter(value);
@@ -161,13 +154,24 @@ export function EligibilityQuiz({
       )}
 
       {result === "pass" && (
-        <div className="mt-5 flex items-start gap-3 rounded-xl border border-success/30 bg-success/5 px-4 py-3.5 text-sm">
-          <Check className="mt-0.5 size-4 shrink-0 text-success" />
-          <p className="text-foreground/80">
-            Likely eligible for the Renters &amp; Flat Owners grant. Follow
-            the guide below — nothing is charged until OZEV approves.
-          </p>
-        </div>
+        <>
+          <div className="mt-5 flex items-start gap-3 rounded-xl border border-success/30 bg-success/5 px-4 py-3.5 text-sm">
+            <Check className="mt-0.5 size-4 shrink-0 text-success" />
+            <p className="text-foreground/80">
+              Likely eligible for the Renters &amp; Flat Owners grant —
+              nothing is charged until OZEV approves.
+            </p>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button
+              onClick={onPass}
+              className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              Next
+              <ArrowRight className="size-4" />
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );

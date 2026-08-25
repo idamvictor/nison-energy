@@ -9,6 +9,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { PostcodeInput } from "@/components/shared/postcode-input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -38,6 +39,10 @@ export default function GetAQuotePage() {
       const field = form.elements.namedItem(name);
       if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
         field.value = value;
+        // PostcodeInput is a controlled component — a direct DOM value
+        // assignment won't trigger its onChange, so dispatch a real input
+        // event to sync its React state (and kick off validation).
+        field.dispatchEvent(new Event("input", { bubbles: true }));
       }
     };
     set("fullName", `${accountCustomer.firstName} ${accountCustomer.lastName}`);
@@ -173,7 +178,7 @@ export default function GetAQuotePage() {
                     />
                   </Field>
                   <Field label="Postcode">
-                    <Input name="postcode" required placeholder="Postcode" />
+                    <PostcodeInput required />
                   </Field>
                   <Field label="Select your charger" className="sm:col-span-2">
                     <Select

@@ -3,7 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, ShoppingCart, Video, Zap } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Cable,
+  CheckCircle2,
+  ShoppingCart,
+  Smartphone,
+  Umbrella,
+  Video,
+  X,
+  Zap,
+} from "lucide-react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -11,6 +21,14 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PostcodeInput } from "@/components/shared/postcode-input";
 import { useCart, resolveCartItem } from "@/hooks/use-cart";
 import { generateReferenceCode } from "@/lib/reference-code";
 
@@ -18,24 +36,73 @@ const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
 });
-const SURGE_PROTECTION_PRICE = 40;
+
+type ExtraId = "surge-protection" | "extra-cable" | "cable-cover" | "smart-setup";
+
+type Extra = {
+  id: ExtraId;
+  name: string;
+  price: number;
+  description: string;
+  icon: LucideIcon;
+};
+
+const availableExtras: Extra[] = [
+  {
+    id: "surge-protection",
+    name: "Surge protection device",
+    price: 40,
+    description: "Recommended under wiring regulations.",
+    icon: Zap,
+  },
+  {
+    id: "extra-cable",
+    name: "Additional Type 2 charging cable (5m)",
+    price: 89,
+    description: "A spare cable to keep in the car or at a second parking spot.",
+    icon: Cable,
+  },
+  {
+    id: "cable-cover",
+    name: "Weatherproof cable management kit",
+    price: 25,
+    description: "Keeps the charging cable tidy and protected from the elements.",
+    icon: Umbrella,
+  },
+  {
+    id: "smart-setup",
+    name: "Smart charging app setup & tariff optimisation",
+    price: 35,
+    description: "We configure your app and set up off-peak smart charging.",
+    icon: Smartphone,
+  },
+];
 
 export default function CheckoutPage() {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
   const [submitted, setSubmitted] = useState(false);
   const [reference, setReference] = useState("");
-  const [surgeProtection, setSurgeProtection] = useState(false);
+  const [extraIds, setExtraIds] = useState<ExtraId[]>([]);
+  const [pendingExtra, setPendingExtra] = useState("");
 
   const lines = items
     .map((item) => resolveCartItem(item))
     .filter((line): line is NonNullable<typeof line> => line !== null);
 
+  const selectedExtras = availableExtras.filter((extra) =>
+    extraIds.includes(extra.id)
+  );
+  const remainingExtras = availableExtras.filter(
+    (extra) => !extraIds.includes(extra.id)
+  );
+
   const itemsSubtotal = lines.reduce(
     (sum, line) => sum + (line.price ?? 0) * line.quantity,
     0
   );
-  const subtotal = itemsSubtotal + (surgeProtection ? SURGE_PROTECTION_PRICE : 0);
+  const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+  const subtotal = itemsSubtotal + extrasTotal;
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
 
   return (
@@ -116,30 +183,70 @@ export default function CheckoutPage() {
                 <Card>
                   <CardContent className="flex flex-col gap-3">
                     <StepHeading number={2} title="Extras" />
-                    <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border px-4 py-3 transition-colors hover:bg-secondary">
-                      <input
-                        type="checkbox"
-                        checked={surgeProtection}
-                        onChange={(e) => setSurgeProtection(e.target.checked)}
-                        className="mt-1 size-4 accent-primary"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <Zap className="size-4 text-primary" />
-                            <p className="text-sm font-medium text-foreground">
-                              Surge protection device
-                            </p>
+
+                    {selectedExtras.length > 0 && (
+                      <div className="flex flex-col gap-2">
+                        {selectedExtras.map((extra) => (
+                          <div
+                            key={extra.id}
+                            className="flex items-start gap-3 rounded-lg border border-border px-4 py-3"
+                          >
+                            <extra.icon className="mt-0.5 size-4 shrink-0 text-primary" />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-sm font-medium text-foreground">
+                                  {extra.name}
+                                </p>
+                                <p className="text-sm font-semibold text-foreground">
+                                  {currency.format(extra.price)}
+                                </p>
+                              </div>
+                              <p className="mt-0.5 text-sm text-muted-foreground">
+                                {extra.description}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExtraIds((ids) =>
+                                  ids.filter((id) => id !== extra.id)
+                                )
+                              }
+                              aria-label={`Remove ${extra.name}`}
+                              className="text-muted-foreground transition-colors hover:text-destructive"
+                            >
+                              <X className="size-4" />
+                            </button>
                           </div>
-                          <p className="text-sm font-semibold text-foreground">
-                            {currency.format(SURGE_PROTECTION_PRICE)}
-                          </p>
-                        </div>
-                        <p className="mt-0.5 text-sm text-muted-foreground">
-                          Recommended under wiring regulations.
-                        </p>
+                        ))}
                       </div>
-                    </label>
+                    )}
+
+                    {remainingExtras.length > 0 ? (
+                      <Select
+                        value={pendingExtra}
+                        onValueChange={(value) => {
+                          if (!value) return;
+                          setExtraIds((ids) => [...ids, value as ExtraId]);
+                          setPendingExtra("");
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Add an extra…" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {remainingExtras.map((extra) => (
+                            <SelectItem key={extra.id} value={extra.id}>
+                              {extra.name} — {currency.format(extra.price)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        All available extras have been added.
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -163,7 +270,7 @@ export default function CheckoutPage() {
                         <Input required placeholder="Address" />
                       </Field>
                       <Field label="Postcode">
-                        <Input required placeholder="Postcode" />
+                        <PostcodeInput required />
                       </Field>
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -211,22 +318,22 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                     ))}
-                    {surgeProtection && (
-                      <div className="flex items-center gap-3">
+                    {selectedExtras.map((extra) => (
+                      <div key={extra.id} className="flex items-center gap-3">
                         <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-secondary ring-1 ring-border">
-                          <Zap className="size-4.5 text-primary" />
+                          <extra.icon className="size-4.5 text-primary" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">
-                            Surge protection
+                            {extra.name}
                           </p>
                           <p className="text-xs text-muted-foreground">Qty 1</p>
                         </div>
                         <p className="text-sm font-semibold text-foreground">
-                          {currency.format(SURGE_PROTECTION_PRICE)}
+                          {currency.format(extra.price)}
                         </p>
                       </div>
-                    )}
+                    ))}
                   </div>
                   <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
                     <p className="text-muted-foreground">Subtotal</p>

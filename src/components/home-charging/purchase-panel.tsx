@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Heart } from "lucide-react";
+import { Check, Heart, ShieldCheck } from "lucide-react";
 
 import { products, type Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
 
 const INSTALL_FEE = 499;
-const EXTENDED_WARRANTY_FEE = 49;
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -27,9 +26,6 @@ export function PurchasePanel({
 }) {
   const router = useRouter();
   const [cableLength, setCableLength] = useState(product.cableLength ?? "");
-  const [warrantyOption, setWarrantyOption] = useState<"standard" | "extended">(
-    "standard"
-  );
   const [installation, setInstallation] = useState<"standard" | "none">(
     "standard"
   );
@@ -41,9 +37,7 @@ export function PurchasePanel({
 
   const devicePrice = product.price - INSTALL_FEE;
   const unitPrice =
-    devicePrice +
-    (installation === "standard" ? INSTALL_FEE : 0) +
-    (warrantyOption === "extended" ? EXTENDED_WARRANTY_FEE : 0);
+    devicePrice + (installation === "standard" ? INSTALL_FEE : 0);
   const total = unitPrice * quantity;
   const totalExVat = Math.round(total / 1.2);
 
@@ -105,22 +99,6 @@ export function PurchasePanel({
         </label>
 
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Warranty option
-          <select
-            value={warrantyOption}
-            onChange={(e) =>
-              setWarrantyOption(e.target.value as "standard" | "extended")
-            }
-            className={selectClass}
-          >
-            <option value="standard">{warranty} (included)</option>
-            <option value="extended">
-              5 year extended warranty (+£{EXTENDED_WARRANTY_FEE})
-            </option>
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Installation option
           <select
             value={installation}
@@ -135,6 +113,13 @@ export function PurchasePanel({
             <option value="none">No installation (device only)</option>
           </select>
         </label>
+      </div>
+
+      <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+        <p className="text-sm text-foreground">
+          <span className="font-medium">Warranty:</span> {warranty} included
+        </p>
       </div>
 
       <div>

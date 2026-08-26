@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Cable, Inbox, LayoutDashboard, Zap, Package } from "lucide-react";
+import { ArrowUpRight, Cable, Inbox, LayoutDashboard, Newspaper, Zap, Package } from "lucide-react";
 
 import {
   Sidebar,
@@ -109,6 +109,26 @@ export function AdminSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Content</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/admin/blog")}
+                  className={navItemClass(isActive("/admin/blog"))}
+                  render={<Link href="/admin/blog" />}
+                >
+                  <Newspaper />
+                  <span>Blog</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

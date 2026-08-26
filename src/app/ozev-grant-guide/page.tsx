@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
@@ -35,7 +36,6 @@ import { generatePermissionLetterPdf } from "@/lib/generate-permission-letter-pd
 import { generateApplicationGuidePdf } from "@/lib/generate-application-guide-pdf";
 import { cn } from "@/lib/utils";
 
-const OPENQUOTE_URL = "https://app.openquote.net/company/ocunioenergy?category=EV";
 const scheme = getGrantScheme("renters-and-flat-owners")!;
 
 const wizardSteps = [
@@ -274,14 +274,12 @@ export default function OzevGrantGuidePage() {
                             <p>
                               We send you a link to start the home survey
                               through our{" "}
-                              <a
-                                href={OPENQUOTE_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                              <Link
+                                href="/virtual-survey"
                                 className="font-medium text-primary underline underline-offset-2"
                               >
                                 OpenQuote system
-                              </a>
+                              </Link>
                               , confirming your charger, any additional work
                               required, and the grant-adjusted price.
                             </p>
@@ -289,12 +287,10 @@ export default function OzevGrantGuidePage() {
                           <Button
                             className="mb-5 gap-1.5"
                             nativeButton={false}
-                            render={
-                              <a href={OPENQUOTE_URL} target="_blank" rel="noopener noreferrer" />
-                            }
+                            render={<Link href="/virtual-survey" />}
                           >
                             Start Virtual Survey
-                            <ExternalLink className="size-4" />
+                            <Video className="size-4" />
                           </Button>
                           <ul className="flex flex-col gap-2">
                             <li className="flex items-start gap-2 text-sm text-foreground/80">

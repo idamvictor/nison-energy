@@ -20,6 +20,7 @@ const quickLinks = [
   { label: "Blog", href: "/blog" },
   { label: "OZEV Grant Eligibility", href: "/ozev-grants" },
   { label: "Workplace Grant Eligibility", href: "/ozev-grants/workplace-charging-scheme" },
+  { label: "Independent Subcontractor", href: "/independent-subcontractor" },
 ];
 
 const productLinks = [

@@ -5,6 +5,7 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { useGrantApplication } from "@/hooks/use-grant-application";
+import { useNotifications } from "@/hooks/use-notifications";
 
 export function AppHydration() {
   return (
@@ -24,6 +25,10 @@ export function AppHydration() {
       <StoreHydration
         storageKey="nison-grant-application"
         rehydrate={() => useGrantApplication.persist.rehydrate()}
+      />
+      <StoreHydration
+        storageKey="nison-notifications"
+        rehydrate={() => useNotifications.persist.rehydrate()}
       />
     </>
   );

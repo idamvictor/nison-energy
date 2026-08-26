@@ -2,20 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, LayoutDashboard, Mail, User } from "lucide-react";
+import { Heart, Inbox, LayoutDashboard, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { useNotifications } from "@/hooks/use-notifications";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/account", label: "Overview", icon: LayoutDashboard },
   { href: "/account/profile", label: "Profile", icon: User },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
-  { href: "/account/enquiries", label: "My Enquiries", icon: Mail },
+  { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ];
 
 export function AccountNav() {
   const pathname = usePathname();
+  const unreadCount = useNotifications((s) => s.items.filter((item) => !item.read).length);
   const isActive = (href: string) =>
     href === "/account" ? pathname === "/account" : pathname.startsWith(href);
 
@@ -38,6 +40,11 @@ export function AccountNav() {
             >
               <link.icon className="size-4" />
               {link.label}
+              {link.href === "/account/inbox" && unreadCount > 0 && (
+                <span className="ml-auto flex size-4.5 shrink-0 items-center justify-center rounded-full bg-accent text-[0.65rem] font-semibold text-accent-foreground">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}

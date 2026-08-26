@@ -4,12 +4,6 @@ import { persist } from "zustand/middleware";
 export type GrantApplicationStatus = "waiting" | "approved" | "rejected";
 
 export type GrantApplicationRecord = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  street: string;
-  postcode: string;
   chargerId: string;
   hasApplied: boolean;
   status: GrantApplicationStatus | null;

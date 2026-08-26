@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import {
   ArrowRight,
   Heart,
+  Inbox,
   LayoutDashboard,
   LogOut,
-  Mail,
   Menu,
   ShoppingCart,
   User,
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 import { accountCustomer } from "@/lib/account-mock";
 import {
   Sheet,
@@ -40,7 +41,7 @@ const accountLinks = [
   { href: "/account", label: "Overview", icon: LayoutDashboard },
   { href: "/account/profile", label: "Profile", icon: User },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
-  { href: "/account/enquiries", label: "My Enquiries", icon: Mail },
+  { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ];
 
 const navLinks = [
@@ -63,6 +64,7 @@ export function SiteHeader() {
   const isSignedIn = useAuth((s) => s.isSignedIn);
   const signIn = useAuth((s) => s.signIn);
   const signOut = useAuth((s) => s.signOut);
+  const unreadCount = useNotifications((s) => s.items.filter((item) => !item.read).length);
   const initials = `${accountCustomer.firstName[0]}${accountCustomer.lastName[0]}`;
 
   return (
@@ -148,6 +150,11 @@ export function SiteHeader() {
                     <DropdownMenuItem key={link.href} render={<Link href={link.href} />}>
                       <link.icon />
                       {link.label}
+                      {link.href === "/account/inbox" && unreadCount > 0 && (
+                        <span className="ml-auto flex size-4.5 shrink-0 items-center justify-center rounded-full bg-accent text-[0.65rem] font-semibold text-accent-foreground">
+                          {unreadCount}
+                        </span>
+                      )}
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
@@ -219,6 +226,11 @@ export function SiteHeader() {
                       >
                         <link.icon className="size-4" />
                         {link.label}
+                        {link.href === "/account/inbox" && unreadCount > 0 && (
+                          <span className="ml-auto flex size-4.5 shrink-0 items-center justify-center rounded-full bg-accent text-[0.65rem] font-semibold text-accent-foreground">
+                            {unreadCount}
+                          </span>
+                        )}
                       </Link>
                     ))}
                     <button

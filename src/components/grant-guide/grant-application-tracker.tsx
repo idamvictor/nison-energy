@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { Check, Clock, ExternalLink, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -15,16 +16,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PostcodeInput } from "@/components/shared/postcode-input";
-import { AddressAutocomplete } from "@/components/shared/address-autocomplete";
 import { products } from "@/lib/products";
 import { commercialProducts } from "@/lib/commercial-products";
+import { accountCustomer } from "@/lib/account-mock";
 import { cn } from "@/lib/utils";
 import {
   useGrantApplication,
   type GrantApplicationRecord,
   type GrantApplicationStatus,
 } from "@/hooks/use-grant-application";
+import { useNotifications } from "@/hooks/use-notifications";
+
+const statusLabel: Record<GrantApplicationStatus, string> = {
+  approved: "Grant application approved",
+  rejected: "Grant application rejected",
+  waiting: "Grant application awaiting a decision",
+};
+
+function notifyGrantChanges(
+  prev: GrantApplicationRecord | null,
+  next: Omit<GrantApplicationRecord, "updatedAt">,
+  push: (kind: "order" | "grant", title: string, description?: string) => void
+) {
+  if (!prev) {
+    return;
+  }
+  if (!prev.hasApplied && next.hasApplied) {
+    push("grant", "Grant application marked as submitted");
+  }
+  if (prev.status !== next.status && next.status) {
+    push(
+      "grant",
+      statusLabel[next.status],
+      next.status === "rejected" ? next.rejectionReason || undefined : undefined
+    );
+  }
+  if (!prev.authCode && next.authCode) {
+    push("grant", "Your grant authorisation code has arrived", next.authCode);
+  }
+}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -71,6 +101,30 @@ function formatDate(iso: string) {
     month: "short",
     year: "numeric",
   });
+}
+
+function AccountDetailsSummary() {
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-secondary px-4 py-3.5 text-sm">
+      <div>
+        <p className="font-medium text-foreground">
+          {accountCustomer.firstName} {accountCustomer.lastName}
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {accountCustomer.email} · {accountCustomer.phone}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {accountCustomer.address}, {accountCustomer.postcode}
+        </p>
+      </div>
+      <Link
+        href="/account/profile"
+        className="shrink-0 text-xs font-medium text-primary hover:underline"
+      >
+        Not you? Edit profile
+      </Link>
+    </div>
+  );
 }
 
 type TimelineState = "done" | "active" | "rejected" | "pending";
@@ -159,18 +213,23 @@ function Timeline({ items }: { items: TimelineItem[] }) {
 export function GrantApplicationTracker() {
   const record = useGrantApplication((state) => state.record);
   const save = useGrantApplication((state) => state.save);
+  const pushNotification = useNotifications((state) => state.push);
   const [editing, setEditing] = useState(false);
 
   if (!record || editing) {
     return (
-      <ApplicationForm
-        initial={record}
-        onCancel={record ? () => setEditing(false) : undefined}
-        onSave={(next) => {
-          save(next);
-          setEditing(false);
-        }}
-      />
+      <div className="flex flex-col gap-5">
+        <AccountDetailsSummary />
+        <ApplicationForm
+          initial={record}
+          onCancel={record ? () => setEditing(false) : undefined}
+          onSave={(next) => {
+            notifyGrantChanges(record, next, pushNotification);
+            save(next);
+            setEditing(false);
+          }}
+        />
+      </div>
     );
   }
 
@@ -178,16 +237,13 @@ export function GrantApplicationTracker() {
 
   return (
     <div className="flex flex-col gap-4">
+      <AccountDetailsSummary />
+
       <div className="rounded-xl border border-border p-4">
         <div className="mb-4 flex items-start justify-between gap-3">
-          <div>
-            <p className="font-heading text-sm font-semibold text-foreground">
-              {record.firstName} {record.lastName}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Last updated {formatDate(record.updatedAt)}
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            Last updated {formatDate(record.updatedAt)}
+          </p>
           <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
             Update status
           </Button>
@@ -231,38 +287,14 @@ function ApplicationForm({
   );
   const [status, setStatus] = useState<GrantApplicationStatus | null>(initial?.status ?? null);
   const [chargerId, setChargerId] = useState(initial?.chargerId ?? "");
-  const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (!initial) return;
-    const form = formRef.current;
-    if (!form) return;
-    const setField = (name: string, value: string) => {
-      const field = form.elements.namedItem(name);
-      if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-        field.value = value;
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-    };
-    setField("street", initial.street);
-    setField("postcode", initial.postcode);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <form
-      ref={formRef}
       className="flex flex-col gap-5"
       onSubmit={(e) => {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
         onSave({
-          firstName: String(data.get("firstName") ?? ""),
-          lastName: String(data.get("lastName") ?? ""),
-          email: String(data.get("email") ?? ""),
-          phone: String(data.get("phone") ?? ""),
-          street: String(data.get("street") ?? ""),
-          postcode: String(data.get("postcode") ?? ""),
           chargerId,
           hasApplied: hasApplied === "yes",
           status: hasApplied === "yes" ? status : null,
@@ -272,30 +304,6 @@ function ApplicationForm({
         });
       }}
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="First name">
-          <Input name="firstName" required placeholder="First name" defaultValue={initial?.firstName} />
-        </Field>
-        <Field label="Last name">
-          <Input name="lastName" required placeholder="Last name" defaultValue={initial?.lastName} />
-        </Field>
-        <Field label="Email">
-          <Input name="email" required type="email" placeholder="Email" defaultValue={initial?.email} />
-        </Field>
-        <Field label="Phone number">
-          <Input name="phone" required type="tel" placeholder="Phone number" defaultValue={initial?.phone} />
-        </Field>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Street address">
-          <AddressAutocomplete name="street" required />
-        </Field>
-        <Field label="Postcode">
-          <PostcodeInput required />
-        </Field>
-      </div>
-
       <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
         <Field label="Have you applied for the grant on the GOV.UK website?">
           <RadioRow

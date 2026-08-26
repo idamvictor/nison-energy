@@ -1,30 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Heart, Mail, User } from "lucide-react";
+import { ArrowRight, Heart, Inbox, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { useNotifications } from "@/hooks/use-notifications";
 import { accountCustomer } from "@/lib/account-mock";
-import { adminLeads } from "@/lib/admin-leads";
 
 const tiles = [
   { href: "/account/profile", label: "Profile", icon: User },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
-  { href: "/account/enquiries", label: "My Enquiries", icon: Mail },
+  { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ] as const;
 
 export function AccountOverview() {
   const { items } = useWishlist();
-  const enquiryCount = adminLeads.filter(
-    (lead) => lead.email === accountCustomer.email
-  ).length;
+  const unreadCount = useNotifications(
+    (s) => s.items.filter((item) => !item.read).length
+  );
 
   const counts: Record<(typeof tiles)[number]["href"], string> = {
     "/account/profile": "Saved details",
     "/account/wishlist": `${items.length} saved`,
-    "/account/enquiries": `${enquiryCount} submitted`,
+    "/account/inbox": unreadCount > 0 ? `${unreadCount} new` : "All caught up",
   };
 
   return (

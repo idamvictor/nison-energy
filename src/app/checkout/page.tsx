@@ -35,6 +35,7 @@ import {
   type AddressSuggestion,
 } from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem } from "@/hooks/use-cart";
+import { useNotifications } from "@/hooks/use-notifications";
 import { generateReferenceCode } from "@/lib/reference-code";
 
 const currency = new Intl.NumberFormat("en-GB", {
@@ -86,6 +87,7 @@ const availableExtras: Extra[] = [
 export default function CheckoutPage() {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
+  const pushNotification = useNotifications((s) => s.push);
   const [submitted, setSubmitted] = useState(false);
   const [reference, setReference] = useState("");
   const [extraIds, setExtraIds] = useState<ExtraId[]>([]);
@@ -195,9 +197,15 @@ export default function CheckoutPage() {
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  setReference(generateReferenceCode("ORD"));
+                  const ref = generateReferenceCode("ORD");
+                  setReference(ref);
                   setSubmitted(true);
                   clear();
+                  pushNotification(
+                    "order",
+                    "Order placed",
+                    `Reference ${ref} — we'll be in touch to confirm installation.`
+                  );
                 }}
               >
                 <Card>

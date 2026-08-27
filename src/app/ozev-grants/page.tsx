@@ -23,7 +23,7 @@ import { GrantSchemeCard } from "@/components/grants/grant-scheme-card";
 import { grantSchemes } from "@/lib/grants";
 
 export const metadata: Metadata = {
-  title: "OZEV Grants | Nison Energy",
+  title: "OZEV Grants | Ocunio Energy",
   description:
     "Government grants can cover up to 75% of your EV charger installation. See which OZEV scheme you qualify for.",
 };

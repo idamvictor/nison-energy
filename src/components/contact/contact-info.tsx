@@ -34,7 +34,7 @@ export function ContactInfo() {
         </a>
 
         <a
-          href="mailto:info@nisonenergy.com"
+          href="mailto:info@ocunioenergy.com"
           className="flex items-center gap-3 transition-colors hover:text-primary"
         >
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
@@ -43,7 +43,7 @@ export function ContactInfo() {
           <div>
             <p className="text-xs text-muted-foreground">Email us</p>
             <p className="text-sm font-medium text-foreground">
-              info@nisonenergy.com
+              info@ocunioenergy.com
             </p>
           </div>
         </a>

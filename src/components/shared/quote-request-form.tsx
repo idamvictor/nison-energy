@@ -153,7 +153,7 @@ export function QuoteRequestForm({
         <Field label="Select your charger" className="sm:col-span-2">
           <Select value={selectedId} onValueChange={(value) => setSelectedId(value ?? "")}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choose your Nison Energy charger" />
+              <SelectValue placeholder="Choose your Ocunio Energy charger" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -194,9 +194,9 @@ export function QuoteRequestForm({
       {showComplianceFooter && (
         <div className="mt-4 flex flex-col gap-1 border-t border-border pt-4 text-xs text-muted-foreground">
           <p>
-            Nison Energy (trading as Nison Limited) · OZEV Installer No. 13528 · Borehamwood, Hertfordshire
+            Ocunio Energy (trading as Nison Limited) · OZEV Installer No. 13528 · Borehamwood, Hertfordshire
           </p>
-          <p>info@nisonenergy.com · 033 0633 0252 · www.nisonenergy.com</p>
+          <p>info@ocunioenergy.com · 033 0633 0252 · www.ocunioenergy.com</p>
           <p>
             We&apos;ll never share your details. A quote is sent by email within one working day.
           </p>

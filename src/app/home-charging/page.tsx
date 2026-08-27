@@ -8,7 +8,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
 
 export const metadata: Metadata = {
-  title: "Residential Chargers | Nison Energy",
+  title: "Residential Chargers | Ocunio Energy",
   description:
     "Browse our full range of OZEV-approved home EV chargers, professionally installed by certified engineers.",
 };

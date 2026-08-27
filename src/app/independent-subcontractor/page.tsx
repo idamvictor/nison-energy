@@ -22,9 +22,9 @@ const REGISTRATION_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSfsSQ7zuj7YMe1rFBBI0qWf62ovcV4yXsU_HbXuvfrOfJ93Ww/viewform";
 
 export const metadata: Metadata = {
-  title: "Independent Subcontractor | Nison Energy",
+  title: "Independent Subcontractor | Ocunio Energy",
   description:
-    "Join Nison Energy's national network of EV installers — vetted leads, OZEV claim support, and no cost to join.",
+    "Join Ocunio Energy's national network of EV installers — vetted leads, OZEV claim support, and no cost to join.",
 };
 
 const benefits = [
@@ -99,7 +99,7 @@ export default function IndependentSubcontractorPage() {
 
             <Reveal>
               <h2 className="mt-12 mb-5 font-heading text-lg font-semibold text-foreground">
-                Why Installers Partner With Nison Energy
+                Why Installers Partner With Ocunio Energy
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {benefits.map((benefit) => (

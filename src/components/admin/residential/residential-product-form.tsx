@@ -177,7 +177,7 @@ export function ResidentialProductForm({ product }: { product?: Product }) {
           <Field label="Tags (comma separated)">
             <Input
               defaultValue={product?.tags.join(", ")}
-              placeholder="e.g. Nison recommends, Free UK delivery"
+              placeholder="e.g. Ocunio recommends, Free UK delivery"
             />
           </Field>
           <Field label="Internal notes (optional)">

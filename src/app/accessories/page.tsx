@@ -7,7 +7,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
 
 export const metadata: Metadata = {
-  title: "Accessories | Nison Energy",
+  title: "Accessories | Ocunio Energy",
   description:
     "Type 2 EV charging cables in coiled or straight styles, discreet grey or hi-vis lime green, for single-phase and three-phase charging.",
 };

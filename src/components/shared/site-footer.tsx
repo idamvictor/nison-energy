@@ -51,11 +51,11 @@ export function SiteFooter() {
           <div>
             <Link href="/" className="flex items-center">
               <Image
-                src="/logo.png"
-                alt="Nison Energy"
-                width={3264}
-                height={1273}
-                className="h-9 w-auto brightness-0 invert"
+                src="/ocunio-energy-logo.png"
+                alt="Ocunio Energy"
+                width={676}
+                height={369}
+                className="h-11 w-auto brightness-0 invert"
               />
             </Link>
             <p className="mt-4 max-w-xs text-sm text-white/60">
@@ -128,7 +128,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <p className="max-w-2xl text-xs leading-relaxed text-white/50">
-            Nison Limited, trading as Nison Energy. Registered in England and
+            Nison Limited, trading as Ocunio Energy. Registered in England and
             Wales. Copyright © {new Date().getFullYear()}. All rights
             reserved.
           </p>

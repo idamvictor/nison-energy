@@ -12,7 +12,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
 
 export const metadata: Metadata = {
-  title: "About Us | Nison Energy",
+  title: "About Us | Ocunio Energy",
   description:
     "A UK-based EV charger supplier and NICEIC-certified installation company, OZEV-accredited from the first question to the last cable.",
 };

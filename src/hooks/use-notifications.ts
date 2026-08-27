@@ -52,7 +52,7 @@ export const useNotifications = create<NotificationsState>()(
         })),
     }),
     {
-      name: "nison-notifications",
+      name: "ocunio-notifications",
       skipHydration: true,
     }
   )

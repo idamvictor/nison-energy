@@ -6,7 +6,7 @@ import { useEffect } from "react";
 // skipHydration: true — calls rehydrate() once after mount (avoiding the
 // server/client mismatch a synchronous localStorage read would cause) and
 // again on cross-tab storage changes. Used once per store in the root
-// layout, e.g. <StoreHydration rehydrate={() => useCart.persist.rehydrate()} storageKey="nison-cart" />.
+// layout, e.g. <StoreHydration rehydrate={() => useCart.persist.rehydrate()} storageKey="ocunio-cart" />.
 export function StoreHydration({
   rehydrate,
   storageKey,

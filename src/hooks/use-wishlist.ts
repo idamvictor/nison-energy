@@ -30,7 +30,7 @@ export const useWishlist = create<WishlistState>()(
         })),
     }),
     {
-      name: "nison-wishlist",
+      name: "ocunio-wishlist",
       skipHydration: true,
       partialize: (state) => ({ items: state.items }),
     }

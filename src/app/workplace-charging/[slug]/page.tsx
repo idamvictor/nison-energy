@@ -38,7 +38,7 @@ export async function generateMetadata({
   if (!product) return {};
 
   return {
-    title: `${product.name} | Nison Energy`,
+    title: `${product.name} | Ocunio Energy`,
     description: commercialProductDetails[slug]?.tagline,
   };
 }

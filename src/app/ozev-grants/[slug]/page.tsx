@@ -36,7 +36,7 @@ export async function generateMetadata({
   if (!scheme) return {};
 
   return {
-    title: `${scheme.audience} | OZEV Grants | Nison Energy`,
+    title: `${scheme.audience} | OZEV Grants | Ocunio Energy`,
     description: scheme.tagline,
   };
 }

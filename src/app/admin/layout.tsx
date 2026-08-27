@@ -5,7 +5,7 @@ import { AdminSidebar } from "@/components/admin/shared/admin-sidebar";
 import { AdminTopbar } from "@/components/admin/shared/admin-topbar";
 
 export const metadata: Metadata = {
-  title: "Admin | Nison Energy",
+  title: "Admin | Ocunio Energy",
   robots: { index: false, follow: false },
 };
 

@@ -89,7 +89,7 @@ export function AboutHero() {
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-xl text-white">
             <span className="about-hero-copy inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide uppercase">
-              About Nison Energy
+              About Ocunio Energy
             </span>
             <h1 className="mt-5 text-4xl leading-[1.1] font-semibold tracking-[-0.02em] sm:text-5xl">
               {words.map((word, i) => (

@@ -100,5 +100,5 @@ export function generateApplicationGuidePdf() {
     MUTED
   );
 
-  doc.save("nison-energy-ozev-application-guide.pdf");
+  doc.save("ocunio-energy-ozev-application-guide.pdf");
 }

@@ -107,7 +107,7 @@ export function OnStreetIntakeForm() {
           {reference}
         </p>
         <p className="max-w-md text-sm text-muted-foreground">
-          A member of the Nison Energy team will review your submission and
+          A member of the Ocunio Energy team will review your submission and
           be in touch to confirm next steps, including your site survey and
           local highways authority consent guidance.
         </p>
@@ -310,7 +310,7 @@ export function OnStreetIntakeForm() {
               />
             </Field>
             <CheckRow id="dataConsent" required>
-              I consent to Nison Energy storing and using these details to
+              I consent to Ocunio Energy storing and using these details to
               assess my eligibility, obtain quotes, and progress my grant
               application.
             </CheckRow>

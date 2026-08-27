@@ -10,7 +10,7 @@ export type BlogPost = {
 };
 
 // Real articles crawled from the previous Ocunio Energy site's blog and
-// rebranded for Nison Energy — internal CTAs point at our real routes,
+// rebranded for Ocunio Energy — internal CTAs point at our real routes,
 // ads/newsletter widgets/related-post carousels/social-share blocks were
 // stripped since they weren't article content, and the actual editorial
 // text is preserved as written.
@@ -21,7 +21,7 @@ export const blogPostsSeed: BlogPost[] = [
     excerpt:
       "The Workplace Charging Scheme is usually pitched at offices and fleet yards — but if your home is your registered place of business, you can often claim too.",
     coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/06/image-3.jpeg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2026-06-09",
     tags: ["Workplace Charging Scheme", "OZEV Grants", "Home Business"],
     bodyMarkdown: `If you're a contractor, sole trader or director running your business from home, there's a government grant with your name on it that you've probably been told doesn't apply to you. The [Workplace Charging Scheme (WCS)](https://www.find-government-grants.service.gov.uk/grants/workplace-charging-scheme-2) is usually pitched at offices, warehouses and fleet yards — so most people working from a home office assume it's not for them. In a lot of cases, they're wrong.
@@ -80,7 +80,7 @@ Not sure if your home setup qualifies? That's the most common question we get fr
     excerpt:
       "From 1 April 2026 the grant rate jumped to £500 per socket across both the Workplace Charging Scheme and the Residential Landlord Chargepoint Grant — here's what that means in practice.",
     coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/06/image-1.jpeg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2026-06-09",
     tags: ["OZEV Grants", "Workplace Charging Scheme", "Landlords"],
     bodyMarkdown: `## Introduction
@@ -110,7 +110,7 @@ The grant covers up to **75% of the total purchase and installation cost (includ
 - Registered UK businesses of any size — sole traders, SMEs, including small accommodation businesses and large enterprises
 - Charities and public-sector organisations
 - You need dedicated off-street parking — staff bays, fleet bays or a customer car park
-- You must use an OZEV-authorised installer (Nison Energy is authorised)
+- You must use an OZEV-authorised installer (Ocunio Energy is authorised)
 - Charge points must be available to staff or fleet vehicles, not reserved for a single director
 - Available across England, Wales, Scotland and Northern Ireland
 
@@ -159,7 +159,7 @@ A handy detail: a dual-socket charger counts as two sockets, so a single dual-so
 - You must be registered with Companies House or VAT-registered with HMRC
 - Properties must be residential and let to tenants (commercial landlord grants have closed)
 - Each property needs dedicated off-street or allocated parking
-- You must use an OZEV-approved installer — Nison Energy is authorised
+- You must use an OZEV-approved installer — Ocunio Energy is authorised
 - You must install an OZEV-approved smart chargepoint
 - The chargepoint must be installed after eligibility is confirmed — never before
 
@@ -175,7 +175,7 @@ The grant covers the charger hardware (purchase and delivery), installation labo
 
 > "In 2026, tenants are actively filtering Rightmove for 'EV charging'. Installing a charger future-proofs your rental income and reduces void periods — and right now the government pays half the cost."
 >
-> — Nison Energy landlord analysis, May 2026
+> — Ocunio Energy landlord analysis, May 2026
 
 ### Recommended chargers for rental properties
 
@@ -187,7 +187,7 @@ The grant covers the charger hardware (purchase and delivery), installation labo
 
 The process changed on 1 April 2026. The old OZEV portal has been replaced for landlord grants by the government's Find a Grant platform — and importantly, you now apply directly, rather than through your installer.
 
-1. **Book a free site survey with Nison Energy.** We confirm the property is suitable, recommend the right charger and prepare a dated quote — now required as part of the application.
+1. **Book a free site survey with Ocunio Energy.** We confirm the property is suitable, recommend the right charger and prepare a dated quote — now required as part of the application.
 2. **Apply via Find a Grant before installation.** Create an account on the government platform and upload your evidence: proof of landlord status (Companies House or VAT registration), a tenancy agreement, proof of parking, and our dated quote.
 3. **Wait for OZEV approval (up to 10 working days).** Do not begin installation before you receive confirmation. If the charger goes in before approval, the grant may be refused.
 4. **We carry out the installation.** Once you're approved, we fit your chosen chargepoint and handle all electrical work, commissioning and testing.
@@ -212,7 +212,7 @@ Add EV charging to your portfolio or workplace. [Book a free site survey](/conta
     excerpt:
       "Rightmove and Zoopla are both tracking a surge in demand for EV charging. Here's what it does to your property's value, and how a networked charger can pay for itself.",
     coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/06/id-1.jpg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2026-06-09",
     tags: ["Property", "Landlords", "EV Charging"],
     bodyMarkdown: `Not long ago, an EV charge point was a curiosity on a property listing. Today it's fast becoming something buyers and tenants look for by name — and the property portals have noticed. Whether you own your home, let it out, or manage a commercial site, a well-chosen charge point is now one of the more sensible upgrades you can make. Here's what the data says, and how the right setup can actually earn its keep.
@@ -250,11 +250,11 @@ This is where an app-based platform like Monta comes in. Monta is an EV charging
 
 Whatever your situation, there's likely a grant that cuts the upfront cost by up to 75%. Businesses, charities and public-sector organisations can use the Workplace Charging Scheme (£500 per socket, up to 40 sockets and £20,000 per business). Private residential landlords can claim through the Residential Landlord Chargepoint Grant (£500 per socket, up to 200 sockets a year). Both schemes run until 31 March 2027 — we break down the eligibility and application steps in full in our [dedicated OZEV grants guide](/ozev-grants).
 
-## Getting started with Nison Energy
+## Getting started with Ocunio Energy
 
 The picture from Rightmove and Zoopla is consistent: charging is moving from nice-to-have to expected, it supports property value, and it can be set up to pay for itself over time. The buildings that get ahead of this will be the easier ones to sell, let and lease.
 
-As an OZEV-approved installer, Nison Energy handles the whole journey: a free site survey, the right hardware for your property, software setup with platforms like Monta, the grant paperwork, and a clean certified installation.
+As an OZEV-approved installer, Ocunio Energy handles the whole journey: a free site survey, the right hardware for your property, software setup with platforms like Monta, the grant paperwork, and a clean certified installation.
 
 Ready to add charging — and make it work for you? [Book a free, no-obligation site survey](/contact-us) and we'll map out your options, including every grant you qualify for and how to turn your charger into an income stream.`,
   },
@@ -264,7 +264,7 @@ Ready to add charging — and make it work for you? [Book a free, no-obligation 
     excerpt:
       "25% of global car sales are now electric. Here's what's happening right now across charging speeds, home energy freedom, infrastructure and the 2025/26 grants.",
     coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/04/i3nnin.jpg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2026-04-21",
     tags: ["EV Industry", "Home Charging", "OZEV Grants"],
     bodyMarkdown: `2026 isn't just another year for electric vehicles — it's the year the industry hits hyper-drive. From the streets of London to the highways of Europe, the landscape of mobility is shifting beneath our wheels. Here is what's happening right now in the world of e-mobility.
@@ -310,7 +310,7 @@ Whether you're a homeowner looking for energy independence or a business scaling
     excerpt:
       "Five grant schemes have been extended until 31 March 2027 with new, higher rates, while three grants close permanently at the end of March 2026. Here's what's changing.",
     coverImage: "https://ocunioenergy.com/wp-content/uploads/2025/06/Picture89.jpg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2026-03-30",
     tags: ["OZEV Grants", "Policy Update"],
     bodyMarkdown: `The Office for Zero Emission Vehicles (OZEV) has announced significant updates to its home and workplace charge point grant schemes. Five grant schemes have been extended until 31 March 2027 with new grant rates, while three grants will close permanently at the end of March 2026. The aim is to simplify the system and make it easier for households and businesses to access support.
@@ -364,7 +364,7 @@ Full guidance is available on our [OZEV grants page](/ozev-grants).
 | 6 July 2026 | Final deadline for claim resubmissions |
 | 31 March 2027 | End of all remaining OZEV grant schemes |
 
-If you have questions or need support navigating the new requirements, it's worth [contacting Nison Energy](/contact-us) ahead of the April deadlines.`,
+If you have questions or need support navigating the new requirements, it's worth [contacting Ocunio Energy](/contact-us) ahead of the April deadlines.`,
   },
   {
     slug: "guide-to-electric-car-charging-and-ownership",
@@ -372,7 +372,7 @@ If you have questions or need support navigating the new requirements, it's wort
     excerpt:
       "From home charging tariffs and cable types to connector standards, battery health and today's OZEV grant rates — a complete walkthrough of EV ownership.",
     coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/03/image-2.jpeg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2026-03-10",
     tags: ["EV Ownership", "Home Charging", "OZEV Grants"],
     bodyMarkdown: `Filling up with fuel is simple, but charging an electric car (EV) requires a bit more thought and planning. While different connectors and apps can seem complex, this guide aims to simplify the process.
@@ -480,7 +480,7 @@ OZEV is also consolidating eight schemes down to five to simplify the system —
 
 When the new service opened on 1 April 2026, customers now register for a [Find a Grant account](https://www.find-government-grants.service.gov.uk/) and apply for the flats and renters grant directly, rather than being sent a link by their installer. Installers are notified by email when a claim is rejected, declined or approved. Initial assessment timescales are up to 10 working days.
 
-At Nison Energy, our electricians are OZEV-approved, so we can take away the hard work from you and apply for a grant on your behalf. [See our full OZEV grants guide](/ozev-grants).`,
+At Ocunio Energy, our electricians are OZEV-approved, so we can take away the hard work from you and apply for a grant on your behalf. [See our full OZEV grants guide](/ozev-grants).`,
   },
   {
     slug: "uk-electric-car-grant-2025-save-up-to-3750-on-your-next-ev",
@@ -489,7 +489,7 @@ At Nison Energy, our electricians are OZEV-approved, so we can take away the har
       "A £650 million Electric Car Grant offers discounts of up to £3,750 on eligible electric vehicles priced at or under £37,000 — here's who qualifies and what it means alongside home charging.",
     coverImage:
       "https://ocunioenergy.com/wp-content/uploads/2025/07/UK-Electric-Car-Grant-2025_blog-image.webp",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2025-07-30",
     tags: ["EV Grants", "Buying an EV"],
     bodyMarkdown: `The UK government has launched a game-changing initiative that could make electric vehicles more affordable than ever before. The new £650 million Electric Car Grant (ECG) offers discounts of up to £3,750 per car for eligible electric vehicles priced at or under £37,000, marking a significant step forward in making sustainable transport accessible to working families across the nation.
@@ -530,7 +530,7 @@ Owning and buying an electric vehicle (EV) is becoming cheaper, with 2 in 5 of u
 
 The automotive industry has responded positively to the grant announcement. Mike Hawes, SMMT chief executive, stated that "today's announcement of the return of government support for the purchase of electric vehicles is a clear signal to consumers that now is the time to switch." The SMMT estimates that discounts on EVs cost carmakers in the region of £4 billion in 2024, demonstrating the substantial investment manufacturers are already making.
 
-## What This Means for Nison Energy Customers
+## What This Means for Ocunio Energy Customers
 
 As specialists in EV charging infrastructure, we understand that the transition to electric vehicles represents a crucial component of sustainable living. The new Electric Car Grant makes this transition more affordable, but it also increases the importance of having the right charging infrastructure at home.
 
@@ -561,7 +561,7 @@ As specialists in EV charging infrastructure, we understand that the transition 
 
 The new Electric Car Grant creates unprecedented opportunities for UK drivers to access affordable electric mobility. However, to truly maximise the benefits of EV ownership, it's essential to consider the complete ecosystem — from the vehicle itself to home charging infrastructure and energy management.
 
-Ready to explore your electric future? [Contact Nison Energy](/contact-us) today to discuss how we can support your EV charging needs and help you take full advantage of these exciting new opportunities in sustainable transport.`,
+Ready to explore your electric future? [Contact Ocunio Energy](/contact-us) today to discuss how we can support your EV charging needs and help you take full advantage of these exciting new opportunities in sustainable transport.`,
   },
   {
     slug: "choosing-the-right-ev-charging-cable-why-zev-cables-stand-out",
@@ -570,9 +570,9 @@ Ready to explore your electric future? [Contact Nison Energy](/contact-us) today
       "Your cable is just as crucial as your charger. Here's why we recommend ZEV's Type 2 charging cables for home, workplace and public charging.",
     coverImage:
       "https://ocunioenergy.com/wp-content/uploads/2025/07/Zev-Cable-2025-05-04-at-15.38.53.jpeg.jpg",
-    author: "Nison Energy",
+    author: "Ocunio Energy",
     publishedAt: "2025-07-12",
-    tags: ["EV Charging", "EV Charging Cable", "Electric Vehicle Charging Points", "Nison Energy", "OZEV", "Green Driving", "EV Accessories", "Workplace Charging Scheme"],
+    tags: ["EV Charging", "EV Charging Cable", "Electric Vehicle Charging Points", "Ocunio Energy", "OZEV", "Green Driving", "EV Accessories", "Workplace Charging Scheme"],
     bodyMarkdown: `When it comes to charging your electric vehicle, your cable is just as crucial as your charger. ZEV offers high-quality EV charging cables that are durable, reliable, and tailored to UK standards — specifically Type 2 connectors, which are now the universal standard for most EVs and chargepoints across the UK and Europe.
 
 ZEV's cables support home, workplace, and public charging stations. They provide multiple cable lengths and power capacities (16A or 32A), accommodating both single and three-phase charging scenarios.

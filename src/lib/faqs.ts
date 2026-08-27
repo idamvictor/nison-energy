@@ -63,7 +63,7 @@ export const faqCategories: FaqCategory[] = [
       {
         question: "Are your engineers qualified?",
         answer:
-          "Yes. All Nison Energy installations are carried out by NICEIC-certified electricians — independently assessed and approved. We don't subcontract to unverified tradespeople.",
+          "Yes. All Ocunio Energy installations are carried out by NICEIC-certified electricians — independently assessed and approved. We don't subcontract to unverified tradespeople.",
       },
       {
         question: "What happens after installation?",

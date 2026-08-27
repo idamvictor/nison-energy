@@ -11,7 +11,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
 
 export const metadata: Metadata = {
-  title: "Commercial Chargers | Nison Energy",
+  title: "Commercial Chargers | Ocunio Energy",
   description:
     "Commercial EV charger installation for offices, depots and car parks, backed by the OZEV Workplace Charging Scheme.",
 };

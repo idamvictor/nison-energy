@@ -31,7 +31,7 @@ export const useGrantApplication = create<GrantApplicationState>()(
       clear: () => set({ record: null }),
     }),
     {
-      name: "nison-grant-application",
+      name: "ocunio-grant-application",
       skipHydration: true,
     }
   )

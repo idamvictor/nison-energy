@@ -18,6 +18,6 @@ export const useAuth = create<AuthState>()(
       signIn: () => set({ isSignedIn: true }),
       signOut: () => set({ isSignedIn: false }),
     }),
-    { name: "nison-auth", skipHydration: true }
+    { name: "ocunio-auth", skipHydration: true }
   )
 );

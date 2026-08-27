@@ -1,5 +1,5 @@
 const tagStyles: Record<string, string> = {
-  "Nison recommends": "bg-primary text-primary-foreground border-transparent",
+  "Ocunio recommends": "bg-primary text-primary-foreground border-transparent",
   "Free UK delivery": "bg-success text-success-foreground border-transparent",
   "3 year warranty": "bg-success text-success-foreground border-transparent",
 };

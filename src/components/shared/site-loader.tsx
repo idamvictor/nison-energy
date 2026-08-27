@@ -96,10 +96,10 @@ export function SiteLoader() {
 
       <div className="relative flex flex-col items-center gap-6">
         <Image
-          src="/logo.png"
-          alt="Nison Energy"
-          width={3264}
-          height={1273}
+          src="/ocunio-energy-logo.png"
+          alt="Ocunio Energy"
+          width={676}
+          height={369}
           priority
           className="loader-logo h-14 w-auto sm:h-16"
         />

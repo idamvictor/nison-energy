@@ -76,12 +76,12 @@ export function SiteHeader() {
       <div className="mx-auto flex h-17 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
           <Image
-            src="/logo.png"
-            alt="Nison Energy"
-            width={3264}
-            height={1273}
+            src="/ocunio-energy-logo.png"
+            alt="Ocunio Energy"
+            width={676}
+            height={369}
             priority
-            className="h-9 w-auto"
+            className="h-11 w-auto"
           />
         </Link>
 
@@ -189,7 +189,7 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <SheetHeader>
-                <SheetTitle>Nison Energy</SheetTitle>
+                <SheetTitle>Ocunio Energy</SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-4">
                 {navLinks.map((link) => {

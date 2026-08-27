@@ -30,7 +30,7 @@ export const accessoryProducts: AccessoryProduct[] = [
     phase: "3 Phase",
     lengthOptions: ["5m", "10m"],
     variantGroup: "zev-3phase",
-    tags: ["Nison recommends"],
+    tags: ["Ocunio recommends"],
     image: images.greyCoiled,
   },
   {
@@ -78,7 +78,7 @@ export const accessoryProducts: AccessoryProduct[] = [
     phase: "Single Phase",
     lengthOptions: ["5m", "10m"],
     variantGroup: "zev-single",
-    tags: ["Nison recommends"],
+    tags: ["Ocunio recommends"],
     image: images.greyCoiled,
   },
   {

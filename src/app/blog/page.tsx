@@ -8,9 +8,9 @@ import { HelpSection } from "@/components/shared/help-section";
 import { BlogList } from "@/components/blog/blog-list";
 
 export const metadata: Metadata = {
-  title: "Blog | Nison Energy",
+  title: "Blog | Ocunio Energy",
   description:
-    "EV charging news, OZEV grant updates, and buying guides from the Nison Energy team.",
+    "EV charging news, OZEV grant updates, and buying guides from the Ocunio Energy team.",
 };
 
 export default function BlogPage() {
@@ -20,7 +20,7 @@ export default function BlogPage() {
       <TrustBar />
       <main className="flex-1">
         <CategoryHero
-          title="The Nison Energy Blog"
+          title="The Ocunio Energy Blog"
           subtitle="EV charging news, OZEV grant updates, and buying guides — written by our team."
           image="https://ocunioenergy.com/wp-content/uploads/2026/06/image-3.jpeg"
         />

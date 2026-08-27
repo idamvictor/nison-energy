@@ -55,7 +55,7 @@ export const useCart = create<CartState>()(
       closeCart: () => set({ isOpen: false }),
     }),
     {
-      name: "nison-cart",
+      name: "ocunio-cart",
       skipHydration: true,
       partialize: (state) => ({ items: state.items }),
     }

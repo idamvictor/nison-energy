@@ -7,7 +7,7 @@ import { ContactInfo } from "@/components/contact/contact-info";
 import { SiteFooter } from "@/components/shared/site-footer";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Nison Energy",
+  title: "Contact Us | Ocunio Energy",
   description:
     "Ready to start your OZEV grant application? Get in touch and we'll take it from there.",
 };

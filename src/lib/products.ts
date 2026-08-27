@@ -27,7 +27,7 @@ export const products: Product[] = [
     colour: "Black",
     powerOutput: "7.4kW",
     price: 980,
-    tags: ["Nison recommends", "Free UK delivery"],
+    tags: ["Ocunio recommends", "Free UK delivery"],
     image: `${IMG}/2025/05/easee-one-ev-charger-8.jpg`,
   },
   {
@@ -75,7 +75,7 @@ export const products: Product[] = [
     variantGroup: "indra-smart-lux",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1050,
-    tags: ["Nison recommends", "3 year warranty"],
+    tags: ["Ocunio recommends", "3 year warranty"],
     image: `${IMG}/2025/05/indra-smart-lux-ev-charger-black.webp`,
   },
   {
@@ -119,7 +119,7 @@ export const products: Product[] = [
     powerOutput: "7.4kW",
     compatibleTariffs: ["Octopus Energy", "OVO Energy"],
     price: 1077,
-    tags: ["Nison recommends", "Free UK delivery"],
+    tags: ["Ocunio recommends", "Free UK delivery"],
     image: `${IMG}/2025/05/Ohme-home_pro_1.png`,
   },
   {

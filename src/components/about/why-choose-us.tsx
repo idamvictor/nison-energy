@@ -30,7 +30,7 @@ export function WhyChooseUs() {
         <Reveal>
           <SectionKicker tone="invert" />
           <h2 className="mt-4 text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
-            Why Choose Nison Energy
+            Why Choose Ocunio Energy
           </h2>
         </Reveal>
 

@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Nison Energy | Premium EV Home Charging",
+  title: "Ocunio Energy | Premium EV Home Charging",
   description:
     "Certified EV charger installation for home and workplace. Instant online quotes, expert installers, and OZEV grant support.",
 };

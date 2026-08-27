@@ -88,7 +88,7 @@ export function generateQuotePdf(input: QuotePdfInput) {
   doc.setFontSize(9.5);
   doc.setTextColor(...MUTED);
   doc.text(
-    "Tel: 033 0633 0252   |   Email: info@nisonenergy.com   |   Web: www.nisonenergy.com",
+    "Tel: 033 0633 0252   |   Email: info@ocunioenergy.com   |   Web: www.ocunioenergy.com",
     MARGIN,
     y
   );
@@ -221,5 +221,5 @@ export function generateQuotePdf(input: QuotePdfInput) {
     MUTED
   );
 
-  doc.save(`nison-energy-quote-${input.reference}.pdf`);
+  doc.save(`ocunio-energy-quote-${input.reference}.pdf`);
 }

@@ -25,7 +25,7 @@ export const commercialProducts: CommercialProduct[] = [
     colour: "Anthracite",
     powerOutput: "1.4–22kW",
     price: 1634,
-    tags: ["Nison recommends"],
+    tags: ["Ocunio recommends"],
     image: `${IMG}/2025/05/easee-charge-max-front-use-this-photo.webp`,
   },
   {
@@ -63,7 +63,7 @@ export const commercialProducts: CommercialProduct[] = [
     powerOutput: "22kW",
     variantGroup: "zappi-22kw",
     price: 1296,
-    tags: ["Nison recommends", "Solar compatible"],
+    tags: ["Ocunio recommends", "Solar compatible"],
     image: `${IMG}/2025/06/Zappi_myenergi-zappi-22kw-type-2-tethered-ev-charger-black-2.jpg`,
   },
   {

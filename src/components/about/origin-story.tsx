@@ -22,7 +22,7 @@ export function OriginStory() {
                   you.
                 </p>
                 <p>
-                  We started Nison Energy because we noticed the EV charging
+                  We started Ocunio Energy because we noticed the EV charging
                   market was full of unnecessary complexity. Too many
                   customers were left to navigate grant applications, DNO
                   paperwork and installation logistics on their own — often

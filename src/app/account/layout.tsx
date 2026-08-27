@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { AccountNav } from "@/components/account/account-nav";
 
 export const metadata: Metadata = {
-  title: { template: "%s | My Account | Nison Energy", default: "My Account | Nison Energy" },
+  title: { template: "%s | My Account | Ocunio Energy", default: "My Account | Ocunio Energy" },
 };
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {

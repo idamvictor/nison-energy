@@ -103,5 +103,5 @@ export function generatePermissionLetterPdf() {
   );
   doc.text(footer, MARGIN, y);
 
-  doc.save("nison-energy-landlord-permission-letter-template.pdf");
+  doc.save("ocunio-energy-landlord-permission-letter-template.pdf");
 }

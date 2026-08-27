@@ -28,7 +28,7 @@ export const useBlogPosts = create<BlogPostsState>()(
         })),
     }),
     {
-      name: "nison-blog-posts",
+      name: "ocunio-blog-posts",
       skipHydration: true,
     }
   )

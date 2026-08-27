@@ -53,10 +53,10 @@ export function AdminSidebar() {
           className="flex items-center gap-2 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80"
         >
           <Image
-            src="/logo.png"
-            alt="Nison Energy"
-            width={3264}
-            height={1273}
+            src="/ocunio-energy-logo.png"
+            alt="Ocunio Energy"
+            width={676}
+            height={369}
             className="h-6 w-auto"
           />
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[0.65rem] font-semibold tracking-wide text-primary uppercase">

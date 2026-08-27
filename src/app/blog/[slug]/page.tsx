@@ -14,10 +14,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = blogPostsSeed.find((p) => p.slug === slug);
-  if (!post) return { title: "Blog | Nison Energy" };
+  if (!post) return { title: "Blog | Ocunio Energy" };
 
   return {
-    title: `${post.title} | Nison Energy`,
+    title: `${post.title} | Ocunio Energy`,
     description: post.excerpt,
   };
 }

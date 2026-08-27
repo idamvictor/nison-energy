@@ -50,7 +50,7 @@ export function BlogPostForm({ post }: { post?: BlogPost }) {
           title,
           excerpt: String(data.get("excerpt") ?? ""),
           coverImage: String(data.get("coverImage") ?? ""),
-          author: String(data.get("author") ?? "Nison Energy"),
+          author: String(data.get("author") ?? "Ocunio Energy"),
           publishedAt: String(data.get("publishedAt") ?? new Date().toISOString().slice(0, 10)),
           tags: String(data.get("tags") ?? "")
             .split(",")
@@ -106,7 +106,7 @@ export function BlogPostForm({ post }: { post?: BlogPost }) {
               />
             </Field>
             <Field label="Author">
-              <Input name="author" defaultValue={post?.author ?? "Nison Energy"} />
+              <Input name="author" defaultValue={post?.author ?? "Ocunio Energy"} />
             </Field>
             <Field label="Published date">
               <Input

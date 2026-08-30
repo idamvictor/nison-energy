@@ -4,8 +4,10 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { CategoryHero } from "@/components/shared/category-hero";
 import { HomeChargingCatalog } from "@/components/home-charging/home-charging-catalog";
+import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { residentialFaqCategories } from "@/lib/faqs";
 
 export const metadata: Metadata = {
   title: "Residential Chargers | Ocunio Energy",
@@ -27,6 +29,10 @@ export default function HomeChargingPage() {
           image={`${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`}
         />
         <HomeChargingCatalog />
+        <FaqSection
+          categories={residentialFaqCategories}
+          title="Residential Charger FAQs"
+        />
         <HelpSection />
       </main>
       <SiteFooter />

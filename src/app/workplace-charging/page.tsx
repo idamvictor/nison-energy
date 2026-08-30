@@ -7,8 +7,10 @@ import { CategoryHero } from "@/components/shared/category-hero";
 import { CommercialCatalog } from "@/components/workplace-charging/commercial-catalog";
 import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
+import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { commercialFaqCategories } from "@/lib/faqs";
 
 export const metadata: Metadata = {
   title: "Commercial Chargers | Ocunio Energy",
@@ -54,6 +56,10 @@ export default function WorkplaceChargingPage() {
           </div>
         </section>
 
+        <FaqSection
+          categories={commercialFaqCategories}
+          title="Workplace & Commercial FAQs"
+        />
         <HelpSection />
       </main>
       <SiteFooter />

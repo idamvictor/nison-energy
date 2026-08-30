@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,25 +14,41 @@ gsap.registerPlugin(useGSAP);
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";
 
-const slides = [
+type Slide = {
+  tag?: string;
+  headline: string;
+  copy: string;
+  bullets?: string[];
+  cta: string;
+  href: string;
+  image: string;
+};
+
+const slides: Slide[] = [
   {
-    headline: "Premium chargers, installed properly.",
-    copy: "Instant online quotes and expert installation from certified engineers. Fitted in days, not weeks.",
-    cta: "Browse home chargers",
+    tag: "Best Sellers In Stock",
+    headline: "Your car. Charged right.",
+    copy: "Trusted by thousands of UK drivers. Fast delivery, expert fitting, real savings.",
+    bullets: [
+      "Universal EV Compatibility",
+      "OZEV Grant-Eligible Chargers",
+      "Cheaper Overnight Charging",
+    ],
+    cta: "Shop Now",
     href: "/home-charging",
     image: `${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`,
   },
   {
-    headline: "Power up your fleet on-site.",
-    copy: "Scalable commercial installations for offices, depots and car parks, backed by OZEV workplace funding.",
+    headline: "On-site charging for your whole fleet.",
+    copy: "Scalable, revenue-ready installations for offices, depots and car parks — backed by OZEV workplace funding.",
     cta: "Explore workplace charging",
     href: "/workplace-charging",
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
   },
   {
-    headline: "Cables, adapters and everything else.",
-    copy: "Type 2 cables, holsters and portable chargers to round out your setup.",
-    cta: "Shop accessories",
+    headline: "Cables, posts and install kits.",
+    copy: "Type 2 cables, mounts and posts, and portable chargers, hand-picked to complete your installation.",
+    cta: "Shop Now",
     href: "/accessories",
     image: `${IMG}/2025/05/EV_OneStop_Website_Type_2_Cables_1f4fd143-35b6-46ba-a663-705f220bc1f4.png`,
   },
@@ -60,7 +76,10 @@ export function Hero() {
 
       if (reduceMotion) {
         gsap.set(".hero-word", { yPercent: 0, autoAlpha: 1 });
-        gsap.set([".hero-copy", ".hero-cta"], { y: 0, autoAlpha: 1 });
+        gsap.set([".hero-tag", ".hero-copy", ".hero-bullet", ".hero-cta"], {
+          y: 0,
+          autoAlpha: 1,
+        });
         gsap.set(imageRef.current, { scale: 1, autoAlpha: 1 });
         return;
       }
@@ -82,6 +101,12 @@ export function Hero() {
           "<"
         )
         .fromTo(
+          ".hero-tag",
+          { y: 10, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out" },
+          0.15
+        )
+        .fromTo(
           ".hero-word",
           { yPercent: 110, autoAlpha: 0 },
           {
@@ -100,6 +125,18 @@ export function Hero() {
           0.55
         )
         .fromTo(
+          ".hero-bullet",
+          { y: 10, autoAlpha: 0 },
+          {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.5,
+            ease: "power2.out",
+            stagger: 0.06,
+          },
+          0.65
+        )
+        .fromTo(
           ".hero-cta",
           { y: 14, autoAlpha: 0 },
           {
@@ -109,7 +146,7 @@ export function Hero() {
             ease: "power2.out",
             stagger: 0.08,
           },
-          0.68
+          0.8
         );
     },
     { scope: containerRef, dependencies: [index], revertOnUpdate: true }
@@ -149,6 +186,12 @@ export function Hero() {
 
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-lg text-white">
+            {slide.tag && (
+              <span className="hero-tag mb-4 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/15 px-3 py-1 text-xs font-semibold tracking-wide text-accent uppercase">
+                <span className="size-1.5 rounded-full bg-accent" />
+                {slide.tag}
+              </span>
+            )}
             <h1 className="text-4xl leading-[1.08] font-semibold tracking-[-0.02em] sm:text-5xl">
               {words.map((word, i) => (
                 <span key={i} className="inline-block overflow-hidden pb-1">
@@ -162,7 +205,20 @@ export function Hero() {
             <p className="hero-copy mt-5 max-w-md text-lg leading-relaxed text-white/70">
               {slide.copy}
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            {slide.bullets && (
+              <ul className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-2">
+                {slide.bullets.map((bullet) => (
+                  <li
+                    key={bullet}
+                    className="hero-bullet flex items-center gap-2 text-sm font-medium text-white/85"
+                  >
+                    <Check className="size-4 shrink-0 text-accent" strokeWidth={2.5} />
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button
                 size="lg"
                 nativeButton={false}
@@ -171,15 +227,6 @@ export function Hero() {
               >
                 {slide.cta}
                 <ArrowRight className="size-4" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                nativeButton={false}
-                className="hero-cta h-12 border-white/40 bg-transparent px-6 text-base text-white hover:border-white hover:bg-white/10"
-                render={<Link href="/ozev-grants" />}
-              >
-                Check grant eligibility
               </Button>
             </div>
           </div>

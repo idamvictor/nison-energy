@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 export const metadata: Metadata = {
   title: "Contact Us | Ocunio Energy",
   description:
-    "Ready to start your OZEV grant application? Get in touch and we'll take it from there.",
+    "We're here to help with chargers, installs, and grant eligibility. Get in touch and we'll take it from there.",
 };
 
 export default function ContactUsPage() {
@@ -21,11 +21,11 @@ export default function ContactUsPage() {
         <div className="bg-primary text-primary-foreground">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Contact Us
+              Have a Question?
             </h1>
             <p className="mt-3 max-w-lg text-primary-foreground/75">
-              Ready to start your OZEV grant application? Tell us a bit
-              about your enquiry and we&apos;ll take it from there.
+              We&apos;re here to help with chargers, installs, and grant
+              eligibility.
             </p>
           </div>
         </div>

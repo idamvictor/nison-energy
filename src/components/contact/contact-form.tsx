@@ -107,10 +107,6 @@ export function ContactForm() {
       </div>
 
       <RadioField
-        name="paid-service"
-        label="Are there plans to make it a paid service?"
-      />
-      <RadioField
         name="communications"
         label="Happy to receive future communications on insights and trends?"
       />

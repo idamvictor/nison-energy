@@ -1,12 +1,10 @@
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, Phone } from "lucide-react";
 
 import {
   FacebookIcon,
   InstagramIcon,
   LinkedinIcon,
 } from "@/components/shared/social-icons";
-
-const ADDRESS = "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ";
 
 const hours = [
   { day: "Monday – Friday", time: "09:00 – 18:00" },
@@ -75,16 +73,6 @@ export function ContactInfo() {
               <Icon className="size-4" />
             </a>
           ))}
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3 rounded-2xl border border-border p-6">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
-          <MapPin className="size-4" />
-        </span>
-        <div>
-          <p className="text-xs text-muted-foreground">Our address</p>
-          <p className="text-sm font-medium text-foreground">{ADDRESS}</p>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ gsap.registerPlugin(useGSAP);
 const IMG =
   "https://ocunioenergy.com/wp-content/uploads/2025/05/pexels-andersen-ev-1587213396-27355833-scaled.jpg";
 
-const headline = "Making EV charging simple, from the first question to the last cable.";
+const headline = "Your One-Stop EV Charging Solution";
 
 export function AboutHero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -102,9 +102,7 @@ export function AboutHero() {
               ))}
             </h1>
             <p className="about-hero-copy mt-5 max-w-md text-lg leading-relaxed text-white/75">
-              A UK-based EV charger supplier and NICEIC-certified installation
-              company — OZEV-accredited, so every installation we carry out
-              is eligible for government grant support.
+              Buy. Install. Claim Your Grant. All in One Place.
             </p>
           </div>
         </div>

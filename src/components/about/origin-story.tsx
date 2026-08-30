@@ -10,30 +10,40 @@ export function OriginStory() {
             <div>
               <SectionKicker />
               <h2 className="mt-4 text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
-                Why We Started
+                Our Story
               </h2>
               <div className="mt-5 flex flex-col gap-4 text-foreground/80">
                 <p>
-                  We help homeowners, businesses, schools and landlords get
-                  the right charger installed correctly — with as little
-                  fuss as possible. We&apos;re OZEV-accredited, which means
-                  every installation we carry out is eligible for government
-                  grant support, and we handle the application process for
-                  you.
+                  Ocunio Energy is the trading name of Nison Limited, an
+                  OZEV-approved EV charger installation company built on a
+                  simple observation: too many people invest thousands in an
+                  electric vehicle, then undermine that investment on day
+                  one.
                 </p>
                 <p>
-                  We started Ocunio Energy because we noticed the EV charging
-                  market was full of unnecessary complexity. Too many
-                  customers were left to navigate grant applications, DNO
-                  paperwork and installation logistics on their own — often
-                  with little support after the sale.
+                  We kept seeing the same pattern — someone buys a new EV,
+                  then reaches for a cheap granny charger because it seems
+                  like the easier option, without realising that slower
+                  charging puts greater strain on their home wiring and can
+                  cause long-term wear. Others simply don&apos;t know where
+                  to start, which charger suits their home, whether they
+                  qualify for a grant, or who to trust with the
+                  installation. That confusion is holding people back from
+                  embracing EVs with confidence.
                 </p>
                 <p>
-                  We do things differently. From your first enquiry to the
-                  moment you plug in for the first time, we manage
-                  everything: site survey, charger selection, DNO
-                  notification, OZEV grant application, installation,
-                  commissioning and aftercare.
+                  This problem hasn&apos;t gone away. It&apos;s still what we
+                  see today, and it&apos;s exactly what led us to start
+                  Ocunio Energy — bringing the right charger, a proper
+                  certified installation, and full grant support into one
+                  straightforward service.
+                </p>
+                <p>
+                  Today, based in Borehamwood, Hertfordshire, our certified
+                  engineers help homeowners, landlords, schools, and
+                  businesses across the UK make the switch properly: with a
+                  charger that protects their investment, and an
+                  installation done right the first time.
                 </p>
               </div>
             </div>

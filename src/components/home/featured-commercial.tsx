@@ -17,10 +17,11 @@ export function FeaturedCommercial({ limit = 3 }: { limit?: number }) {
           <div className="mx-auto max-w-2xl text-center">
             <SectionKicker center />
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              Featured Commercial Chargers
+              Featured Commercial EV Chargers
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Scalable charging solutions for offices, depots and car parks.
+              Scalable charging systems designed for workplaces, depots, and
+              car parks.
             </p>
           </div>
         </Reveal>

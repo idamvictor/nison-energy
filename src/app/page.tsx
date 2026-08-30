@@ -22,8 +22,8 @@ export default function Home() {
           <ProductGrid
             limit={3}
             viewAllHref="/home-charging"
-            title="Featured Residential Chargers"
-            subtitle="A few favourites from our home charging range."
+            title="Our Best-Selling Chargers"
+            subtitle="A curated selection of our best-selling chargers."
           />
         </HeroReveal>
         <FeaturedCommercial limit={3} />

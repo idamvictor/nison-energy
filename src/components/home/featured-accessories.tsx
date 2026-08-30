@@ -17,11 +17,10 @@ export function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
           <div className="mx-auto max-w-2xl text-center">
             <SectionKicker center />
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              Featured Accessories
+              EV Charger Accessories
             </h2>
             <p className="mt-3 text-muted-foreground">
-              TÜV-certified Type 2 charging cables in coiled or straight
-              styles.
+              Selected range of EV Charger accessories
             </p>
           </div>
         </Reveal>

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { useCart, resolveCartItem } from "@/hooks/use-cart";
+import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -93,6 +93,11 @@ export function CartSheet() {
                         </button>
                       </div>
                       <p className="text-xs text-muted-foreground">{line.brand}</p>
+                      {formatCartOptions(line.options) && (
+                        <p className="text-xs text-muted-foreground">
+                          {formatCartOptions(line.options)}
+                        </p>
+                      )}
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <QuantityStepper
                           quantity={line.quantity}

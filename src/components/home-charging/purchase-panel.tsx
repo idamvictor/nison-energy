@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Heart, ShieldCheck } from "lucide-react";
+import { Check, ChevronDown, Heart, ShieldCheck, Zap } from "lucide-react";
 
 import { products, type Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
 
 const INSTALL_FEE = 499;
+const OZEV_GRANT_GUIDE_URL = "https://nison-energy.vercel.app/ozev-grant-guide";
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -25,9 +26,8 @@ export function PurchasePanel({
 }) {
   const router = useRouter();
   const [cableLength, setCableLength] = useState(product.cableLength ?? "");
-  const [installation, setInstallation] = useState<"standard" | "none">(
-    "standard"
-  );
+  const [installation, setInstallation] = useState<"standard" | "none" | null>(null);
+  const [installationOpen, setInstallationOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
@@ -35,8 +35,7 @@ export function PurchasePanel({
   const wishlisted = isWishlisted(product.id);
 
   const devicePrice = product.price - INSTALL_FEE;
-  const unitPrice =
-    devicePrice + (installation === "standard" ? INSTALL_FEE : 0);
+  const unitPrice = devicePrice + (installation === "standard" ? INSTALL_FEE : 0);
   const total = unitPrice * quantity;
   const totalExVat = Math.round(total / 1.2);
 
@@ -45,6 +44,13 @@ export function PurchasePanel({
     : [product];
   const cableLengthOptions = product.cableLengthOptions ??
     (product.cableLength ? [product.cableLength] : []);
+
+  const installationLabel =
+    installation === "standard"
+      ? `Standard installation (+£${INSTALL_FEE})`
+      : installation === "none"
+        ? "No installation (device only)"
+        : "Choose option";
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -97,21 +103,60 @@ export function PurchasePanel({
           )}
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+        <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
           Installation option
-          <select
-            value={installation}
-            onChange={(e) =>
-              setInstallation(e.target.value as "standard" | "none")
-            }
-            className={selectClass}
-          >
-            <option value="standard">
-              Standard installation (+£{INSTALL_FEE})
-            </option>
-            <option value="none">No installation (device only)</option>
-          </select>
-        </label>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setInstallationOpen((open) => !open)}
+              className={cn(
+                selectClass,
+                "flex items-center justify-between text-left font-normal",
+                installation === null && "text-muted-foreground"
+              )}
+            >
+              {installationLabel}
+              <ChevronDown
+                className={cn(
+                  "size-4 shrink-0 transition-transform",
+                  installationOpen && "rotate-180"
+                )}
+              />
+            </button>
+
+            {installationOpen && (
+              <div className="absolute z-10 mt-1.5 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInstallation("standard");
+                    setInstallationOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                >
+                  Standard installation (+£{INSTALL_FEE})
+                  {installation === "standard" && <Check className="size-4 text-primary" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInstallation("none");
+                    setInstallationOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between border-t border-border px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                >
+                  No installation (device only)
+                  {installation === "none" && <Check className="size-4 text-primary" />}
+                </button>
+              </div>
+            )}
+          </div>
+          {installation === null && (
+            <p className="text-xs font-normal text-muted-foreground">
+              Select an installation option to continue.
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
@@ -130,9 +175,14 @@ export function PurchasePanel({
 
       <Button
         size="lg"
+        disabled={installation === null}
         className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
         onClick={() => {
-          addItem(product.id, "residential", quantity);
+          if (installation === null) return;
+          addItem(product.id, "residential", quantity, {
+            cableLength: cableLength || undefined,
+            installation,
+          });
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2000);
         }}
@@ -160,6 +210,27 @@ export function PurchasePanel({
         />
         {wishlisted ? "Saved to wishlist" : "Add to wishlist"}
       </button>
+
+      <a
+        href={OZEV_GRANT_GUIDE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-center justify-between gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5 transition-colors hover:bg-primary/10"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Zap className="size-4.5" />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              Pay £0 today. Get up to £500 funded by the UK government.
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              No payment due until grant is approved.
+            </p>
+          </div>
+        </div>
+      </a>
     </div>
   );
 }

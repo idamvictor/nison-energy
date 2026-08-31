@@ -34,7 +34,7 @@ import {
   AddressAutocomplete,
   type AddressSuggestion,
 } from "@/components/shared/address-autocomplete";
-import { useCart, resolveCartItem } from "@/hooks/use-cart";
+import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
 import { useNotifications } from "@/hooks/use-notifications";
 import { generateReferenceCode } from "@/lib/reference-code";
 
@@ -149,7 +149,7 @@ export default function CheckoutPage() {
                     Did you know you could get up to £500 off with an OZEV grant?
                   </p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    Answer 3 quick questions to check your eligibility.
+                    Check Your OZEV Grant Eligibility — £0 Today!
                   </p>
                 </div>
               </div>
@@ -362,6 +362,8 @@ export default function CheckoutPage() {
                           </p>
                           <p className="text-xs text-muted-foreground">
                             Qty {line.quantity}
+                            {formatCartOptions(line.options) &&
+                              ` · ${formatCartOptions(line.options)}`}
                           </p>
                         </div>
                         <p className="text-sm font-semibold text-foreground">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Heart, ShieldCheck } from "lucide-react";
+import { Check, Heart, ShieldCheck, Zap } from "lucide-react";
 
 import {
   commercialProducts,
@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+
+const OZEV_GRANT_GUIDE_URL = "https://nison-energy.vercel.app/ozev-grant-guide";
 
 export function CommercialPurchasePanel({
   product,
@@ -122,6 +124,27 @@ export function CommercialPurchasePanel({
         />
         {wishlisted ? "Saved to wishlist" : "Add to wishlist"}
       </button>
+
+      <a
+        href={OZEV_GRANT_GUIDE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-center justify-between gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5 transition-colors hover:bg-primary/10"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Zap className="size-4.5" />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              Pay £0 today. Get up to £500 funded by the UK government.
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              No payment due until grant is approved.
+            </p>
+          </div>
+        </div>
+      </a>
     </div>
   );
 }

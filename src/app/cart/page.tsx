@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { useCart, resolveCartItem } from "@/hooks/use-cart";
+import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -87,6 +87,11 @@ export default function CartPage() {
                             <p className="text-sm text-muted-foreground">
                               {line.brand}
                             </p>
+                            {formatCartOptions(line.options) && (
+                              <p className="text-xs text-muted-foreground">
+                                {formatCartOptions(line.options)}
+                              </p>
+                            )}
                           </div>
                           <p className="text-lg font-semibold text-foreground">
                             {line.price != null

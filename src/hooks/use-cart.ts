@@ -6,18 +6,49 @@ import { commercialProducts } from "@/lib/commercial-products";
 import { accessoryProducts } from "@/lib/accessory-products";
 
 export type CartCategory = "residential" | "commercial" | "accessories";
-export type CartItem = { id: string; category: CartCategory; quantity: number };
+export type CartItemOptions = {
+  cableLength?: string;
+  installation?: "standard" | "none";
+};
+export type CartItem = {
+  id: string;
+  category: CartCategory;
+  quantity: number;
+  options?: CartItemOptions;
+};
 
 type CartState = {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (id: string, category: CartCategory, quantity?: number) => void;
+  addItem: (
+    id: string,
+    category: CartCategory,
+    quantity?: number,
+    options?: CartItemOptions
+  ) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clear: () => void;
   openCart: () => void;
   closeCart: () => void;
 };
+
+// Renders the cable length / installation type carried over from the
+// product page as a short line under the product name, wherever cart lines
+// are shown (mini-cart, /cart, checkout order summary).
+export function formatCartOptions(options?: CartItemOptions) {
+  if (!options) return null;
+  const parts: string[] = [];
+  if (options.cableLength) parts.push(`${options.cableLength} cable`);
+  if (options.installation) {
+    parts.push(
+      options.installation === "standard"
+        ? "Standard installation"
+        : "No installation"
+    );
+  }
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
 
 // Same shared-store shape as useWishlist — a header badge, a mini-cart
 // drawer, the /cart page and /checkout all read this one store, so an
@@ -27,16 +58,20 @@ export const useCart = create<CartState>()(
     (set) => ({
       items: [],
       isOpen: false,
-      addItem: (id, category, quantity = 1) =>
+      addItem: (id, category, quantity = 1, options) =>
         set((state) => {
           const existing = state.items.find((item) => item.id === id);
           const items = existing
             ? state.items.map((item) =>
                 item.id === id
-                  ? { ...item, quantity: item.quantity + quantity }
+                  ? {
+                      ...item,
+                      quantity: item.quantity + quantity,
+                      options: options ?? item.options,
+                    }
                   : item
               )
-            : [...state.items, { id, category, quantity }];
+            : [...state.items, { id, category, quantity, options }];
           return { items, isOpen: true };
         }),
       removeItem: (id) =>
@@ -66,6 +101,7 @@ export type ResolvedCartLine = {
   id: string;
   category: CartCategory;
   quantity: number;
+  options?: CartItemOptions;
   name: string;
   brand: string;
   image: string;

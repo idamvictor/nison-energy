@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Clock, ExternalLink, X } from "lucide-react";
+import { Check, Clock, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -255,17 +255,8 @@ export function GrantApplicationTracker() {
         <div className="flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
           <span className="font-semibold text-accent">!</span>
           <p>
-            Ready to apply?{" "}
-            <a
-              href="https://www.find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-grant-for-renters-and-flat-owners-2"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-accent underline underline-offset-2"
-            >
-              Apply for your £500 grant on GOV.UK
-              <ExternalLink className="ml-1 inline size-3" />
-            </a>{" "}
-            then come back and update your status here.
+            Ready to apply? Use the apply button in the next step of this
+            guide, then come back and update your status here.
           </p>
         </div>
       )}

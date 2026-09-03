@@ -202,7 +202,7 @@ export default async function CommercialProductDetailPage({
                   size="lg"
                   variant="outline"
                   nativeButton={false}
-                  render={<Link href="/ozev-grant-guide" />}
+                  render={<Link href="/ozev-grant-guide/workplace-charging-scheme" />}
                 >
                   Check OZEV Grant Eligibility
                 </Button>

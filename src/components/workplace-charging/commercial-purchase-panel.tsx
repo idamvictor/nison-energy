@@ -17,7 +17,8 @@ import { cn } from "@/lib/utils";
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
-const OZEV_GRANT_GUIDE_URL = "https://nison-energy.vercel.app/ozev-grant-guide";
+const OZEV_GRANT_GUIDE_URL =
+  "https://nison-energy.vercel.app/ozev-grant-guide/workplace-charging-scheme";
 
 export function CommercialPurchasePanel({
   product,

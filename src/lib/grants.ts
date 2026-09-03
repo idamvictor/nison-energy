@@ -166,7 +166,10 @@ export const grantSchemes: GrantScheme[] = [
       "Have previously claimed this grant or the Renters and Flat Owners grant at this address",
       "Are moving or planning to move",
     ],
-    applyCta: { label: "More information & apply now", href: "/ozev-grant-guide" },
+    applyCta: {
+      label: "More information & apply now",
+      href: "/ozev-grant-guide/renters-and-flat-owners",
+    },
     resources: [
       {
         label: "Apply via Find a Grant",

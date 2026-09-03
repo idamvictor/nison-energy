@@ -93,11 +93,13 @@ export function AboutHero() {
             </span>
             <h1 className="mt-5 text-4xl leading-[1.1] font-semibold tracking-[-0.02em] sm:text-5xl">
               {words.map((word, i) => (
-                <span key={i} className="inline-block overflow-hidden pb-1">
-                  <span className="about-hero-word inline-block">
-                    {word}
-                    {i < words.length - 1 ? " " : ""}
+                <span key={i}>
+                  <span className="inline-block overflow-hidden pb-1">
+                    <span className="about-hero-word inline-block">
+                      {word}
+                    </span>
                   </span>
+                  {i < words.length - 1 ? " " : ""}
                 </span>
               ))}
             </h1>

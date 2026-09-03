@@ -1,5 +1,10 @@
+import Image from "next/image";
+
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
+
+const QUOTE_IMG =
+  "https://ocunioenergy.com/wp-content/uploads/2025/05/pexels-kindelmedia-9800036-scaled.webp";
 
 export function OriginStory() {
   return (
@@ -50,8 +55,16 @@ export function OriginStory() {
           </Reveal>
 
           <Reveal delay={100}>
-            <div className="flex h-full items-center rounded-2xl bg-primary p-8 text-primary-foreground sm:p-10">
-              <p className="font-heading text-3xl leading-tight font-semibold tracking-[-0.01em] sm:text-4xl">
+            <div className="relative flex h-full min-h-70 items-center overflow-hidden rounded-2xl p-8 sm:p-10">
+              <Image
+                src={QUOTE_IMG}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-br from-primary/90 via-primary/75 to-black/70" />
+              <p className="relative font-heading text-3xl leading-tight font-semibold tracking-[-0.01em] text-primary-foreground sm:text-4xl">
                 &ldquo;One team, one point of contact, no surprises.&rdquo;
               </p>
             </div>

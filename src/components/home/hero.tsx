@@ -76,15 +76,20 @@ export function Hero() {
 
       if (reduceMotion) {
         gsap.set(".hero-word", { yPercent: 0, autoAlpha: 1 });
-        gsap.set([".hero-tag", ".hero-copy", ".hero-bullet", ".hero-cta"], {
-          y: 0,
-          autoAlpha: 1,
-        });
+        gsap.set(".hero-copy, .hero-cta", { y: 0, autoAlpha: 1 });
+        if (slides[index].tag) {
+          gsap.set(".hero-tag", { y: 0, autoAlpha: 1 });
+        }
+        if (slides[index].bullets) {
+          gsap.set(".hero-bullet", { y: 0, autoAlpha: 1 });
+        }
         gsap.set(imageRef.current, { scale: 1, autoAlpha: 1 });
         return;
       }
 
-      gsap
+      const currentSlide = slides[index];
+
+      const tl = gsap
         .timeline()
         .fromTo(
           imageRef.current,
@@ -99,32 +104,37 @@ export function Hero() {
             ease: "none",
           },
           "<"
-        )
-        .fromTo(
+        );
+
+      if (currentSlide.tag) {
+        tl.fromTo(
           ".hero-tag",
           { y: 10, autoAlpha: 0 },
           { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out" },
           0.15
-        )
-        .fromTo(
-          ".hero-word",
-          { yPercent: 110, autoAlpha: 0 },
-          {
-            yPercent: 0,
-            autoAlpha: 1,
-            duration: 0.8,
-            ease: "power3.out",
-            stagger: 0.035,
-          },
-          0.3
-        )
-        .fromTo(
-          ".hero-copy",
-          { y: 14, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 0.6, ease: "power2.out" },
-          0.55
-        )
-        .fromTo(
+        );
+      }
+
+      tl.fromTo(
+        ".hero-word",
+        { yPercent: 110, autoAlpha: 0 },
+        {
+          yPercent: 0,
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.035,
+        },
+        0.3
+      ).fromTo(
+        ".hero-copy",
+        { y: 14, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.6, ease: "power2.out" },
+        0.55
+      );
+
+      if (currentSlide.bullets) {
+        tl.fromTo(
           ".hero-bullet",
           { y: 10, autoAlpha: 0 },
           {
@@ -135,19 +145,21 @@ export function Hero() {
             stagger: 0.06,
           },
           0.65
-        )
-        .fromTo(
-          ".hero-cta",
-          { y: 14, autoAlpha: 0 },
-          {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.6,
-            ease: "power2.out",
-            stagger: 0.08,
-          },
-          0.8
         );
+      }
+
+      tl.fromTo(
+        ".hero-cta",
+        { y: 14, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.6,
+          ease: "power2.out",
+          stagger: 0.08,
+        },
+        0.8
+      );
     },
     { scope: containerRef, dependencies: [index], revertOnUpdate: true }
   );
@@ -194,11 +206,11 @@ export function Hero() {
             )}
             <h1 className="text-4xl leading-[1.08] font-semibold tracking-[-0.02em] sm:text-5xl">
               {words.map((word, i) => (
-                <span key={i} className="inline-block overflow-hidden pb-1">
-                  <span className="hero-word inline-block">
-                    {word}
-                    {i < words.length - 1 ? " " : ""}
+                <span key={i}>
+                  <span className="inline-block overflow-hidden pb-1">
+                    <span className="hero-word inline-block">{word}</span>
                   </span>
+                  {i < words.length - 1 ? " " : ""}
                 </span>
               ))}
             </h1>

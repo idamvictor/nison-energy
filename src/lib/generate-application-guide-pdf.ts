@@ -78,7 +78,7 @@ export function generateApplicationGuidePdf() {
   y += 3;
 
   heading("How To Apply");
-  scheme.applicationSteps.forEach((step, index) => numbered(index + 1, step));
+  (scheme.applicationSteps ?? []).forEach((step, index) => numbered(index + 1, step));
   y += 2;
 
   heading("Typical Turnaround");

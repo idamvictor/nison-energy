@@ -14,10 +14,11 @@ export type GrantScheme = {
   grantDetails?: string[];
   overview: string[];
   eligibility: string[];
-  ineligible: string[];
+  ineligible?: string[];
   requirements?: string[];
   documentation?: string[];
-  applicationSteps: string[];
+  applicationSteps?: string[];
+  applyCta?: { label: string; href: string };
   resources: { label: string; href: string }[];
 };
 
@@ -41,49 +42,35 @@ export const grantSchemes: GrantScheme[] = [
     slug: "renters-and-flat-owners",
     audience: "Renters & Flat Owners",
     title: "Electric Vehicle Chargepoint Grant for Renters and Flat Owners",
-    tagline:
-      "Living in a rented home or flat with off-street parking? You can still get a grant-funded charger.",
+    tagline: "Live in a flat or rent your property? Save up to £500 with OZEV funding",
     image: `${IMG}/side-view-man-charging-his-car-min-scaled.webp`,
     status: "open",
     grantAmount: "75% of cost, up to £500 per socket",
-    grantDetails: [
-      "£500 per socket for applications submitted from 1 April 2026 (previously £350)",
-      "One grant per eligible vehicle and address",
-      "Paid directly to your OZEV-authorised installer and deducted from your invoice",
-    ],
     overview: [
-      "This grant makes EV charging accessible for people living in rented homes or flats. With landlord or property manager approval, eligible residents can install a chargepoint wherever off-street parking is available.",
+      "If you rent your home or own a flat, you could save money on the cost of an EV chargepoint through OZEV funding.",
+      "The EV Chargepoint Grant for Renters and Flat Owners covers 75% of the cost of buying and installing a home chargepoint, up to £500 per socket. The grant is paid straight to your OZEV-approved installer and deducted from your invoice — you never handle the money yourself.",
+      "Once approved, your installer completes the installation, deducts the £500 grant from your invoice, and claims it directly from OZEV.",
     ],
     eligibility: [
-      "Reside in an owned flat (including shared ownership) or a rental property",
-      "Have private, off-street parking accessible at all times",
-      "Own or use an OZEV-approved electric or plug-in hybrid vehicle",
-      "Have not previously installed a chargepoint at the address",
-      "Live in an occupied UK residential property",
+      "Live in a flat you own (including shared ownership), or rent any residential property",
+      "Have a private, off-street parking space you own or have a legal right to use, accessible at all times",
+      "Own or use an OZEV-approved electric or qualifying plug-in hybrid vehicle",
+      "Not yet have the chargepoint installed (the grant can't be backdated)",
+      "Live in an existing, occupied residential property in England, Wales, Scotland or Northern Ireland",
     ],
     ineligible: [
-      "Owners of standalone houses (converted flats are acceptable)",
-      "Renting a room in a shared home where a landlord or owner is also present",
-      "Relocating or planning to move",
-      "Have previously claimed this or a related grant at the address",
-      "Properties where a chargepoint is legally mandated, or in the Channel Islands/Isle of Man",
-    ],
-    requirements: [
-      "Parking space must be off-street, private, clearly defined, and accessible at all times",
-      "You must legally own or be authorised to use the space, with supporting documentation",
-      "Vehicle must be on the OZEV-approved list — registered owners, 6+ month leaseholders, company car assignees, salary sacrifice participants, and those with a vehicle on order all qualify",
-    ],
-    documentation: [
-      "Renters: signed tenancy agreement, a recent utility bill (under 3 months), and written landlord permission",
-      "Flat owners: a recent utility bill (under 3 months) and written freeholder permission",
-      "Everyone: a dated installation quote from an OZEV-authorised installer",
-      "Vehicles on order: order form documentation",
+      "Own a standalone house (unless it's been converted into flats and you occupy just one)",
+      "Rent a room where your landlord also lives",
+      "Are moving or planning to move",
+      "Have already claimed this grant, EVHS, or the Domestic Recharge Scheme at this address",
+      "Live somewhere a chargepoint is legally required (e.g. a new build)",
+      "Live in the Channel Islands or Isle of Man",
     ],
     applicationSteps: [
-      "Contact an OZEV-authorised installer for a dated quote",
-      "Gather the permissions and documentation listed above",
-      "Apply via the GOV.UK Find a Grant platform with your property and vehicle details",
-      "OZEV reviews your application and notifies you and your installer by email",
+      "Get a dated quote from an OZEV-authorised installer",
+      "Gather your documents — tenancy agreement or ownership proof, a utility bill under 3 months old, and written landlord/freeholder permission",
+      "From 1 April 2026, apply directly via the GOV.UK Find a Grant platform (installers can no longer send you the application link)",
+      "OZEV reviews your application and notifies you and your installer by email once approved",
     ],
     resources: [
       {
@@ -101,114 +88,50 @@ export const grantSchemes: GrantScheme[] = [
     slug: "residential-landlords",
     audience: "Residential Landlords",
     title: "Electric Vehicle Chargepoint Grant for Residential Landlords",
-    tagline:
-      "Support for landlords and property managers installing chargepoints across residential sites.",
+    tagline: "Are you a residential landlord? Save up to £500 per socket with OZEV funding",
     image: `${IMG}/Home-Charging-Image.jpg`,
-    status: "closed",
-    statusNote:
-      "This scheme closed on 31 March 2026 and is no longer accepting new applications. Details are kept here for reference — get in touch and we'll help you find what's currently available.",
-    grantAmount: "Was 75% of cost, up to £500 per socket",
-    grantDetails: [
-      "£500 per socket for applications from 1 April 2026 (previously £350)",
-      "Landlords could claim up to 200 sockets per year across eligible properties",
-      "Paid directly to the OZEV-authorised installer, deducted from the invoice",
-    ],
+    status: "open",
+    grantAmount: "75% of cost, up to £500 per socket",
     overview: [
-      "This grant enabled residential landlords, right-to-manage companies, and social housing providers to install chargepoints across rented properties — improving tenant amenity and property value.",
+      "The EV Chargepoint Grant for Residential Landlords has been extended and remains open to new applications. Landlords can claim 75% of the cost of buying and installing an EV chargepoint, up to £500 per socket for up to 200 sockets per year across their properties. The grant is paid directly to the OZEV-approved installer and deducted from the landlord's invoice.",
     ],
     eligibility: [
-      "Individual landlords with rental properties",
-      "Right to manage (RTM) companies and residents' management companies (RMC)",
-      "Freeholders of multi-unit properties",
-      "Social housing providers, public sector organisations, and charities managing residential property",
-      "Property factors (Scotland)",
+      "Own or manage residential rental property — a single let flat, a block of flats, or shared communal parking/spaces",
+      "Provide a private, off-street parking space accessible to the tenant at all times",
+      "Have a company registration or VAT number (individuals, RTM/RMC companies, freeholders, management companies, social housing providers, and public sector landlords all qualify)",
+      "Not be installing the chargepoint because it's a mandatory requirement (e.g. a new-build planning condition)",
     ],
-    ineligible: [
-      "Owner-occupants",
-      "Holiday rental operators",
-      "Organisations without company or VAT registration",
-      "Mandatory installations (planning conditions, new builds)",
-      "Properties in the Channel Islands, Isle of Man, or still under construction",
-    ],
-    requirements: [
-      "Parking must be off-street, private, and clearly defined",
-      "Accessible to tenants at all times, owned by the applicant or with legal usage rights granted",
-      "Applicants needed to complete electrical supply upgrades, arrange maintenance, and update fire safety risk assessments before applying",
-    ],
-    documentation: [
-      "All applicants: an installation quote from an OZEV-authorised installer",
-      "Freeholders of multi-unit properties: Land Registry title confirming freehold status",
-      "Private landlords/charities: a current, dated insurance policy showing rental status",
-      "RMC/RTM companies: Companies House verification and appointment documentation",
-      "Public sector/social housing: quote only, no further documentation required",
-    ],
-    applicationSteps: [
-      "Obtain quotes from OZEV-approved installers",
-      "Confirm installation scope and select an eligible chargepoint model",
-      "Gather the required documentation for your organisation type",
-      "Apply via the GOV.UK Find a Grant platform",
-      "Receive OZEV approval notification",
-      "Installer completes the work and submits the claim with photos and invoice",
-    ],
-    resources: [
-      {
-        label: "Scheme details on GOV.UK",
-        href: "https://www.find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-and-infrastructure-grants-for-landlords-1",
-      },
-      ...govResources,
-    ],
+    applyCta: { label: "More information & apply now", href: "/workplace-charging" },
+    resources: govResources,
   },
   {
     slug: "workplace-charging-scheme",
     audience: "Businesses, Charities & Public Sector",
     title:
       "Workplace Charging Scheme — Electric Vehicle Chargepoint Grant for Businesses, Charities and Public Sector",
-    tagline:
-      "Enable your organisation to install EV chargepoints at reduced cost.",
+    tagline: "Are you a business, charity, or public sector organisation? Save up to £20,000 with OZEV funding",
     image: `${IMG}/pexels-kindelmedia-9800036-scaled.webp`,
     status: "open",
     grantAmount: "75% of cost (incl. VAT), up to £500 per socket",
-    grantDetails: [
-      "£500 per socket for installations from 1 April 2026 (previously £350)",
-      "Up to 40 sockets per applicant across all sites, capped at £20,000 total",
-      "Voucher-based — the voucher is valid for 180 days from issue",
-    ],
     overview: [
-      "The Workplace Charging Scheme is a government grant administered by OZEV and DVLA that provides eligible organisations with support towards the upfront cost of purchasing and installing EV chargepoints at their sites.",
+      "The Workplace Charging Scheme (WCS) is a voucher-based grant from OZEV and DVLA that covers 75% of the cost of buying and installing EV chargepoints (including VAT), up to £500 per socket, for up to 40 sockets per applicant — a maximum of £20,000. The grant is issued as a voucher and deducted from your final invoice by your OZEV-authorised installer, who must not charge you until the grant has been paid.",
+      "Home workers can also apply, provided their address is registered as a place of business and an eligible dual-use (residential/commercial) chargepoint is installed.",
+      "Tax benefits: employees using workplace EV charging aren't taxed on the electricity provided, and businesses can claim 100% of chargepoint installation costs as a capital allowance in the year of installation — with some expenditure qualifying for further enhanced deductions. Combined with the WCS grant, this can substantially reduce your net installation cost.",
     ],
     eligibility: [
-      "Businesses, including SMEs and sole traders",
-      "Charities",
-      "Public sector organisations — councils, NHS, armed forces, emergency services",
-      "Small accommodation businesses — hotels, B&Bs, guest houses",
-    ],
-    ineligible: [
-      "Sites outside England, Wales, Scotland or Northern Ireland",
-      "Non-designated or customer-only parking",
-      "Unbuilt parking facilities or domestic property parking (unless it's the primary workplace)",
-      "Sites already claimed under this scheme or the EVHS/Domestic Recharging Scheme",
-      "Installations mandated by Part S Building Regulations or planning conditions",
-    ],
-    requirements: [
-      "You must own the property or have written landlord consent",
-      "Dedicated off-road parking clearly associated with the premises, for staff or fleet use",
-      "A pre-installation survey by an authorised installer is required",
-      "Businesses: staff/fleet use during working hours only. Public authorities, charities and accommodation providers have no usage restriction, but must comply with the Public Chargepoint Regulations 2023 if offering public access",
-    ],
-    documentation: [
-      "Companies House registration number and VAT registration number",
-      "A business rate bill from your local council",
-      "Charities: Charity Commission registration or a principal regulator letter",
-      "NHS surgeries and schools: matching organisational email domain plus registration evidence",
+      "Be a business, charity, public sector organisation, or small accommodation business in England, Wales, Scotland or Northern Ireland",
+      "Have dedicated off-street parking, clearly associated with your premises and designated for staff or fleet use",
+      "Own the site or have written landlord consent to install chargepoints",
+      "Provide a company registration number, VAT number, or business rates bill (or equivalent evidence for charities, NHS surgeries and schools)",
+      "Not be installing chargepoints as a mandatory requirement (e.g. under Part S regulations or a planning condition)",
     ],
     applicationSteps: [
-      "Confirm organisational and site eligibility, then arrange a site survey with an OZEV-authorised installer",
-      "Select an eligible chargepoint model",
-      "Apply online with your organisation details, site address(es), socket quantity and evidence",
-      "Receive a voucher code by email within 5 working days",
-      "Share the voucher with your installer — do not start work before the voucher is issued",
-      "Installer completes the work within 180 days and submits the claim with photos and invoice",
+      "Arrange a site survey with an OZEV-authorised installer",
+      "Apply online at apply-workplace-chargepoint-grant.service.gov.uk — approval and voucher issued within 5 working days",
+      "Share the voucher with your installer and complete installation within 180 days (don't install before the voucher is issued)",
+      "Your installer claims the grant on your behalf and deducts it from your invoice",
     ],
+    applyCta: { label: "More information & apply now", href: "/workplace-charging" },
     resources: [
       {
         label: "Apply for a workplace voucher",
@@ -218,110 +141,32 @@ export const grantSchemes: GrantScheme[] = [
     ],
   },
   {
-    slug: "education-institutions",
-    audience: "State-Funded Education Institutions",
-    title:
-      "Workplace Charging Scheme for State-Funded Education Institutions",
-    tagline:
-      "Support your institution's transition to electric mobility with dedicated chargepoint funding.",
-    image: `${IMG}/indra-smart-pro-tethered-in-situ-4.webp`,
-    status: "open",
-    grantAmount: "75% of cost (incl. VAT), up to £2,000 per socket",
-    grantDetails: [
-      "£2,000 per socket from 1 April 2026 (previously £2,500, if the voucher is redeemed by 30 September 2026)",
-      "Up to 40 sockets available across all sites, per institution",
-      "Voucher-based — valid for 180 days from issue",
-    ],
-    overview: [
-      "A government voucher-based grant administered by OZEV and DVLA, supporting state-funded educational institutions installing EV chargepoints.",
-    ],
-    eligibility: [
-      "State-funded primary and secondary schools",
-      "State-funded sixth form and further education colleges, and nurseries",
-      "Academies and free schools within academy trusts (multi-academy trusts apply separately per institution)",
-      "England, Wales, Scotland and Northern Ireland (excludes Channel Islands and Isle of Man)",
-    ],
-    ineligible: [
-      "Independent (non state-funded) schools",
-      "Parking not designated for the institution, or unbuilt parking facilities",
-      "Chargepoints already claimed under another scheme",
-      "Installations mandated by building regulations",
-    ],
-    requirements: [
-      "Minimum 3kW power supply per socket, undiminished under simultaneous use",
-      "Maximum one socket per parking space",
-      "Installation to British Standards (BS 8300, BS EN 61851, BS 7671) by an OZEV-authorised installer",
-    ],
-    documentation: [
-      "Institution or SEED reference number",
-      "Number of chargepoints needed and number of installation sites",
-      "Installer name and OZEV registration",
-      "Two institutional contacts with matching email domains",
-    ],
-    applicationSteps: [
-      "Complete the online application via the GOV.UK guidance page",
-      "Receive a unique voucher code within 5 working days",
-      "Share the voucher code with your OZEV-authorised installer",
-      "Installer completes the work within the 180-day window",
-      "Installer submits the claim with a cost breakdown and installation photos",
-      "OZEV pays the installer directly",
-    ],
-    resources: [
-      {
-        label: "Apply on GOV.UK",
-        href: "https://www.gov.uk/guidance/workplace-charging-scheme-for-state-funded-education-institutions",
-      },
-      ...govResources,
-    ],
-  },
-  {
     slug: "on-street-parking",
     audience: "Households with On-Street Parking",
-    title:
-      "Electric Vehicle Chargepoint Grant for Households with On-Street Parking",
-    tagline: "No driveway? No problem.",
+    title: "Electric Vehicle Chargepoint Grant for Households with On-Street Parking",
+    tagline: "Got on-street parking? Save up to £500 with OZEV funding",
     image: `${IMG}/freepik__the-style-is-candid-image-photography-with-natural__60490.jpeg`,
     status: "open",
     grantAmount: "75% of cost, up to £500 per socket",
-    grantDetails: [
-      "Requires a permanent cross-pavement solution (cable channel or ducting) installed alongside the chargepoint",
-      "The grant does not entitle you to a reserved parking space on the public highway",
-      "Cross-pavement solution costs are not covered by the grant itself",
-    ],
     overview: [
-      "For households without private off-street parking, this scheme covers 75% of the combined cost of the chargepoint and its installation — paired with a permanent, council-approved cross-pavement cable solution.",
+      "The EV Chargepoint Grant for Households with On-Street Parking supports residents without private off-street parking. It covers 75% of the combined cost of a chargepoint and its installation, up to £500 per socket, but a permanent cross-pavement charging solution (such as a cable channel cut into the pavement) must be installed at the same time. The grant is paid directly to your OZEV-approved installer and deducted from your invoice.",
+      "Note: the grant doesn't cover the cross-pavement solution itself — only the chargepoint purchase and installation costs are eligible. Local highways authority consent can take time to arrange, so it's worth contacting them early.",
     ],
     eligibility: [
-      "Own or rent the residential property and live there",
-      "Lack private, exclusive off-street parking (no driveway, garage or car park)",
-      "Have lawful on-street parking available without compromising traffic safety",
-      "Own or be responsible for an eligible battery electric or plug-in hybrid vehicle (PHEV under 50g/km CO₂)",
-      "Located in England, Wales, Scotland or Northern Ireland",
+      "Own or rent the residential property and live there, with no private off-street parking (driveway, garage or residential car park)",
+      "Have adequate, lawful on-street parking available near your home",
+      "Own, lease, or be responsible for an OZEV-approved electric vehicle",
+      "Obtain consent from your local highway's authority for the cross-pavement solution before applying",
+      "Be located in England, Wales, Scotland or Northern Ireland",
     ],
     ineligible: [
-      "Already have a chargepoint installed, or have claimed this grant or its predecessors (EVHS/Domestic Recharge Scheme)",
-      "Relocating, or seeking to replace/upgrade an existing chargepoint",
-      "Have private off-street parking access",
-      "Not willing to install a permanent cross-pavement solution",
+      "Already have a chargepoint installed, or simply want to replace, upgrade or relocate one",
+      "Have private off-street parking",
+      "Won't be installing a permanent cross-pavement solution",
+      "Have previously claimed this grant or the Renters and Flat Owners grant at this address",
+      "Are moving or planning to move",
     ],
-    requirements: [
-      "The cross-pavement solution must be permanent — temporary cable covers or mats are not eligible",
-      "Written consent from your local highways authority is mandatory before applying, and planning permission may also be required",
-    ],
-    documentation: [
-      "Written consent from landlords, freeholders, managing agents or private road owners, where applicable",
-      "Local highways authority (LHA) consent evidence for the cross-pavement installation",
-      "A dated quote from an OZEV-authorised installer",
-    ],
-    applicationSteps: [
-      "Secure any third-party permissions needed (landlord, freeholder, managing agent)",
-      "Get a quote from an OZEV-approved installer",
-      "Apply to your local highways authority for cross-pavement consent",
-      "Create an account on the GOV.UK Find a Grant platform and apply, uploading your LHA consent evidence",
-      "Wait for OZEV's eligibility notification — do not install before this arrives",
-      "Proceed with installation once approved",
-      "Installer submits the claim with photos and invoice",
-    ],
+    applyCta: { label: "More information & apply now", href: "/ozev-grant-guide" },
     resources: [
       {
         label: "Apply via Find a Grant",
@@ -330,6 +175,45 @@ export const grantSchemes: GrantScheme[] = [
       {
         label: "Eligible vehicles list",
         href: "https://www.gov.uk/government/publications/residential-chargepoints-eligible-vehicles",
+      },
+      ...govResources,
+    ],
+  },
+  {
+    slug: "education-institutions",
+    audience: "State-Funded Education Institutions",
+    title: "Workplace Charging Scheme for State-Funded Education Institutions",
+    tagline: "Are you a state-funded school or education institution? Save up to £2,000 per socket with OZEV funding",
+    image: `${IMG}/indra-smart-pro-tethered-in-situ-4.webp`,
+    status: "open",
+    grantAmount: "75% of cost (incl. VAT), up to £2,000 per socket",
+    overview: [
+      "The Workplace Charging Scheme (WCS) for State-Funded Education Institutions is a voucher-based grant from OZEV and DVLA. It covers 75% of the total purchase and installation cost (including VAT), up to £2,000 per socket from 1 April 2026, for up to 40 sockets across all sites. The grant will be deducted from your invoice by your OZEV-authorised installer once the claim is made on your behalf.",
+    ],
+    eligibility: [
+      "Be a state-funded primary, secondary, sixth form, or further education institution, nursery, academy or free school (independent schools apply via the standard WCS instead)",
+      "Have designated off-street parking clearly associated with the premises",
+      "Use an OZEV-authorised installer and an eligible chargepoint from the OZEV-approved model list",
+      "Have authority to apply on the institution's behalf, with two named contacts using the institution's email domain",
+    ],
+    ineligible: [
+      "The institution is independent, or based in the Channel Islands or Isle of Man",
+      "The parking isn't designated for the institution, or hasn't been built yet",
+      "A chargepoint has already been claimed for the same socket under another grant scheme",
+      "Installation was a mandatory requirement (e.g. under building or planning regulations)",
+    ],
+    applicationSteps: [
+      "Arrange a site survey with an OZEV-authorised installer and agree the scope of work",
+      "Complete the dedicated application form at gov.uk (not the Find a Grant platform) in one session, with your institution/SEED reference number and contact details",
+      "If successful, you'll be emailed a voucher code within 5 working days — don't begin installation before receiving it",
+      "Your installer completes the work within the 180-day voucher validity period",
+      "Your installer submits the claim, including photographs, a cost breakdown, and a site plan, and deducts the grant from your invoice",
+    ],
+    applyCta: { label: "More information & apply now", href: "/workplace-charging" },
+    resources: [
+      {
+        label: "Apply on GOV.UK",
+        href: "https://www.gov.uk/guidance/workplace-charging-scheme-for-state-funded-education-institutions",
       },
       ...govResources,
     ],

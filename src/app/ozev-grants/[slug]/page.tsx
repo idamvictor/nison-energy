@@ -4,6 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   AlertTriangle,
+  ArrowRight,
   Check,
   ChevronRight,
   ExternalLink,
@@ -96,9 +97,25 @@ export default async function GrantSchemePage({
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
+                  {scheme.applyCta && (
+                    <Button
+                      size="lg"
+                      className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                      nativeButton={false}
+                      render={<Link href={scheme.applyCta.href} />}
+                    >
+                      {scheme.applyCta.label}
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  )}
                   <Button
                     size="lg"
-                    className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                    variant={scheme.applyCta ? "outline" : "default"}
+                    className={
+                      scheme.applyCta
+                        ? "gap-2"
+                        : "gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                    }
                     nativeButton={false}
                     render={<Link href="/contact-us" />}
                   >
@@ -163,7 +180,13 @@ export default async function GrantSchemePage({
             </Reveal>
 
             <Reveal>
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <div
+                className={
+                  scheme.ineligible && scheme.ineligible.length > 0
+                    ? "grid grid-cols-1 gap-8 sm:grid-cols-2"
+                    : "grid grid-cols-1"
+                }
+              >
                 <div>
                   <h2 className="font-heading text-lg font-semibold text-foreground">
                     Who can apply
@@ -177,19 +200,21 @@ export default async function GrantSchemePage({
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <h2 className="font-heading text-lg font-semibold text-foreground">
-                    Who can&apos;t apply
-                  </h2>
-                  <ul className="mt-4 flex flex-col gap-2.5">
-                    {scheme.ineligible.map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
-                        <X className="mt-0.5 size-4 shrink-0 text-destructive" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {scheme.ineligible && scheme.ineligible.length > 0 && (
+                  <div>
+                    <h2 className="font-heading text-lg font-semibold text-foreground">
+                      Who can&apos;t apply
+                    </h2>
+                    <ul className="mt-4 flex flex-col gap-2.5">
+                      {scheme.ineligible.map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
+                          <X className="mt-0.5 size-4 shrink-0 text-destructive" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </Reveal>
 
@@ -226,22 +251,24 @@ export default async function GrantSchemePage({
               </Reveal>
             )}
 
-            <Reveal>
-              <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
-                <ListChecks className="size-4.5 text-primary" />
-                How to apply
-              </h2>
-              <ol className="mt-5 flex flex-col gap-5">
-                {scheme.applicationSteps.map((step, index) => (
-                  <li key={step} className="flex gap-4">
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-semibold text-primary">
-                      {index + 1}
-                    </span>
-                    <p className="text-sm text-foreground/80">{step}</p>
-                  </li>
-                ))}
-              </ol>
-            </Reveal>
+            {scheme.applicationSteps && (
+              <Reveal>
+                <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
+                  <ListChecks className="size-4.5 text-primary" />
+                  How to apply
+                </h2>
+                <ol className="mt-5 flex flex-col gap-5">
+                  {scheme.applicationSteps.map((step, index) => (
+                    <li key={step} className="flex gap-4">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-semibold text-primary">
+                        {index + 1}
+                      </span>
+                      <p className="text-sm text-foreground/80">{step}</p>
+                    </li>
+                  ))}
+                </ol>
+              </Reveal>
+            )}
 
             <Reveal>
               <h2 className="font-heading text-lg font-semibold text-foreground">

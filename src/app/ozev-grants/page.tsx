@@ -37,9 +37,18 @@ const schemeIcons: Record<string, LucideIcon> = {
 };
 
 const stats = [
-  { label: "Up to £500 per socket", sub: "Most residential & workplace schemes" },
-  { label: "75% of costs covered", sub: "Purchase and installation, including VAT" },
-  { label: "Up to £2,000 per socket", sub: "State-funded education institutions" },
+  {
+    label: "Renters, Flat Owners & Landlord schemes",
+    sub: "Covers 75% of cost up to £500 per socket. 1 grant per household.",
+  },
+  {
+    label: "Workplace Charging Scheme",
+    sub: "Covers 75% of cost up to £500 per socket — up to 40 sockets",
+  },
+  {
+    label: "WCS for State-Funded Schools",
+    sub: "Covers 75% of cost up to £2,000 per socket — up to 40 sockets",
+  },
 ];
 
 export default function OzevGrantsPage() {
@@ -63,13 +72,17 @@ export default function OzevGrantsPage() {
             <Reveal>
               <SectionKicker center tone="invert" />
               <h1 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Are You Eligible For £500 Off?
+                Which OZEV Grant Could Save You Up to 75%?
               </h1>
-              <p className="mx-auto mt-4 max-w-xl text-primary-foreground/80">
-                The government's OZEV grant schemes can cover up to 75% of
-                your EV chargepoint costs — for homes, landlords, workplaces,
-                schools and on-street parking. Most people qualify for at
-                least one.
+              <p className="mx-auto mt-4 max-w-2xl text-primary-foreground/80">
+                You&apos;ll learn more about OZEV grant scheme — for renters,
+                flat owners, residential landlords, workplaces, on-street
+                parking households, and state-funded education settings.
+                Whatever your situation, there&apos;s likely a grant to help
+                cover your EV charger installation costs. As an OZEV-Approved
+                Installer, Ocunio Energy matches you to the right scheme and
+                manages the process from start to finish. Get in touch to
+                find out which one applies to you.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Button
@@ -95,16 +108,16 @@ export default function OzevGrantsPage() {
             </Reveal>
 
             <Reveal delay={100}>
-              <div className="mx-auto mt-12 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-4 text-left sm:grid-cols-3">
                 {stats.map((stat) => (
                   <div
                     key={stat.label}
-                    className="rounded-2xl border border-white/15 bg-white/10 px-4 py-5 backdrop-blur-sm"
+                    className="rounded-2xl border border-white/15 bg-white/10 px-5 py-5 backdrop-blur-sm"
                   >
-                    <p className="font-heading text-xl font-semibold">
+                    <p className="font-heading text-base font-semibold">
                       {stat.label}
                     </p>
-                    <p className="mt-1 text-xs text-primary-foreground/70">
+                    <p className="mt-1.5 text-sm text-primary-foreground/70">
                       {stat.sub}
                     </p>
                   </div>
@@ -120,12 +133,12 @@ export default function OzevGrantsPage() {
               <div className="mx-auto max-w-2xl text-center">
                 <SectionKicker center />
                 <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-                  Find the right scheme
+                  Which OZEV grant is yours?
                 </h2>
                 <p className="mt-3 text-muted-foreground">
-                  Five OZEV grant schemes, each for a different situation.
-                  Pick the one that matches yours to see the full eligibility
-                  criteria and how to apply.
+                  There are five OZEV chargepoint grants — one for almost
+                  every situation. Find yours below to see exactly what you
+                  qualify for and how to apply.
                 </p>
               </div>
             </Reveal>

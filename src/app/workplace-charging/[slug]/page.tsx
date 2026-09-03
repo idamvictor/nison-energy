@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 import { commercialProducts } from "@/lib/commercial-products";
+import { commercialProductDetails } from "@/lib/commercial-product-details";
 import {
-  commercialProductDetails,
-  commercialStandardInstallation,
-} from "@/lib/commercial-product-details";
+  installationProcessMarkdown,
+  deliveryPolicyMarkdown,
+  returnsPolicyMarkdown,
+} from "@/lib/legal-content";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -17,12 +19,22 @@ import { CommercialPurchasePanel } from "@/components/workplace-charging/commerc
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { BlogMarkdown } from "@/components/blog/blog-markdown";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export function generateStaticParams() {
   return commercialProducts.map((product) => ({ slug: product.id }));
@@ -124,10 +136,12 @@ export default async function CommercialProductDetailPage({
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specification">Specification</TabsTrigger>
               <TabsTrigger value="installation">Installation</TabsTrigger>
+              <TabsTrigger value="delivery">Delivery Policy</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="features" className="max-w-2xl py-6">
-              <ul className="flex flex-col gap-2.5">
+            <TabsContent value="features" className="py-6">
+              <ul className="grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
                 {detail.features.map((feature) => (
                   <li
                     key={feature}
@@ -140,7 +154,7 @@ export default async function CommercialProductDetailPage({
               </ul>
             </TabsContent>
 
-            <TabsContent value="description" className="max-w-3xl py-6">
+            <TabsContent value="description" className="py-6">
               <div className="flex flex-col gap-4 text-foreground/80">
                 {detail.description.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -149,39 +163,58 @@ export default async function CommercialProductDetailPage({
             </TabsContent>
 
             <TabsContent value="specification" className="py-6">
-              <dl className="grid max-w-2xl grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:gap-x-8 sm:divide-y-0">
-                {detail.specs.map((spec) => (
-                  <div
-                    key={spec.label}
-                    className="flex items-center justify-between gap-4 border-b border-border py-3 sm:justify-start"
-                  >
-                    <dt className="text-sm text-muted-foreground">
-                      {spec.label}
-                    </dt>
-                    <dd className="text-sm font-medium text-foreground sm:ml-auto">
-                      {spec.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <div className="overflow-hidden rounded-xl border border-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-secondary/60 hover:bg-secondary/60">
+                      <TableHead>Specification</TableHead>
+                      <TableHead>Value</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {detail.specs.map((spec) => (
+                      <TableRow key={spec.label}>
+                        <TableCell className="text-muted-foreground">
+                          {spec.label}
+                        </TableCell>
+                        <TableCell className="font-medium text-foreground">
+                          {spec.value}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </TabsContent>
 
-            <TabsContent value="installation" className="max-w-2xl py-6">
-              <p className="text-foreground/80">
-                Every commercial charger includes a standard installation
-                carried out by a NICEIC-qualified engineer:
-              </p>
-              <ul className="mt-4 flex flex-col gap-2">
-                {commercialStandardInstallation.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-foreground/80"
-                  >
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+            <TabsContent value="installation" className="py-6">
+              <BlogMarkdown content={installationProcessMarkdown} />
+              <div className="mt-2 flex flex-wrap gap-3">
+                <Button
+                  size="lg"
+                  className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                  nativeButton={false}
+                  render={<Link href="/contact-us" />}
+                >
+                  Book Installation (£549)
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  nativeButton={false}
+                  render={<Link href="/ozev-grant-guide" />}
+                >
+                  Check OZEV Grant Eligibility
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="delivery" className="py-6">
+              <BlogMarkdown content={deliveryPolicyMarkdown} />
+            </TabsContent>
+
+            <TabsContent value="returns" className="py-6">
+              <BlogMarkdown content={returnsPolicyMarkdown} />
             </TabsContent>
           </Tabs>
         </section>

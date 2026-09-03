@@ -59,8 +59,8 @@ export function SiteFooter() {
               />
             </Link>
             <p className="mt-4 max-w-xs text-sm text-white/60">
-              Premium EV charger sales and installation for homes and
-              workplaces across the UK.
+              Buy. Install. Claim Your Grant. All in One Place, from Ocunio
+              Energy.
             </p>
             <a
               href="tel:03306330252"
@@ -128,9 +128,12 @@ export function SiteFooter() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <p className="max-w-2xl text-xs leading-relaxed text-white/50">
-            Nison Limited, trading as Ocunio Energy. Registered in England and
-            Wales. Copyright © {new Date().getFullYear()}. All rights
-            reserved.
+            Nison Limited, trading as Ocunio Energy. Registered in England
+            and Wales No.16371062. Registered office 71-75 Shelton Street
+            Covent Garden London United Kingdom WC2 9JQ. VAT Number:
+            495472057.
+            <br />
+            Copyright © {new Date().getFullYear()}. All rights reserved.
           </p>
           <div className="flex flex-wrap gap-2">
             {paymentMethods.map((method) => (

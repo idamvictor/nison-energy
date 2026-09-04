@@ -72,6 +72,14 @@ export const grantSchemes: GrantScheme[] = [
       "From 1 April 2026, apply directly via the GOV.UK Find a Grant platform (installers can no longer send you the application link)",
       "OZEV reviews your application and notifies you and your installer by email once approved",
     ],
+    documentation: [
+      "Proof of address — a utility bill or council tax bill dated within the last 3 months",
+      "Proof of tenancy or ownership — your signed tenancy agreement (AST), or your leasehold title if you own the flat",
+      "If you're renting: written landlord or freeholder consent — grab our ready-made permission letter template to speed things along",
+      "Your itemised quote from Ocunio, showing the £500 grant deduction clearly",
+      "Vehicle evidence: your V5C logbook, lease agreement, or registration number if you already have the car — or your vehicle order form plus a photo of your off-street parking space if it's on order",
+      "Some landlords, especially councils or housing associations, require you to submit a business case as part of your permission — we support you with the information and supporting documents needed for this",
+    ],
     resources: [
       {
         label: "Apply via Find a Grant",

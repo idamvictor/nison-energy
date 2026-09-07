@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   AlertTriangle,
   Check,
+  Download,
   FileCheck2,
   Video,
   X,
@@ -26,7 +27,6 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
-import { generateReferenceCode } from "@/lib/reference-code";
 import { generateLandlordQuotePdf } from "@/lib/generate-landlord-quote-pdf";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +57,7 @@ const questions: { key: keyof Answers; label: string; options: { label: string; 
   },
   {
     key: "registered",
-    label: "Do you have a Companies House registration number or an HMRC VAT number?",
+    label: "Do you have a Companies House Reg No or VAT No?",
     options: [
       { label: "Yes", value: "yes" },
       { label: "No", value: "no" },
@@ -82,11 +82,12 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
       {label}
       {children}
+      {hint && <span className="text-xs font-normal text-muted-foreground">{hint}</span>}
     </label>
   );
 }
@@ -97,6 +98,9 @@ export default function ResidentialLandlordsGuidePage() {
   const [answers, setAnswers] = useState<Answers>({ installType: null, parking: null, registered: null });
   const [charger, setCharger] = useState(chargerModels[0]);
   const [installType, setInstallType] = useState("Single Tenancy Rental");
+  const [sockets, setSockets] = useState("");
+  const [chargerCost, setChargerCost] = useState("");
+  const [labourCost, setLabourCost] = useState("");
   const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
   const [quoteResult, setQuoteResult] = useState<{ netPayable: number; grant: number; sockets: number } | null>(null);
 
@@ -123,6 +127,17 @@ export default function ResidentialLandlordsGuidePage() {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
+  const socketsNum = parseInt(sockets, 10) || 1;
+  const chargerCostNum = parseFloat(chargerCost) || 0;
+  const labourCostNum = parseFloat(labourCost) || 0;
+  const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
+  const previewSubtotal = (chargerCostNum + labourCostNum) * socketsNum + worksCostNum;
+  const previewVat = previewSubtotal * 0.2;
+  const previewTotal = previewSubtotal + previewVat;
+  const previewGrantCap = 500 * socketsNum;
+  const previewGrant = Math.min(previewTotal * 0.75, previewGrantCap);
+  const previewNet = previewTotal - previewGrant;
+
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -132,7 +147,8 @@ export default function ResidentialLandlordsGuidePage() {
           <Reveal>
             <SectionKicker />
             <h1 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              Could Your Rental Property Qualify For Up To £500 Per Socket?
+              Your Rental Property Could Be Eligible For Up To £500 Per
+              Socket In EV Grant Funding.
             </h1>
             <p className="mt-3 text-muted-foreground">
               Answer three quick questions below. If you qualify, we&apos;ll
@@ -140,17 +156,52 @@ export default function ResidentialLandlordsGuidePage() {
               Residential Landlords — with nothing charged until OZEV
               approves your application.
             </p>
-            <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
-              <span className="font-semibold text-accent">!</span>
-              <p>
-                Note: this guide now reflects OZEV&apos;s confirmed portal
-                steps and document checklist for residential landlords. OZEV
-                hasn&apos;t published a full &quot;not eligible if&quot; list
-                beyond the parking, registration, and mandatory-install
-                rules checked below, so that part isn&apos;t guessed at
-                further.
-              </p>
-            </div>
+          </Reveal>
+
+          <Reveal>
+            <Card className={cn("mt-6", cardClass)}>
+              <CardContent>
+                <p className="mb-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                  Grant Value &amp; Annual Caps
+                </p>
+                <ul className="flex flex-col gap-2">
+                  <li className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <strong className="text-foreground">Contribution Rate:</strong>{" "}
+                      Covers up to 75% of the eligible purchase and
+                      installation costs.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <strong className="text-foreground">Cap Per Socket:</strong>{" "}
+                      Capped at £500 per socket.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <strong className="text-foreground">Annual Allocation:</strong>{" "}
+                      Eligible landlords can claim up to 200 grant sockets
+                      per financial year — across multiple properties or
+                      concentrated in a single multi-unit development.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <strong className="text-foreground">Common Ownership Limit:</strong>{" "}
+                      If your organisation is part of a wider group (linked
+                      entities, shared directorships, or parent/holding
+                      companies), the 200-socket limit applies to the
+                      entire group combined, not per company.
+                    </span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
           </Reveal>
 
           <Reveal>
@@ -190,7 +241,13 @@ export default function ResidentialLandlordsGuidePage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="outline">Ask about installation without the grant</Button>
+                      <Button
+                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        nativeButton={false}
+                        render={<Link href="/checkout" />}
+                      >
+                        Return to checkout to continue shopping →
+                      </Button>
                     </div>
                   </>
                 )}
@@ -200,14 +257,20 @@ export default function ResidentialLandlordsGuidePage() {
                     <div className="flex items-start gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3.5 text-sm">
                       <AlertTriangle className="mt-0.5 size-4 shrink-0 text-accent" />
                       <p className="text-foreground/80">
-                        You&apos;ll need a Companies House registration
-                        number or an HMRC VAT number before you can apply —
-                        the portal requires this to verify your entity. Get
-                        that in place first, then come back to apply.
+                        You&apos;ll need a Companies House Reg No or VAT No
+                        before you can apply — the portal requires this to
+                        verify your entity. Get that in place first, then
+                        come back to apply.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="outline">Ask about installation without the grant</Button>
+                      <Button
+                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        nativeButton={false}
+                        render={<Link href="/checkout" />}
+                      >
+                        Return to checkout to continue shopping →
+                      </Button>
                     </div>
                   </>
                 )}
@@ -260,37 +323,29 @@ export default function ResidentialLandlordsGuidePage() {
                       onSubmit={(e) => {
                         e.preventDefault();
                         const data = new FormData(e.currentTarget);
-                        const sockets = parseInt(String(data.get("sockets") ?? "1"), 10) || 1;
-                        const chargerUnitCost = parseFloat(String(data.get("chargerCost") ?? "0")) || 0;
-                        const labourCost = parseFloat(String(data.get("labourCost") ?? "0")) || 0;
                         const workItems = works
                           .filter((w) => w.desc || w.cost)
                           .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
                         generateLandlordQuotePdf({
-                          reference: generateReferenceCode("OCU"),
+                          reference: `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`,
                           contactName: String(data.get("contactName") ?? ""),
                           email: String(data.get("email") ?? ""),
                           phone: String(data.get("phone") ?? "") || undefined,
                           businessName: String(data.get("business") ?? ""),
                           regNumber: String(data.get("regNo") ?? "") || undefined,
+                          vatNumber: String(data.get("vatNo") ?? "") || undefined,
                           billingAddress: String(data.get("billingAddress") ?? ""),
                           siteAddress: String(data.get("site") ?? ""),
                           installType,
-                          sockets,
+                          sockets: socketsNum,
                           chargerModel: charger,
-                          chargerUnitCost,
-                          labourCost,
+                          chargerUnitCost: chargerCostNum,
+                          labourCost: labourCostNum,
                           works: workItems,
                         });
 
-                        const chargerTotal = chargerUnitCost * sockets;
-                        const labourTotal = labourCost * sockets;
-                        const worksTotal = workItems.reduce((sum, w) => sum + w.cost, 0);
-                        const subtotal = chargerTotal + labourTotal + worksTotal;
-                        const totalIncVat = subtotal * 1.2;
-                        const grant = Math.min(totalIncVat * 0.75, 500 * sockets);
-                        setQuoteResult({ netPayable: totalIncVat - grant, grant, sockets });
+                        setQuoteResult({ netPayable: previewNet, grant: previewGrant, sockets: socketsNum });
                       }}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -306,8 +361,17 @@ export default function ResidentialLandlordsGuidePage() {
                         <Field label="Business / organisation name">
                           <Input name="business" placeholder="e.g. Woodgreen Property Ltd" />
                         </Field>
-                        <Field label="Companies House reg. no. / HMRC VAT no.">
+                        <Field label="Companies House Registration No.">
                           <Input name="regNo" placeholder="e.g. 12345678" />
+                        </Field>
+                        <Field label="VAT No.">
+                          <Input name="vatNo" placeholder="e.g. GB123456789" />
+                        </Field>
+                        <Field label="Billing address">
+                          <Input name="billingAddress" placeholder="e.g. 10 Commercial Way, London, NW10 7LR" />
+                        </Field>
+                        <Field label="Installation site address">
+                          <Input name="site" placeholder="e.g. Woodgreen Court, Block A, Woodgreen Road, London" />
                         </Field>
                         <Field label="Installation type">
                           <Select value={installType} onValueChange={(v) => setInstallType(v ?? installType)}>
@@ -320,14 +384,14 @@ export default function ResidentialLandlordsGuidePage() {
                             </SelectContent>
                           </Select>
                         </Field>
-                        <Field label="Billing address">
-                          <Input name="billingAddress" placeholder="e.g. 10 Commercial Way, London, NW10 7LR" />
-                        </Field>
-                        <Field label="Installation site address">
-                          <Input name="site" placeholder="e.g. Woodgreen Court, Block A, Woodgreen Road, London" />
-                        </Field>
                         <Field label="Number of sockets requested">
-                          <Input name="sockets" type="number" min={1} placeholder="e.g. 4" />
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="e.g. 4"
+                            value={sockets}
+                            onChange={(e) => setSockets(e.target.value)}
+                          />
                         </Field>
                         <Field label="Charger model">
                           <Select value={charger} onValueChange={(v) => setCharger(v ?? charger)}>
@@ -343,15 +407,63 @@ export default function ResidentialLandlordsGuidePage() {
                             </SelectContent>
                           </Select>
                         </Field>
-                        <Field label="EV chargepoint unit cost per socket (£, ex VAT)">
-                          <Input name="chargerCost" type="text" inputMode="decimal" placeholder="e.g. 399" />
+                        <Field
+                          label="EV chargepoint unit cost per socket (£, ex VAT)"
+                          hint="Enter the cost before VAT — e.g. £500 ex VAT becomes £600 inc VAT automatically."
+                        >
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="e.g. 399"
+                            value={chargerCost}
+                            onChange={(e) => setChargerCost(e.target.value)}
+                          />
                         </Field>
-                        <Field label="Installation labour cost per socket (£, ex VAT)">
-                          <Input name="labourCost" type="text" inputMode="decimal" placeholder="e.g. 250" />
+                        <Field
+                          label="Standard installation labour cost per socket (£, ex VAT)"
+                          hint="Also ex VAT — VAT is added for you in the summary below."
+                        >
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="e.g. 250"
+                            value={labourCost}
+                            onChange={(e) => setLabourCost(e.target.value)}
+                          />
                         </Field>
                       </div>
 
                       <WorksRowsField rows={works} onChange={setWorks} />
+
+                      <div className="rounded-lg border border-border bg-card p-4">
+                        <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                          Estimated cost summary
+                        </p>
+                        <div className="flex flex-col divide-y divide-border text-sm">
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-foreground/80">Subtotal (ex. VAT)</span>
+                            <span className="text-foreground">£{previewSubtotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-foreground/80">VAT (20%)</span>
+                            <span className="text-foreground">£{previewVat.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 font-semibold">
+                            <span className="text-foreground">Total (inc. VAT)</span>
+                            <span className="text-foreground">£{previewTotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-primary">
+                              Less: OZEV grant ({socketsNum} socket{socketsNum === 1 ? "" : "s"}, up to £500/socket)
+                            </span>
+                            <span className="text-primary">− £{previewGrant.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 font-semibold">
+                            <span className="text-foreground">Net payable</span>
+                            <span className="text-foreground">£{previewNet.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
 
                       <Button type="submit" className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90">
                         Generate My Quote →
@@ -412,7 +524,7 @@ export default function ResidentialLandlordsGuidePage() {
                         </p>
                         <ul className="flex flex-col gap-1.5">
                           {[
-                            "Companies House or VAT registration number",
+                            "Companies House Reg No or VAT No",
                             "Land Registry Title Deed for the property",
                             "Itemised quote from Ocunio (Nison Limited) showing the £500 grant deduction",
                             "Clear photo of the private driveway or tenant parking bay",
@@ -430,7 +542,7 @@ export default function ResidentialLandlordsGuidePage() {
                         </p>
                         <ul className="flex flex-col gap-1.5">
                           {[
-                            "Companies House or VAT registration number",
+                            "Companies House Reg No or VAT No",
                             "Freehold title, or RTM/management company minutes confirming authority over the parking areas",
                             "Itemised quote from Ocunio (Nison Limited) showing all socket deductions (£500 per socket)",
                             "Site layout diagram or photos of the marked tenant/communal bays",
@@ -454,6 +566,21 @@ export default function ResidentialLandlordsGuidePage() {
                     </div>
 
                     <p className="mt-4 text-sm text-foreground/80">
+                      Download our free OZEV Application Guide — a quick
+                      walkthrough of the Government portal so you know
+                      exactly what to expect before you start.
+                    </p>
+                    <a
+                      href="/documents/ozev-grant-application-guide.pdf"
+                      download
+                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Download className="size-4 shrink-0" />
+                      <span className="flex-1 font-medium">OZEV Application Guide</span>
+                      <span className="text-xs text-muted-foreground">PDF</span>
+                    </a>
+
+                    <p className="mt-4 text-sm text-foreground/80">
                       Once your documents are ready, here&apos;s what the
                       GOV.UK Find a Grant portal will ask for:
                     </p>
@@ -462,9 +589,8 @@ export default function ResidentialLandlordsGuidePage() {
                         <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
                         <span>
                           <strong className="text-foreground">Section 1 — Organisation &amp; Identity:</strong>{" "}
-                          your Companies House registration number or HMRC
-                          VAT number, plus your registered contact and
-                          company address
+                          your Companies House Reg No or VAT No, plus your
+                          registered contact and company address
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">

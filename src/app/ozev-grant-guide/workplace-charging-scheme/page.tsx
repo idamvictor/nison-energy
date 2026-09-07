@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
   Check,
+  Download,
   ExternalLink,
   X,
 } from "lucide-react";
@@ -24,7 +26,6 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
-import { generateReferenceCode } from "@/lib/reference-code";
 import { generateWorkplaceQuotePdf } from "@/lib/generate-workplace-quote-pdf";
 import { cn } from "@/lib/utils";
 
@@ -82,11 +83,12 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
       {label}
       {children}
+      {hint && <span className="text-xs font-normal text-muted-foreground">{hint}</span>}
     </label>
   );
 }
@@ -96,6 +98,9 @@ const cardClass = "border border-border shadow-lg shadow-primary/5 ring-primary/
 export default function WorkplaceChargingSchemeGuidePage() {
   const [answers, setAnswers] = useState<Answers>({ orgType: null, parking: null, ownership: null });
   const [charger, setCharger] = useState(chargerModels[0]);
+  const [sockets, setSockets] = useState("");
+  const [chargerCost, setChargerCost] = useState("");
+  const [labourCost, setLabourCost] = useState("");
   const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
   const [quoteResult, setQuoteResult] = useState<{ netPayable: number; grant: number; sockets: number } | null>(null);
 
@@ -122,6 +127,17 @@ export default function WorkplaceChargingSchemeGuidePage() {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
+  const socketsNum = Math.min(parseInt(sockets, 10) || 1, 40);
+  const chargerCostNum = parseFloat(chargerCost) || 0;
+  const labourCostNum = parseFloat(labourCost) || 0;
+  const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
+  const previewSubtotal = (chargerCostNum + labourCostNum) * socketsNum + worksCostNum;
+  const previewVat = previewSubtotal * 0.2;
+  const previewTotal = previewSubtotal + previewVat;
+  const previewGrantCap = Math.min(500 * socketsNum, 20000);
+  const previewGrant = Math.min(previewTotal * 0.75, previewGrantCap);
+  const previewNet = previewTotal - previewGrant;
+
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -131,7 +147,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
           <Reveal>
             <SectionKicker />
             <h1 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              Could Your Business Save Up To £20,000 On EV Charging?
+              Your Business Could Save Up To £20,000 On EV Charging?
             </h1>
             <p className="mt-3 text-muted-foreground">
               Answer three quick questions below. If you qualify, we&apos;ll
@@ -139,16 +155,6 @@ export default function WorkplaceChargingSchemeGuidePage() {
               a voucher-based grant, so your installer can&apos;t charge you
               until the grant has been paid.
             </p>
-            <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
-              <span className="font-semibold text-accent">!</span>
-              <p>
-                Note: this guide reflects OZEV&apos;s published Workplace
-                Charging Scheme rules. It&apos;s a voucher scheme rather
-                than the Find a Grant portal used for residential
-                applications — the steps below follow that process
-                specifically.
-              </p>
-            </div>
           </Reveal>
 
           <Reveal>
@@ -189,7 +195,13 @@ export default function WorkplaceChargingSchemeGuidePage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="outline">Ask about installation without the grant</Button>
+                      <Button
+                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        nativeButton={false}
+                        render={<Link href="/checkout" />}
+                      >
+                        Return to checkout to continue shopping →
+                      </Button>
                     </div>
                   </>
                 )}
@@ -205,7 +217,13 @@ export default function WorkplaceChargingSchemeGuidePage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="outline">Ask about installation without the grant</Button>
+                      <Button
+                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        nativeButton={false}
+                        render={<Link href="/checkout" />}
+                      >
+                        Return to checkout to continue shopping →
+                      </Button>
                     </div>
                   </>
                 )}
@@ -261,40 +279,28 @@ export default function WorkplaceChargingSchemeGuidePage() {
                       onSubmit={(e) => {
                         e.preventDefault();
                         const data = new FormData(e.currentTarget);
-                        const sockets = Math.min(
-                          parseInt(String(data.get("sockets") ?? "1"), 10) || 1,
-                          40
-                        );
-                        const chargerUnitCost = parseFloat(String(data.get("chargerCost") ?? "0")) || 0;
-                        const labourCost = parseFloat(String(data.get("labourCost") ?? "0")) || 0;
                         const workItems = works
                           .filter((w) => w.desc || w.cost)
                           .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
                         generateWorkplaceQuotePdf({
-                          reference: generateReferenceCode("OCU"),
+                          reference: `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`,
                           contactName: String(data.get("contactName") ?? ""),
                           email: String(data.get("email") ?? ""),
                           phone: String(data.get("phone") ?? "") || undefined,
                           businessName: String(data.get("business") ?? ""),
                           regNumber: String(data.get("regNo") ?? "") || undefined,
+                          vatNumber: String(data.get("vatNo") ?? "") || undefined,
                           billingAddress: String(data.get("billingAddress") ?? ""),
                           siteAddress: String(data.get("site") ?? ""),
-                          sockets,
+                          sockets: socketsNum,
                           chargerModel: charger,
-                          chargerUnitCost,
-                          labourCost,
+                          chargerUnitCost: chargerCostNum,
+                          labourCost: labourCostNum,
                           works: workItems,
                         });
 
-                        const chargerTotal = chargerUnitCost * sockets;
-                        const labourTotal = labourCost * sockets;
-                        const worksTotal = workItems.reduce((sum, w) => sum + w.cost, 0);
-                        const subtotal = chargerTotal + labourTotal + worksTotal;
-                        const totalIncVat = subtotal * 1.2;
-                        const grantCap = Math.min(500 * sockets, 20000);
-                        const grant = Math.min(totalIncVat * 0.75, grantCap);
-                        setQuoteResult({ netPayable: totalIncVat - grant, grant, sockets });
+                        setQuoteResult({ netPayable: previewNet, grant: previewGrant, sockets: socketsNum });
                       }}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -310,11 +316,11 @@ export default function WorkplaceChargingSchemeGuidePage() {
                         <Field label="Business / organisation name">
                           <Input name="business" placeholder="e.g. Woodgreen Logistics Ltd" />
                         </Field>
-                        <Field label="Company reg. no. / VAT no. / business rates ref.">
+                        <Field label="Companies House Registration No.">
                           <Input name="regNo" placeholder="e.g. 12345678" />
                         </Field>
-                        <Field label="Number of sockets requested (max 40)">
-                          <Input name="sockets" type="number" min={1} max={40} placeholder="e.g. 6" />
+                        <Field label="VAT No.">
+                          <Input name="vatNo" placeholder="e.g. GB123456789" />
                         </Field>
                         <Field label="Billing address">
                           <Input name="billingAddress" placeholder="e.g. 10 Commercial Way, London, NW10 7LR" />
@@ -323,6 +329,15 @@ export default function WorkplaceChargingSchemeGuidePage() {
                           <Input
                             name="site"
                             placeholder="e.g. Woodgreen Logistics, Site 2, Industrial Estate, Watford"
+                          />
+                        </Field>
+                        <Field label="Number of sockets requested (max 40)">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="e.g. 6"
+                            value={sockets}
+                            onChange={(e) => setSockets(e.target.value)}
                           />
                         </Field>
                         <Field label="Charger model">
@@ -339,15 +354,63 @@ export default function WorkplaceChargingSchemeGuidePage() {
                             </SelectContent>
                           </Select>
                         </Field>
-                        <Field label="EV chargepoint unit cost per socket (£, ex VAT)">
-                          <Input name="chargerCost" type="text" inputMode="decimal" placeholder="e.g. 399" />
+                        <Field
+                          label="EV chargepoint unit cost per socket (£, ex VAT)"
+                          hint="Enter the cost before VAT — e.g. £500 ex VAT becomes £600 inc VAT automatically."
+                        >
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="e.g. 399"
+                            value={chargerCost}
+                            onChange={(e) => setChargerCost(e.target.value)}
+                          />
                         </Field>
-                        <Field label="Installation labour cost per socket (£, ex VAT)">
-                          <Input name="labourCost" type="text" inputMode="decimal" placeholder="e.g. 250" />
+                        <Field
+                          label="Standard installation labour cost per socket (£, ex VAT)"
+                          hint="Also ex VAT — VAT is added for you in the summary below."
+                        >
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="e.g. 250"
+                            value={labourCost}
+                            onChange={(e) => setLabourCost(e.target.value)}
+                          />
                         </Field>
                       </div>
 
                       <WorksRowsField rows={works} onChange={setWorks} />
+
+                      <div className="rounded-lg border border-border bg-card p-4">
+                        <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                          Estimated cost summary
+                        </p>
+                        <div className="flex flex-col divide-y divide-border text-sm">
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-foreground/80">Subtotal (ex. VAT)</span>
+                            <span className="text-foreground">£{previewSubtotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-foreground/80">VAT (20%)</span>
+                            <span className="text-foreground">£{previewVat.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 font-semibold">
+                            <span className="text-foreground">Total (inc. VAT)</span>
+                            <span className="text-foreground">£{previewTotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-primary">
+                              Less: OZEV voucher ({socketsNum} socket{socketsNum === 1 ? "" : "s"}, up to £500/socket, max £20,000)
+                            </span>
+                            <span className="text-primary">− £{previewGrant.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 font-semibold">
+                            <span className="text-foreground">Net payable</span>
+                            <span className="text-foreground">£{previewNet.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
 
                       <Button type="submit" className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90">
                         Generate My Quote →
@@ -432,6 +495,21 @@ export default function WorkplaceChargingSchemeGuidePage() {
                     </div>
 
                     <p className="mt-4 text-sm text-foreground/80">
+                      Download our free OZEV Application Guide — a quick
+                      walkthrough of the Government portal so you know
+                      exactly what to expect before you start.
+                    </p>
+                    <a
+                      href="/documents/ozev-grant-application-guide.pdf"
+                      download
+                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Download className="size-4 shrink-0" />
+                      <span className="flex-1 font-medium">OZEV Application Guide</span>
+                      <span className="text-xs text-muted-foreground">PDF</span>
+                    </a>
+
+                    <p className="mt-4 text-sm text-foreground/80">
                       Once you have your documents ready, apply online —
                       approval and your voucher are normally issued within
                       5 working days.
@@ -475,6 +553,18 @@ export default function WorkplaceChargingSchemeGuidePage() {
                       grant has been paid, so there&apos;s nothing to
                       settle upfront on the grant-covered portion.
                     </p>
+
+                    <p className="mt-4 text-sm text-foreground/80">
+                      Download our Installation Guide for what to expect
+                      on the day — access requirements, how long it takes,
+                      and how to get your charger set up afterwards.
+                    </p>
+                    <div className="mt-2 flex items-center gap-2 rounded-lg border border-dashed border-border px-3.5 py-2.5 text-xs text-muted-foreground">
+                      <span className="size-1.5 shrink-0 rounded-full bg-accent" />
+                      Installation Guide — attachment not provided
+                      (original draft: File 2)
+                    </div>
+
                     <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
                       <span className="font-semibold text-accent">!</span>
                       <p>

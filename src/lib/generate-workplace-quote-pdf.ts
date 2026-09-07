@@ -24,6 +24,7 @@ export type WorkplaceQuotePdfInput = {
   phone?: string;
   businessName: string;
   regNumber?: string;
+  vatNumber?: string;
   billingAddress: string;
   siteAddress: string;
   sockets: number;
@@ -91,12 +92,22 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput) {
   body(`Quote/Invoice No.: ${input.reference}     Date of Issue: ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`);
   y += 1;
 
+  heading("Installer Details");
+  body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
+  body("OZEV Installer Number: 13528");
+  body("Company Registration No.: 16371062");
+  body("VAT No.: 495472057");
+  body("Installer Contact: info@ocunioenergy.com · 07525 567054");
+  y += 1;
+
   heading("Client Details");
   doc.setFont("times", "normal");
   doc.setFontSize(10);
   doc.setTextColor(...BODY);
   const clientLines = [
-    `Business / Organisation Name: ${input.businessName || "—"}${input.regNumber ? ` (Reg./VAT/Business Rates Ref.: ${input.regNumber})` : ""}`,
+    `Business / Organisation Name: ${input.businessName || "—"}`,
+    `Companies House Registration No.: ${input.regNumber || "—"}`,
+    `VAT No.: ${input.vatNumber || "—"}`,
     `Billing Address: ${input.billingAddress || "—"}`,
     `Installation Site Address: ${input.siteAddress || "—"}`,
     `Contact Name: ${input.contactName}`,
@@ -210,32 +221,14 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput) {
   body("Grant calculated after VAT: ex-VAT → +20% VAT → inc-VAT → less OZEV voucher.", 9, "italic", MUTED);
   y += 3;
 
-  heading("Installer Details");
-  body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
-  body("OZEV Installer Number: 13528");
-  body("Installer Contact: info@ocunioenergy.com · 07525 567054");
-  y += 1;
-
   heading("Compliance & Statutory Declarations");
   const declarations = [
     "Technical Standard: Installation carried out in accordance with BS 7671 (IET Wiring Regulations, 18th Edition) and BS EN 61851.",
-    "Warranty: Hardware and installation warranty terms as per the manufacturer's and Ocunio Energy's standard documentation, provided separately.",
-    "Grant Deduction: The grant amount shown is an estimate. Do not begin installation before your voucher is issued. Once installed, the confirmed voucher value will be deducted from this invoice and claimed by Ocunio Energy directly from OZEV — you are not charged for the grant-covered portion in advance.",
+    "Warranty: Hardware and installation warranty terms as per the manufacturer's and Nison Limited's standard documentation, provided separately.",
+    "Grant Deduction: The grant amount shown is an estimate. Do not begin installation before your voucher is issued. Once installed, the confirmed voucher value will be deducted from this invoice and claimed by Nison Limited directly from OZEV — you are not charged for the grant-covered portion in advance.",
   ];
   declarations.forEach((d, i) => body(`${i + 1}. ${d}`, 9.5));
-  y += 4;
-
-  y = ensureSpace(doc, y, 24);
-  const colWidth = CONTENT_WIDTH / 2;
-  doc.setFont("times", "normal");
-  doc.setFontSize(9.5);
-  doc.setTextColor(...BODY);
-  doc.text("Customer Signature: ________________________", MARGIN, y);
-  doc.text("Installer Signature: ________________________", MARGIN + colWidth, y);
-  y += 12;
-  doc.text("Date: ________________", MARGIN, y);
-  doc.text("Date: ________________", MARGIN + colWidth, y);
-  y += 10;
+  y += 2;
 
   heading("Notes");
   const notes = [
@@ -251,7 +244,7 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput) {
   }
 
   rule();
-  body("Ocunio Energy (Nison Limited) — Borehamwood, Hertfordshire · www.ocunioenergy.com", 9, "italic", MUTED);
+  body("Nison Limited — Borehamwood, Hertfordshire · www.ocunioenergy.com", 9, "italic", MUTED);
 
   doc.save(`ocunio-energy-workplace-quote-${input.reference}.pdf`);
 }

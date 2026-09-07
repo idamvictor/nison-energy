@@ -22,7 +22,7 @@ export function HelpSection() {
               </div>
 
               <a
-                href="tel:03306330252"
+                href="tel:07525567054"
                 className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10"
               >
                 <Phone className="size-5" />
@@ -30,7 +30,7 @@ export function HelpSection() {
                   <p className="text-xs text-primary-foreground/70">
                     Call our team
                   </p>
-                  <p className="font-heading font-semibold">033 0633 0252</p>
+                  <p className="font-heading font-semibold">07525 567054</p>
                 </div>
               </a>
 

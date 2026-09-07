@@ -42,7 +42,7 @@ export function ContactForm() {
         </p>
         <p className="max-w-sm text-sm text-muted-foreground">
           A member of the team will be in touch shortly. If it&apos;s
-          urgent, call us on 033 0633 0252.
+          urgent, call us on 07525 567054.
         </p>
       </div>
     );

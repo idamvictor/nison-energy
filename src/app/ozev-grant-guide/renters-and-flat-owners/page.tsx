@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  AlertTriangle,
   Check,
+  Download,
   FileCheck2,
   Video,
   X,
@@ -26,9 +26,8 @@ import {
 } from "@/components/ui/select";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
-import { OnStreetIntakeForm } from "@/components/grant-guide/on-street-intake-form";
+import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
 import { getGrantScheme } from "@/lib/grants";
-import { generateReferenceCode } from "@/lib/reference-code";
 import { generateRentersQuotePdf } from "@/lib/generate-renters-quote-pdf";
 import { cn } from "@/lib/utils";
 
@@ -87,23 +86,25 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
       {label}
       {children}
+      {hint && <span className="text-xs font-normal text-muted-foreground">{hint}</span>}
     </label>
   );
 }
 
 export default function RentersFlatOwnersGuidePage() {
   const [answers, setAnswers] = useState<Answers>({ property: null, parking: null, ev: null });
-  const [showOnStreetForm, setShowOnStreetForm] = useState(false);
   const [charger, setCharger] = useState(chargerModels[0]);
+  const [chargerCost, setChargerCost] = useState("");
+  const [labourCost, setLabourCost] = useState("");
+  const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
   const [quoteResult, setQuoteResult] = useState<{ netPayable: number; grant: number } | null>(null);
 
   const guideRef = useRef<HTMLDivElement>(null);
-  const onStreetRef = useRef<HTMLDivElement>(null);
 
   const allAnswered = answers.property && answers.parking && answers.ev;
   const ineligible = answers.parking === "off" && answers.property === "own-house";
@@ -119,15 +120,16 @@ export default function RentersFlatOwnersGuidePage() {
 
   function handleAnswer(key: keyof Answers, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
-    setShowOnStreetForm(false);
   }
 
-  function goToOnStreetForm() {
-    setShowOnStreetForm(true);
-    requestAnimationFrame(() =>
-      onStreetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    );
-  }
+  const chargerCostNum = parseFloat(chargerCost) || 0;
+  const labourCostNum = parseFloat(labourCost) || 0;
+  const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
+  const previewSubtotal = chargerCostNum + labourCostNum + worksCostNum;
+  const previewVat = previewSubtotal * 0.2;
+  const previewTotal = previewSubtotal + previewVat;
+  const previewGrant = Math.min(previewTotal * 0.75, 500);
+  const previewNet = previewTotal - previewGrant;
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -146,15 +148,6 @@ export default function RentersFlatOwnersGuidePage() {
               grant — with nothing charged until OZEV approves your
               application.
             </p>
-            <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
-              <span className="font-semibold text-accent">!</span>
-              <p>
-                Note: the OZEV portal steps below are now confirmed from
-                OZEV&apos;s own guidance. Only the ready-made landlord
-                permission letter template from the original draft is still
-                outstanding — marked as a pending attachment below.
-              </p>
-            </div>
           </Reveal>
 
           <Reveal>
@@ -195,8 +188,12 @@ export default function RentersFlatOwnersGuidePage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="outline">
-                        Add professional installation instead — £249
+                      <Button
+                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        nativeButton={false}
+                        render={<Link href="/checkout" />}
+                      >
+                        Return to the checkout to continue shopping →
                       </Button>
                     </div>
                   </>
@@ -204,25 +201,26 @@ export default function RentersFlatOwnersGuidePage() {
 
                 {outcome === "warn" && (
                   <>
-                    <div className="flex items-start gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3.5 text-sm">
-                      <AlertTriangle className="mt-0.5 size-4 shrink-0 text-accent" />
+                    <div className="flex flex-col gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3.5 text-sm">
                       <p className="text-foreground/80">
-                        Likely eligible — but under the separate On-Street
-                        Parking Grant, which requires local highways
-                        authority consent for a cross-pavement solution
-                        before applying. This page covers the Renters &amp;
-                        Flat Owners route below; check the on-street
-                        requirements and complete our progress update form
-                        so we&apos;re ready to guide you through that process
-                        instead.
+                        Likely eligible — but under the On-Street Parking
+                        Grant, which requires local highways authority
+                        consent for a cross-pavement solution before
+                        applying.
+                      </p>
+                      <p className="text-foreground/80">
+                        You&apos;ll need permission from your local council
+                        to install a cross-pavement charging solution, where
+                        the cable runs across the pavement between your home
+                        and your on-street parking space. A council-approved
+                        cross-pavement solution must be installed before a
+                        grant application can be submitted. Once approved,
+                        we&apos;ll initiate the chargepoint installation.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <Button nativeButton={false} render={<Link href="/ozev-grants" />}>
                         Check the requirements
-                      </Button>
-                      <Button variant="outline" onClick={goToOnStreetForm}>
-                        Complete the progress update form
                       </Button>
                     </div>
                   </>
@@ -288,27 +286,23 @@ export default function RentersFlatOwnersGuidePage() {
                       onSubmit={(e) => {
                         e.preventDefault();
                         const data = new FormData(e.currentTarget);
-                        const chargerUnitCost = parseFloat(String(data.get("chargerCost") ?? "0")) || 0;
-                        const labourCost = parseFloat(String(data.get("labourCost") ?? "0")) || 0;
-                        const worksCost = parseFloat(String(data.get("worksCost") ?? "0")) || 0;
+                        const workItems = works
+                          .filter((w) => w.desc || w.cost)
+                          .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
                         generateRentersQuotePdf({
-                          reference: generateReferenceCode("OCU"),
+                          reference: `NSE-${Date.now().toString().slice(-8)}`,
                           fullName: String(data.get("fullName") ?? ""),
                           email: String(data.get("email") ?? ""),
                           phone: String(data.get("phone") ?? "") || undefined,
                           address: String(data.get("address") ?? ""),
                           chargerModel: charger,
-                          chargerUnitCost,
-                          labourCost,
-                          worksCost,
-                          worksDesc: String(data.get("worksDesc") ?? "") || undefined,
+                          chargerUnitCost: chargerCostNum,
+                          labourCost: labourCostNum,
+                          works: workItems,
                         });
 
-                        const subtotal = chargerUnitCost + labourCost + worksCost;
-                        const totalIncVat = subtotal * 1.2;
-                        const grant = Math.min(totalIncVat * 0.75, 500);
-                        setQuoteResult({ netPayable: totalIncVat - grant, grant });
+                        setQuoteResult({ netPayable: previewNet, grant: previewGrant });
                       }}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -338,21 +332,60 @@ export default function RentersFlatOwnersGuidePage() {
                             </SelectContent>
                           </Select>
                         </Field>
-                        <Field label="EV chargepoint unit cost (£, ex VAT)">
-                          <Input name="chargerCost" type="text" inputMode="decimal" placeholder="e.g. 399" />
-                        </Field>
-                        <Field label="Installation labour cost (£, ex VAT)">
-                          <Input name="labourCost" type="text" inputMode="decimal" placeholder="e.g. 250" />
-                        </Field>
-                        <Field label="Additional works cost (£, ex VAT)">
-                          <Input name="worksCost" type="text" inputMode="decimal" placeholder="e.g. 0" />
-                        </Field>
-                        <Field label="Additional works description">
+                        <Field
+                          label="EV chargepoint unit cost (£, ex VAT)"
+                          hint="Enter the cost before VAT — e.g. £399 ex VAT becomes £478.80 inc VAT automatically."
+                        >
                           <Input
-                            name="worksDesc"
-                            placeholder="e.g. consumer unit upgrade, cabling — leave blank if none"
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="e.g. 399"
+                            value={chargerCost}
+                            onChange={(e) => setChargerCost(e.target.value)}
                           />
                         </Field>
+                        <Field
+                          label="Standard installation labour cost (£, ex VAT)"
+                          hint="Also ex VAT — VAT is added for you in the summary below."
+                        >
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="e.g. 250"
+                            value={labourCost}
+                            onChange={(e) => setLabourCost(e.target.value)}
+                          />
+                        </Field>
+                      </div>
+
+                      <WorksRowsField rows={works} onChange={setWorks} />
+
+                      <div className="rounded-lg border border-border bg-card p-4">
+                        <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                          Estimated cost summary
+                        </p>
+                        <div className="flex flex-col divide-y divide-border text-sm">
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-foreground/80">Subtotal (ex. VAT)</span>
+                            <span className="text-foreground">£{previewSubtotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-foreground/80">VAT (20%)</span>
+                            <span className="text-foreground">£{previewVat.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 font-semibold">
+                            <span className="text-foreground">Total (inc. VAT)</span>
+                            <span className="text-foreground">£{previewTotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span className="text-primary">Less: OZEV grant (75% of total, capped at £500)</span>
+                            <span className="text-primary">− £{previewGrant.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 font-semibold">
+                            <span className="text-foreground">Net payable</span>
+                            <span className="text-foreground">£{previewNet.toFixed(2)}</span>
+                          </div>
+                        </div>
                       </div>
 
                       <Button type="submit" className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90">
@@ -412,11 +445,53 @@ export default function RentersFlatOwnersGuidePage() {
                       ))}
                     </ul>
 
-                    <div className="mt-4 flex items-center gap-2 rounded-lg border border-dashed border-border px-3.5 py-2.5 text-xs text-muted-foreground">
-                      <span className="size-1.5 shrink-0 rounded-full bg-accent" />
-                      Landlord/freeholder permission letter template —
-                      attachment not provided (original draft: File 1)
-                    </div>
+                    <p className="mt-4 text-sm text-foreground/80">
+                      <strong className="text-foreground">Important points to note:</strong>
+                    </p>
+                    <ul className="mt-2 flex flex-col gap-1.5">
+                      <li className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        Normal turnaround: pre-approval within 10 working
+                        days, but due to demand, pre-approval can take
+                        longer than 10 working days
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        Our advice — apply sooner rather than later
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        Scheme rules mean we would not book your
+                        installation until your grant has been approved
+                      </li>
+                    </ul>
+
+                    <a
+                      href="/documents/landlord-consent-form.pdf"
+                      download
+                      className="mt-4 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Download className="size-4 shrink-0" />
+                      <span className="flex-1 font-medium">
+                        Landlord / freeholder permission letter template
+                      </span>
+                      <span className="text-xs text-muted-foreground">PDF</span>
+                    </a>
+
+                    <p className="mt-4 text-sm text-foreground/80">
+                      Download our free OZEV Application Guide — a quick
+                      walkthrough of the Government portal so you know
+                      exactly what to expect before you start.
+                    </p>
+                    <a
+                      href="/documents/ozev-grant-application-guide.pdf"
+                      download
+                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Download className="size-4 shrink-0" />
+                      <span className="flex-1 font-medium">OZEV Application Guide</span>
+                      <span className="text-xs text-muted-foreground">PDF</span>
+                    </a>
 
                     <p className="mt-4 text-sm text-foreground/80">
                       Once your documents are ready, here&apos;s what the
@@ -461,34 +536,12 @@ export default function RentersFlatOwnersGuidePage() {
                       </li>
                     </ul>
 
-                    <ul className="mt-4 flex flex-col gap-1.5">
-                      <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                        Normal turnaround: pre-approval within 10 working days
-                      </li>
-                      <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                        Right now, due to demand: pre-approval can take
-                        longer than 10 working days
-                      </li>
-                      <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                        Our advice — apply sooner rather than later
-                      </li>
-                    </ul>
-
-                    <p className="mt-4 text-sm text-foreground/80">
-                      One thing to keep in mind: scheme rules mean we
-                      can&apos;t book your installation until your grant has
-                      been pre-approved.
-                    </p>
-
                     <Button
                       className="mt-4 gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
                       nativeButton={false}
                       render={
                         <a
-                          href="https://find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-grant-for-renters-and-flat-owners-2"
+                          href="https://find-government-grants.service.gov.uk/"
                           target="_blank"
                           rel="noopener noreferrer"
                         />
@@ -553,17 +606,6 @@ export default function RentersFlatOwnersGuidePage() {
                 are being pre-approved, which is currently slower than usual
                 due to high demand.
               </p>
-            </div>
-          )}
-
-          {showOnStreetForm && (
-            <div ref={onStreetRef} className="mt-14 scroll-mt-24">
-              <Reveal>
-                <h2 className="mb-5 font-heading text-lg font-semibold text-foreground">
-                  On-Street Parking Grant — Customer Intake
-                </h2>
-                <OnStreetIntakeForm />
-              </Reveal>
             </div>
           )}
         </div>

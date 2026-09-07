@@ -126,10 +126,10 @@ export default async function GrantSchemePage({
                     variant="outline"
                     className="gap-2"
                     nativeButton={false}
-                    render={<a href="tel:03306330252" />}
+                    render={<a href="tel:07525567054" />}
                   >
                     <Phone className="size-4" />
-                    033 0633 0252
+                    07525 567054
                   </Button>
                 </div>
               </div>

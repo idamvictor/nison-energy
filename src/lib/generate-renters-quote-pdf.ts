@@ -15,6 +15,8 @@ const RULE: [number, number, number] = [222, 230, 232];
 
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
+export type WorkItem = { desc: string; cost: number };
+
 export type RentersQuotePdfInput = {
   reference: string;
   fullName: string;
@@ -24,15 +26,24 @@ export type RentersQuotePdfInput = {
   chargerModel: string;
   chargerUnitCost: number;
   labourCost: number;
-  worksCost: number;
-  worksDesc?: string;
+  works: WorkItem[];
 };
+
+function ensureSpace(doc: jsPDF, y: number, needed: number) {
+  const PAGE_HEIGHT = 297;
+  if (y + needed > PAGE_HEIGHT - MARGIN) {
+    doc.addPage();
+    return MARGIN;
+  }
+  return y;
+}
 
 export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
   const doc = new jsPDF();
   let y = MARGIN;
 
   const heading = (text: string, size = 12) => {
+    y = ensureSpace(doc, y, 14);
     doc.setFont("times", "bold");
     doc.setFontSize(size);
     doc.setTextColor(...PRIMARY);
@@ -45,6 +56,7 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
     doc.setFontSize(size);
     doc.setTextColor(...color);
     const lines = doc.splitTextToSize(text, CONTENT_WIDTH);
+    y = ensureSpace(doc, y, lines.length * size * 0.45 + 2);
     doc.text(lines, MARGIN, y);
     y += lines.length * size * 0.45 + 2;
   };
@@ -62,38 +74,28 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
   y += 10;
 
   body("trading as Ocunio Energy · Borehamwood, Hertfordshire, United Kingdom", 9, "normal", MUTED);
-  body(
-    "Company No: 16371062   |   VAT No: 495472057   |   OZEV Installer No: 13528",
-    9,
-    "normal",
-    MUTED
-  );
   y += 2;
   rule();
 
   doc.setFont("times", "normal");
   doc.setFontSize(9.5);
   doc.setTextColor(...MUTED);
-  doc.text("Tel: 033 0633 0252   |   Email: info@ocunioenergy.com   |   Web: www.ocunioenergy.com", MARGIN, y);
+  doc.text("Tel: 07525 567054   |   Email: info@ocunioenergy.com   |   Web: www.ocunioenergy.com", MARGIN, y);
   y += 8;
 
-  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-  doc.setFont("times", "bold");
-  doc.setFontSize(10);
-  doc.setTextColor(...BODY);
-  doc.text("Quote Date: ", MARGIN, y);
-  doc.setFont("times", "normal");
-  doc.text(today, MARGIN + 22, y);
-  doc.setFont("times", "bold");
-  doc.text("Ref:", MARGIN + 90, y);
-  doc.setFont("times", "normal");
-  doc.text(input.reference, MARGIN + 98, y);
-  y += 9;
+  heading("QUOTATION: EV CHARGEPOINT INSTALLATION", 15);
+  y += 1;
 
-  heading("EV Chargepoint Grant — Renters & Flat Owners — Itemised Quote", 13);
+  heading("Installer Details");
+  body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
+  body("OZEV Installer Number: 13528");
+  body("Company Registration No.: 16371062");
+  body("VAT No.: 495472057");
+  body("Installer Contact: info@ocunioenergy.com · 07525 567054");
   y += 1;
 
   heading("Applicant & Property Details");
+  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   doc.setFont("times", "normal");
   doc.setFontSize(10);
   doc.setTextColor(...BODY);
@@ -102,8 +104,11 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
     `Email: ${input.email}`,
     `Phone: ${input.phone || "—"}`,
     `Installation Address: ${input.address || "—"}`,
+    `Quote Date: ${today}`,
+    `Quote Reference No.: ${input.reference}`,
   ];
   for (const line of clientLines) {
+    y = ensureSpace(doc, y, 5);
     doc.text(line, MARGIN, y);
     y += 5;
   }
@@ -111,7 +116,8 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
 
   heading("Itemised Costs");
 
-  const subtotal = input.chargerUnitCost + input.labourCost + input.worksCost;
+  const worksTotal = input.works.reduce((sum, w) => sum + w.cost, 0);
+  const subtotal = input.chargerUnitCost + input.labourCost + worksTotal;
   const vat = subtotal * 0.2;
   const totalIncVat = subtotal + vat;
   const grant = Math.min(totalIncVat * 0.75, 500);
@@ -135,14 +141,15 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
       ],
       shaded: true,
     },
-    {
-      cells: [
-        `Additional Works${input.worksDesc ? ` (${input.worksDesc})` : ""}`,
-        input.worksCost > 0 ? "1" : "0",
-        currency.format(input.worksCost),
-        currency.format(input.worksCost),
+    ...input.works.map((w, i) => ({
+      cells: [w.desc, "1", currency.format(w.cost), currency.format(w.cost)] as [
+        string,
+        string,
+        string,
+        string,
       ],
-    },
+      shaded: i % 2 !== 0,
+    })),
   ];
 
   autoTable(doc, {
@@ -173,6 +180,7 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
     ],
     ["Net Payable by Customer", currency.format(netPayable)],
   ];
+  y = ensureSpace(doc, y, summaryRows.length * 9 + 10);
   autoTable(doc, {
     startY: y,
     margin: { left: MARGIN, right: MARGIN },
@@ -197,8 +205,16 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
   );
   y += 3;
 
-  heading("Installer Details");
-  body("Nison Limited (trading as Ocunio Energy) · OZEV Installer No. 13528 · info@ocunioenergy.com · 033 0633 0252");
+  heading("What This Quote Covers");
+  const covers = [
+    "The selected EV charger",
+    "Installation by professionals and OZEV-approved installers",
+    "Up to 15m cable supplied, including standard fittings & fixings",
+    "System commissioning and app setup.",
+  ];
+  for (const item of covers) {
+    body(`•  ${item}`, 9.5);
+  }
   y += 1;
 
   heading("Notes");
@@ -214,12 +230,7 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
   }
 
   rule();
-  body(
-    "Ocunio Energy (Nison Limited) — Borehamwood, Hertfordshire · www.ocunioenergy.com",
-    9,
-    "italic",
-    MUTED
-  );
+  body("Nison Limited — Borehamwood, Hertfordshire · www.ocunioenergy.com", 9, "italic", MUTED);
 
   doc.save(`ocunio-energy-renters-quote-${input.reference}.pdf`);
 }

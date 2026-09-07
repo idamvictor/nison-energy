@@ -99,10 +99,10 @@ export default function OzevGrantsPage() {
                   variant="outline"
                   className="h-11 border-white/25 bg-transparent px-5 text-primary-foreground hover:bg-white/10"
                   nativeButton={false}
-                  render={<a href="tel:03306330252" />}
+                  render={<a href="tel:07525567054" />}
                 >
                   <Phone className="size-4" />
-                  033 0633 0252
+                  07525 567054
                 </Button>
               </div>
             </Reveal>

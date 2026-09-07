@@ -17,7 +17,7 @@ export function ContactInfo() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-border p-6">
         <a
-          href="tel:03306330252"
+          href="tel:07525567054"
           className="flex items-center gap-3 transition-colors hover:text-primary"
         >
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
@@ -26,7 +26,7 @@ export function ContactInfo() {
           <div>
             <p className="text-xs text-muted-foreground">Call us</p>
             <p className="text-sm font-medium text-foreground">
-              033 0633 0252
+              07525 567054
             </p>
           </div>
         </a>

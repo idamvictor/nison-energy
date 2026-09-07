@@ -84,7 +84,7 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput) {
     "normal",
     MUTED
   );
-  body("info@ocunioenergy.com · 033 0633 0252", 9, "normal", MUTED);
+  body("info@ocunioenergy.com · 07525 567054", 9, "normal", MUTED);
   y += 2;
   rule();
 
@@ -212,7 +212,7 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput) {
   heading("Installer Details");
   body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
   body("OZEV Installer Number: 13528");
-  body("Installer Contact: info@ocunioenergy.com · 033 0633 0252");
+  body("Installer Contact: info@ocunioenergy.com · 07525 567054");
   y += 1;
 
   heading("Compliance & Statutory Declarations");

@@ -303,7 +303,7 @@ export default async function GrantSchemePage({
                   <Link
                     key={s.slug}
                     href={`/ozev-grants/${s.slug}`}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background px-5 py-4 transition-colors hover:border-primary/30 hover:bg-primary/5"
+                    className="flex items-center justify-between gap-4 rounded-xl border border-foreground/18 bg-background px-5 py-4 shadow-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
                   >
                     <div>
                       <p className="font-medium text-foreground">{s.audience}</p>

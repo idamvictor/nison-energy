@@ -24,11 +24,8 @@ export function LatestBlog({ limit = 3 }: { limit?: number }) {
           <div className="mx-auto max-w-2xl text-center">
             <SectionKicker center />
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-              From the Blog
+              The Blog
             </h2>
-            <p className="mt-3 text-muted-foreground">
-              EV charging news, OZEV grant updates, and buying guides from our team.
-            </p>
           </div>
         </Reveal>
 

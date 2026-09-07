@@ -13,11 +13,11 @@
       transform: translateX(-50%);
     }
   }
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.1875rem;
-  --text-xl: 1.3125rem;
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.375rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
@@ -65,11 +65,11 @@
 
 :root {
   --background: #fbfcfc;
-  --foreground: #0e2429;
+  --foreground: #000000;
   --card: #ffffff;
-  --card-foreground: #0e2429;
+  --card-foreground: #000000;
   --popover: #ffffff;
-  --popover-foreground: #0e2429;
+  --popover-foreground: #000000;
   --primary: #00627a;
   --primary-foreground: #ffffff;
   --secondary: #eaf3f5;

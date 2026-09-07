@@ -16,18 +16,18 @@ export function HelpSection() {
                   Get Help And Advice
                 </h2>
                 <p className="mt-2 text-primary-foreground/75">
-                  Our team is on hand to talk through chargers, installs, and
-                  grant eligibility.
+                  Our team is on hand to talk through our products, installs,
+                  and grant eligibility.
                 </p>
               </div>
 
               <a
                 href="tel:07525567054"
-                className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10"
+                className="flex items-center gap-3 rounded-xl bg-accent px-5 py-4 text-accent-foreground transition-colors hover:bg-accent/90"
               >
                 <Phone className="size-5" />
                 <div>
-                  <p className="text-xs text-primary-foreground/70">
+                  <p className="text-xs text-accent-foreground/80">
                     Call our team
                   </p>
                   <p className="font-heading font-semibold">07525 567054</p>
@@ -36,8 +36,7 @@ export function HelpSection() {
 
               <Button
                 size="lg"
-                variant="outline"
-                className="h-auto gap-3 border-white/20 bg-transparent px-5 py-4 text-primary-foreground hover:bg-white/10"
+                className="h-auto gap-3 bg-accent px-5 py-4 text-accent-foreground hover:bg-accent/90"
                 nativeButton={false}
                 render={<Link href="/contact-us" />}
               >

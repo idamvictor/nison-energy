@@ -63,7 +63,7 @@ export default function OzevGrantGuideSelectorPage() {
               {paths.map((path, index) => (
                 <Reveal key={path.href} delay={index * 90}>
                   <Link href={path.href} className="group block h-full">
-                    <Card className="h-full transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
+                    <Card className="h-full border border-foreground/18 shadow-md transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
                       <CardContent className="flex h-full flex-col">
                         <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                           <path.icon className="size-5" />

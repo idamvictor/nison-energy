@@ -26,11 +26,31 @@ export const homeFaqCategories: FaqCategory[] = [
         answer:
           "Yes, we offer buy now, pay later options (such as pay in 3) with Paypal and Klarna at checkout for eligible orders, in addition to full upfront payment.",
       },
-    ],
-  },
-  {
-    category: "Choosing Your Charger",
-    items: [
+      {
+        question: "What payment methods do you accept?",
+        answer:
+          "We accept all major debit/credit cards, bank transfers, and online payments through our secure checkout.",
+      },
+      {
+        question: "Can I cancel my order?",
+        answer:
+          "Yes, orders can be cancelled free of charge before dispatch. Once shipped or installation is scheduled, our standard cancellation policy applies.",
+      },
+      {
+        question: "How quickly will my order be delivered?",
+        answer:
+          "Standard delivery typically takes 1–3 working days from order confirmation. Installation slots are then booked separately.",
+      },
+      {
+        question: "Can I request delivery on a specific date?",
+        answer:
+          "Yes, we're happy to coordinate a preferred delivery date where possible. Just let our team know via customer support.",
+      },
+      {
+        question: "Do you offer nationwide delivery?",
+        answer:
+          "Yes, we deliver and install across the UK. Coverage and lead times may vary slightly depending on your location.",
+      },
       {
         question:
           "What's the difference between a tethered and untethered charger?",
@@ -99,8 +119,28 @@ export const homeFaqCategories: FaqCategory[] = [
     ],
   },
   {
-    category: "After Installation",
+    category: "Returns & Refunds",
     items: [
+      {
+        question: "Can I return a product if I ordered the wrong item?",
+        answer:
+          "Yes, unused items in original packaging can be returned within 14 days. Contact our support team first to arrange the return.",
+      },
+      {
+        question: "How long do refunds take?",
+        answer:
+          "We process refunds within 14 working days after we receive and inspect the returned item. You'll be notified by email once it's complete.",
+      },
+    ],
+  },
+  {
+    category: "Warranty & Support",
+    items: [
+      {
+        question: "Do your products come with a warranty?",
+        answer:
+          "Yes, all chargers come with a manufacturer warranty, typically 2–3 years depending on the model.",
+      },
       {
         question:
           "What warranty and support do I get after installation, and what if something goes wrong?",

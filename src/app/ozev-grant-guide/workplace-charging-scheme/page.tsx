@@ -75,7 +75,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
         "rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all",
         active
           ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-4px_rgba(0,98,122,0.5)]"
-          : "border-border bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
+          : "border-foreground/25 bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
       )}
     >
       {label}
@@ -93,7 +93,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const cardClass = "border border-border shadow-lg shadow-primary/5 ring-primary/10";
+const cardClass = "border border-foreground/18 shadow-md";
 
 export default function WorkplaceChargingSchemeGuidePage() {
   const [answers, setAnswers] = useState<Answers>({ orgType: null, parking: null, ownership: null });

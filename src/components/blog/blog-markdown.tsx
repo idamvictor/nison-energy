@@ -1,15 +1,43 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+function textContent(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textContent).join("");
+  if (
+    node &&
+    typeof node === "object" &&
+    "props" in node &&
+    (node as { props?: { children?: ReactNode } }).props?.children
+  ) {
+    return textContent((node as { props: { children: ReactNode } }).props.children);
+  }
+  return "";
+}
+
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 const components: Components = {
   h2: ({ children }) => (
-    <h2 className="mt-10 mb-4 font-heading text-xl font-semibold text-foreground first:mt-0">
+    <h2
+      id={slugify(textContent(children))}
+      className="mt-10 mb-4 scroll-mt-24 font-heading text-xl font-semibold text-foreground first:mt-0"
+    >
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="mt-8 mb-3 font-heading text-lg font-semibold text-foreground">
+    <h3
+      id={slugify(textContent(children))}
+      className="mt-8 mb-3 scroll-mt-24 font-heading text-lg font-semibold text-foreground"
+    >
       {children}
     </h3>
   ),

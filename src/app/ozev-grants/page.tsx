@@ -39,7 +39,7 @@ const schemeIcons: Record<string, LucideIcon> = {
 const stats = [
   {
     label: "Renters, Flat Owners & Landlord schemes",
-    sub: "Covers 75% of cost up to £500 per socket. 1 grant per household.",
+    sub: "Covers 75% of cost up to £500 per socket. One socket per household & up to 200 sockets for landlords.",
   },
   {
     label: "Workplace Charging Scheme",

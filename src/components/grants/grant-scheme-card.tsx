@@ -16,7 +16,7 @@ export function GrantSchemeCard({
 }) {
   return (
     <Link href={`/ozev-grants/${scheme.slug}`} className="group block h-full">
-      <Card className="h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
+      <Card className="h-full gap-0 overflow-hidden border border-foreground/18 py-0 shadow-md transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
         <div className="relative h-32 w-full bg-secondary">
           <Image
             src={scheme.image}
@@ -51,7 +51,7 @@ export function GrantSchemeCard({
             {scheme.title}
           </h3>
 
-          <div className="mt-auto border-t border-border pt-3.5">
+          <div className="mt-auto border-t border-foreground/15 pt-3.5">
             <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
               View eligibility
               <ArrowRight className="size-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />

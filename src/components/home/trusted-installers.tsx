@@ -20,7 +20,7 @@ export function TrustedInstallers() {
   const track = [...logos, ...logos];
 
   return (
-    <section className="bg-secondary">
+    <section className="bg-background">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
           <SectionKicker center />
@@ -30,18 +30,18 @@ export function TrustedInstallers() {
         </Reveal>
 
         <div className="mt-10 overflow-hidden mask-[linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
-          <div className="flex w-max animate-[marquee_28s_linear_infinite] items-center gap-16 motion-reduce:animate-none">
+          <div className="flex w-max animate-[marquee_28s_linear_infinite] items-center gap-20 motion-reduce:animate-none">
             {track.map((logo, i) => (
               <div
                 key={`${logo.alt}-${i}`}
-                className="flex h-10 w-28 shrink-0 items-center justify-center grayscale opacity-60 transition-all duration-200 hover:grayscale-0 hover:opacity-100"
+                className="flex h-16 w-40 shrink-0 items-center justify-center"
               >
                 <Image
                   src={logo.src}
                   alt={logo.alt}
-                  width={112}
-                  height={40}
-                  className="max-h-10 w-auto object-contain"
+                  width={160}
+                  height={64}
+                  className="max-h-16 w-auto object-contain"
                 />
               </div>
             ))}

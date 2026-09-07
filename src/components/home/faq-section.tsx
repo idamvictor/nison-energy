@@ -13,20 +13,26 @@ import { homeFaqCategories, type FaqCategory } from "@/lib/faqs";
 
 export function FaqSection({
   categories = homeFaqCategories,
-  title = "Common Questions, Straight Answers",
+  title = "Frequently Asked Questions",
+  showHeading = true,
+  viewAllHref,
 }: {
   categories?: FaqCategory[];
   title?: string;
+  showHeading?: boolean;
+  viewAllHref?: string;
 }) {
   return (
     <section className="bg-secondary">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <Reveal>
-          <SectionKicker center />
-          <h2 className="mt-3 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
-            {title}
-          </h2>
-        </Reveal>
+        {showHeading && (
+          <Reveal>
+            <SectionKicker center />
+            <h2 className="mt-3 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
+              {title}
+            </h2>
+          </Reveal>
+        )}
 
         <div className="mt-7 flex flex-col gap-6">
           {categories.map((category, catIndex) => (
@@ -64,6 +70,20 @@ export function FaqSection({
             </Reveal>
           ))}
         </div>
+
+        {viewAllHref && (
+          <Reveal>
+            <div className="mt-8 flex justify-center">
+              <Link
+                href={viewAllHref}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                View all FAQs
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
+          </Reveal>
+        )}
       </div>
     </section>
   );

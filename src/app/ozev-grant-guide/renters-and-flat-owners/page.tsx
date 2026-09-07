@@ -78,7 +78,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
         "rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all",
         active
           ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-4px_rgba(0,98,122,0.5)]"
-          : "border-border bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
+          : "border-foreground/25 bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
       )}
     >
       {label}
@@ -155,7 +155,7 @@ export default function RentersFlatOwnersGuidePage() {
               <span className="mr-2 text-primary">01</span>
               Check Your Eligibility
             </h2>
-            <Card className="border border-border shadow-lg shadow-primary/5 ring-primary/10">
+            <Card className="border border-foreground/18 shadow-md">
               <CardContent className="flex flex-col gap-5">
                 {questions.map((question) => (
                   <div key={question.key}>
@@ -263,7 +263,7 @@ export default function RentersFlatOwnersGuidePage() {
 
               {/* Step 1 */}
               <Reveal>
-                <Card className="mb-5 border border-border shadow-lg shadow-primary/5 ring-primary/10">
+                <Card className="mb-5 border border-foreground/18 shadow-md">
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
                       <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
@@ -421,7 +421,7 @@ export default function RentersFlatOwnersGuidePage() {
 
               {/* Step 2 */}
               <Reveal>
-                <Card className="mb-5 border border-border shadow-lg shadow-primary/5 ring-primary/10">
+                <Card className="mb-5 border border-foreground/18 shadow-md">
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
                       <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
@@ -555,7 +555,7 @@ export default function RentersFlatOwnersGuidePage() {
 
               {/* Step 3 */}
               <Reveal>
-                <Card className="mb-5 border border-border shadow-lg shadow-primary/5 ring-primary/10">
+                <Card className="mb-5 border border-foreground/18 shadow-md">
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
                       <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">

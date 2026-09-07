@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { CreditCard, Mail, Phone, ShieldCheck } from "lucide-react";
+import { CreditCard, Mail, Phone } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ const quickLinks = [
   { label: "About Us", href: "/about-us" },
   { label: "Contact Us", href: "/contact-us" },
   { label: "Blog", href: "/blog" },
+  { label: "FAQ", href: "/faq" },
   { label: "OZEV Grant Eligibility", href: "/ozev-grants" },
   { label: "Workplace Grant Eligibility", href: "/ozev-grants/workplace-charging-scheme" },
   { label: "Independent Subcontractor", href: "/independent-subcontractor" },
@@ -28,12 +29,12 @@ const productLinks = [
   { label: "Commercial Chargers", href: "/workplace-charging" },
   { label: "Accessories", href: "/accessories" },
   { label: "OZEV Grants", href: "/ozev-grants" },
-  { label: "Delivery Information", href: "#" },
+  { label: "Delivery Information", href: "/delivery-information" },
 ];
 
 const legalLinks = [
-  { label: "Terms & Conditions", href: "#" },
-  { label: "Privacy Policy", href: "#" },
+  { label: "Terms & Conditions", href: "/terms-and-conditions" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 
 const paymentMethods = ["Visa", "Mastercard", "PayPal", "Stripe", "Apple Pay"];
@@ -89,11 +90,14 @@ export function SiteFooter() {
           <FooterColumn title="Legal" items={legalLinks} />
 
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3">
-              <ShieldCheck className="size-5 shrink-0 text-white/80" />
-              <p className="text-xs leading-snug text-white/70">
-                Office for Zero Emission Vehicles approved installer
-              </p>
+            <div className="flex items-center justify-center rounded-xl border border-white/15 bg-white p-3">
+              <Image
+                src="https://res.cloudinary.com/dyp8gtllq/image/upload/v1788398074/Picture4_e1xgc8.webp"
+                alt="Office for Zero Emission Vehicles approved installer"
+                width={357}
+                height={154}
+                className="h-14 w-auto object-contain"
+              />
             </div>
 
             <div>

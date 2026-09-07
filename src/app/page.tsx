@@ -7,10 +7,14 @@ import { ProductGrid } from "@/components/home/product-grid";
 import { FeaturedCommercial } from "@/components/home/featured-commercial";
 import { FeaturedAccessories } from "@/components/home/featured-accessories";
 import { LatestBlog } from "@/components/home/latest-blog";
-import { GrantBanner } from "@/components/home/grant-banner";
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { homeFaqCategories } from "@/lib/faqs";
+
+const orderingDeliveryFaq = homeFaqCategories.filter(
+  (category) => category.category === "Ordering & Delivery"
+);
 
 export default function Home() {
   return (
@@ -31,8 +35,11 @@ export default function Home() {
         <CategoryCards />
         <TrustedInstallers />
         <LatestBlog limit={3} />
-        <GrantBanner />
-        <FaqSection />
+        <FaqSection
+          categories={orderingDeliveryFaq}
+          title="Ordering & Delivery"
+          viewAllHref="/faq"
+        />
         <HelpSection />
       </main>
       <SiteFooter />

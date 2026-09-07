@@ -164,3 +164,146 @@ This section applies where Ocunio Energy has agreed to supply and install a char
 ## Part F — Your Statutory Rights
 
 Nothing in this policy limits your statutory rights, including your rights under the Consumer Rights Act 2015 in respect of goods or installation services that are faulty, not as described, or not fit for purpose.`;
+
+// Standalone "Delivery Information" page (linked from the footer) — how
+// EV charger equipment orders are dispatched and tracked. Distinct from
+// deliveryPolicyMarkdown above, which covers the product-page delivery tab.
+export const deliveryInformationMarkdown = `At Ocunio Energy, we keep things simple from order to installation. Equipment is dispatched via Royal Mail Tracked, with same-day dispatch on orders placed before 1pm (Monday to Friday). You'll receive a tracking link by email or SMS as soon as your order is on its way.
+
+## Delivery Options
+
+We use Royal Mail Tracked services for all parcels. You'll receive tracking details via email or SMS as soon as your item has been dispatched.
+
+| Delivery Type | Cost | Estimated Time |
+|---|---|---|
+| Royal Mail Tracked 48 | Free | 2–3 working days |
+| Royal Mail Tracked 24 | From £4.95 | 1–2 working days |
+| Royal Mail Special Delivery (Guaranteed by 1pm) | From £7.95 | Next working day |
+
+## When Will My Item Be Dispatched?
+
+- Orders placed before 1pm (Monday to Friday) will usually be dispatched the same day.
+- Orders placed after 1pm or on weekends will be dispatched the next working day.
+- We do not dispatch on bank holidays or weekends.
+
+## Where Do We Deliver?
+
+We deliver to mainland UK, including Northern Ireland, using Royal Mail's extensive network. For remote or offshore locations, delivery may take an additional day.
+
+Please ensure someone is available to receive the parcel at the delivery address, or use Royal Mail's Safeplace or Local Collect services for flexibility.
+
+## Track Your Delivery
+
+Once your order is dispatched, you'll receive a Royal Mail tracking link so you can follow your parcel every step of the way — track your item at [royalmail.com/track-your-item](https://www.royalmail.com/track-your-item).
+
+**Damaged or missing items:** if your item arrives damaged or goes missing, contact our team within 48 hours of delivery at [info@ocunioenergy.com](mailto:info@ocunioenergy.com). We'll work with Royal Mail to resolve the issue quickly.`;
+
+// Standalone "Terms and Conditions" and "Privacy Policy" pages (footer
+// links). Written to cover the same real, business-specific practices and
+// policies Ocunio Energy operates under — payment via Stripe, UK-based
+// arbitration, GDPR/UK GDPR rights, etc. — in original wording, rather than
+// reproducing the third-party legal-template boilerplate the previous site
+// was built on.
+export const termsAndConditionsMarkdown = `**Last updated:** ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+
+These terms and conditions form a binding agreement between you and Nison Limited (trading as Ocunio Energy), company number 16371062, registered office 71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ ("Ocunio Energy", "we", "us"). By accessing or using this website, or by purchasing products or installation services from us, you agree to be bound by these terms. If you do not agree, please do not use the site.
+
+## 1. Eligibility
+
+Our services are intended for users aged 18 and over. By using this site, you confirm that you meet this requirement and that any information you provide us is accurate and current.
+
+## 2. Our Services
+
+We sell EV chargepoints and related accessories, and provide OZEV-approved installation and grant-support services, as described elsewhere on this site. Product availability, specifications and pricing are subject to change without notice.
+
+## 3. Intellectual Property
+
+All content on this site — including text, graphics, logos, and software — is owned by or licensed to Nison Limited and is protected by UK and international intellectual property law. You may view, download and print pages for your own personal, non-commercial use only. You may not reproduce, republish, or exploit any part of the site for commercial purposes without our prior written consent.
+
+## 4. Purchases and Payment
+
+All prices are shown in British pounds sterling and, unless stated otherwise, include VAT. Payments are processed securely through Stripe; we do not store your full card details ourselves. We reserve the right to refuse or cancel an order, for example where a product is listed at an incorrect price or is out of stock.
+
+## 5. Delivery and Returns
+
+Delivery timescales are set out on our [Delivery Information](/delivery-information) page. Returns, cancellations and warranty claims for goods and installations are governed by the returns policy available on each product page.
+
+## 6. Prohibited Activities
+
+You agree not to misuse this site, including by: attempting to gain unauthorised access to our systems; using automated tools to scrape or harvest data; submitting fraudulent orders or payment details; or engaging in conduct that is abusive, unlawful, or disrupts the site for other users.
+
+## 7. User Contributions
+
+If you submit reviews, comments or other content to us (for example, via our contact form), you confirm it is your own and grant us a licence to use, reproduce and display it in connection with operating and promoting our services. We may remove any contribution at our discretion.
+
+## 8. Third-Party Links
+
+This site may link to third-party websites (for example, Royal Mail tracking, or the GOV.UK Find a Grant service). We do not control and are not responsible for the content or practices of those sites.
+
+## 9. Liability
+
+We provide the site and our services with reasonable care and skill, but we do not guarantee the site will always be available, uninterrupted or error-free. To the fullest extent permitted by law, we exclude liability for indirect or consequential loss. Nothing in these terms excludes or limits liability that cannot lawfully be excluded, including for death or personal injury caused by our negligence, or for fraud.
+
+## 10. Termination
+
+We may suspend or restrict access to the site for any user who breaches these terms.
+
+## 11. Governing Law and Disputes
+
+These terms are governed by the laws of England and Wales. Before starting formal proceedings, we encourage you to contact us so we can try to resolve any dispute informally. Where that isn't possible, the courts of England and Wales will have jurisdiction, without prejudice to any statutory right you have to bring proceedings in your own local courts.
+
+## 12. Changes to These Terms
+
+We may update these terms from time to time; the "Last updated" date above will reflect the most recent revision. Continued use of the site after a change constitutes acceptance of the updated terms.
+
+## 13. Contact Us
+
+Questions about these terms can be sent to [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or via our [contact page](/contact-us).`;
+
+export const privacyPolicyMarkdown = `**Last updated:** ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+
+Nison Limited, trading as Ocunio Energy ("we", "us", "our"), is committed to protecting your privacy. This notice explains what personal information we collect, how we use it, and the rights you have over it.
+
+## 1. Information We Collect
+
+Depending on how you interact with us, we may collect: contact details (name, email, phone, address); order and payment information; documents you provide to support an OZEV grant application (such as proof of address or vehicle evidence); and technical information collected automatically when you browse the site (IP address, device and browser type, and cookie data).
+
+## 2. How We Use Your Information
+
+We use your information to: process orders and installation bookings; support your OZEV grant application; respond to enquiries; send service updates (and, where you've opted in, our newsletter); improve the site; and prevent fraud and misuse.
+
+## 3. Payment Information
+
+Card payments are processed by Stripe, a PCI-compliant third-party payment processor. We do not store your full card details on our own systems.
+
+## 4. Sharing Your Information
+
+We share information with trusted third parties only where necessary — for example, with OZEV as part of your grant application, with our couriers to deliver your order, or with Stripe to process payment. We do not sell your personal information to third parties.
+
+## 5. Cookies
+
+We use cookies and similar technologies to keep the site working correctly and to understand how it's used. You can control cookies through your browser settings.
+
+## 6. How Long We Keep Your Information
+
+We retain personal information only for as long as necessary to fulfil the purposes described in this notice, including any legal, accounting or reporting requirements.
+
+## 7. Keeping Your Information Safe
+
+We use appropriate technical and organisational measures to protect your information. However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.
+
+## 8. Children's Privacy
+
+Our services are not directed at children, and we do not knowingly collect personal information from anyone under 18.
+
+## 9. Your Privacy Rights
+
+If you are based in the UK, EEA or Switzerland, you have rights under GDPR/UK GDPR including the right to access, correct, or request deletion of your personal information, to object to or restrict certain processing, and to withdraw consent at any time. To exercise any of these rights, contact us using the details below.
+
+## 10. Updates to This Notice
+
+We may update this notice from time to time; the "Last updated" date above reflects the most recent revision.
+
+## 11. Contact Us
+
+For any questions about this notice, or to exercise your privacy rights, contact our team at [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or 07525 567054.`;

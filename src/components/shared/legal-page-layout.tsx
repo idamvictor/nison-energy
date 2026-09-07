@@ -3,6 +3,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { BlogMarkdown } from "@/components/blog/blog-markdown";
+import { LegalToc } from "@/components/shared/legal-toc";
 
 export type LegalSection = { id: string; label: string };
 
@@ -34,22 +35,7 @@ export function LegalPageLayout({
         <section className="bg-background">
           <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-              <nav className="hidden lg:block">
-                <div className="sticky top-24 flex flex-col gap-1 border-l border-foreground/15 pl-4">
-                  <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    On this page
-                  </p>
-                  {sections.map((section) => (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className="py-1 text-sm text-foreground/70 transition-colors hover:text-primary"
-                    >
-                      {section.label}
-                    </a>
-                  ))}
-                </div>
-              </nav>
+              <LegalToc sections={sections} />
 
               <div className="min-w-0 rounded-2xl border border-foreground/15 bg-card p-6 shadow-md sm:p-10">
                 <BlogMarkdown content={content} />

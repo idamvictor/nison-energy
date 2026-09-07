@@ -55,7 +55,7 @@ export function OriginStory() {
           </Reveal>
 
           <Reveal delay={100}>
-            <div className="relative flex h-full min-h-70 items-center overflow-hidden rounded-2xl p-8 sm:p-10">
+            <div className="relative h-full min-h-70 overflow-hidden rounded-2xl">
               <Image
                 src={QUOTE_IMG}
                 alt=""
@@ -63,10 +63,6 @@ export function OriginStory() {
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-linear-to-br from-primary/90 via-primary/75 to-black/70" />
-              <p className="relative font-heading text-3xl leading-tight font-semibold tracking-[-0.01em] text-primary-foreground sm:text-4xl">
-                &ldquo;One team, one point of contact, no surprises.&rdquo;
-              </p>
             </div>
           </Reveal>
         </div>

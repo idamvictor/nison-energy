@@ -10,7 +10,6 @@ import {
   ExternalLink,
   FileText,
   ListChecks,
-  Phone,
   X,
 } from "lucide-react";
 
@@ -96,8 +95,8 @@ export default async function GrantSchemePage({
                   {scheme.grantAmount}
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {scheme.applyCta && (
+                {scheme.applyCta && (
+                  <div className="mt-6 flex flex-wrap gap-3">
                     <Button
                       size="lg"
                       className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
@@ -107,31 +106,8 @@ export default async function GrantSchemePage({
                       {scheme.applyCta.label}
                       <ArrowRight className="size-4" />
                     </Button>
-                  )}
-                  <Button
-                    size="lg"
-                    variant={scheme.applyCta ? "outline" : "default"}
-                    className={
-                      scheme.applyCta
-                        ? "gap-2"
-                        : "gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
-                    }
-                    nativeButton={false}
-                    render={<Link href="/contact-us" />}
-                  >
-                    Request a call back
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="gap-2"
-                    nativeButton={false}
-                    render={<a href="tel:07525567054" />}
-                  >
-                    <Phone className="size-4" />
-                    07525 567054
-                  </Button>
-                </div>
+                  </div>
+                )}
               </div>
 
               <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-secondary">
@@ -287,6 +263,29 @@ export default async function GrantSchemePage({
                     {resource.label}
                   </a>
                 ))}
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <div className="flex flex-wrap gap-3 border-t border-foreground/15 pt-8">
+                <Button
+                  size="lg"
+                  className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                  nativeButton={false}
+                  render={<a href={scheme.moreInfoHref} target="_blank" rel="noopener noreferrer" />}
+                >
+                  More Information
+                  <ExternalLink className="size-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                  nativeButton={false}
+                  render={<Link href="/ozev-grant-guide" />}
+                >
+                  Learn &amp; Apply for OZEV Grant
+                  <ArrowRight className="size-4" />
+                </Button>
               </div>
             </Reveal>
           </div>

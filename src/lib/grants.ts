@@ -19,6 +19,7 @@ export type GrantScheme = {
   documentation?: string[];
   applicationSteps?: string[];
   applyCta?: { label: string; href: string };
+  moreInfoHref: string;
   resources: { label: string; href: string }[];
 };
 
@@ -80,6 +81,8 @@ export const grantSchemes: GrantScheme[] = [
       "Vehicle evidence: your V5C logbook, lease agreement, or registration number if you already have the car — or your vehicle order form plus a photo of your off-street parking space if it's on order",
       "Some landlords, especially councils or housing associations, require you to submit a business case as part of your permission — we support you with the information and supporting documents needed for this",
     ],
+    moreInfoHref:
+      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-renters-and-flat-owners/",
     resources: [
       {
         label: "Apply via Find a Grant",
@@ -110,13 +113,15 @@ export const grantSchemes: GrantScheme[] = [
       "Not be installing the chargepoint because it's a mandatory requirement (e.g. a new-build planning condition)",
     ],
     applyCta: { label: "More information & apply now", href: "/workplace-charging" },
+    moreInfoHref:
+      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-residential-landlords/",
     resources: govResources,
   },
   {
     slug: "workplace-charging-scheme",
     audience: "Businesses, Charities & Public Sector",
     title:
-      "Workplace Charging Scheme — Electric Vehicle Chargepoint Grant for Businesses, Charities and Public Sector",
+      "Workplace Charging Scheme Chargepoint Grant for Businesses, Charities and Public Sector",
     tagline: "Are you a business, charity, or public sector organisation? Save up to £20,000 with OZEV funding",
     image: `${IMG}/pexels-kindelmedia-9800036-scaled.webp`,
     status: "open",
@@ -140,6 +145,8 @@ export const grantSchemes: GrantScheme[] = [
       "Your installer claims the grant on your behalf and deducts it from your invoice",
     ],
     applyCta: { label: "More information & apply now", href: "/workplace-charging" },
+    moreInfoHref:
+      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-businesses-charities-and-public-sector/",
     resources: [
       {
         label: "Apply for a workplace voucher",
@@ -178,6 +185,8 @@ export const grantSchemes: GrantScheme[] = [
       label: "More information & apply now",
       href: "/ozev-grant-guide/renters-and-flat-owners",
     },
+    moreInfoHref:
+      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-households-with-on-street-parking/",
     resources: [
       {
         label: "Apply via Find a Grant",
@@ -221,6 +230,8 @@ export const grantSchemes: GrantScheme[] = [
       "Your installer submits the claim, including photographs, a cost breakdown, and a site plan, and deducts the grant from your invoice",
     ],
     applyCta: { label: "More information & apply now", href: "/workplace-charging" },
+    moreInfoHref:
+      "https://ocunioenergy.com/ozev-grants/workplace-charging-scheme-for-state-funded-education-institutions/",
     resources: [
       {
         label: "Apply on GOV.UK",

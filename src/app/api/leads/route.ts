@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth-dal";
 
 // Reads/writes a real database, so never statically cache this route.
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  // Lead data is customer PII — admin only. proxy.ts doesn't cover /api routes.
+  const user = await getCurrentUser();
+  if (!user || user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const leads = await prisma.lead.findMany({
     orderBy: { submittedAt: "desc" },
   });

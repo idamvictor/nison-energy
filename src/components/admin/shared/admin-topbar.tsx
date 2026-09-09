@@ -1,8 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 function pageTitle(pathname: string): string {
   if (pathname === "/admin") return "Dashboard";
@@ -15,6 +18,14 @@ function pageTitle(pathname: string): string {
 
 export function AdminTopbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    router.push("/sign-in");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/70">
@@ -27,6 +38,17 @@ export function AdminTopbar() {
         <h1 className="font-heading text-sm font-semibold text-foreground">
           {pageTitle(pathname)}
         </h1>
+        <div className="ml-auto flex items-center gap-3">
+          {session?.user.email && (
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              {session.user.email}
+            </span>
+          )}
+          <Button variant="ghost" size="sm" onClick={handleSignOut}>
+            <LogOut />
+            Sign out
+          </Button>
+        </div>
       </div>
     </header>
   );

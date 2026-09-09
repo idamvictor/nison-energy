@@ -1,0 +1,52 @@
+// Prisma schema — https://pris.ly/d/prisma-schema
+// Run `npm run db:migrate` after editing models.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A sales / enquiry lead. Mirrors the `AdminLead` shape in
+/// src/lib/admin-leads.ts, which is currently only mock data.
+model Lead {
+  id                    String     @id @default(cuid())
+  firstName             String
+  lastName              String
+  phone                 String
+  email                 String
+  jobTitle              String?
+  companyName           String?
+  postcode              String?
+  areaOfEnquiry         String
+  reasonForEnquiry      String
+  paidServicePlans      Boolean    @default(false)
+  futureCommunications  Boolean    @default(false)
+  additionalInformation String?
+  status                LeadStatus @default(New)
+  submittedAt           DateTime   @default(now())
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  // OZEV grant / installation journey — only populated once a lead is Won.
+  installStage String?
+  surveyDate   DateTime?
+  grantStatus  String?
+  installDate  DateTime?
+  engineer     String?
+
+  @@index([status])
+  @@index([submittedAt])
+}
+
+enum LeadStatus {
+  New
+  Contacted
+  Quoted
+  Won
+  Lost
+}

@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Prisma 7 driver adapter — keep the Node `pg` stack out of the bundle.
+  serverExternalPackages: ["@prisma/adapter-pg", "pg"],
   images: {
     remotePatterns: [
       {

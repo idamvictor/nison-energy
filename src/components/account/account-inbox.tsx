@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { GrantApplicationTracker } from "@/components/grant-guide/grant-application-tracker";
 import { useNotifications } from "@/hooks/use-notifications";
-import { adminLeads, type AdminLead } from "@/lib/admin-leads";
+import type { AdminLead } from "@/lib/admin-leads";
 import { cn } from "@/lib/utils";
 
 type FeedKind = "order" | "grant" | "enquiry";
@@ -46,9 +46,8 @@ function formatDate(iso: string) {
   });
 }
 
-function buildEnquiryItems(userEmail: string): FeedItem[] {
-  return adminLeads
-    .filter((lead) => lead.email.toLowerCase() === userEmail.toLowerCase())
+function buildEnquiryItems(leads: AdminLead[]): FeedItem[] {
+  return leads
     .flatMap((lead): FeedItem[] => {
       const items: FeedItem[] = [
         {
@@ -88,7 +87,7 @@ function buildEnquiryItems(userEmail: string): FeedItem[] {
     });
 }
 
-export function AccountInbox({ userEmail }: { userEmail: string }) {
+export function AccountInbox({ leads }: { leads: AdminLead[] }) {
   const notifications = useNotifications((s) => s.items);
   const markAllRead = useNotifications((s) => s.markAllRead);
   const markRead = useNotifications((s) => s.markRead);
@@ -96,7 +95,7 @@ export function AccountInbox({ userEmail }: { userEmail: string }) {
 
   const feed: FeedItem[] = [
     ...notifications,
-    ...buildEnquiryItems(userEmail),
+    ...buildEnquiryItems(leads),
   ].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   const unreadCount = notifications.filter((n) => !n.read).length;

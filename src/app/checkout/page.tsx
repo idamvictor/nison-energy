@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
@@ -36,7 +36,8 @@ import {
 } from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
 import { useNotifications } from "@/hooks/use-notifications";
-import { generateReferenceCode } from "@/lib/reference-code";
+import { placeOrder } from "@/app/checkout/actions";
+import type { OrderLineInput } from "@/lib/orders";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -92,6 +93,8 @@ export default function CheckoutPage() {
   const [reference, setReference] = useState("");
   const [extraIds, setExtraIds] = useState<ExtraId[]>([]);
   const [pendingExtra, setPendingExtra] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleAddressSelect(suggestion: AddressSuggestion) {
@@ -197,15 +200,53 @@ export default function CheckoutPage() {
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const ref = generateReferenceCode("ORD");
-                  setReference(ref);
-                  setSubmitted(true);
-                  clear();
-                  pushNotification(
-                    "order",
-                    "Order placed",
-                    `Reference ${ref} — we'll be in touch to confirm installation.`
-                  );
+                  const fd = new FormData(e.currentTarget);
+                  setError(null);
+
+                  const orderLines: OrderLineInput[] = [
+                    ...lines.map((line) => ({
+                      productId: line.id,
+                      category: line.category,
+                      name: line.name,
+                      unitPrice: line.price,
+                      quantity: line.quantity,
+                      options: line.options,
+                    })),
+                    ...selectedExtras.map((extra) => ({
+                      productId: extra.id,
+                      category: "extra" as const,
+                      name: extra.name,
+                      unitPrice: extra.price,
+                      quantity: 1,
+                    })),
+                  ];
+
+                  startTransition(async () => {
+                    const result = await placeOrder({
+                      firstName: String(fd.get("firstName") ?? ""),
+                      lastName: String(fd.get("lastName") ?? ""),
+                      email: String(fd.get("email") ?? ""),
+                      phone: String(fd.get("phone") ?? ""),
+                      address: String(fd.get("address") ?? ""),
+                      postcode: String(fd.get("postcode") ?? ""),
+                      lines: orderLines,
+                    });
+                    if (!result.ok) {
+                      setError(
+                        Object.values(result.errors)[0] ??
+                          "Could not place the order.",
+                      );
+                      return;
+                    }
+                    setReference(result.reference);
+                    setSubmitted(true);
+                    clear();
+                    pushNotification(
+                      "order",
+                      "Order placed",
+                      `Reference ${result.reference} — we'll be in touch to confirm installation.`,
+                    );
+                  });
                 }}
               >
                 <Card>
@@ -304,16 +345,16 @@ export default function CheckoutPage() {
                     <StepHeading number={3} title="Installation address" />
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="First name">
-                        <Input required placeholder="First name" />
+                        <Input name="firstName" required placeholder="First name" />
                       </Field>
                       <Field label="Last name">
-                        <Input required placeholder="Last name" />
+                        <Input name="lastName" required placeholder="Last name" />
                       </Field>
                       <Field label="Email">
-                        <Input required type="email" placeholder="Email" />
+                        <Input name="email" required type="email" placeholder="Email" />
                       </Field>
                       <Field label="Phone number">
-                        <Input required type="tel" placeholder="Phone number" />
+                        <Input name="phone" required type="tel" placeholder="Phone number" />
                       </Field>
                       <Field label="Installation address" className="sm:col-span-2">
                         <AddressAutocomplete
@@ -334,8 +375,15 @@ export default function CheckoutPage() {
                   </CardContent>
                 </Card>
 
-                <Button type="submit" size="lg" className="w-fit bg-accent text-accent-foreground hover:bg-accent/90">
-                  Place Order
+                {error && <p className="text-sm text-destructive">{error}</p>}
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={pending}
+                  className="w-fit bg-accent text-accent-foreground hover:bg-accent/90"
+                >
+                  {pending ? "Placing order…" : "Place Order"}
                 </Button>
               </form>
 

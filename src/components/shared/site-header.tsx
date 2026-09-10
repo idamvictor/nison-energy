@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  ShoppingBag,
   ShoppingCart,
   User,
 } from "lucide-react";
@@ -39,6 +40,7 @@ import {
 const accountLinks = [
   { href: "/account", label: "Overview", icon: LayoutDashboard },
   { href: "/account/profile", label: "Profile", icon: User },
+  { href: "/account/orders", label: "Orders", icon: ShoppingBag },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ];

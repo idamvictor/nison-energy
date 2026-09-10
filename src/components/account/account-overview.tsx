@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Heart, Inbox, User } from "lucide-react";
+import { ArrowRight, Heart, Inbox, ShoppingBag, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,20 @@ import type { SessionUser } from "@/lib/auth-dal";
 
 const tiles = [
   { href: "/account/profile", label: "Profile", icon: User },
+  { href: "/account/orders", label: "Orders", icon: ShoppingBag },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ] as const;
 
-export function AccountOverview({ user }: { user: SessionUser }) {
+export function AccountOverview({
+  user,
+  orderCount,
+  enquiryCount,
+}: {
+  user: SessionUser;
+  orderCount: number;
+  enquiryCount: number;
+}) {
   const { items } = useWishlist();
   const unreadCount = useNotifications(
     (s) => s.items.filter((item) => !item.read).length
@@ -23,8 +32,17 @@ export function AccountOverview({ user }: { user: SessionUser }) {
 
   const counts: Record<(typeof tiles)[number]["href"], string> = {
     "/account/profile": "Saved details",
+    "/account/orders":
+      orderCount > 0
+        ? `${orderCount} ${orderCount === 1 ? "order" : "orders"}`
+        : "No orders yet",
     "/account/wishlist": `${items.length} saved`,
-    "/account/inbox": unreadCount > 0 ? `${unreadCount} new` : "All caught up",
+    "/account/inbox":
+      unreadCount > 0
+        ? `${unreadCount} new`
+        : enquiryCount > 0
+          ? `${enquiryCount} ${enquiryCount === 1 ? "enquiry" : "enquiries"}`
+          : "All caught up",
   };
 
   return (
@@ -38,7 +56,7 @@ export function AccountOverview({ user }: { user: SessionUser }) {
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {tiles.map((tile) => (
           <Link key={tile.href} href={tile.href} className="block">
             <Card className="gap-3 transition-all hover:-translate-y-0.5 hover:shadow-md hover:ring-primary/20">

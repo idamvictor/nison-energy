@@ -11,8 +11,8 @@ datasource db {
   provider = "postgresql"
 }
 
-/// A sales / enquiry lead. Mirrors the `AdminLead` shape in
-/// src/lib/admin-leads.ts, which is currently only mock data.
+/// A sales / enquiry lead. The `AdminLead` type in src/lib/admin-leads.ts is the
+/// UI-facing shape; src/lib/leads-dal.ts maps between them.
 model Lead {
   id                    String     @id @default(cuid())
   firstName             String
@@ -32,6 +32,10 @@ model Lead {
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
 
+  // Set when the enquiry was submitted by a signed-in customer.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   // OZEV grant / installation journey — only populated once a lead is Won.
   installStage String?
   surveyDate   DateTime?
@@ -41,6 +45,7 @@ model Lead {
 
   @@index([status])
   @@index([submittedAt])
+  @@index([userId])
 }
 
 enum LeadStatus {
@@ -49,6 +54,58 @@ enum LeadStatus {
   Quoted
   Won
   Lost
+}
+
+/// A charger order placed through checkout. No online payment — the team
+/// confirms payment and books installation, tracked via `status`.
+model Order {
+  id        String      @id @default(cuid())
+  reference String      @unique
+  status    OrderStatus @default(Pending)
+
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  address   String
+  postcode  String
+  notes     String?
+
+  subtotal Int // whole GBP — the catalog is priced in integer pounds
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String // catalog id, or an extra's id
+  category  String // residential | commercial | accessories | extra
+  name      String // snapshot at time of order
+  unitPrice Int? // whole GBP; null for quote-only accessories
+  quantity  Int
+  options   Json? // { cableLength?, installation? }
+
+  @@index([orderId])
+}
+
+enum OrderStatus {
+  Pending
+  Confirmed
+  Scheduled
+  Installed
+  Cancelled
 }
 
 // ─── Better Auth ────────────────────────────────────────────────────────────
@@ -74,6 +131,8 @@ model User {
   postcode      String?
   sessions      Session[]
   accounts      Account[]
+  leads         Lead[]
+  orders        Order[]
 
   @@unique([email])
   @@map("user")

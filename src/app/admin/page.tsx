@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, Cable, Inbox, MailWarning, Package, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Cable,
+  Inbox,
+  MailWarning,
+  Package,
+  ShoppingBag,
+  Zap,
+} from "lucide-react";
 
 import { StatCard } from "@/components/admin/dashboard/stat-card";
 import { LeadTable } from "@/components/admin/shared/lead-table";
@@ -7,18 +15,17 @@ import { Button } from "@/components/ui/button";
 import { products } from "@/lib/products";
 import { commercialProducts } from "@/lib/commercial-products";
 import { accessoryProducts } from "@/lib/accessory-products";
-import { adminLeads } from "@/lib/admin-leads";
+import { getLeads } from "@/lib/leads-dal";
+import { getOrders, getPendingOrderCount } from "@/lib/orders-dal";
 
-export default function AdminDashboardPage() {
-  const totalProducts =
-    products.length + commercialProducts.length + accessoryProducts.length;
-  const newLeads = adminLeads.filter((lead) => lead.status === "New").length;
-  const recentLeads = [...adminLeads]
-    .sort(
-      (a, b) =>
-        new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
-    )
-    .slice(0, 5);
+export default async function AdminDashboardPage() {
+  const [leads, orders, pendingOrders] = await Promise.all([
+    getLeads(),
+    getOrders(),
+    getPendingOrderCount(),
+  ]);
+  const newLeads = leads.filter((lead) => lead.status === "New").length;
+  const recentLeads = leads.slice(0, 5);
 
   return (
     <div className="flex flex-col gap-6">
@@ -48,19 +55,20 @@ export default function AdminDashboardPage() {
           href="/admin/accessories"
         />
         <StatCard
-          label="Total products"
-          value={totalProducts}
-          subtext="Across 3 categories"
-          icon={Package}
-          tone="muted"
-        />
-        <StatCard
           label="New leads"
           value={newLeads}
-          subtext={`${adminLeads.length} total`}
+          subtext={`${leads.length} total`}
           icon={MailWarning}
           tone="accent"
           href="/admin/leads"
+        />
+        <StatCard
+          label="Pending orders"
+          value={pendingOrders}
+          subtext={`${orders.length} total`}
+          icon={ShoppingBag}
+          tone="primary"
+          href="/admin/orders"
         />
       </div>
 

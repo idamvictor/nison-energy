@@ -6,7 +6,7 @@ import { ArrowLeft, Building2, Mail, MapPin, Phone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadStatusSelect } from "@/components/admin/leads/lead-status-select";
 import { InstallationTracker } from "@/components/admin/leads/installation-tracker";
-import { adminLeads } from "@/lib/admin-leads";
+import { getLead } from "@/lib/leads-dal";
 
 export async function generateMetadata({
   params,
@@ -14,7 +14,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const lead = adminLeads.find((l) => l.id === id);
+  const lead = await getLead(id);
   return {
     title: lead ? `${lead.firstName} ${lead.lastName} | Admin` : "Lead | Admin",
   };
@@ -36,7 +36,7 @@ export default async function LeadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const lead = adminLeads.find((l) => l.id === id);
+  const lead = await getLead(id);
 
   if (!lead) notFound();
 
@@ -50,7 +50,7 @@ export default async function LeadDetailPage({
           <ArrowLeft className="size-4" />
           Back to leads
         </Link>
-        <LeadStatusSelect initialStatus={lead.status} />
+        <LeadStatusSelect leadId={lead.id} initialStatus={lead.status} />
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
@@ -124,7 +124,7 @@ export default async function LeadDetailPage({
               <CardTitle>Installation &amp; grant tracking</CardTitle>
             </CardHeader>
             <CardContent>
-              <InstallationTracker installation={lead.installation} />
+              <InstallationTracker leadId={lead.id} installation={lead.installation} />
             </CardContent>
           </Card>
         </div>

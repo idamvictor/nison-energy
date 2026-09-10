@@ -3,7 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Cable, Inbox, LayoutDashboard, Newspaper, Zap, Package } from "lucide-react";
+import {
+  ArrowUpRight,
+  Cable,
+  Inbox,
+  LayoutDashboard,
+  Newspaper,
+  ShoppingBag,
+  Zap,
+  Package,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -20,7 +29,6 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { adminLeads } from "@/lib/admin-leads";
 
 const overviewLinks = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -39,11 +47,16 @@ function navItemClass(active: boolean) {
   );
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  newLeadCount = 0,
+  pendingOrderCount = 0,
+}: {
+  newLeadCount?: number;
+  pendingOrderCount?: number;
+}) {
   const pathname = usePathname();
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
-  const newLeads = adminLeads.filter((lead) => lead.status === "New").length;
 
   return (
     <Sidebar collapsible="offcanvas" className="border-sidebar-border">
@@ -136,7 +149,7 @@ export function AdminSidebar() {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>Enquiries</SidebarGroupLabel>
+          <SidebarGroupLabel>Sales</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -148,9 +161,24 @@ export function AdminSidebar() {
                   <Inbox />
                   <span>Leads</span>
                 </SidebarMenuButton>
-                {newLeads > 0 && (
+                {newLeadCount > 0 && (
                   <SidebarMenuBadge className="text-primary">
-                    {newLeads}
+                    {newLeadCount}
+                  </SidebarMenuBadge>
+                )}
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/admin/orders")}
+                  className={navItemClass(isActive("/admin/orders"))}
+                  render={<Link href="/admin/orders" />}
+                >
+                  <ShoppingBag />
+                  <span>Orders</span>
+                </SidebarMenuButton>
+                {pendingOrderCount > 0 && (
+                  <SidebarMenuBadge className="text-primary">
+                    {pendingOrderCount}
                   </SidebarMenuBadge>
                 )}
               </SidebarMenuItem>

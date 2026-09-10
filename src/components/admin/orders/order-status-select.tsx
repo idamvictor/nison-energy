@@ -9,17 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { leadStatuses, type LeadStatus } from "@/lib/admin-leads";
-import { updateLeadStatus } from "@/app/admin/leads/actions";
+import { orderStatuses, type OrderStatus } from "@/lib/orders";
+import { updateOrderStatus } from "@/app/admin/orders/actions";
 
-export function LeadStatusSelect({
-  leadId,
+export function OrderStatusSelect({
+  orderId,
   initialStatus,
 }: {
-  leadId: string;
-  initialStatus: LeadStatus;
+  orderId: string;
+  initialStatus: OrderStatus;
 }) {
-  const [status, setStatus] = useState<LeadStatus>(initialStatus);
+  const [status, setStatus] = useState<OrderStatus>(initialStatus);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -29,12 +29,13 @@ export function LeadStatusSelect({
         value={status}
         disabled={pending}
         onValueChange={(value) => {
-          const next = value as LeadStatus;
+          if (!value) return;
+          const next = value as OrderStatus;
           const prev = status;
           setStatus(next);
           setError(null);
           startTransition(async () => {
-            const result = await updateLeadStatus(leadId, next);
+            const result = await updateOrderStatus(orderId, next);
             if (!result.ok) {
               setStatus(prev);
               setError(result.error);
@@ -46,7 +47,7 @@ export function LeadStatusSelect({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {leadStatuses.map((s) => (
+          {orderStatuses.map((s) => (
             <SelectItem key={s} value={s}>
               {s}
             </SelectItem>

@@ -2,13 +2,13 @@ import "dotenv/config";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 
-import { adminLeads } from "../src/lib/admin-leads";
+import { sampleLeads } from "./seed-leads";
 import { PrismaClient, type Prisma } from "../src/generated/prisma/client";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-function toLeadCreate(lead: (typeof adminLeads)[number]): Prisma.LeadCreateManyInput {
+function toLeadCreate(lead: (typeof sampleLeads)[number]): Prisma.LeadCreateManyInput {
   return {
     id: lead.id,
     firstName: lead.firstName,
@@ -38,7 +38,7 @@ function toLeadCreate(lead: (typeof adminLeads)[number]): Prisma.LeadCreateManyI
 }
 
 async function main() {
-  const data = adminLeads.map(toLeadCreate);
+  const data = sampleLeads.map(toLeadCreate);
   const result = await prisma.lead.createMany({ data, skipDuplicates: true });
   console.log(`Seeded ${result.count} lead(s).`);
 }

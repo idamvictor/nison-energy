@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Newspaper,
   ShoppingBag,
+  Users,
   Zap,
   Package,
 } from "lucide-react";
@@ -181,6 +182,26 @@ export function AdminSidebar({
                     {pendingOrderCount}
                   </SidebarMenuBadge>
                 )}
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>People</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/admin/users")}
+                  className={navItemClass(isActive("/admin/users"))}
+                  render={<Link href="/admin/users" />}
+                >
+                  <Users />
+                  <span>Users</span>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

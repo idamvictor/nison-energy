@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
+import { TrendingDown, TrendingUp, type LucideIcon } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ export function StatCard({
   tone = "primary",
   href,
   className,
+  delta,
 }: {
   label: string;
   value: string | number;
@@ -27,6 +28,7 @@ export function StatCard({
   tone?: keyof typeof toneClasses;
   href?: string;
   className?: string;
+  delta?: { pct: number; label?: string };
 }) {
   const body = (
     <Card
@@ -42,6 +44,31 @@ export function StatCard({
           <p className="font-heading text-2xl font-semibold text-foreground">
             {value}
           </p>
+          {delta && (
+            <p
+              className={cn(
+                "flex items-center gap-1 text-xs font-medium",
+                delta.pct > 0
+                  ? "text-success"
+                  : delta.pct < 0
+                    ? "text-destructive"
+                    : "text-muted-foreground",
+              )}
+            >
+              {delta.pct > 0 ? (
+                <TrendingUp className="size-3.5" />
+              ) : delta.pct < 0 ? (
+                <TrendingDown className="size-3.5" />
+              ) : null}
+              {delta.pct > 0 ? "+" : ""}
+              {delta.pct}%
+              {delta.label && (
+                <span className="font-normal text-muted-foreground">
+                  {delta.label}
+                </span>
+              )}
+            </p>
+          )}
           {subtext && (
             <p className="text-xs text-muted-foreground">{subtext}</p>
           )}

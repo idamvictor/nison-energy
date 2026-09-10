@@ -4,8 +4,8 @@
  *   npx tsx scripts/set-role.ts <email> [role]
  *
  * `role` defaults to "admin". Pass "user" to demote.
- * The email must already have signed in once (so the user row exists) and be on
- * STAFF_ALLOWLIST.
+ * The email must already have signed in once (so the user row exists).
+ * This is the bootstrap for the FIRST admin — after that, use /admin/users.
  */
 import "dotenv/config";
 

@@ -84,6 +84,7 @@ model Order {
   @@index([email])
   @@index([userId])
   @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {

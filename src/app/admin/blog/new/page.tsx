@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Add article | Admin" };
 export default function NewBlogPostPage() {
   return (
     <div className="mx-auto max-w-4xl">
-      <BlogPostForm />
+      <BlogPostForm post={null} />
     </div>
   );
 }

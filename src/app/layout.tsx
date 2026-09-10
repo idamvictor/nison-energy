@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import { SiteLoader } from "@/components/shared/site-loader";
 import { AppHydration } from "@/components/shared/app-hydration";
 import { CartSheet } from "@/components/shared/cart-sheet";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -16,6 +17,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Ocunio Energy | Premium EV Home Charging",
   description:
     "Certified EV charger installation for home and workplace. Instant online quotes, expert installers, and OZEV grant support.",

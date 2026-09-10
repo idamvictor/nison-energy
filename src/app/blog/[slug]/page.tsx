@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { BlogPostView } from "@/components/blog/blog-post-view";
-import { blogPostsSeed } from "@/lib/content/blog-posts";
+import { getPostBySlug, getPostRow, getPublishedPosts } from "@/lib/blog/queries";
 
-export function generateStaticParams() {
-  return blogPostsSeed.map((post) => ({ slug: post.slug }));
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({
@@ -13,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPostsSeed.find((p) => p.slug === slug);
+  const post = await getPostRow(slug);
   if (!post) return { title: "Blog | Ocunio Energy" };
 
   return {
@@ -28,5 +33,8 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <BlogPostView slug={slug} />;
+  const post = await getPostBySlug(slug);
+  if (!post) notFound();
+
+  return <BlogPostView post={post} />;
 }

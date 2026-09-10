@@ -6,10 +6,9 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Reveal } from "@/components/shared/reveal";
 import { BlogCard } from "@/components/blog/blog-card";
-import { useBlogPosts } from "@/lib/blog/store";
+import type { BlogPost } from "@/lib/blog/types";
 
-export function BlogList() {
-  const posts = useBlogPosts((s) => s.posts);
+export function BlogList({ posts }: { posts: BlogPost[] }) {
   const [query, setQuery] = useState("");
 
   const sorted = [...posts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));

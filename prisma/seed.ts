@@ -4,6 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 import { sampleLeads } from "./seed-leads";
 import { sampleProducts } from "./seed-products";
+import { samplePosts } from "./seed-posts";
 import { PrismaClient, type Prisma } from "../src/generated/prisma/client";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
@@ -50,6 +51,12 @@ async function main() {
     skipDuplicates: true,
   });
   console.log(`Seeded ${products.count} product(s).`);
+
+  const posts = await prisma.post.createMany({
+    data: samplePosts,
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${posts.count} post(s).`);
 }
 
 main()

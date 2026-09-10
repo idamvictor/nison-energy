@@ -1,19 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { useBlogPosts } from "@/lib/blog/store";
+import { getLatestPosts } from "@/lib/blog/queries";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
 
-export function LatestBlog({ limit = 3 }: { limit?: number }) {
-  const posts = useBlogPosts((s) => s.posts);
-  const latest = [...posts]
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
-    .slice(0, limit);
+export async function LatestBlog({ limit = 3 }: { limit?: number }) {
+  const latest = await getLatestPosts(limit);
 
   if (latest.length === 0) return null;
 

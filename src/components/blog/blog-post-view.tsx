@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
@@ -9,8 +7,8 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { Badge } from "@/components/ui/badge";
-import { BlogMarkdown } from "@/components/blog/blog-markdown";
-import { useBlogPosts } from "@/lib/blog/store";
+import { RichContent } from "@/components/blog/rich-content";
+import type { BlogPost } from "@/lib/blog/types";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -20,32 +18,7 @@ function formatDate(iso: string) {
   });
 }
 
-export function BlogPostView({ slug }: { slug: string }) {
-  const post = useBlogPosts((s) => s.posts.find((p) => p.slug === slug));
-
-  if (!post) {
-    return (
-      <div className="flex min-h-full flex-1 flex-col">
-        <SiteHeader />
-        <TrustBar />
-        <main className="flex-1">
-          <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 px-4 py-24 text-center">
-            <h1 className="font-heading text-2xl font-semibold text-foreground">
-              Article not found
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              This post may have been removed.
-            </p>
-            <Link href="/blog" className="mt-2 text-sm font-medium text-primary hover:underline">
-              Back to the blog
-            </Link>
-          </div>
-        </main>
-        <SiteFooter />
-      </div>
-    );
-  }
-
+export function BlogPostView({ post }: { post: BlogPost }) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -99,7 +72,7 @@ export function BlogPostView({ slug }: { slug: string }) {
               Back to the blog
             </Link>
 
-            <BlogMarkdown content={post.bodyMarkdown} />
+            <RichContent html={post.bodyHtml} />
 
             {post.tags.length > 0 && (
               <div className="mt-10 flex flex-wrap gap-2 border-t border-border pt-6">

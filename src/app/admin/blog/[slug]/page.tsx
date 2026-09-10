@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { BlogPostEdit } from "@/components/admin/blog/blog-post-edit";
-import { blogPostsSeed } from "@/lib/content/blog-posts";
+import { BlogPostForm } from "@/components/admin/blog/blog-post-form";
+import { getPostRow } from "@/lib/blog/queries";
 
 export async function generateMetadata({
   params,
@@ -9,7 +10,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPostsSeed.find((p) => p.slug === slug);
+  const post = await getPostRow(slug);
   return { title: post ? `${post.title} | Admin` : "Article | Admin" };
 }
 
@@ -19,9 +20,12 @@ export default async function EditBlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const post = await getPostRow(slug);
+  if (!post) notFound();
+
   return (
     <div className="mx-auto max-w-4xl">
-      <BlogPostEdit slug={slug} />
+      <BlogPostForm post={post} />
     </div>
   );
 }

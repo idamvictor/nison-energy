@@ -1,11 +1,24 @@
-import type { BlogPost } from "@/lib/blog/types";
+import { marked } from "marked";
+
+import { cleanBodyHtml } from "../src/lib/blog/sanitize";
+import type { Prisma } from "../src/generated/prisma/client";
 
 // Real articles crawled from the previous Ocunio Energy site's blog and
-// rebranded for Ocunio Energy — internal CTAs point at our real routes,
-// ads/newsletter widgets/related-post carousels/social-share blocks were
-// stripped since they weren't article content, and the actual editorial
-// text is preserved as written.
-export const blogPostsSeed: BlogPost[] = [
+// rebranded — internal CTAs point at our real routes, and the editorial text
+// is preserved as written. Authored here in Markdown; converted to sanitised
+// HTML at seed time so the stored shape matches what the Tiptap editor writes.
+type SeedPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  coverImage: string;
+  author: string;
+  publishedAt: string;
+  tags: string[];
+  bodyMarkdown: string;
+};
+
+const seedPosts: SeedPost[] = [
   {
     slug: "work-from-home-you-could-claim-500-towards-an-ev-charger",
     title: "Work From Home? You Could Claim £500 towards an EV Charger",
@@ -563,7 +576,16 @@ Ready to explore your electric future? [Contact Ocunio Energy](/contact-us) toda
       "https://ocunioenergy.com/wp-content/uploads/2025/07/Zev-Cable-2025-05-04-at-15.38.53.jpeg.jpg",
     author: "Ocunio Energy",
     publishedAt: "2025-07-12",
-    tags: ["EV Charging", "EV Charging Cable", "Electric Vehicle Charging Points", "Ocunio Energy", "OZEV", "Green Driving", "EV Accessories", "Workplace Charging Scheme"],
+    tags: [
+      "EV Charging",
+      "EV Charging Cable",
+      "Electric Vehicle Charging Points",
+      "Ocunio Energy",
+      "OZEV",
+      "Green Driving",
+      "EV Accessories",
+      "Workplace Charging Scheme",
+    ],
     bodyMarkdown: `When it comes to charging your electric vehicle, your cable is just as crucial as your charger. ZEV offers high-quality EV charging cables that are durable, reliable, and tailored to UK standards — specifically Type 2 connectors, which are now the universal standard for most EVs and chargepoints across the UK and Europe.
 
 ZEV's cables support home, workplace, and public charging stations. They provide multiple cable lengths and power capacities (16A or 32A), accommodating both single and three-phase charging scenarios.
@@ -578,3 +600,15 @@ ZEV's cables support home, workplace, and public charging stations. They provide
 We recommend ZEV cables to our customers seeking dependable accessories to complement their electric vehicle charger installations. [Browse our full range of cables](/accessories).`,
   },
 ];
+
+export const samplePosts: Prisma.PostCreateManyInput[] = seedPosts.map((post) => ({
+  id: post.slug,
+  title: post.title,
+  excerpt: post.excerpt,
+  coverImage: post.coverImage,
+  author: post.author,
+  tags: post.tags,
+  bodyHtml: cleanBodyHtml(marked.parse(post.bodyMarkdown, { async: false })),
+  published: true,
+  publishedAt: new Date(post.publishedAt),
+}));

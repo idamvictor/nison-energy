@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Heart, ShieldCheck, Zap } from "lucide-react";
 
-import {
-  commercialProducts,
-  type CommercialProduct,
-} from "@/lib/commercial-products";
+import type { CommercialProduct } from "@/lib/commercial-products";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/hooks/use-cart";
@@ -23,9 +20,11 @@ const OZEV_GRANT_GUIDE_URL =
 export function CommercialPurchasePanel({
   product,
   warranty,
+  siblings,
 }: {
   product: CommercialProduct;
   warranty: string;
+  siblings: CommercialProduct[];
 }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -37,9 +36,8 @@ export function CommercialPurchasePanel({
   const total = product.price * quantity;
   const totalExVat = Math.round(total / 1.2);
 
-  const colourSiblings = product.variantGroup
-    ? commercialProducts.filter((p) => p.variantGroup === product.variantGroup)
-    : [product];
+  const colourSiblings =
+    product.variantGroup && siblings.length > 0 ? siblings : [product];
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -97,7 +95,17 @@ export function CommercialPurchasePanel({
         size="lg"
         className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
         onClick={() => {
-          addItem(product.id, "commercial", quantity);
+          addItem(
+            {
+              id: product.id,
+              category: "commercial",
+              name: product.name,
+              brand: product.brand,
+              image: product.image,
+              price: product.price,
+            },
+            quantity,
+          );
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2000);
         }}

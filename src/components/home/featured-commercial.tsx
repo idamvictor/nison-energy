@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { commercialProducts } from "@/lib/commercial-products";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
+import { getFeatured, dbToCommercial } from "@/lib/catalog-dal";
 
-export function FeaturedCommercial({ limit = 3 }: { limit?: number }) {
-  const products = commercialProducts.slice(0, limit);
+export async function FeaturedCommercial({ limit = 3 }: { limit?: number }) {
+  const products = (await getFeatured("Commercial", limit)).map(dbToCommercial);
 
   return (
     <section className="bg-secondary">

@@ -3,8 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { commercialProducts } from "@/lib/commercial-products";
-import { commercialProductDetails } from "@/lib/commercial-product-details";
+import {
+  getCommercialCatalog,
+  getProductRow,
+  dbToCommercial,
+  dbToDetail,
+} from "@/lib/catalog-dal";
 import {
   installationProcessMarkdown,
   deliveryPolicyMarkdown,
@@ -36,8 +40,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function generateStaticParams() {
-  return commercialProducts.map((product) => ({ slug: product.id }));
+export const dynamicParams = true;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const products = await getCommercialCatalog();
+  return products.map((product) => ({ slug: product.id }));
 }
 
 export async function generateMetadata({
@@ -46,12 +54,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = commercialProducts.find((p) => p.id === slug);
-  if (!product) return {};
+  const row = await getProductRow(slug);
+  if (!row || row.category !== "Commercial") return {};
 
   return {
-    title: `${product.name} | Ocunio Energy`,
-    description: commercialProductDetails[slug]?.tagline,
+    title: `${row.name} | Ocunio Energy`,
+    description: row.tagline ?? undefined,
   };
 }
 
@@ -61,12 +69,18 @@ export default async function CommercialProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = commercialProducts.find((p) => p.id === slug);
-  const detail = commercialProductDetails[slug];
+  const row = await getProductRow(slug);
 
-  if (!product || !detail) notFound();
+  if (!row || row.category !== "Commercial" || !row.active) notFound();
 
-  const similar = commercialProducts
+  const product = dbToCommercial(row);
+  const detail = dbToDetail(row);
+
+  const catalog = await getCommercialCatalog();
+  const siblings = product.variantGroup
+    ? catalog.filter((p) => p.variantGroup === product.variantGroup)
+    : [product];
+  const similar = catalog
     .filter(
       (p) =>
         p.id !== product.id &&
@@ -124,6 +138,7 @@ export default async function CommercialProductDetailPage({
               <CommercialPurchasePanel
                 product={product}
                 warranty={detail.warranty}
+                siblings={siblings}
               />
             </div>
           </div>

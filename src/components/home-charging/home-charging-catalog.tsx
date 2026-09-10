@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
-import { products, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import { ProductCard } from "@/components/shared/product-card";
 import { CompareBar } from "@/components/home-charging/compare-bar";
 import { CompareDialog } from "@/components/home-charging/compare-dialog";
@@ -61,7 +61,7 @@ function toggle<T>(set: Set<T>, value: T) {
   return next;
 }
 
-export function HomeChargingCatalog() {
+export function HomeChargingCatalog({ products }: { products: Product[] }) {
   const [brands, setBrands] = useState<Set<string>>(new Set());
   const [connectionTypes, setConnectionTypes] = useState<Set<string>>(
     new Set()
@@ -99,7 +99,7 @@ export function HomeChargingCatalog() {
       );
     }
     return counts;
-  }, []);
+  }, [products]);
 
   const filtered = useMemo(() => {
     let list = products.filter((p: Product) => {
@@ -130,6 +130,7 @@ export function HomeChargingCatalog() {
 
     return list;
   }, [
+    products,
     brands,
     connectionTypes,
     cableLengths,
@@ -279,12 +280,14 @@ export function HomeChargingCatalog() {
       </div>
 
       <CompareBar
+        products={products}
         productIds={compareIds}
         onRemove={toggleCompare}
         onClear={() => setCompareIds([])}
         onCompare={() => setCompareOpen(true)}
       />
       <CompareDialog
+        products={products}
         open={compareOpen}
         onOpenChange={setCompareOpen}
         productIds={compareIds}

@@ -5,6 +5,9 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { AccessoriesCatalog } from "@/components/accessories/accessories-catalog";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { getAccessoryCatalog } from "@/lib/catalog-dal";
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Accessories | Ocunio Energy",
@@ -12,7 +15,8 @@ export const metadata: Metadata = {
     "Type 2 EV charging cables in coiled or straight styles, discreet grey or hi-vis lime green, for single-phase and three-phase charging.",
 };
 
-export default function AccessoriesPage() {
+export default async function AccessoriesPage() {
+  const products = await getAccessoryCatalog();
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -29,7 +33,7 @@ export default function AccessoriesPage() {
             </p>
           </div>
         </div>
-        <AccessoriesCatalog />
+        <AccessoriesCatalog products={products} />
         <HelpSection />
       </main>
       <SiteFooter />

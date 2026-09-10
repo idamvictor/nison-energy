@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
 
-import { products, type Product } from "@/lib/products";
-import { productDetails } from "@/lib/product-details";
+import type { Product } from "@/lib/products";
 import {
   Dialog,
   DialogContent,
@@ -21,25 +20,25 @@ const rows: { label: string; value: (p: Product) => React.ReactNode }[] = [
   { label: "Cable length", value: (p) => p.cableLength ?? "—" },
   { label: "Colour", value: (p) => p.colour },
   { label: "Power output", value: (p) => p.powerOutput },
-  {
-    label: "Warranty",
-    value: (p) => productDetails[p.id]?.warranty ?? "—",
-  },
+  { label: "Warranty", value: (p) => p.warranty ?? "—" },
 ];
 
 export function CompareDialog({
+  products,
   open,
   onOpenChange,
   productIds,
   onRemove,
 }: {
+  products: Product[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   productIds: string[];
   onRemove: (id: string) => void;
 }) {
+  const byId = new Map(products.map((p) => [p.id, p]));
   const selected = productIds
-    .map((id) => products.find((p) => p.id === id))
+    .map((id) => byId.get(id))
     .filter((p): p is Product => Boolean(p));
 
   return (

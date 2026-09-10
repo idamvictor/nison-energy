@@ -3,6 +3,7 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 import { sampleLeads } from "./seed-leads";
+import { sampleProducts } from "./seed-products";
 import { PrismaClient, type Prisma } from "../src/generated/prisma/client";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
@@ -38,9 +39,17 @@ function toLeadCreate(lead: (typeof sampleLeads)[number]): Prisma.LeadCreateMany
 }
 
 async function main() {
-  const data = sampleLeads.map(toLeadCreate);
-  const result = await prisma.lead.createMany({ data, skipDuplicates: true });
-  console.log(`Seeded ${result.count} lead(s).`);
+  const leads = await prisma.lead.createMany({
+    data: sampleLeads.map(toLeadCreate),
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${leads.count} lead(s).`);
+
+  const products = await prisma.product.createMany({
+    data: sampleProducts,
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${products.count} product(s).`);
 }
 
 main()

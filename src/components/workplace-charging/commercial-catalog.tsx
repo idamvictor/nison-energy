@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
-import { commercialProducts, type CommercialProduct } from "@/lib/commercial-products";
+import type { CommercialProduct } from "@/lib/commercial-products";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { CommercialCompareBar } from "@/components/workplace-charging/commercial-compare-bar";
 import { CommercialCompareDialog } from "@/components/workplace-charging/commercial-compare-dialog";
@@ -54,7 +54,11 @@ function toggle<T>(set: Set<T>, value: T) {
   return next;
 }
 
-export function CommercialCatalog() {
+export function CommercialCatalog({
+  products: commercialProducts,
+}: {
+  products: CommercialProduct[];
+}) {
   const [brands, setBrands] = useState<Set<string>>(new Set());
   const [connectionTypes, setConnectionTypes] = useState<Set<string>>(
     new Set()
@@ -90,7 +94,7 @@ export function CommercialCatalog() {
       );
     }
     return counts;
-  }, []);
+  }, [commercialProducts]);
 
   const filtered = useMemo(() => {
     let list = commercialProducts.filter((p: CommercialProduct) => {
@@ -115,7 +119,15 @@ export function CommercialCatalog() {
     });
 
     return list;
-  }, [brands, connectionTypes, colours, powerOutputs, buckets, sort]);
+  }, [
+    commercialProducts,
+    brands,
+    connectionTypes,
+    colours,
+    powerOutputs,
+    buckets,
+    sort,
+  ]);
 
   const filterGroups = (
     <Accordion multiple defaultValue={filterKeys}>
@@ -246,12 +258,14 @@ export function CommercialCatalog() {
       </div>
 
       <CommercialCompareBar
+        products={commercialProducts}
         productIds={compareIds}
         onRemove={toggleCompare}
         onClear={() => setCompareIds([])}
         onCompare={() => setCompareOpen(true)}
       />
       <CommercialCompareDialog
+        products={commercialProducts}
         open={compareOpen}
         onOpenChange={setCompareOpen}
         productIds={compareIds}

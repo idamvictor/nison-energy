@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronDown, Heart, ShieldCheck, Zap } from "lucide-react";
 
-import { products, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/hooks/use-cart";
@@ -20,9 +20,11 @@ const selectClass =
 export function PurchasePanel({
   product,
   warranty,
+  siblings,
 }: {
   product: Product;
   warranty: string;
+  siblings: Product[];
 }) {
   const router = useRouter();
   const [cableLength, setCableLength] = useState(product.cableLength ?? "");
@@ -39,9 +41,8 @@ export function PurchasePanel({
   const total = unitPrice * quantity;
   const totalExVat = Math.round(total / 1.2);
 
-  const colourSiblings = product.variantGroup
-    ? products.filter((p) => p.variantGroup === product.variantGroup)
-    : [product];
+  const colourSiblings =
+    product.variantGroup && siblings.length > 0 ? siblings : [product];
   const cableLengthOptions = product.cableLengthOptions ??
     (product.cableLength ? [product.cableLength] : []);
 
@@ -179,10 +180,21 @@ export function PurchasePanel({
         className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
         onClick={() => {
           if (installation === null) return;
-          addItem(product.id, "residential", quantity, {
-            cableLength: cableLength || undefined,
-            installation,
-          });
+          addItem(
+            {
+              id: product.id,
+              category: "residential",
+              name: product.name,
+              brand: product.brand,
+              image: product.image,
+              price: product.price,
+            },
+            quantity,
+            {
+              cableLength: cableLength || undefined,
+              installation,
+            },
+          );
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2000);
         }}

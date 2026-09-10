@@ -16,10 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { products } from "@/lib/products";
-import { commercialProducts } from "@/lib/commercial-products";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+
+export type ChargerOption = {
+  id: string;
+  name: string;
+  colour: string;
+  category: "Residential" | "Commercial";
+};
 import {
   useGrantApplication,
   type GrantApplicationRecord,
@@ -215,7 +220,11 @@ function Timeline({ items }: { items: TimelineItem[] }) {
   );
 }
 
-export function GrantApplicationTracker() {
+export function GrantApplicationTracker({
+  chargerOptions = [],
+}: {
+  chargerOptions?: ChargerOption[];
+}) {
   const record = useGrantApplication((state) => state.record);
   const save = useGrantApplication((state) => state.save);
   const pushNotification = useNotifications((state) => state.push);
@@ -227,6 +236,7 @@ export function GrantApplicationTracker() {
         <AccountDetailsSummary />
         <ApplicationForm
           initial={record}
+          chargerOptions={chargerOptions}
           onCancel={record ? () => setEditing(false) : undefined}
           onSave={(next) => {
             notifyGrantChanges(record, next, pushNotification);
@@ -271,10 +281,12 @@ export function GrantApplicationTracker() {
 
 function ApplicationForm({
   initial,
+  chargerOptions,
   onCancel,
   onSave,
 }: {
   initial: GrantApplicationRecord | null;
+  chargerOptions: ChargerOption[];
   onCancel?: () => void;
   onSave: (record: Omit<GrantApplicationRecord, "updatedAt">) => void;
 }) {
@@ -359,19 +371,23 @@ function ApplicationForm({
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Residential Chargers</SelectLabel>
-              {products.map((product) => (
-                <SelectItem key={product.id} value={product.id}>
-                  {product.name} — {product.colour}
-                </SelectItem>
-              ))}
+              {chargerOptions
+                .filter((c) => c.category === "Residential")
+                .map((product) => (
+                  <SelectItem key={product.id} value={product.id}>
+                    {product.name} — {product.colour}
+                  </SelectItem>
+                ))}
             </SelectGroup>
             <SelectGroup>
               <SelectLabel>Commercial Chargers</SelectLabel>
-              {commercialProducts.map((product) => (
-                <SelectItem key={product.id} value={product.id}>
-                  {product.name} — {product.colour}
-                </SelectItem>
-              ))}
+              {chargerOptions
+                .filter((c) => c.category === "Commercial")
+                .map((product) => (
+                  <SelectItem key={product.id} value={product.id}>
+                    {product.name} — {product.colour}
+                  </SelectItem>
+                ))}
             </SelectGroup>
           </SelectContent>
         </Select>

@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { accessoryProducts } from "@/lib/accessory-products";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
+import { getFeatured, dbToAccessory } from "@/lib/catalog-dal";
 
-export function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
-  const products = accessoryProducts.slice(0, limit);
+export async function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
+  const products = (await getFeatured("Accessory", limit)).map(dbToAccessory);
 
   return (
     <section className="bg-background">

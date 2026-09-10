@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 
-import { AccessoryProductsPage } from "@/components/admin/accessories/accessory-products-page";
+import { ProductsView } from "@/components/admin/catalog/products-view";
+import { getAdminProducts, toAdminRow } from "@/lib/catalog-dal";
 
 export const metadata: Metadata = { title: "Accessories | Admin" };
 
-export default function AdminAccessoriesPage() {
-  return <AccessoryProductsPage />;
+export default async function AdminAccessoriesPage() {
+  const rows = await getAdminProducts("Accessory");
+  return <ProductsView category="Accessory" products={rows.map(toAdminRow)} />;
 }

@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 
-import { ResidentialProductsPage } from "@/components/admin/residential/residential-products-page";
+import { ProductsView } from "@/components/admin/catalog/products-view";
+import { getAdminProducts, toAdminRow } from "@/lib/catalog-dal";
 
 export const metadata: Metadata = { title: "Residential Chargers | Admin" };
 
-export default function AdminResidentialPage() {
-  return <ResidentialProductsPage />;
+export default async function AdminResidentialPage() {
+  const rows = await getAdminProducts("Residential");
+  return (
+    <ProductsView category="Residential" products={rows.map(toAdminRow)} />
+  );
 }

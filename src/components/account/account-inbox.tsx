@@ -13,7 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { GrantApplicationTracker } from "@/components/grant-guide/grant-application-tracker";
+import {
+  GrantApplicationTracker,
+  type ChargerOption,
+} from "@/components/grant-guide/grant-application-tracker";
 import { useNotifications } from "@/hooks/use-notifications";
 import type { AdminLead } from "@/lib/admin-leads";
 import { cn } from "@/lib/utils";
@@ -87,7 +90,13 @@ function buildEnquiryItems(leads: AdminLead[]): FeedItem[] {
     });
 }
 
-export function AccountInbox({ leads }: { leads: AdminLead[] }) {
+export function AccountInbox({
+  leads,
+  chargerOptions,
+}: {
+  leads: AdminLead[];
+  chargerOptions: ChargerOption[];
+}) {
   const notifications = useNotifications((s) => s.items);
   const markAllRead = useNotifications((s) => s.markAllRead);
   const markRead = useNotifications((s) => s.markRead);
@@ -199,7 +208,9 @@ export function AccountInbox({ leads }: { leads: AdminLead[] }) {
             )}
           </DialogHeader>
 
-          {selected?.kind === "grant" && <GrantApplicationTracker />}
+          {selected?.kind === "grant" && (
+            <GrantApplicationTracker chargerOptions={chargerOptions} />
+          )}
 
           {selected?.kind === "order" && selected.description && (
             <p className="text-sm text-foreground/80">{selected.description}</p>

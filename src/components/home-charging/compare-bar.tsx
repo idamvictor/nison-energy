@@ -3,23 +3,26 @@
 import Image from "next/image";
 import { Scale, X } from "lucide-react";
 
-import { products, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function CompareBar({
+  products,
   productIds,
   onRemove,
   onClear,
   onCompare,
 }: {
+  products: Product[];
   productIds: string[];
   onRemove: (id: string) => void;
   onClear: () => void;
   onCompare: () => void;
 }) {
+  const byId = new Map(products.map((p) => [p.id, p]));
   const selected = productIds
-    .map((id) => products.find((p) => p.id === id))
+    .map((id) => byId.get(id))
     .filter((p): p is Product => Boolean(p));
 
   return (

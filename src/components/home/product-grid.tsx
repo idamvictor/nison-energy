@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
-import { products as allProducts } from "@/lib/products";
 import { ProductCard } from "@/components/shared/product-card";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
+import { getResidentialCatalog, getFeatured, dbToResidential } from "@/lib/catalog-dal";
 
-export function ProductGrid({
+export async function ProductGrid({
   limit,
   viewAllHref,
   title = "Residential Charging Units",
@@ -18,7 +18,9 @@ export function ProductGrid({
   title?: string;
   subtitle?: string;
 }) {
-  const products = limit ? allProducts.slice(0, limit) : allProducts;
+  const products = limit
+    ? (await getFeatured("Residential", limit)).map(dbToResidential)
+    : await getResidentialCatalog();
 
   return (
     <section id="chargers" className="bg-background">

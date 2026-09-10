@@ -11,6 +11,9 @@ import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { commercialFaqCategories } from "@/lib/faqs";
+import { getCommercialCatalog } from "@/lib/catalog-dal";
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Commercial Chargers | Ocunio Energy",
@@ -20,7 +23,8 @@ export const metadata: Metadata = {
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";
 
-export default function WorkplaceChargingPage() {
+export default async function WorkplaceChargingPage() {
+  const products = await getCommercialCatalog();
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -32,7 +36,7 @@ export default function WorkplaceChargingPage() {
           image={`${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`}
         />
 
-        <CommercialCatalog />
+        <CommercialCatalog products={products} />
 
         <section className="bg-primary text-primary-foreground">
           <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">

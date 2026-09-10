@@ -8,6 +8,10 @@ import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { residentialFaqCategories } from "@/lib/faqs";
+import { getResidentialCatalog } from "@/lib/catalog-dal";
+
+// Prerendered, but admin catalog edits `revalidatePath` this route immediately.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Residential Chargers | Ocunio Energy",
@@ -17,7 +21,8 @@ export const metadata: Metadata = {
 
 const IMG = "https://ocunioenergy.com/wp-content/uploads";
 
-export default function HomeChargingPage() {
+export default async function HomeChargingPage() {
+  const products = await getResidentialCatalog();
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -28,7 +33,7 @@ export default function HomeChargingPage() {
           subtitle="Our full range of OZEV-approved home chargers, professionally installed by certified engineers."
           image={`${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`}
         />
-        <HomeChargingCatalog />
+        <HomeChargingCatalog products={products} />
         <FaqSection
           categories={residentialFaqCategories}
           title="Residential Charger FAQs"

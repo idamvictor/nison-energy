@@ -3,8 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { products } from "@/lib/products";
-import { productDetails } from "@/lib/product-details";
+import {
+  getResidentialCatalog,
+  getProductRow,
+  dbToResidential,
+  dbToDetail,
+} from "@/lib/catalog-dal";
 import {
   installationProcessMarkdown,
   deliveryPolicyMarkdown,
@@ -37,7 +41,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function generateStaticParams() {
+export const dynamicParams = true;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const products = await getResidentialCatalog();
   return products.map((product) => ({ slug: product.id }));
 }
 
@@ -47,12 +55,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = products.find((p) => p.id === slug);
-  if (!product) return {};
+  const row = await getProductRow(slug);
+  if (!row || row.category !== "Residential") return {};
 
   return {
-    title: `${product.name} | Ocunio Energy`,
-    description: productDetails[slug]?.tagline,
+    title: `${row.name} | Ocunio Energy`,
+    description: row.tagline ?? undefined,
   };
 }
 
@@ -62,12 +70,18 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = products.find((p) => p.id === slug);
-  const detail = productDetails[slug];
+  const row = await getProductRow(slug);
 
-  if (!product || !detail) notFound();
+  if (!row || row.category !== "Residential" || !row.active) notFound();
 
-  const similar = products
+  const product = dbToResidential(row);
+  const detail = dbToDetail(row);
+
+  const catalog = await getResidentialCatalog();
+  const siblings = product.variantGroup
+    ? catalog.filter((p) => p.variantGroup === product.variantGroup)
+    : [product];
+  const similar = catalog
     .filter(
       (p) =>
         p.id !== product.id &&
@@ -124,7 +138,11 @@ export default async function ProductDetailPage({
 
               <TariffBadges tariffs={product.compatibleTariffs} />
 
-              <PurchasePanel product={product} warranty={detail.warranty} />
+              <PurchasePanel
+                product={product}
+                warranty={detail.warranty}
+                siblings={siblings}
+              />
             </div>
           </div>
         </section>

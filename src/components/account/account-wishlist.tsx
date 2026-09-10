@@ -5,20 +5,28 @@ import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/hooks/use-wishlist";
-import { products } from "@/lib/products";
-import { commercialProducts } from "@/lib/commercial-products";
-import { accessoryProducts } from "@/lib/accessory-products";
+import type { Product } from "@/lib/products";
+import type { CommercialProduct } from "@/lib/commercial-products";
+import type { AccessoryProduct } from "@/lib/accessory-products";
 import { ProductCard } from "@/components/shared/product-card";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 
-export function AccountWishlist() {
+export function AccountWishlist({
+  residential,
+  commercial,
+  accessories,
+}: {
+  residential: Product[];
+  commercial: CommercialProduct[];
+  accessories: AccessoryProduct[];
+}) {
   const { items } = useWishlist();
 
   const savedIds = new Set(items.map((item) => item.id));
-  const savedResidential = products.filter((p) => savedIds.has(p.id));
-  const savedCommercial = commercialProducts.filter((p) => savedIds.has(p.id));
-  const savedAccessories = accessoryProducts.filter((p) => savedIds.has(p.id));
+  const savedResidential = residential.filter((p) => savedIds.has(p.id));
+  const savedCommercial = commercial.filter((p) => savedIds.has(p.id));
+  const savedAccessories = accessories.filter((p) => savedIds.has(p.id));
 
   if (items.length === 0) {
     return (

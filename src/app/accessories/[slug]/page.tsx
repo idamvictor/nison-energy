@@ -3,8 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { accessoryProducts } from "@/lib/accessory-products";
-import { getAccessoryDetail } from "@/lib/accessory-product-details";
+import {
+  getAccessoryCatalog,
+  getProductRow,
+  dbToAccessory,
+  dbToDetail,
+} from "@/lib/catalog-dal";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -21,8 +25,12 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
-export function generateStaticParams() {
-  return accessoryProducts.map((product) => ({ slug: product.id }));
+export const dynamicParams = true;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const products = await getAccessoryCatalog();
+  return products.map((product) => ({ slug: product.id }));
 }
 
 export async function generateMetadata({
@@ -31,12 +39,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = accessoryProducts.find((p) => p.id === slug);
-  if (!product) return {};
+  const row = await getProductRow(slug);
+  if (!row || row.category !== "Accessory") return {};
 
   return {
-    title: `${product.name} | Ocunio Energy`,
-    description: getAccessoryDetail(slug)?.tagline,
+    title: `${row.name} | Ocunio Energy`,
+    description: row.tagline ?? undefined,
   };
 }
 
@@ -46,12 +54,18 @@ export default async function AccessoryDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = accessoryProducts.find((p) => p.id === slug);
-  const detail = getAccessoryDetail(slug);
+  const row = await getProductRow(slug);
 
-  if (!product || !detail) notFound();
+  if (!row || row.category !== "Accessory" || !row.active) notFound();
 
-  const similar = accessoryProducts
+  const product = dbToAccessory(row);
+  const detail = dbToDetail(row);
+
+  const catalog = await getAccessoryCatalog();
+  const siblings = catalog.filter(
+    (p) => p.variantGroup === product.variantGroup
+  );
+  const similar = catalog
     .filter(
       (p) => p.id !== product.id && p.variantGroup !== product.variantGroup
     )
@@ -104,7 +118,7 @@ export default async function AccessoryDetailPage({
                 </div>
               )}
 
-              <AccessoryPurchasePanel product={product} />
+              <AccessoryPurchasePanel product={product} siblings={siblings} />
             </div>
           </div>
         </section>

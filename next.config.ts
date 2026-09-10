@@ -8,23 +8,10 @@ const nextConfig: NextConfig = {
   // Prisma 7 driver adapter — keep the Node `pg` stack out of the bundle.
   serverExternalPackages: ["@prisma/adapter-pg", "pg"],
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "ocunioenergy.com",
-        pathname: "/wp-content/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.pexels.com",
-        pathname: "/photos/**",
-      },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-        pathname: "/dyp8gtllq/image/upload/**",
-      },
-    ],
+    // Product & blog images are admin-entered URLs (the admin area is
+    // `requireAdmin`-gated). The Next image optimizer is the only thing that
+    // fetches these, so allow any HTTPS host rather than maintaining a list.
+    remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
 };
 

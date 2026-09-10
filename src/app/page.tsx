@@ -16,6 +16,8 @@ const orderingDeliveryFaq = homeFaqCategories.filter(
   (category) => category.category === "Ordering & Delivery"
 );
 
+export const revalidate = 3600;
+
 export default function Home() {
   return (
     <div className="flex min-h-full flex-1 flex-col">

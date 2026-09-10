@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Heart } from "lucide-react";
 
-import {
-  accessoryProducts,
-  type AccessoryProduct,
-} from "@/lib/accessory-products";
+import type { AccessoryProduct } from "@/lib/accessory-products";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/hooks/use-cart";
@@ -19,8 +16,10 @@ const selectClass =
 
 export function AccessoryPurchasePanel({
   product,
+  siblings,
 }: {
   product: AccessoryProduct;
+  siblings: AccessoryProduct[];
 }) {
   const router = useRouter();
   const [length, setLength] = useState(product.lengthOptions[0]);
@@ -30,9 +29,8 @@ export function AccessoryPurchasePanel({
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
 
-  const variantSiblings = accessoryProducts.filter(
-    (p) => p.variantGroup === product.variantGroup
-  );
+  const variantSiblings =
+    siblings.length > 0 ? siblings : [product];
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -88,7 +86,17 @@ export function AccessoryPurchasePanel({
         size="lg"
         className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
         onClick={() => {
-          addItem(product.id, "accessories", quantity);
+          addItem(
+            {
+              id: product.id,
+              category: "accessories",
+              name: product.name,
+              brand: product.brand,
+              image: product.image,
+              price: null,
+            },
+            quantity,
+          );
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2000);
         }}

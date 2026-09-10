@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ResidentialProductForm } from "@/components/admin/residential/residential-product-form";
-import { products } from "@/lib/products";
+import { ProductForm } from "@/components/admin/catalog/product-form";
+import { getProductRow } from "@/lib/catalog-dal";
 
 export async function generateMetadata({
   params,
@@ -10,8 +10,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = products.find((p) => p.id === slug);
-  return { title: product ? `${product.name} | Admin` : "Product | Admin" };
+  const row = await getProductRow(slug);
+  return { title: row ? `${row.name} | Admin` : "Product | Admin" };
 }
 
 export default async function EditResidentialProductPage({
@@ -20,13 +20,12 @@ export default async function EditResidentialProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = products.find((p) => p.id === slug);
-
-  if (!product) notFound();
+  const row = await getProductRow(slug);
+  if (!row || row.category !== "Residential") notFound();
 
   return (
     <div className="mx-auto max-w-4xl">
-      <ResidentialProductForm product={product} />
+      <ProductForm category="Residential" row={row} />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
 
-import { accessoryProducts, type AccessoryProduct } from "@/lib/accessory-products";
+import type { AccessoryProduct } from "@/lib/accessory-products";
 import {
   Dialog,
   DialogContent,
@@ -22,18 +22,21 @@ const rows: { label: string; value: (p: AccessoryProduct) => React.ReactNode }[]
 ];
 
 export function AccessoryCompareDialog({
+  products,
   open,
   onOpenChange,
   productIds,
   onRemove,
 }: {
+  products: AccessoryProduct[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   productIds: string[];
   onRemove: (id: string) => void;
 }) {
+  const byId = new Map(products.map((p) => [p.id, p]));
   const selected = productIds
-    .map((id) => accessoryProducts.find((p) => p.id === id))
+    .map((id) => byId.get(id))
     .filter((p): p is AccessoryProduct => Boolean(p));
 
   return (

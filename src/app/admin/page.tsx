@@ -12,17 +12,16 @@ import {
 import { StatCard } from "@/components/admin/dashboard/stat-card";
 import { LeadTable } from "@/components/admin/shared/lead-table";
 import { Button } from "@/components/ui/button";
-import { products } from "@/lib/products";
-import { commercialProducts } from "@/lib/commercial-products";
-import { accessoryProducts } from "@/lib/accessory-products";
 import { getLeads } from "@/lib/leads-dal";
 import { getOrders, getPendingOrderCount } from "@/lib/orders-dal";
+import { getProductCounts } from "@/lib/catalog-dal";
 
 export default async function AdminDashboardPage() {
-  const [leads, orders, pendingOrders] = await Promise.all([
+  const [leads, orders, pendingOrders, productCounts] = await Promise.all([
     getLeads(),
     getOrders(),
     getPendingOrderCount(),
+    getProductCounts(),
   ]);
   const newLeads = leads.filter((lead) => lead.status === "New").length;
   const recentLeads = leads.slice(0, 5);
@@ -32,7 +31,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatCard
           label="Residential"
-          value={products.length}
+          value={productCounts.residential}
           subtext="Home chargers"
           icon={Zap}
           tone="primary"
@@ -40,7 +39,7 @@ export default async function AdminDashboardPage() {
         />
         <StatCard
           label="Commercial"
-          value={commercialProducts.length}
+          value={productCounts.commercial}
           subtext="Workplace chargers"
           icon={Package}
           tone="accent"
@@ -48,7 +47,7 @@ export default async function AdminDashboardPage() {
         />
         <StatCard
           label="Accessories"
-          value={accessoryProducts.length}
+          value={productCounts.accessory}
           subtext="Cables"
           icon={Cable}
           tone="success"

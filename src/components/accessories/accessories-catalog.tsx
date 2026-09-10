@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
-import { accessoryProducts, type AccessoryProduct } from "@/lib/accessory-products";
+import type { AccessoryProduct } from "@/lib/accessory-products";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { AccessoryCompareBar } from "@/components/accessories/accessory-compare-bar";
 import { AccessoryCompareDialog } from "@/components/accessories/accessory-compare-dialog";
@@ -47,7 +47,11 @@ function toggle<T>(set: Set<T>, value: T) {
   return next;
 }
 
-export function AccessoriesCatalog() {
+export function AccessoriesCatalog({
+  products: accessoryProducts,
+}: {
+  products: AccessoryProduct[];
+}) {
   const [colours, setColours] = useState<Set<string>>(new Set());
   const [styles, setStyles] = useState<Set<string>>(new Set());
   const [phases, setPhases] = useState<Set<string>>(new Set());
@@ -91,7 +95,7 @@ export function AccessoriesCatalog() {
     });
 
     return list;
-  }, [colours, styles, phases, lengths, sort]);
+  }, [accessoryProducts, colours, styles, phases, lengths, sort]);
 
   const filterGroups = (
     <Accordion multiple defaultValue={filterKeys}>
@@ -211,12 +215,14 @@ export function AccessoriesCatalog() {
       </div>
 
       <AccessoryCompareBar
+        products={accessoryProducts}
         productIds={compareIds}
         onRemove={toggleCompare}
         onClear={() => setCompareIds([])}
         onCompare={() => setCompareOpen(true)}
       />
       <AccessoryCompareDialog
+        products={accessoryProducts}
         open={compareOpen}
         onOpenChange={setCompareOpen}
         productIds={compareIds}

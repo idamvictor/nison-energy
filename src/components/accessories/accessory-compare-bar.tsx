@@ -3,23 +3,26 @@
 import Image from "next/image";
 import { Scale, X } from "lucide-react";
 
-import { accessoryProducts, type AccessoryProduct } from "@/lib/accessory-products";
+import type { AccessoryProduct } from "@/lib/accessory-products";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function AccessoryCompareBar({
+  products,
   productIds,
   onRemove,
   onClear,
   onCompare,
 }: {
+  products: AccessoryProduct[];
   productIds: string[];
   onRemove: (id: string) => void;
   onClear: () => void;
   onCompare: () => void;
 }) {
+  const byId = new Map(products.map((p) => [p.id, p]));
   const selected = productIds
-    .map((id) => accessoryProducts.find((p) => p.id === id))
+    .map((id) => byId.get(id))
     .filter((p): p is AccessoryProduct => Boolean(p));
 
   return (

@@ -16,8 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
+import {
+  useGrantApplication,
+  type GrantApplicationRecord,
+  type GrantApplicationStatus,
+} from "@/lib/grant-guide/store";
+import { useNotifications } from "@/lib/notifications/store";
 
 export type ChargerOption = {
   id: string;
@@ -25,12 +31,6 @@ export type ChargerOption = {
   colour: string;
   category: "Residential" | "Commercial";
 };
-import {
-  useGrantApplication,
-  type GrantApplicationRecord,
-  type GrantApplicationStatus,
-} from "@/hooks/use-grant-application";
-import { useNotifications } from "@/hooks/use-notifications";
 
 const statusLabel: Record<GrantApplicationStatus, string> = {
   approved: "Grant application approved",

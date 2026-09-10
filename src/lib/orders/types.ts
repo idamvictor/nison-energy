@@ -54,3 +54,22 @@ export type OrderRecord = {
 };
 
 export type OrderWithItems = OrderRecord & { items: OrderItemRecord[] };
+
+// ─── Action / payload shapes (used by client components + the actions) ──────
+
+export type PlaceOrderPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  postcode: string;
+  notes?: string;
+  lines: OrderLineInput[];
+};
+
+export type PlaceOrderResult =
+  | { ok: true; reference: string }
+  | { ok: false; errors: Record<string, string> };
+
+export type OrderActionResult = { ok: true } | { ok: false; error: string };

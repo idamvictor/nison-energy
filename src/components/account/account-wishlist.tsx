@@ -4,10 +4,10 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useWishlist } from "@/hooks/use-wishlist";
-import type { Product } from "@/lib/products";
-import type { CommercialProduct } from "@/lib/commercial-products";
-import type { AccessoryProduct } from "@/lib/accessory-products";
+import { useWishlist } from "@/lib/wishlist/store";
+import type { Product } from "@/lib/catalog/types";
+import type { CommercialProduct } from "@/lib/catalog/types";
+import type { AccessoryProduct } from "@/lib/catalog/types";
 import { ProductCard } from "@/components/shared/product-card";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";

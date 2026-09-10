@@ -22,10 +22,10 @@ import {
   accessoryStyles,
   connectionTypes,
   type ProductCategory,
-} from "@/lib/catalog";
-import type { ProductInput } from "@/lib/catalog-dal";
+  type ProductInput,
+} from "@/lib/catalog/types";
 import type { Product as ProductRow } from "@/generated/prisma/client";
-import { saveProduct } from "@/app/admin/catalog-actions";
+import { saveProduct } from "@/lib/catalog/actions";
 
 type Spec = { label: string; value: string };
 

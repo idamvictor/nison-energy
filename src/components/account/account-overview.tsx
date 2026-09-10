@@ -5,9 +5,9 @@ import { ArrowRight, Heart, Inbox, ShoppingBag, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useWishlist } from "@/hooks/use-wishlist";
-import { useNotifications } from "@/hooks/use-notifications";
-import type { SessionUser } from "@/lib/auth-dal";
+import { useWishlist } from "@/lib/wishlist/store";
+import { useNotifications } from "@/lib/notifications/store";
+import type { SessionUser } from "@/lib/auth/session";
 
 const tiles = [
   { href: "/account/profile", label: "Profile", icon: User },

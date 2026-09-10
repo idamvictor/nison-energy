@@ -8,12 +8,12 @@ import {
   getProductRow,
   dbToCommercial,
   dbToDetail,
-} from "@/lib/catalog-dal";
+} from "@/lib/catalog/queries";
 import {
   installationProcessMarkdown,
   deliveryPolicyMarkdown,
   returnsPolicyMarkdown,
-} from "@/lib/legal-content";
+} from "@/lib/content/legal";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";

@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge, type badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { VariantProps } from "class-variance-authority";
-import type { OrderStatus, OrderWithItems } from "@/lib/orders";
+import type { OrderStatus, OrderWithItems } from "@/lib/orders/types";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

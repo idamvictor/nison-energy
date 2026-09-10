@@ -6,10 +6,13 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+} from "@/lib/catalog/queries";
+import {
+  categoryRoute,
+  type ProductCategory,
   type ProductInput,
   type WriteResult,
-} from "@/lib/catalog-dal";
-import { categoryRoute, type ProductCategory } from "@/lib/catalog";
+} from "@/lib/catalog/types";
 
 const adminRoute: Record<ProductCategory, string> = {
   Residential: "/admin/residential",

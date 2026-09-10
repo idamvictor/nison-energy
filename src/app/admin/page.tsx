@@ -12,9 +12,9 @@ import {
 import { StatCard } from "@/components/admin/dashboard/stat-card";
 import { LeadTable } from "@/components/admin/shared/lead-table";
 import { Button } from "@/components/ui/button";
-import { getLeads } from "@/lib/leads-dal";
-import { getOrders, getPendingOrderCount } from "@/lib/orders-dal";
-import { getProductCounts } from "@/lib/catalog-dal";
+import { getLeads } from "@/lib/leads/queries";
+import { getOrders, getPendingOrderCount } from "@/lib/orders/queries";
+import { getProductCounts } from "@/lib/catalog/queries";
 
 export default async function AdminDashboardPage() {
   const [leads, orders, pendingOrders, productCounts] = await Promise.all([

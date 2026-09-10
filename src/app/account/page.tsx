@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import { AccountOverview } from "@/components/account/account-overview";
-import { requireUser } from "@/lib/auth-dal";
-import { getLeadsForUser } from "@/lib/leads-dal";
-import { getOrdersForUser } from "@/lib/orders-dal";
+import { requireUser } from "@/lib/auth/session";
+import { getLeadsForUser } from "@/lib/leads/queries";
+import { getOrdersForUser } from "@/lib/orders/queries";
 
 export const metadata: Metadata = { title: "Overview" };
 

@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
-import { commercialFaqCategories } from "@/lib/faqs";
-import { getCommercialCatalog } from "@/lib/catalog-dal";
+import { commercialFaqCategories } from "@/lib/content/faqs";
+import { getCommercialCatalog } from "@/lib/catalog/queries";
 
 export const revalidate = 3600;
 

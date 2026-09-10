@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronDown, Heart, ShieldCheck, Zap } from "lucide-react";
 
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { useCart } from "@/hooks/use-cart";
-import { useWishlist } from "@/hooks/use-wishlist";
+import { useCart } from "@/lib/cart/store";
+import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 
 const INSTALL_FEE = 499;

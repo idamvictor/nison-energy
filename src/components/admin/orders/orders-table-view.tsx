@@ -25,7 +25,7 @@ import {
   orderStatuses,
   type OrderStatus,
   type OrderWithItems,
-} from "@/lib/orders";
+} from "@/lib/orders/types";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

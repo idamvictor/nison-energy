@@ -6,8 +6,9 @@ import { CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
-import { submitEnquiry, type EnquiryFormState } from "@/app/contact-us/actions";
+import { authClient } from "@/lib/auth/client";
+import { submitEnquiry } from "@/lib/leads/actions";
+import type { EnquiryFormState } from "@/lib/leads/types";
 
 const enquiryAreas = [
   "House",

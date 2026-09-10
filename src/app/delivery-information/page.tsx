@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { LegalPageLayout } from "@/components/shared/legal-page-layout";
-import { deliveryInformationMarkdown } from "@/lib/legal-content";
+import { deliveryInformationMarkdown } from "@/lib/content/legal";
 
 export const metadata: Metadata = {
   title: "Delivery Information | Ocunio Energy",

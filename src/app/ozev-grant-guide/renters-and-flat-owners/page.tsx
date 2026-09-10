@@ -27,8 +27,8 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
-import { getGrantScheme } from "@/lib/grants";
-import { generateRentersQuotePdf } from "@/lib/generate-renters-quote-pdf";
+import { getGrantScheme } from "@/lib/content/grant-schemes";
+import { generateRentersQuotePdf } from "@/lib/pdf/renters-quote";
 import { cn } from "@/lib/utils";
 
 const scheme = getGrantScheme("renters-and-flat-owners")!;

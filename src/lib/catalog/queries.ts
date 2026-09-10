@@ -3,13 +3,18 @@ import "server-only";
 import { cache } from "react";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth-dal";
+import { requireAdmin } from "@/lib/auth/session";
 import type { Product as ProductRow } from "@/generated/prisma/client";
-import type { Product } from "@/lib/products";
-import type { CommercialProduct } from "@/lib/commercial-products";
-import type { AccessoryProduct } from "@/lib/accessory-products";
-import type { ProductDetail, Spec } from "@/lib/product-details";
-import type { ProductCategory } from "@/lib/catalog";
+import type {
+  AccessoryProduct,
+  CommercialProduct,
+  Product,
+  ProductCategory,
+  ProductDetail,
+  ProductInput,
+  Spec,
+  WriteResult,
+} from "@/lib/catalog/types";
 
 // ─── Row → view-type mappers ────────────────────────────────────────────────
 
@@ -181,39 +186,6 @@ export const getAdminProducts = cache((category: ProductCategory) =>
 // ─── Writes ────────────────────────────────────────────────────────────────
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-export type ProductInput = {
-  category: ProductCategory;
-  name: string;
-  brand: string;
-  colour: string;
-  cardImage: string;
-  tags: string[];
-  variantGroup: string | null;
-  active: boolean;
-  featured: boolean;
-  sortOrder: number;
-  spec: string | null;
-  connectionType: string | null;
-  cableLength: string | null;
-  powerOutput: string | null;
-  price: number | null;
-  cableLengthOptions: string[];
-  compatibleTariffs: string[];
-  style: string | null;
-  phase: string | null;
-  lengthOptions: string[];
-  tagline: string | null;
-  gallery: string[];
-  description: string[];
-  features: string[];
-  specs: Spec[];
-  warranty: string | null;
-};
-
-export type WriteResult =
-  | { ok: true; id: string }
-  | { ok: false; error: string };
 
 function validate(input: ProductInput): string | null {
   if (!input.name.trim()) return "Name is required.";

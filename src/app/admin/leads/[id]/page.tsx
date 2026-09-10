@@ -6,7 +6,7 @@ import { ArrowLeft, Building2, Mail, MapPin, Phone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadStatusSelect } from "@/components/admin/leads/lead-status-select";
 import { InstallationTracker } from "@/components/admin/leads/installation-tracker";
-import { getLead } from "@/lib/leads-dal";
+import { getLead } from "@/lib/leads/queries";
 
 export async function generateMetadata({
   params,

@@ -20,7 +20,7 @@ import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
 import { GrantSchemeCard } from "@/components/grants/grant-scheme-card";
-import { grantSchemes } from "@/lib/grants";
+import { grantSchemes } from "@/lib/content/grant-schemes";
 
 export const metadata: Metadata = {
   title: "OZEV Grants | Ocunio Energy",

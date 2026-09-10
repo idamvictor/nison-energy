@@ -5,7 +5,7 @@ import { LogOut } from "lucide-react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/client";
 
 function pageTitle(pathname: string): string {
   if (pathname === "/admin") return "Dashboard";

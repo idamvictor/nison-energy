@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { useBlogPosts } from "@/hooks/use-blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";

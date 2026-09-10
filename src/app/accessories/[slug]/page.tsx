@@ -8,7 +8,7 @@ import {
   getProductRow,
   dbToAccessory,
   dbToDetail,
-} from "@/lib/catalog-dal";
+} from "@/lib/catalog/queries";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";

@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
+import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Heart } from "lucide-react";
 
-import type { AccessoryProduct } from "@/lib/accessory-products";
+import type { AccessoryProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { useCart } from "@/hooks/use-cart";
-import { useWishlist } from "@/hooks/use-wishlist";
+import { useCart } from "@/lib/cart/store";
+import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 
 const selectClass =

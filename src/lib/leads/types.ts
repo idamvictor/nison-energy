@@ -64,3 +64,20 @@ export const leadStatuses: LeadStatus[] = [
   "Won",
   "Lost",
 ];
+
+// ─── Action / form-state shapes (used by client components + the actions) ────
+
+export type EnquiryFormState =
+  | { status: "idle" }
+  | { status: "success" }
+  | { status: "error"; errors: Record<string, string>; message?: string };
+
+export type LeadActionResult = { ok: true } | { ok: false; error: string };
+
+export type InstallationInput = {
+  stage: string;
+  grantStatus?: string;
+  surveyDate?: string;
+  installDate?: string;
+  engineer?: string;
+};

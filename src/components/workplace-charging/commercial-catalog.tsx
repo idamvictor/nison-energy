@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
-import type { CommercialProduct } from "@/lib/commercial-products";
+import type { CommercialProduct } from "@/lib/catalog/types";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { CommercialCompareBar } from "@/components/workplace-charging/commercial-compare-bar";
 import { CommercialCompareDialog } from "@/components/workplace-charging/commercial-compare-dialog";

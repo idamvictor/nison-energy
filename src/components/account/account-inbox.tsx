@@ -17,8 +17,8 @@ import {
   GrantApplicationTracker,
   type ChargerOption,
 } from "@/components/grant-guide/grant-application-tracker";
-import { useNotifications } from "@/hooks/use-notifications";
-import type { AdminLead } from "@/lib/admin-leads";
+import { useNotifications } from "@/lib/notifications/store";
+import type { AdminLead } from "@/lib/leads/types";
 import { cn } from "@/lib/utils";
 
 type FeedKind = "order" | "grant" | "enquiry";

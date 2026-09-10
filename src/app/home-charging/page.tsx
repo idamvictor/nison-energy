@@ -7,8 +7,8 @@ import { HomeChargingCatalog } from "@/components/home-charging/home-charging-ca
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
-import { residentialFaqCategories } from "@/lib/faqs";
-import { getResidentialCatalog } from "@/lib/catalog-dal";
+import { residentialFaqCategories } from "@/lib/content/faqs";
+import { getResidentialCatalog } from "@/lib/catalog/queries";
 
 // Prerendered, but admin catalog edits `revalidatePath` this route immediately.
 export const revalidate = 3600;

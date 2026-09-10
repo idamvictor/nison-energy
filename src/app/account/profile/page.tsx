@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { AccountProfileForm } from "@/components/account/account-profile-form";
-import { requireUser } from "@/lib/auth-dal";
+import { requireUser } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Profile" };
 

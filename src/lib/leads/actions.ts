@@ -3,17 +3,57 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth-dal";
+import { requireAdmin } from "@/lib/auth/session";
+import { createLead } from "@/lib/leads/queries";
 import {
   grantStatuses,
   installationStages,
   leadStatuses,
+  type EnquiryFormState,
   type GrantStatus,
+  type InstallationInput,
   type InstallationStage,
+  type LeadActionResult,
   type LeadStatus,
-} from "@/lib/admin-leads";
+} from "@/lib/leads/types";
 
-export type ActionResult = { ok: true } | { ok: false; error: string };
+// ─── Public enquiry form (contact-us) ──────────────────────────────────────
+
+export async function submitEnquiry(
+  _prev: EnquiryFormState,
+  formData: FormData,
+): Promise<EnquiryFormState> {
+  // Honeypot — bots fill hidden fields. Pretend it worked, store nothing.
+  if (String(formData.get("company_website") ?? "").trim() !== "") {
+    return { status: "success" };
+  }
+
+  const result = await createLead({
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
+    phone: formData.get("phone"),
+    email: formData.get("email"),
+    jobTitle: formData.get("jobTitle"),
+    companyName: formData.get("companyName"),
+    postcode: formData.get("postcode"),
+    areaOfEnquiry: formData.get("areaOfEnquiry"),
+    reasonForEnquiry: formData.get("reasonForEnquiry"),
+    additionalInformation: formData.get("additionalInformation"),
+    futureCommunications: formData.get("futureCommunications"),
+  });
+
+  if (!result.ok) {
+    return {
+      status: "error",
+      errors: result.errors,
+      message: "Please check the highlighted fields.",
+    };
+  }
+
+  return { status: "success" };
+}
+
+// ─── Admin CRM mutations ───────────────────────────────────────────────────
 
 function revalidateLead(id: string) {
   revalidatePath("/admin/leads");
@@ -25,7 +65,7 @@ function revalidateLead(id: string) {
 export async function updateLeadStatus(
   id: string,
   status: string,
-): Promise<ActionResult> {
+): Promise<LeadActionResult> {
   await requireAdmin();
   if (!leadStatuses.includes(status as LeadStatus)) {
     return { ok: false, error: "Unknown status." };
@@ -34,14 +74,6 @@ export async function updateLeadStatus(
   revalidateLead(id);
   return { ok: true };
 }
-
-export type InstallationInput = {
-  stage: string;
-  grantStatus?: string;
-  surveyDate?: string;
-  installDate?: string;
-  engineer?: string;
-};
 
 function parseDate(value?: string): Date | null {
   if (!value) return null;
@@ -52,7 +84,7 @@ function parseDate(value?: string): Date | null {
 export async function updateLeadInstallation(
   id: string,
   input: InstallationInput,
-): Promise<ActionResult> {
+): Promise<LeadActionResult> {
   await requireAdmin();
 
   const stage = input.stage;

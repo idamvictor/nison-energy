@@ -1,6 +1,6 @@
 import { Badge, type badgeVariants } from "@/components/ui/badge";
 import type { VariantProps } from "class-variance-authority";
-import type { LeadStatus } from "@/lib/admin-leads";
+import type { LeadStatus } from "@/lib/leads/types";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
 

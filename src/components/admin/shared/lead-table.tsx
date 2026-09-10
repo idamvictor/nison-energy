@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/admin/shared/status-badge";
-import type { AdminLead } from "@/lib/admin-leads";
+import type { AdminLead } from "@/lib/leads/types";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {

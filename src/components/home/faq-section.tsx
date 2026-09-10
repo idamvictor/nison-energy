@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
-import { homeFaqCategories, type FaqCategory } from "@/lib/faqs";
+import { homeFaqCategories, type FaqCategory } from "@/lib/content/faqs";
 
 export function FaqSection({
   categories = homeFaqCategories,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ProductForm } from "@/components/admin/catalog/product-form";
-import { getProductRow } from "@/lib/catalog-dal";
+import { getProductRow } from "@/lib/catalog/queries";
 
 export async function generateMetadata({
   params,

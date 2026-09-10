@@ -4,7 +4,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/server";
 
 // Memoised for the render pass so a layout + page + nested components share one
 // session lookup. See node_modules/next/dist/docs/01-app/02-guides/authentication.md

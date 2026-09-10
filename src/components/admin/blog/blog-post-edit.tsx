@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { BlogPostForm } from "@/components/admin/blog/blog-post-form";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
 
 export function BlogPostEdit({ slug }: { slug: string }) {
   const post = useBlogPosts((s) => s.posts.find((p) => p.slug === slug));

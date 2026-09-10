@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { cartItemHref, type CartCategory } from "@/lib/catalog";
+import { cartItemHref, type CartCategory } from "@/lib/catalog/types";
 
 export type { CartCategory };
 export type CartItemOptions = {

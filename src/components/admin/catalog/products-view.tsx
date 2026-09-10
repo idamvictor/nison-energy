@@ -42,8 +42,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { categoryRoute, type ProductCategory } from "@/lib/catalog";
-import { removeProduct } from "@/app/admin/catalog-actions";
+import { categoryRoute, type ProductCategory } from "@/lib/catalog/types";
+import { removeProduct } from "@/lib/catalog/actions";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

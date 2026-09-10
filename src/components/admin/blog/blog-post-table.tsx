@@ -30,8 +30,8 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
-import type { BlogPost } from "@/lib/blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
+import type { BlogPost } from "@/lib/blog/types";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {

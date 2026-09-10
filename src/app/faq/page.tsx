@@ -5,7 +5,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { FaqSection } from "@/components/home/faq-section";
-import { homeFaqCategories } from "@/lib/faqs";
+import { homeFaqCategories } from "@/lib/content/faqs";
 
 export const metadata: Metadata = {
   title: "FAQ | Ocunio Energy",

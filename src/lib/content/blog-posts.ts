@@ -1,13 +1,4 @@
-export type BlogPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  coverImage: string;
-  author: string;
-  publishedAt: string;
-  tags: string[];
-  bodyMarkdown: string;
-};
+import type { BlogPost } from "@/lib/blog/types";
 
 // Real articles crawled from the previous Ocunio Energy site's blog and
 // rebranded for Ocunio Energy — internal CTAs point at our real routes,

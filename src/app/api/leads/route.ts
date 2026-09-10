@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth-dal";
-import { getLeads, createLead } from "@/lib/leads-dal";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getLeads, createLead } from "@/lib/leads/queries";
 
 // Reads/writes a real database, so never statically cache this route.
 export const dynamic = "force-dynamic";

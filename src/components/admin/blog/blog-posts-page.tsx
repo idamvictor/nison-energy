@@ -7,7 +7,7 @@ import { ArrowUpRight, Newspaper, Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BlogPostTable } from "@/components/admin/blog/blog-post-table";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
 
 export function BlogPostsPage() {
   const posts = useBlogPosts((s) => s.posts);

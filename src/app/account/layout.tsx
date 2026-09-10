@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { AccountNav } from "@/components/account/account-nav";
-import { requireUser } from "@/lib/auth-dal";
+import { requireUser } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: { template: "%s | My Account | Ocunio Energy", default: "My Account | Ocunio Energy" },

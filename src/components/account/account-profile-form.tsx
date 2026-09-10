@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
-import type { SessionUser } from "@/lib/auth-dal";
+import { authClient } from "@/lib/auth/client";
+import type { SessionUser } from "@/lib/auth/session";
 
 export function AccountProfileForm({ user }: { user: SessionUser }) {
   const router = useRouter();

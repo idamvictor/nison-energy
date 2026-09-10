@@ -3,8 +3,8 @@ import "server-only";
 import { cache } from "react";
 
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth-dal";
-import type { OrderLineInput, OrderWithItems } from "@/lib/orders";
+import { getCurrentUser } from "@/lib/auth/session";
+import type { OrderLineInput, OrderWithItems } from "@/lib/orders/types";
 
 export type {
   OrderStatus,
@@ -12,8 +12,8 @@ export type {
   OrderWithItems,
   OrderRecord,
   OrderItemRecord,
-} from "@/lib/orders";
-export { orderStatuses } from "@/lib/orders";
+} from "@/lib/orders/types";
+export { orderStatuses } from "@/lib/orders/types";
 
 // ─── Reads ──────────────────────────────────────────────────────────────────
 

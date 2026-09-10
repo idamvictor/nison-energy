@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { blogPostsSeed, type BlogPost } from "@/lib/blog-posts";
+import { blogPostsSeed } from "@/lib/content/blog-posts";
+import type { BlogPost } from "@/lib/blog/types";
 
 type BlogPostsState = {
   posts: BlogPost[];

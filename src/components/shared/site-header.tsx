@@ -17,9 +17,9 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useCart } from "@/hooks/use-cart";
-import { useNotifications } from "@/hooks/use-notifications";
-import { authClient } from "@/lib/auth-client";
+import { useCart } from "@/lib/cart/store";
+import { useNotifications } from "@/lib/notifications/store";
+import { authClient } from "@/lib/auth/client";
 import {
   Sheet,
   SheetContent,

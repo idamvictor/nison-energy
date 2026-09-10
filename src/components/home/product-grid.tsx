@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/shared/product-card";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
-import { getResidentialCatalog, getFeatured, dbToResidential } from "@/lib/catalog-dal";
+import { getResidentialCatalog, getFeatured, dbToResidential } from "@/lib/catalog/queries";
 
 export async function ProductGrid({
   limit,

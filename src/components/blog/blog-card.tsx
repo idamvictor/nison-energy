@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { BlogPost } from "@/lib/blog-posts";
+import type { BlogPost } from "@/lib/blog/types";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {

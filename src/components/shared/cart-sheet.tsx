@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
+import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

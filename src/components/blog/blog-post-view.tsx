@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { Badge } from "@/components/ui/badge";
 import { BlogMarkdown } from "@/components/blog/blog-markdown";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {

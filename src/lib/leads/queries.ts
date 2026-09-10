@@ -3,13 +3,13 @@ import "server-only";
 import { cache } from "react";
 
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth-dal";
+import { getCurrentUser } from "@/lib/auth/session";
 import type {
   AdminLead,
   GrantStatus,
   InstallationStage,
   LeadStatus,
-} from "@/lib/admin-leads";
+} from "@/lib/leads/types";
 import type { Lead } from "@/generated/prisma/client";
 
 // ─── DB row → UI shape ──────────────────────────────────────────────────────

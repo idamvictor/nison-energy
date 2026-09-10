@@ -5,7 +5,7 @@ import { AccessoryProductCard } from "@/components/accessories/accessory-product
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
-import { getFeatured, dbToAccessory } from "@/lib/catalog-dal";
+import { getFeatured, dbToAccessory } from "@/lib/catalog/queries";
 
 export async function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
   const products = (await getFeatured("Accessory", limit)).map(dbToAccessory);

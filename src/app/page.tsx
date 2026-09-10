@@ -10,7 +10,7 @@ import { LatestBlog } from "@/components/home/latest-blog";
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
-import { homeFaqCategories } from "@/lib/faqs";
+import { homeFaqCategories } from "@/lib/content/faqs";
 
 const orderingDeliveryFaq = homeFaqCategories.filter(
   (category) => category.category === "Ordering & Delivery"

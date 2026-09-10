@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { OpenQuoteEmbed } from "@/components/shared/openquote-embed";
-import { useNotifications } from "@/hooks/use-notifications";
+import { useNotifications } from "@/lib/notifications/store";
 
 const OPENQUOTE_URL = "https://app.openquote.net/company/ocunioenergy?category=EV";
 

@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/shared/admin-sidebar";
 import { AdminTopbar } from "@/components/admin/shared/admin-topbar";
-import { requireAdmin } from "@/lib/auth-dal";
-import { getNewLeadCount } from "@/lib/leads-dal";
-import { getPendingOrderCount } from "@/lib/orders-dal";
+import { requireAdmin } from "@/lib/auth/session";
+import { getNewLeadCount } from "@/lib/leads/queries";
+import { getPendingOrderCount } from "@/lib/orders/queries";
 
 export const metadata: Metadata = {
   title: "Admin | Ocunio Energy",

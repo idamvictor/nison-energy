@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LeadTable } from "@/components/admin/shared/lead-table";
-import { leadStatuses, type AdminLead, type LeadStatus } from "@/lib/admin-leads";
+import { leadStatuses, type AdminLead, type LeadStatus } from "@/lib/leads/types";
 
 export function LeadsTableView({ leads }: { leads: AdminLead[] }) {
   const [query, setQuery] = useState("");

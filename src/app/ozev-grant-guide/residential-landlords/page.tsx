@@ -27,7 +27,7 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
-import { generateLandlordQuotePdf } from "@/lib/generate-landlord-quote-pdf";
+import { generateLandlordQuotePdf } from "@/lib/pdf/landlord-quote";
 import { cn } from "@/lib/utils";
 
 const chargerModels = [

@@ -20,7 +20,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { Reveal } from "@/components/shared/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { grantSchemes, getGrantScheme } from "@/lib/grants";
+import { grantSchemes, getGrantScheme } from "@/lib/content/grant-schemes";
 
 export function generateStaticParams() {
   return grantSchemes.map((scheme) => ({ slug: scheme.slug }));

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { LegalPageLayout } from "@/components/shared/legal-page-layout";
-import { privacyPolicyMarkdown } from "@/lib/legal-content";
+import { privacyPolicyMarkdown } from "@/lib/content/legal";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Ocunio Energy",

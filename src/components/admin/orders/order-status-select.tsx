@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { orderStatuses, type OrderStatus } from "@/lib/orders";
-import { updateOrderStatus } from "@/app/admin/orders/actions";
+import { orderStatuses, type OrderStatus } from "@/lib/orders/types";
+import { updateOrderStatus } from "@/lib/orders/actions";
 
 export function OrderStatusSelect({
   orderId,

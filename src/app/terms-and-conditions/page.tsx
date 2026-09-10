@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { LegalPageLayout } from "@/components/shared/legal-page-layout";
-import { termsAndConditionsMarkdown } from "@/lib/legal-content";
+import { termsAndConditionsMarkdown } from "@/lib/content/legal";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions | Ocunio Energy",

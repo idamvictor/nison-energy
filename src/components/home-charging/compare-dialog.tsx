@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
 
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/catalog/types";
 import {
   Dialog,
   DialogContent,

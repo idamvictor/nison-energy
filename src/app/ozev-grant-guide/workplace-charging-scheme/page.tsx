@@ -26,7 +26,7 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
-import { generateWorkplaceQuotePdf } from "@/lib/generate-workplace-quote-pdf";
+import { generateWorkplaceQuotePdf } from "@/lib/pdf/workplace-quote";
 import { cn } from "@/lib/utils";
 
 const chargerModels = [

@@ -13,8 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { OrderStatusSelect } from "@/components/admin/orders/order-status-select";
-import { getOrder } from "@/lib/orders-dal";
-import type { OrderStatus } from "@/lib/orders";
+import { getOrder } from "@/lib/orders/queries";
+import type { OrderStatus } from "@/lib/orders/types";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

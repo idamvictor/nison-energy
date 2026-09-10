@@ -5,7 +5,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { GrantScheme } from "@/lib/grants";
+import type { GrantScheme } from "@/lib/content/grant-schemes";
 
 export function GrantSchemeCard({
   scheme,

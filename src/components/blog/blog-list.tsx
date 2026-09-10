@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Reveal } from "@/components/shared/reveal";
 import { BlogCard } from "@/components/blog/blog-card";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
 
 export function BlogList() {
   const posts = useBlogPosts((s) => s.posts);

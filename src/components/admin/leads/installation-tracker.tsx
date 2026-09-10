@@ -15,8 +15,8 @@ import {
   installationStages,
   grantStatuses,
   type InstallationDetails,
-} from "@/lib/admin-leads";
-import { updateLeadInstallation } from "@/app/admin/leads/actions";
+} from "@/lib/leads/types";
+import { updateLeadInstallation } from "@/lib/leads/actions";
 
 const NONE = "__none";
 

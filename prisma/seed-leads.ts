@@ -1,4 +1,4 @@
-import type { AdminLead } from "../src/lib/admin-leads";
+import type { AdminLead } from "../src/lib/leads/types";
 
 // Sample enquiries for local development — loaded into the `Lead` table by
 // prisma/seed.ts so the admin CRM and customer inbox have something to show.

@@ -1,6 +1,6 @@
 import { Badge, type badgeVariants } from "@/components/ui/badge";
 import type { VariantProps } from "class-variance-authority";
-import type { OrderStatus } from "@/lib/orders";
+import type { OrderStatus } from "@/lib/orders/types";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
 

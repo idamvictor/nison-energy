@@ -5,7 +5,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { AccessoriesCatalog } from "@/components/accessories/accessories-catalog";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
-import { getAccessoryCatalog } from "@/lib/catalog-dal";
+import { getAccessoryCatalog } from "@/lib/catalog/queries";
 
 export const revalidate = 3600;
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { AccountOrders } from "@/components/account/account-orders";
-import { requireUser } from "@/lib/auth-dal";
-import { getOrdersForUser } from "@/lib/orders-dal";
+import { requireUser } from "@/lib/auth/session";
+import { getOrdersForUser } from "@/lib/orders/queries";
 
 export const metadata: Metadata = { title: "Orders" };
 

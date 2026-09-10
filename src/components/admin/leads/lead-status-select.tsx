@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { leadStatuses, type LeadStatus } from "@/lib/admin-leads";
-import { updateLeadStatus } from "@/app/admin/leads/actions";
+import { leadStatuses, type LeadStatus } from "@/lib/leads/types";
+import { updateLeadStatus } from "@/lib/leads/actions";
 
 export function LeadStatusSelect({
   leadId,

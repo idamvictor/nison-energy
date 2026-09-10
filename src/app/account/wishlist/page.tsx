@@ -5,7 +5,7 @@ import {
   getResidentialCatalog,
   getCommercialCatalog,
   getAccessoryCatalog,
-} from "@/lib/catalog-dal";
+} from "@/lib/catalog/queries";
 
 export const metadata: Metadata = { title: "Wishlist" };
 

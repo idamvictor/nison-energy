@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ProductsView } from "@/components/admin/catalog/products-view";
-import { getAdminProducts, toAdminRow } from "@/lib/catalog-dal";
+import { getAdminProducts, toAdminRow } from "@/lib/catalog/queries";
 
 export const metadata: Metadata = { title: "Commercial Chargers | Admin" };
 

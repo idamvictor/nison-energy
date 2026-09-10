@@ -5,7 +5,7 @@ import { CommercialProductCard } from "@/components/workplace-charging/commercia
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
-import { getFeatured, dbToCommercial } from "@/lib/catalog-dal";
+import { getFeatured, dbToCommercial } from "@/lib/catalog/queries";
 
 export async function FeaturedCommercial({ limit = 3 }: { limit?: number }) {
   const products = (await getFeatured("Commercial", limit)).map(dbToCommercial);

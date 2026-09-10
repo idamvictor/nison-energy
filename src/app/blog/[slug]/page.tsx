@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { BlogPostView } from "@/components/blog/blog-post-view";
-import { blogPostsSeed } from "@/lib/blog-posts";
+import { blogPostsSeed } from "@/lib/content/blog-posts";
 
 export function generateStaticParams() {
   return blogPostsSeed.map((post) => ({ slug: post.slug }));

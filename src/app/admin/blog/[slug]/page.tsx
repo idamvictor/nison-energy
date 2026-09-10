@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { BlogPostEdit } from "@/components/admin/blog/blog-post-edit";
-import { blogPostsSeed } from "@/lib/blog-posts";
+import { blogPostsSeed } from "@/lib/content/blog-posts";
 
 export async function generateMetadata({
   params,

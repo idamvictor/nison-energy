@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
-import type { AccessoryProduct } from "@/lib/accessory-products";
+import type { AccessoryProduct } from "@/lib/catalog/types";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { AccessoryCompareBar } from "@/components/accessories/accessory-compare-bar";
 import { AccessoryCompareDialog } from "@/components/accessories/accessory-compare-dialog";

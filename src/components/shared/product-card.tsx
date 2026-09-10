@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/catalog/types";
 import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/shared/product-tag";
-import { useWishlist } from "@/hooks/use-wishlist";
+import { useWishlist } from "@/lib/wishlist/store";
 
 export function ProductCard({
   product,

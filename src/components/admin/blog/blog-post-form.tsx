@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
-import type { BlogPost } from "@/lib/blog-posts";
+import { useBlogPosts } from "@/lib/blog/store";
+import type { BlogPost } from "@/lib/blog/types";
 
 function slugify(value: string) {
   return value

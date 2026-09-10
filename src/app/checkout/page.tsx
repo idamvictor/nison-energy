@@ -34,10 +34,10 @@ import {
   AddressAutocomplete,
   type AddressSuggestion,
 } from "@/components/shared/address-autocomplete";
-import { useCart, resolveCartItem, formatCartOptions } from "@/hooks/use-cart";
-import { useNotifications } from "@/hooks/use-notifications";
-import { placeOrder } from "@/app/checkout/actions";
-import type { OrderLineInput } from "@/lib/orders";
+import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
+import { useNotifications } from "@/lib/notifications/store";
+import { placeOrder } from "@/lib/orders/actions";
+import type { OrderLineInput } from "@/lib/orders/types";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",

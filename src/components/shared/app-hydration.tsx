@@ -1,11 +1,11 @@
 "use client";
 
 import { StoreHydration } from "@/components/shared/store-hydration";
-import { useWishlist } from "@/hooks/use-wishlist";
-import { useCart } from "@/hooks/use-cart";
-import { useGrantApplication } from "@/hooks/use-grant-application";
-import { useNotifications } from "@/hooks/use-notifications";
-import { useBlogPosts } from "@/hooks/use-blog-posts";
+import { useWishlist } from "@/lib/wishlist/store";
+import { useCart } from "@/lib/cart/store";
+import { useGrantApplication } from "@/lib/grant-guide/store";
+import { useNotifications } from "@/lib/notifications/store";
+import { useBlogPosts } from "@/lib/blog/store";
 
 export function AppHydration() {
   return (

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Heart, Inbox, LayoutDashboard, ShoppingBag, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useNotifications } from "@/hooks/use-notifications";
+import { useNotifications } from "@/lib/notifications/store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [

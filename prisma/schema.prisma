@@ -68,6 +68,10 @@ model User {
   banned        Boolean?  @default(false)
   banReason     String?
   banExpires    DateTime?
+  // Customer profile fields (Better Auth additionalFields — see src/lib/auth.ts)
+  phone         String?
+  address       String?
+  postcode      String?
   sessions      Session[]
   accounts      Account[]
 

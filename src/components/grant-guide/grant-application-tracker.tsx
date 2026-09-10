@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { products } from "@/lib/products";
 import { commercialProducts } from "@/lib/commercial-products";
-import { accountCustomer } from "@/lib/account-mock";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import {
   useGrantApplication,
@@ -104,24 +104,29 @@ function formatDate(iso: string) {
 }
 
 function AccountDetailsSummary() {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  if (!user) return null;
+
+  const contact = [user.email, user.phone].filter(Boolean).join(" · ");
+  const location = [user.address, user.postcode].filter(Boolean).join(", ");
+
   return (
     <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-secondary px-4 py-3.5 text-sm">
       <div>
-        <p className="font-medium text-foreground">
-          {accountCustomer.firstName} {accountCustomer.lastName}
-        </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          {accountCustomer.email} · {accountCustomer.phone}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {accountCustomer.address}, {accountCustomer.postcode}
-        </p>
+        <p className="font-medium text-foreground">{user.name || user.email}</p>
+        {contact && (
+          <p className="mt-0.5 text-xs text-muted-foreground">{contact}</p>
+        )}
+        {location && (
+          <p className="text-xs text-muted-foreground">{location}</p>
+        )}
       </div>
       <Link
         href="/account/profile"
         className="shrink-0 text-xs font-medium text-primary hover:underline"
       >
-        Not you? Edit profile
+        Edit profile
       </Link>
     </div>
   );

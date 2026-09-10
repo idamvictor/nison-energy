@@ -14,6 +14,15 @@ export const getCurrentUser = cache(async () => {
   return session?.user ?? null;
 });
 
+export type SessionUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+
+// Any signed-in user (customer or staff). Used to guard /account.
+export const requireUser = cache(async () => {
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in?redirect=/account");
+  return user;
+});
+
 export const requireAdmin = cache(async () => {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in?redirect=/admin");

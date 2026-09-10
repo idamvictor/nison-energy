@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowRight,
   Heart,
@@ -17,9 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
-import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
-import { accountCustomer } from "@/lib/account-mock";
+import { authClient } from "@/lib/auth-client";
 import {
   Sheet,
   SheetContent,
@@ -53,19 +52,33 @@ const navLinks = [
   { href: "/ozev-grants", label: "OZEV Grants" },
 ];
 
+function initialsOf(name?: string | null, email?: string | null) {
+  const source = name?.trim() || email?.split("@")[0] || "";
+  const parts = source.split(/[\s._-]+/).filter(Boolean);
+  const letters = (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
+  return letters.toUpperCase() || "U";
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const isActive = (href: string) =>
     href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
   const cartCount = useCart((s) =>
     s.items.reduce((sum, item) => sum + item.quantity, 0)
   );
   const openCart = useCart((s) => s.openCart);
-  const isSignedIn = useAuth((s) => s.isSignedIn);
-  const signIn = useAuth((s) => s.signIn);
-  const signOut = useAuth((s) => s.signOut);
+  const { data: session } = authClient.useSession();
+  const isSignedIn = !!session;
+  const displayName = session?.user.name?.trim() || session?.user.email || "";
+  const initials = initialsOf(session?.user.name, session?.user.email);
   const unreadCount = useNotifications((s) => s.items.filter((item) => !item.read).length);
-  const initials = `${accountCustomer.firstName[0]}${accountCustomer.lastName[0]}`;
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 shadow-sm backdrop-blur-sm supports-backdrop-filter:bg-background/70">
@@ -142,9 +155,7 @@ export function SiteHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuGroup>
-                  <DropdownMenuLabel>
-                    Signed in as {accountCustomer.firstName} {accountCustomer.lastName}
-                  </DropdownMenuLabel>
+                  <DropdownMenuLabel>Signed in as {displayName}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {accountLinks.map((link) => (
                     <DropdownMenuItem key={link.href} render={<Link href={link.href} />}>
@@ -158,7 +169,7 @@ export function SiteHeader() {
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onClick={signOut}>
+                  <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
                     <LogOut />
                     Sign out
                   </DropdownMenuItem>
@@ -170,8 +181,7 @@ export function SiteHeader() {
               className="hidden gap-1.5 bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 sm:inline-flex"
               size="lg"
               nativeButton={false}
-              render={<Link href="/account" />}
-              onClick={signIn}
+              render={<Link href="/sign-in" />}
             >
               Get Started
               <ArrowRight className="size-4" />
@@ -215,8 +225,7 @@ export function SiteHeader() {
                 {isSignedIn ? (
                   <>
                     <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
-                      Signed in as {accountCustomer.firstName}{" "}
-                      {accountCustomer.lastName}
+                      Signed in as {displayName}
                     </p>
                     {accountLinks.map((link) => (
                       <Link
@@ -235,7 +244,7 @@ export function SiteHeader() {
                     ))}
                     <button
                       type="button"
-                      onClick={signOut}
+                      onClick={handleSignOut}
                       className="flex items-center gap-2.5 rounded-md px-2 py-2.5 text-left text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
                     >
                       <LogOut className="size-4" />
@@ -246,8 +255,7 @@ export function SiteHeader() {
                   <Button
                     className="bg-accent text-accent-foreground hover:bg-accent/90"
                     nativeButton={false}
-                    render={<Link href="/account" />}
-                    onClick={signIn}
+                    render={<Link href="/sign-in" />}
                   >
                     Get Started
                   </Button>

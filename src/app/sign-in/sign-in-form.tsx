@@ -19,7 +19,7 @@ function safeRedirect(target: string | null): string {
   if (target && target.startsWith("/") && !target.startsWith("//")) {
     return target;
   }
-  return "/admin";
+  return "/account";
 }
 
 type Mode = "sign-in" | "sign-up";
@@ -79,10 +79,12 @@ export function SignInForm() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>
-          {isSignUp ? "Create a staff account" : "Sign in to Ocunio Energy"}
+          {isSignUp ? "Create your account" : "Sign in to Ocunio Energy"}
         </CardTitle>
         <CardDescription>
-          Staff access only — your email must be on the allowlist.
+          {isSignUp
+            ? "Track your orders and OZEV grant application in one place."
+            : "Welcome back."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

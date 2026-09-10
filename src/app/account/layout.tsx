@@ -4,12 +4,19 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { AccountNav } from "@/components/account/account-nav";
+import { requireUser } from "@/lib/auth-dal";
 
 export const metadata: Metadata = {
   title: { template: "%s | My Account | Ocunio Energy", default: "My Account | Ocunio Energy" },
 };
 
-export default function AccountLayout({ children }: { children: React.ReactNode }) {
+export default async function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  await requireUser();
+
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />

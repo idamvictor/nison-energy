@@ -1,31 +1,28 @@
 import { betterAuth } from "better-auth";
-import { APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 
 import { prisma } from "@/lib/db";
 
-// Staff-only for now — both Google and email/password sign-up are gated to this
-// allowlist. Opening sign-up to the public is a later phase (drop this hook,
-// add email verification).
-const staffAllowlist = (process.env.STAFF_ALLOWLIST ?? "")
-  .split(",")
-  .map((entry) => entry.trim().toLowerCase())
-  .filter(Boolean);
-
-function assertAllowlisted(email: string) {
-  if (!staffAllowlist.includes(email.toLowerCase())) {
-    throw new APIError("FORBIDDEN", {
-      message: "This email is not authorised to create an account.",
-    });
-  }
-}
+// Extra profile fields stored on the Better Auth `user` row. Kept in sync with
+// the `User` model in prisma/schema.prisma and inferred on the client in
+// src/lib/auth-client.ts.
+export const userAdditionalFields = {
+  phone: { type: "string", required: false },
+  address: { type: "string", required: false },
+  postcode: { type: "string", required: false },
+} as const;
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  user: {
+    additionalFields: userAdditionalFields,
+  },
   emailAndPassword: {
     enabled: true,
+    // No email provider yet — accounts are usable immediately. Add
+    // `requireEmailVerification` + `sendResetPassword` when one is configured.
   },
   socialProviders: {
     google: {
@@ -36,17 +33,9 @@ export const auth = betterAuth({
       prompt: "select_account",
     },
   },
-  databaseHooks: {
-    user: {
-      create: {
-        before: async (user) => {
-          assertAllowlisted(user.email);
-          return { data: user };
-        },
-      },
-    },
-  },
   plugins: [
+    // New users get role "user" (customer). Staff are promoted to "admin" with
+    // scripts/set-role.ts; `/admin` + the leads API check for it.
     admin({ adminRoles: ["admin"], defaultRole: "user" }),
     // Keep last — lets Better Auth set cookies from Server Actions.
     nextCookies(),

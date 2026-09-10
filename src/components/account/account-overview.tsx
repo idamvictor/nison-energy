@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useNotifications } from "@/hooks/use-notifications";
-import { accountCustomer } from "@/lib/account-mock";
+import type { SessionUser } from "@/lib/auth-dal";
 
 const tiles = [
   { href: "/account/profile", label: "Profile", icon: User },
@@ -15,7 +15,7 @@ const tiles = [
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ] as const;
 
-export function AccountOverview() {
+export function AccountOverview({ user }: { user: SessionUser }) {
   const { items } = useWishlist();
   const unreadCount = useNotifications(
     (s) => s.items.filter((item) => !item.read).length
@@ -34,7 +34,7 @@ export function AccountOverview() {
           Welcome back
         </p>
         <h2 className="mt-1 text-2xl font-semibold tracking-[-0.02em] text-foreground">
-          {accountCustomer.firstName} {accountCustomer.lastName}
+          {user.name || user.email}
         </h2>
       </div>
 

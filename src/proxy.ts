@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 // Optimistic gate only — a valid cookie can still belong to a non-admin or an
-// expired session. The real check is `requireAdmin()` in the admin layout and
-// the leads route handler (src/lib/auth-dal.ts).
+// expired session. The real checks are `requireAdmin()` / `requireUser()` in the
+// admin + account layouts and the leads route handler (src/lib/auth-dal.ts).
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -17,5 +17,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/account/:path*"],
 };

@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductGallery } from "@/components/shared/product-gallery";
+import { ImageUploadField } from "@/components/shared/image-upload-field";
 import {
   accessoryPhases,
   accessoryStyles,
@@ -204,33 +205,34 @@ export function ProductForm({
             </div>
           )}
           <div className="flex flex-col gap-2.5">
-            <Field label="Card / thumbnail image URL">
-              <Input
-                required
+            <Field label="Card / thumbnail image">
+              <ImageUploadField
                 value={cardImage}
-                onChange={(e) => setCardImage(e.target.value)}
-                placeholder="https://…"
+                onChange={setCardImage}
+                label="Card image"
               />
             </Field>
             <p className="pt-1 text-xs font-medium text-muted-foreground">
               Gallery images (detail page)
             </p>
             {gallery.map((src, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Input
-                  value={src}
-                  onChange={(e) =>
-                    setGallery((prev) =>
-                      prev.map((s, i) => (i === index ? e.target.value : s)),
-                    )
-                  }
-                  placeholder={`Gallery image URL ${index + 1}`}
-                />
+              <div key={index} className="flex items-start gap-2">
+                <div className="flex-1">
+                  <ImageUploadField
+                    value={src}
+                    onChange={(url) =>
+                      setGallery((prev) =>
+                        prev.map((s, i) => (i === index ? url : s)),
+                      )
+                    }
+                    label={`Gallery image ${index + 1}`}
+                  />
+                </div>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                  className="mt-0.5 shrink-0 text-muted-foreground hover:text-destructive"
                   disabled={gallery.length === 1}
                   onClick={() =>
                     setGallery((prev) => prev.filter((_, i) => i !== index))

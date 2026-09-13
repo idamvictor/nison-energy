@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/admin/blog/rich-text-editor";
+import { ImageUploadField } from "@/components/shared/image-upload-field";
 import type { PostInput } from "@/lib/blog/types";
 import type { Post as PostRow } from "@/generated/prisma/client";
 import { savePost } from "@/lib/blog/actions";
@@ -153,12 +154,11 @@ export function BlogPostForm({ post }: { post: PostRow | null }) {
               onChange={(e) => setPublishedAt(e.target.value)}
             />
           </Field>
-          <Field label="Cover image URL">
-            <Input
-              required
+          <Field label="Cover image">
+            <ImageUploadField
               value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-              placeholder="https://…"
+              onChange={setCoverImage}
+              label="Cover image"
             />
           </Field>
           <Field label="Tags (comma separated)">

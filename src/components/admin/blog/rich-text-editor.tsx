@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -17,6 +18,7 @@ import {
   Link2,
   Link2Off,
   ImagePlus,
+  Loader2,
   Minus,
   Undo2,
   Redo2,
@@ -24,6 +26,12 @@ import {
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function ToolbarButton({
   onClick,
@@ -55,6 +63,66 @@ function ToolbarButton({
   );
 }
 
+function ImageMenuButton({ editor }: { editor: Editor }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const insertByUrl = () => {
+    const url = window.prompt("Image URL", "https://");
+    if (url) editor.chain().focus().setImage({ src: url }).run();
+  };
+
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/media", { method: "POST", body: formData });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (res.ok && data.url) {
+        editor.chain().focus().setImage({ src: data.url }).run();
+      } else {
+        window.alert(data.error ?? "Upload failed.");
+      }
+    } catch {
+      window.alert("Upload failed. Check your connection and try again.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label="Insert image"
+        disabled={uploading}
+        className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+      >
+        {uploading ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <ImagePlus className="size-4" />
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuItem onClick={insertByUrl}>Paste link…</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+          Upload image…
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+        hidden
+        onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+    </DropdownMenu>
+  );
+}
+
 function Toolbar({ editor }: { editor: Editor }) {
   const setLink = () => {
     const prev = editor.getAttributes("link").href as string | undefined;
@@ -65,11 +133,6 @@ function Toolbar({ editor }: { editor: Editor }) {
       return;
     }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
-  };
-
-  const addImage = () => {
-    const url = window.prompt("Image URL", "https://");
-    if (url) editor.chain().focus().setImage({ src: url }).run();
   };
 
   return (
@@ -153,9 +216,7 @@ function Toolbar({ editor }: { editor: Editor }) {
       >
         <Link2Off className="size-4" />
       </ToolbarButton>
-      <ToolbarButton label="Insert image by URL" onClick={addImage}>
-        <ImagePlus className="size-4" />
-      </ToolbarButton>
+      <ImageMenuButton editor={editor} />
       <ToolbarButton
         label="Horizontal rule"
         onClick={() => editor.chain().focus().setHorizontalRule().run()}

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { Heart, Inbox, LayoutDashboard, ShoppingBag, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useNotifications } from "@/lib/notifications/store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -16,9 +15,8 @@ const navLinks = [
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ];
 
-export function AccountNav() {
+export function AccountNav({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
-  const unreadCount = useNotifications((s) => s.items.filter((item) => !item.read).length);
   const isActive = (href: string) =>
     href === "/account" ? pathname === "/account" : pathname.startsWith(href);
 

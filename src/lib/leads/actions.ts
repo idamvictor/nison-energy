@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
 import { createLead } from "@/lib/leads/queries";
+import { createNotification } from "@/lib/notifications/queries";
 import {
   grantStatuses,
   installationStages,
@@ -70,7 +71,19 @@ export async function updateLeadStatus(
   if (!leadStatuses.includes(status as LeadStatus)) {
     return { ok: false, error: "Unknown status." };
   }
-  await prisma.lead.update({ where: { id }, data: { status: status as LeadStatus } });
+  const lead = await prisma.lead.update({
+    where: { id },
+    data: { status: status as LeadStatus },
+  });
+  if (status !== "New") {
+    await createNotification({
+      userId: lead.userId,
+      kind: "enquiry",
+      title: `Your enquiry is now ${status}`,
+      body: `Enquiry about ${lead.areaOfEnquiry}.`,
+      href: "/account/inbox",
+    });
+  }
   revalidateLead(id);
   return { ok: true };
 }
@@ -96,7 +109,7 @@ export async function updateLeadInstallation(
     return { ok: false, error: "Unknown grant status." };
   }
 
-  await prisma.lead.update({
+  const lead = await prisma.lead.update({
     where: { id },
     data: {
       installStage: stage,
@@ -105,6 +118,13 @@ export async function updateLeadInstallation(
       installDate: parseDate(input.installDate),
       engineer: input.engineer?.trim() || null,
     },
+  });
+  await createNotification({
+    userId: lead.userId,
+    kind: "enquiry",
+    title: `Installation update — ${stage}`,
+    body: grantStatus ? `OZEV grant: ${grantStatus}` : undefined,
+    href: "/account/inbox",
   });
   revalidateLead(id);
   return { ok: true };

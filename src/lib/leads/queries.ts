@@ -1,9 +1,14 @@
 import "server-only";
 
 import { cache } from "react";
+import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
+import { createNotification } from "@/lib/notifications/queries";
+import { sendEmail } from "@/lib/email/client";
+import { getStaffEmails } from "@/lib/email/recipients";
+import { customerEnquiryAck, staffLeadAlert } from "@/lib/email/templates";
 import type {
   AdminLead,
   GrantStatus,
@@ -148,7 +153,22 @@ export async function createLead(
       futureCommunications: bool(input.futureCommunications),
       userId: user?.id ?? null,
     },
-    select: { id: true },
+  });
+
+  await createNotification({
+    userId: lead.userId,
+    kind: "enquiry",
+    title: `Enquiry received — ${lead.areaOfEnquiry}`,
+    body: `We've got your ${lead.reasonForEnquiry} enquiry. The team will be in touch shortly.`,
+    href: "/account/inbox",
+  });
+
+  after(async () => {
+    const staff = await getStaffEmails();
+    const alert = staffLeadAlert(lead);
+    await sendEmail({ to: staff, replyTo: lead.email, ...alert });
+    const ack = customerEnquiryAck(lead);
+    await sendEmail({ to: lead.email, ...ack });
   });
 
   return { ok: true, id: lead.id };

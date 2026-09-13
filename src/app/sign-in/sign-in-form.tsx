@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { authClient } from "@/lib/auth/client";
@@ -28,6 +29,7 @@ export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = safeRedirect(searchParams.get("redirect"));
+  const justReset = searchParams.get("reset") === "1";
 
   const [mode, setMode] = useState<Mode>("sign-in");
   const [name, setName] = useState("");
@@ -140,6 +142,20 @@ export function SignInForm() {
             />
           </label>
 
+          {!isSignUp && (
+            <Link
+              href="/forgot-password"
+              className="-mt-1 self-start text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          )}
+
+          {justReset && !error && (
+            <p className="text-sm text-success">
+              Password updated — sign in with your new password.
+            </p>
+          )}
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <Button

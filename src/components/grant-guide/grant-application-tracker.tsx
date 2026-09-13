@@ -23,8 +23,6 @@ import {
   type GrantApplicationRecord,
   type GrantApplicationStatus,
 } from "@/lib/grant-guide/store";
-import { useNotifications } from "@/lib/notifications/store";
-
 export type ChargerOption = {
   id: string;
   name: string;
@@ -32,34 +30,6 @@ export type ChargerOption = {
   category: "Residential" | "Commercial";
 };
 
-const statusLabel: Record<GrantApplicationStatus, string> = {
-  approved: "Grant application approved",
-  rejected: "Grant application rejected",
-  waiting: "Grant application awaiting a decision",
-};
-
-function notifyGrantChanges(
-  prev: GrantApplicationRecord | null,
-  next: Omit<GrantApplicationRecord, "updatedAt">,
-  push: (kind: "order" | "grant", title: string, description?: string) => void
-) {
-  if (!prev) {
-    return;
-  }
-  if (!prev.hasApplied && next.hasApplied) {
-    push("grant", "Grant application marked as submitted");
-  }
-  if (prev.status !== next.status && next.status) {
-    push(
-      "grant",
-      statusLabel[next.status],
-      next.status === "rejected" ? next.rejectionReason || undefined : undefined
-    );
-  }
-  if (!prev.authCode && next.authCode) {
-    push("grant", "Your grant authorisation code has arrived", next.authCode);
-  }
-}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -227,7 +197,6 @@ export function GrantApplicationTracker({
 }) {
   const record = useGrantApplication((state) => state.record);
   const save = useGrantApplication((state) => state.save);
-  const pushNotification = useNotifications((state) => state.push);
   const [editing, setEditing] = useState(false);
 
   if (!record || editing) {
@@ -239,7 +208,6 @@ export function GrantApplicationTracker({
           chargerOptions={chargerOptions}
           onCancel={record ? () => setEditing(false) : undefined}
           onSave={(next) => {
-            notifyGrantChanges(record, next, pushNotification);
             save(next);
             setEditing(false);
           }}

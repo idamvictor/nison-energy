@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { AccountInbox } from "@/components/account/account-inbox";
 import { requireUser } from "@/lib/auth/session";
-import { getLeadsForUser } from "@/lib/leads/queries";
+import { getNotificationsForUser } from "@/lib/notifications/queries";
 import { getChargerOptions } from "@/lib/catalog/queries";
 
 export const metadata: Metadata = {
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const user = await requireUser();
-  const [leads, chargerRows] = await Promise.all([
-    getLeadsForUser(user.id, user.email),
+  const [notifications, chargerRows] = await Promise.all([
+    getNotificationsForUser(user.id),
     getChargerOptions(),
   ]);
   const chargerOptions = chargerRows.map((c) => ({
@@ -21,5 +21,7 @@ export default async function Page() {
     colour: c.colour,
     category: c.category as "Residential" | "Commercial",
   }));
-  return <AccountInbox leads={leads} chargerOptions={chargerOptions} />;
+  return (
+    <AccountInbox notifications={notifications} chargerOptions={chargerOptions} />
+  );
 }

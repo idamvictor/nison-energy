@@ -1,9 +1,17 @@
 import "server-only";
 
 import { cache } from "react";
+import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
+import { createNotification } from "@/lib/notifications/queries";
+import { sendEmail } from "@/lib/email/client";
+import { getStaffEmails } from "@/lib/email/recipients";
+import {
+  customerOrderConfirmation,
+  staffOrderAlert,
+} from "@/lib/email/templates";
 import type { OrderLineInput, OrderWithItems } from "@/lib/orders/types";
 
 export type {
@@ -108,7 +116,7 @@ export async function createOrder(
   for (let attempt = 0; attempt < 5; attempt++) {
     const reference = newReference();
     try {
-      await prisma.order.create({
+      const order = await prisma.order.create({
         data: {
           reference,
           firstName,
@@ -131,7 +139,30 @@ export async function createOrder(
             })),
           },
         },
+        include: { items: true },
       });
+
+      await createNotification({
+        userId: order.userId,
+        kind: "order",
+        title: `Order ${order.reference} placed`,
+        body: "We'll be in touch to confirm payment and book your installation.",
+        href: "/account/orders",
+      });
+
+      after(async () => {
+        await sendEmail({
+          to: order.email,
+          ...customerOrderConfirmation(order),
+        });
+        const staff = await getStaffEmails();
+        await sendEmail({
+          to: staff,
+          replyTo: order.email,
+          ...staffOrderAlert(order),
+        });
+      });
+
       return { ok: true, reference };
     } catch (err) {
       const code = (err as { code?: string })?.code;

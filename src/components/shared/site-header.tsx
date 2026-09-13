@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart/store";
-import { useNotifications } from "@/lib/notifications/store";
+import { useUnreadCount } from "@/lib/notifications/use-unread-count";
 import { authClient } from "@/lib/auth/client";
 import {
   Sheet,
@@ -74,7 +74,7 @@ export function SiteHeader() {
   const isSignedIn = !!session;
   const displayName = session?.user.name?.trim() || session?.user.email || "";
   const initials = initialsOf(session?.user.name, session?.user.email);
-  const unreadCount = useNotifications((s) => s.items.filter((item) => !item.read).length);
+  const unreadCount = useUnreadCount();
 
   async function handleSignOut() {
     await authClient.signOut();

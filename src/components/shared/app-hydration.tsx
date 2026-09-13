@@ -4,7 +4,6 @@ import { StoreHydration } from "@/components/shared/store-hydration";
 import { useWishlist } from "@/lib/wishlist/store";
 import { useCart } from "@/lib/cart/store";
 import { useGrantApplication } from "@/lib/grant-guide/store";
-import { useNotifications } from "@/lib/notifications/store";
 
 export function AppHydration() {
   return (
@@ -20,10 +19,6 @@ export function AppHydration() {
       <StoreHydration
         storageKey="ocunio-grant-application"
         rehydrate={() => useGrantApplication.persist.rehydrate()}
-      />
-      <StoreHydration
-        storageKey="ocunio-notifications"
-        rehydrate={() => useNotifications.persist.rehydrate()}
       />
     </>
   );

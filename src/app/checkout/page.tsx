@@ -35,7 +35,7 @@ import {
   type AddressSuggestion,
 } from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
-import { useNotifications } from "@/lib/notifications/store";
+import { COMPANY } from "@/lib/company";
 import { placeOrder } from "@/lib/orders/actions";
 import type { OrderLineInput } from "@/lib/orders/types";
 
@@ -88,7 +88,6 @@ const availableExtras: Extra[] = [
 export default function CheckoutPage() {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
-  const pushNotification = useNotifications((s) => s.push);
   const [submitted, setSubmitted] = useState(false);
   const [reference, setReference] = useState("");
   const [extraIds, setExtraIds] = useState<ExtraId[]>([]);
@@ -174,8 +173,8 @@ export default function CheckoutPage() {
               </p>
               <p className="max-w-sm text-sm text-muted-foreground">
                 A member of the team will be in touch to confirm payment and
-                book your installation. If it&apos;s urgent, call us on 033
-                0633 0252.
+                book your installation. If it&apos;s urgent, call us on{" "}
+                {COMPANY.phone}.
               </p>
               <Button nativeButton={false} render={<Link href="/" />}>
                 Back to home
@@ -241,11 +240,6 @@ export default function CheckoutPage() {
                     setReference(result.reference);
                     setSubmitted(true);
                     clear();
-                    pushNotification(
-                      "order",
-                      "Order placed",
-                      `Reference ${result.reference} — we'll be in touch to confirm installation.`,
-                    );
                   });
                 }}
               >

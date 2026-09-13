@@ -4,6 +4,8 @@ import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 
 import { prisma } from "@/lib/db";
+import { sendEmail } from "@/lib/email/client";
+import { passwordResetEmail } from "@/lib/email/templates";
 
 // Extra profile fields stored on the Better Auth `user` row. Kept in sync with
 // the `User` model in prisma/schema.prisma and inferred on the client in
@@ -21,8 +23,16 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    // No email provider yet — accounts are usable immediately. Add
-    // `requireEmailVerification` + `sendResetPassword` when one is configured.
+    // Password reset via Resend (src/lib/email). `url` points at
+    // /api/auth/reset-password/<token>?callbackURL=/reset-password. Email
+    // verification is intentionally not required (existing users would be
+    // locked out). `sendEmail` never throws.
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        ...passwordResetEmail({ name: user.name, url }),
+      });
+    },
   },
   socialProviders: {
     google: {

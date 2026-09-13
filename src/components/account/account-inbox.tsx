@@ -1,15 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { Inbox as InboxIcon, Mail, ShoppingCart, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Inbox as InboxIcon,
+  Mail,
+  ShoppingCart,
+  Zap,
+} from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -17,26 +23,20 @@ import {
   GrantApplicationTracker,
   type ChargerOption,
 } from "@/components/grant-guide/grant-application-tracker";
-import { useNotifications } from "@/lib/notifications/store";
-import type { AdminLead } from "@/lib/leads/types";
+import {
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/lib/notifications/actions";
+import type {
+  NotificationKind,
+  NotificationView,
+} from "@/lib/notifications/types";
 import { cn } from "@/lib/utils";
 
-type FeedKind = "order" | "grant" | "enquiry";
-
-type FeedItem = {
-  id: string;
-  kind: FeedKind;
-  title: string;
-  description?: string;
-  createdAt: string;
-  read: boolean;
-  lead?: AdminLead;
-};
-
-const kindIcon: Record<FeedKind, LucideIcon> = {
+const kindIcon: Record<NotificationKind, LucideIcon> = {
   order: ShoppingCart,
-  grant: Zap,
   enquiry: Mail,
+  system: InboxIcon,
 };
 
 function formatDate(iso: string) {
@@ -49,88 +49,77 @@ function formatDate(iso: string) {
   });
 }
 
-function buildEnquiryItems(leads: AdminLead[]): FeedItem[] {
-  return leads
-    .flatMap((lead): FeedItem[] => {
-      const items: FeedItem[] = [
-        {
-          id: `enquiry-${lead.id}`,
-          kind: "enquiry",
-          title: `Enquiry received — ${lead.areaOfEnquiry}`,
-          description: `Status: ${lead.status}`,
-          createdAt: lead.submittedAt,
-          read: true,
-          lead,
-        },
-      ];
+function refreshBadge() {
+  window.dispatchEvent(new Event("notifications:refresh"));
+}
 
-      if (lead.installation) {
-        const detail = [
-          lead.installation.grantStatus && `OZEV grant: ${lead.installation.grantStatus}`,
-          lead.installation.engineer && `Engineer: ${lead.installation.engineer}`,
-        ]
-          .filter(Boolean)
-          .join(" · ");
-
-        items.push({
-          id: `enquiry-${lead.id}-installation`,
-          kind: "enquiry",
-          title: `Installation update — ${lead.installation.stage}`,
-          description: detail || undefined,
-          createdAt:
-            lead.installation.installDate ??
-            lead.installation.surveyDate ??
-            lead.submittedAt,
-          read: true,
-          lead,
-        });
-      }
-
-      return items;
-    });
+function GrantCard({ chargerOptions }: { chargerOptions: ChargerOption[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Card
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") setOpen(true);
+        }}
+        className="cursor-pointer transition-colors hover:bg-secondary/60"
+      >
+        <CardContent className="flex items-center gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Zap className="size-4.5" />
+          </span>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">
+              Your OZEV grant application
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Track your application status and authorisation code.
+            </p>
+          </div>
+          <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+        </CardContent>
+      </Card>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>OZEV grant application</DialogTitle>
+          </DialogHeader>
+          <GrantApplicationTracker chargerOptions={chargerOptions} />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 export function AccountInbox({
-  leads,
+  notifications,
   chargerOptions,
 }: {
-  leads: AdminLead[];
+  notifications: NotificationView[];
   chargerOptions: ChargerOption[];
 }) {
-  const notifications = useNotifications((s) => s.items);
-  const markAllRead = useNotifications((s) => s.markAllRead);
-  const markRead = useNotifications((s) => s.markRead);
-  const [selected, setSelected] = useState<FeedItem | null>(null);
-
-  const feed: FeedItem[] = [
-    ...notifications,
-    ...buildEnquiryItems(leads),
-  ].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const [selected, setSelected] = useState<NotificationView | null>(null);
+  const [, startTransition] = useTransition();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  function openItem(item: FeedItem) {
+  function openItem(item: NotificationView) {
     setSelected(item);
-    if (item.kind !== "enquiry" && !item.read) {
-      markRead(item.id);
+    if (!item.read) {
+      startTransition(async () => {
+        await markNotificationRead(item.id);
+        refreshBadge();
+      });
     }
   }
 
-  if (feed.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border px-6 py-16 text-center">
-        <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
-          <InboxIcon className="size-5" />
-        </span>
-        <p className="font-heading text-lg font-semibold text-foreground">
-          Your inbox is empty
-        </p>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          Updates about your orders and your OZEV grant application will show
-          up here as they happen.
-        </p>
-      </div>
-    );
+  function handleMarkAll() {
+    startTransition(async () => {
+      await markAllNotificationsRead();
+      refreshBadge();
+    });
   }
 
   return (
@@ -141,126 +130,105 @@ export function AccountInbox({
             Inbox
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Everything that&apos;s happened with your orders and grant
-            application, in one place.
+            Updates about your orders and enquiries, in one place.
           </p>
         </div>
         {unreadCount > 0 && (
-          <Button variant="outline" size="sm" onClick={markAllRead}>
+          <Button variant="outline" size="sm" onClick={handleMarkAll}>
             Mark all as read
           </Button>
         )}
       </div>
 
       <div className="flex flex-col gap-3">
-        {feed.map((item) => {
-          const Icon = kindIcon[item.kind];
-          return (
-            <Card
-              key={item.id}
-              onClick={() => openItem(item)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") openItem(item);
-              }}
-              className="cursor-pointer transition-colors hover:bg-secondary/60"
-            >
-              <CardContent className="flex items-start gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Icon className="size-4.5" />
-                </span>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-medium text-foreground">
-                      {item.title}
-                    </p>
-                    {!item.read && (
-                      <span
-                        aria-label="Unread"
-                        className={cn("mt-1.5 size-2 shrink-0 rounded-full bg-accent")}
-                      />
+        <GrantCard chargerOptions={chargerOptions} />
+
+        {notifications.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border px-6 py-16 text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
+              <InboxIcon className="size-5" />
+            </span>
+            <p className="font-heading text-lg font-semibold text-foreground">
+              Nothing here yet
+            </p>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Updates about your orders and enquiries will show up here as they
+              happen.
+            </p>
+          </div>
+        ) : (
+          notifications.map((item) => {
+            const Icon = kindIcon[item.kind];
+            return (
+              <Card
+                key={item.id}
+                onClick={() => openItem(item)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") openItem(item);
+                }}
+                className="cursor-pointer transition-colors hover:bg-secondary/60"
+              >
+                <CardContent className="flex items-start gap-3">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Icon className="size-4.5" />
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm font-medium text-foreground">
+                        {item.title}
+                      </p>
+                      {!item.read && (
+                        <span
+                          aria-label="Unread"
+                          className={cn(
+                            "mt-1.5 size-2 shrink-0 rounded-full bg-accent",
+                          )}
+                        />
+                      )}
+                    </div>
+                    {item.body && (
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {item.body}
+                      </p>
                     )}
-                  </div>
-                  {item.description && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {item.description}
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {formatDate(item.createdAt)}
                     </p>
-                  )}
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {formatDate(item.createdAt)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
       </div>
 
-      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <Dialog
+        open={!!selected}
+        onOpenChange={(open) => !open && setSelected(null)}
+      >
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{selected?.title}</DialogTitle>
-            {selected?.kind !== "grant" && (
-              <DialogDescription>
-                {selected ? formatDate(selected.createdAt) : ""}
-              </DialogDescription>
-            )}
           </DialogHeader>
-
-          {selected?.kind === "grant" && (
-            <GrantApplicationTracker chargerOptions={chargerOptions} />
+          {selected?.body && (
+            <p className="text-sm text-foreground/80">{selected.body}</p>
           )}
-
-          {selected?.kind === "order" && selected.description && (
-            <p className="text-sm text-foreground/80">{selected.description}</p>
+          {selected && (
+            <p className="text-xs text-muted-foreground">
+              {formatDate(selected.createdAt)}
+            </p>
           )}
-
-          {selected?.kind === "enquiry" && selected.lead && (
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-              <div>
-                <dt className="text-xs text-muted-foreground">Area of enquiry</dt>
-                <dd className="text-foreground">{selected.lead.areaOfEnquiry}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Status</dt>
-                <dd className="text-foreground">{selected.lead.status}</dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-xs text-muted-foreground">Reason</dt>
-                <dd className="text-foreground">{selected.lead.reasonForEnquiry}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Phone</dt>
-                <dd className="text-foreground">{selected.lead.phone}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Submitted</dt>
-                <dd className="text-foreground">{formatDate(selected.lead.submittedAt)}</dd>
-              </div>
-              {selected.lead.installation && (
-                <>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Installation stage</dt>
-                    <dd className="text-foreground">{selected.lead.installation.stage}</dd>
-                  </div>
-                  {selected.lead.installation.grantStatus && (
-                    <div>
-                      <dt className="text-xs text-muted-foreground">OZEV grant</dt>
-                      <dd className="text-foreground">
-                        {selected.lead.installation.grantStatus}
-                      </dd>
-                    </div>
-                  )}
-                  {selected.lead.installation.engineer && (
-                    <div>
-                      <dt className="text-xs text-muted-foreground">Engineer</dt>
-                      <dd className="text-foreground">{selected.lead.installation.engineer}</dd>
-                    </div>
-                  )}
-                </>
-              )}
-            </dl>
+          {selected?.href && (
+            <Button
+              nativeButton={false}
+              render={<Link href={selected.href} />}
+              className="w-fit"
+            >
+              View
+              <ArrowRight />
+            </Button>
           )}
         </DialogContent>
       </Dialog>

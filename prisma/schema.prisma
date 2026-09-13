@@ -205,9 +205,26 @@ model User {
   accounts      Account[]
   leads         Lead[]
   orders        Order[]
+  notifications Notification[]
 
   @@unique([email])
   @@map("user")
+}
+
+/// An in-app notification shown in the customer's /account/inbox. Written
+/// server-side at real events (order placed, order/lead status changes).
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String // "order" | "enquiry" | "system"
+  title     String
+  body      String?
+  href      String? // deep link, e.g. /account/orders
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Session {

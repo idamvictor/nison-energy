@@ -1,16 +1,11 @@
-"use client";
-
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { OpenQuoteEmbed } from "@/components/shared/openquote-embed";
-import { useNotifications } from "@/lib/notifications/store";
 
 const OPENQUOTE_URL = "https://app.openquote.net/company/ocunioenergy?category=EV";
 
 export function VirtualSurveyView() {
-  const pushNotification = useNotifications((s) => s.push);
-
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
@@ -30,16 +25,7 @@ export function VirtualSurveyView() {
 
         <section className="bg-background">
           <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-            <OpenQuoteEmbed
-              src={OPENQUOTE_URL}
-              onComplete={() =>
-                pushNotification(
-                  "grant",
-                  "Virtual survey completed",
-                  "We'll confirm your installation slot and send a deposit invoice."
-                )
-              }
-            />
+            <OpenQuoteEmbed src={OPENQUOTE_URL} />
           </div>
         </section>
       </main>

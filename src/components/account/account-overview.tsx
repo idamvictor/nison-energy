@@ -6,7 +6,6 @@ import { ArrowRight, Heart, Inbox, ShoppingBag, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/lib/wishlist/store";
-import { useNotifications } from "@/lib/notifications/store";
 import type { SessionUser } from "@/lib/auth/session";
 
 const tiles = [
@@ -20,15 +19,14 @@ export function AccountOverview({
   user,
   orderCount,
   enquiryCount,
+  unreadCount,
 }: {
   user: SessionUser;
   orderCount: number;
   enquiryCount: number;
+  unreadCount: number;
 }) {
   const { items } = useWishlist();
-  const unreadCount = useNotifications(
-    (s) => s.items.filter((item) => !item.read).length
-  );
 
   const counts: Record<(typeof tiles)[number]["href"], string> = {
     "/account/profile": "Saved details",

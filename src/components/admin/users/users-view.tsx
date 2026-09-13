@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   MoreHorizontal,
   Search,
@@ -192,14 +193,17 @@ export function UsersView({
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate font-medium text-foreground">
+                          <Link
+                            href={`/admin/users/${user.id}`}
+                            className="truncate font-medium text-foreground hover:text-primary hover:underline"
+                          >
                             {user.name}
                             {isSelf && (
                               <span className="ml-1.5 text-xs font-normal text-muted-foreground">
                                 (you)
                               </span>
                             )}
-                          </p>
+                          </Link>
                           <p className="truncate text-xs text-muted-foreground">
                             {user.email}
                           </p>

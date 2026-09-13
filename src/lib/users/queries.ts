@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth/server";
-import type { AdminUserRow, Role } from "@/lib/users/types";
+import type { AdminUserDetail, AdminUserRow, Role } from "@/lib/users/types";
 
 type ListUser = {
   id: string;
@@ -68,6 +68,38 @@ export const getUsers = cache(
     return {
       users: (result.users as ListUser[]).map(toRow),
       total: result.total,
+    };
+  },
+);
+
+export const getUser = cache(
+  async (id: string): Promise<AdminUserDetail | null> => {
+    const row = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        sessions: { orderBy: { expiresAt: "desc" } },
+        accounts: { orderBy: { createdAt: "asc" } },
+      },
+    });
+    if (!row) return null;
+    return {
+      ...toRow(row),
+      phone: row.phone ?? null,
+      address: row.address ?? null,
+      postcode: row.postcode ?? null,
+      banExpires: row.banExpires ? row.banExpires.toISOString() : null,
+      sessions: row.sessions.map((s) => ({
+        id: s.id,
+        createdAt: s.createdAt.toISOString(),
+        expiresAt: s.expiresAt.toISOString(),
+        ipAddress: s.ipAddress ?? null,
+        userAgent: s.userAgent ?? null,
+      })),
+      accounts: row.accounts.map((a) => ({
+        id: a.id,
+        providerId: a.providerId,
+        createdAt: a.createdAt.toISOString(),
+      })),
     };
   },
 );

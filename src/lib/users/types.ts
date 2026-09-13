@@ -16,6 +16,29 @@ export type AdminUserRow = {
   createdAt: string; // ISO
 };
 
+export type UserSessionView = {
+  id: string;
+  createdAt: string; // ISO
+  expiresAt: string; // ISO
+  ipAddress: string | null;
+  userAgent: string | null;
+};
+
+export type UserAccountView = {
+  id: string;
+  providerId: string;
+  createdAt: string; // ISO
+};
+
+export type AdminUserDetail = AdminUserRow & {
+  phone: string | null;
+  address: string | null;
+  postcode: string | null;
+  banExpires: string | null; // ISO
+  sessions: UserSessionView[];
+  accounts: UserAccountView[];
+};
+
 export type UserActionResult =
   | { ok: true }
   | { ok: false; error: string };

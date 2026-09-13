@@ -45,6 +45,23 @@ export async function setUserRole(
   }
 }
 
+export async function removeUser(userId: string): Promise<UserActionResult> {
+  const me = await requireAdmin();
+  if (userId === me.id) {
+    return { ok: false, error: "You can't delete your own account." };
+  }
+  try {
+    await auth.api.removeUser({
+      headers: await headers(),
+      body: { userId },
+    });
+    revalidate();
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: errorMessage(err, "Couldn't delete the user.") };
+  }
+}
+
 export async function setUserBanned(
   userId: string,
   banned: boolean,

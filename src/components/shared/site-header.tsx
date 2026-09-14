@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { SiteSearch } from "@/components/shared/site-search";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart/store";
 import { useUnreadCount } from "@/lib/notifications/use-unread-count";
@@ -126,6 +127,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <SiteSearch />
+
           <Button
             variant="outline"
             size="icon"

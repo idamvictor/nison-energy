@@ -28,7 +28,7 @@ import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
 import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
-import { generateLandlordQuotePdf } from "@/lib/pdf/landlord-quote";
+import { generateLandlordQuoteDoc } from "@/lib/pdf/landlord-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
@@ -345,15 +345,16 @@ export default function ResidentialLandlordsGuidePage() {
 
                           const reference = `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
                           const vatDigits = String(data.get("vatNo") ?? "").trim();
+                          const businessName = String(data.get("business") ?? "");
+                          const contactName = String(data.get("contactName") ?? "");
                           const input = {
                             reference,
-                            contactName: String(data.get("contactName") ?? ""),
+                            contactName,
                             email: String(data.get("email") ?? ""),
                             phone: String(data.get("phone") ?? "") || undefined,
-                            businessName: String(data.get("business") ?? ""),
+                            businessName,
                             regNumber: String(data.get("regNo") ?? "") || undefined,
                             vatNumber: vatDigits ? `GB${vatDigits}` : undefined,
-                            billingAddress: String(data.get("billingAddress") ?? ""),
                             siteAddress: String(data.get("site") ?? ""),
                             installType,
                             chargepoints: chargepointsNum,
@@ -364,14 +365,15 @@ export default function ResidentialLandlordsGuidePage() {
                             works: workItems,
                           };
 
-                          const bytes = generateLandlordQuotePdf(input);
-                          const fileName = `ocunio-energy-landlord-quote-${reference}.pdf`;
+                          const html = generateLandlordQuoteDoc(input);
+                          const fileName = `OZEV-Landlord-Quote-${(businessName || contactName).replace(/\s+/g, "-")}.doc`;
+                          const blob = new Blob(["﻿", html], { type: "application/msword" });
 
                           const body = new FormData();
                           body.append("scheme", "ResidentialLandlords");
                           body.append("reference", reference);
                           body.append("fileName", fileName);
-                          body.append("file", new Blob([bytes], { type: "application/pdf" }), fileName);
+                          body.append("file", blob, fileName);
                           body.append("input", JSON.stringify(input));
 
                           const res = await fetch("/api/quotes", { method: "POST", body });
@@ -411,9 +413,6 @@ export default function ResidentialLandlordsGuidePage() {
                             </span>
                             <Input name="vatNo" className="rounded-l-none" placeholder="123456789" />
                           </div>
-                        </Field>
-                        <Field label="Billing address">
-                          <Input name="billingAddress" placeholder="e.g. 10 Commercial Way, London, NW10 7LR" />
                         </Field>
                         <Field label="Installation site address">
                           <Input name="site" placeholder="e.g. Woodgreen Court, Block A, Woodgreen Road, London" />

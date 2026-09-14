@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Check, MoreHorizontal, Search, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { QuoteStatusBadge } from "@/components/admin/quotes/quote-status-badge";
+import { reviewQuote } from "@/lib/quotes/actions";
 import {
   quoteSchemeLabels,
   quoteStatuses,
@@ -39,6 +56,10 @@ function formatDate(iso: string) {
 export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<QuoteStatus | "all">("all");
+  const [rejectTarget, setRejectTarget] = useState<AdminQuoteRow | null>(null);
+  const [reason, setReason] = useState("");
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -49,6 +70,27 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
     });
   }, [quotes, query, status]);
 
+  function approve(quote: AdminQuoteRow) {
+    setError(null);
+    startTransition(async () => {
+      const result = await reviewQuote(quote.id, "approve");
+      if (!result.ok) setError(result.error);
+    });
+  }
+
+  function confirmReject() {
+    if (!rejectTarget) return;
+    setError(null);
+    const target = rejectTarget;
+    const reasonText = reason;
+    startTransition(async () => {
+      const result = await reviewQuote(target.id, "reject", reasonText);
+      setRejectTarget(null);
+      setReason("");
+      if (!result.ok) setError(result.error);
+    });
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -57,6 +99,8 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
           {quotes.length} {quotes.length === 1 ? "quote" : "quotes"} generated from the OZEV guides.
         </p>
       </div>
+
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:w-72">
@@ -102,6 +146,7 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
                 <TableHead>Reference</TableHead>
                 <TableHead>Submitted</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -126,12 +171,72 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
                   <TableCell>
                     <QuoteStatusBadge status={quote.status} />
                   </TableCell>
+                  <TableCell>
+                    {quote.status === "Pending" && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={<Button variant="ghost" size="icon-sm" />}
+                        >
+                          <MoreHorizontal />
+                          <span className="sr-only">Quote actions</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            disabled={pending}
+                            onClick={() => approve(quote)}
+                          >
+                            <Check />
+                            Approve
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            disabled={pending}
+                            onClick={() => {
+                              setReason("");
+                              setRejectTarget(quote);
+                            }}
+                          >
+                            <X />
+                            Reject…
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       )}
+
+      <Dialog
+        open={rejectTarget !== null}
+        onOpenChange={(open) => !open && setRejectTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject {rejectTarget?.userName}&rsquo;s quote</DialogTitle>
+            <DialogDescription>
+              The customer will be notified, with this reason if you add one.
+            </DialogDescription>
+          </DialogHeader>
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+            Reason (optional)
+            <Input
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="e.g. figures don't match the site survey"
+            />
+          </label>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+            <Button variant="destructive" disabled={pending} onClick={confirmReject}>
+              {pending ? "Rejecting…" : "Reject quote"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

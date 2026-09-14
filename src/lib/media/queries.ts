@@ -9,8 +9,9 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
-// Prisma Object Store bucket (S3-compatible). Images only for now — see
-// image-upload-field.tsx for the client side of this.
+// Prisma Object Store bucket (S3-compatible). Two kinds of object: public
+// images under `uploads/` (see image-upload-field.tsx) and private
+// server-generated documents under `quotes/` (see src/lib/quotes/).
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -85,14 +86,16 @@ export async function uploadImage(file: File): Promise<
   return { ok: true, image: { key, url: `/api/media/${key}` } };
 }
 
-/**
- * Streams an object back out. Returns null for a missing key (caller 404s).
- */
-export async function getImageStream(key: string): Promise<{
+type ObjectStream = {
   body: ReadableStream;
   contentType: string;
   contentLength?: number;
-} | null> {
+};
+
+/**
+ * Streams an object back out. Returns null for a missing key (caller 404s).
+ */
+async function getObjectStream(key: string): Promise<ObjectStream | null> {
   try {
     const res = await s3().send(
       new GetObjectCommand({ Bucket: bucket(), Key: key }),
@@ -119,3 +122,31 @@ export async function getImageStream(key: string): Promise<{
     throw error;
   }
 }
+
+/** Public images (products, blog) — served unauthenticated by /api/media/[...key]. */
+export const getImageStream = getObjectStream;
+
+/**
+ * Uploads a server-generated document (e.g. a quote PDF) under `quotes/`, kept
+ * separate from `uploads/` (images) so the two are easy to tell apart in the
+ * bucket. Unlike images, these are never served through the public
+ * /api/media route — only through an ownership-checked route.
+ */
+export async function uploadDocument(
+  bytes: Uint8Array,
+  opts: { contentType: string; ext: string },
+): Promise<{ key: string }> {
+  const key = `quotes/${randomUUID()}.${opts.ext}`;
+  await s3().send(
+    new PutObjectCommand({
+      Bucket: bucket(),
+      Key: key,
+      Body: bytes,
+      ContentType: opts.contentType,
+    }),
+  );
+  return { key };
+}
+
+/** Private documents (quote PDFs) — served through an ownership-checked route. */
+export const getDocumentStream = getObjectStream;

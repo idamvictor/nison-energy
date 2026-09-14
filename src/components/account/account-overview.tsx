@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Heart, Inbox, ShoppingBag, User } from "lucide-react";
+import { ArrowRight, FileText, Heart, Inbox, ShoppingBag, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import type { SessionUser } from "@/lib/auth/session";
 const tiles = [
   { href: "/account/profile", label: "Profile", icon: User },
   { href: "/account/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/account/quotes", label: "Quotes", icon: FileText },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ] as const;
@@ -20,11 +21,13 @@ export function AccountOverview({
   orderCount,
   enquiryCount,
   unreadCount,
+  quoteCount,
 }: {
   user: SessionUser;
   orderCount: number;
   enquiryCount: number;
   unreadCount: number;
+  quoteCount: number;
 }) {
   const { items } = useWishlist();
 
@@ -34,6 +37,10 @@ export function AccountOverview({
       orderCount > 0
         ? `${orderCount} ${orderCount === 1 ? "order" : "orders"}`
         : "No orders yet",
+    "/account/quotes":
+      quoteCount > 0
+        ? `${quoteCount} ${quoteCount === 1 ? "quote" : "quotes"}`
+        : "No quotes yet",
     "/account/wishlist": `${items.length} saved`,
     "/account/inbox":
       unreadCount > 0

@@ -27,8 +27,10 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
+import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
 import { getGrantScheme } from "@/lib/content/grant-schemes";
 import { generateRentersQuotePdf } from "@/lib/pdf/renters-quote";
+import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
 const scheme = getGrantScheme("renters-and-flat-owners")!;
@@ -97,12 +99,16 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 export default function RentersFlatOwnersGuidePage() {
+  const { data: session } = authClient.useSession();
   const [answers, setAnswers] = useState<Answers>({ property: null, parking: null, ev: null });
   const [charger, setCharger] = useState(chargerModels[0]);
   const [chargerCost, setChargerCost] = useState("");
   const [labourCost, setLabourCost] = useState("");
   const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
   const [quoteResult, setQuoteResult] = useState<{ netPayable: number; grant: number } | null>(null);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const guideRef = useRef<HTMLDivElement>(null);
 
@@ -283,26 +289,64 @@ export default function RentersFlatOwnersGuidePage() {
 
                     <form
                       className="mt-4 flex flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
-                      onSubmit={(e) => {
+                      onSubmit={async (e) => {
                         e.preventDefault();
-                        const data = new FormData(e.currentTarget);
-                        const workItems = works
-                          .filter((w) => w.desc || w.cost)
-                          .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
+                        if (!session) {
+                          setShowSignIn(true);
+                          return;
+                        }
 
-                        generateRentersQuotePdf({
-                          reference: `NSE-${Date.now().toString().slice(-8)}`,
-                          fullName: String(data.get("fullName") ?? ""),
-                          email: String(data.get("email") ?? ""),
-                          phone: String(data.get("phone") ?? "") || undefined,
-                          address: String(data.get("address") ?? ""),
-                          chargerModel: charger,
-                          chargerUnitCost: chargerCostNum,
-                          labourCost: labourCostNum,
-                          works: workItems,
-                        });
+                        setSubmitError(null);
+                        setSubmitting(true);
+                        try {
+                          const data = new FormData(e.currentTarget);
+                          const workItems = works
+                            .filter((w) => w.desc || w.cost)
+                            .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
-                        setQuoteResult({ netPayable: previewNet, grant: previewGrant });
+                          const reference = `NSE-${Date.now().toString().slice(-8)}`;
+                          const input = {
+                            reference,
+                            fullName: String(data.get("fullName") ?? ""),
+                            email: String(data.get("email") ?? ""),
+                            phone: String(data.get("phone") ?? "") || undefined,
+                            address: String(data.get("address") ?? ""),
+                            chargerModel: charger,
+                            chargerUnitCost: chargerCostNum,
+                            labourCost: labourCostNum,
+                            works: workItems,
+                          };
+
+                          const bytes = generateRentersQuotePdf(input);
+                          const fileName = `ocunio-energy-renters-quote-${reference}.pdf`;
+
+                          const body = new FormData();
+                          body.append("scheme", "Renters");
+                          body.append("reference", reference);
+                          body.append("fileName", fileName);
+                          body.append("file", new Blob([bytes], { type: "application/pdf" }), fileName);
+                          body.append("input", JSON.stringify(input));
+
+                          const res = await fetch("/api/quotes", { method: "POST", body });
+                          const resData = (await res.json()) as { error?: string };
+                          if (!res.ok) {
+                            setSubmitError(resData.error ?? "Something went wrong. Please try again.");
+                            return;
+                          }
+
+                          // Self-serve — download immediately, same bytes we uploaded.
+                          const blob = new Blob([bytes], { type: "application/pdf" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = fileName;
+                          a.click();
+                          URL.revokeObjectURL(url);
+
+                          setQuoteResult({ netPayable: previewNet, grant: previewGrant });
+                        } finally {
+                          setSubmitting(false);
+                        }
                       }}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -388,19 +432,29 @@ export default function RentersFlatOwnersGuidePage() {
                         </div>
                       </div>
 
-                      <Button type="submit" className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90">
-                        Generate My Quote →
+                      <Button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                      >
+                        {submitting ? "Generating…" : "Generate My Quote →"}
                       </Button>
+
+                      {submitError && (
+                        <p className="text-sm font-medium text-destructive">{submitError}</p>
+                      )}
 
                       {quoteResult && (
                         <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80">
                           <Check className="mt-0.5 size-4 shrink-0 text-success" />
                           <p>
-                            Your pre-filled quote has downloaded as a PDF.
-                            Net payable: £{quoteResult.netPayable.toFixed(2)}{" "}
-                            (after a £{quoteResult.grant.toFixed(2)} grant
-                            deduction). Keep this copy — you&apos;ll need it
-                            for your grant application.
+                            Your pre-filled quote has downloaded as a PDF, and
+                            it&apos;s saved to your account — find it anytime
+                            under Account → Quotes. Net payable: £
+                            {quoteResult.netPayable.toFixed(2)} (after a £
+                            {quoteResult.grant.toFixed(2)} grant deduction).
+                            Keep this copy — you&apos;ll need it for your
+                            grant application.
                           </p>
                         </div>
                       )}
@@ -611,6 +665,7 @@ export default function RentersFlatOwnersGuidePage() {
         </div>
       </main>
       <SiteFooter />
+      <SignInRequiredDialog open={showSignIn} onOpenChange={setShowSignIn} />
     </div>
   );
 }

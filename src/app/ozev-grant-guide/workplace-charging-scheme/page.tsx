@@ -26,7 +26,9 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
+import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
 import { generateWorkplaceQuotePdf } from "@/lib/pdf/workplace-quote";
+import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
 const chargerModels = [
@@ -96,13 +98,17 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 const cardClass = "border border-foreground/18 shadow-md";
 
 export default function WorkplaceChargingSchemeGuidePage() {
+  const { data: session } = authClient.useSession();
   const [answers, setAnswers] = useState<Answers>({ orgType: null, parking: null, ownership: null });
   const [charger, setCharger] = useState(chargerModels[0]);
   const [sockets, setSockets] = useState("");
   const [chargerCost, setChargerCost] = useState("");
   const [labourCost, setLabourCost] = useState("");
   const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
-  const [quoteResult, setQuoteResult] = useState<{ netPayable: number; grant: number; sockets: number } | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const guideRef = useRef<HTMLDivElement>(null);
 
@@ -276,31 +282,61 @@ export default function WorkplaceChargingSchemeGuidePage() {
 
                     <form
                       className="mt-4 flex flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
-                      onSubmit={(e) => {
+                      onSubmit={async (e) => {
                         e.preventDefault();
-                        const data = new FormData(e.currentTarget);
-                        const workItems = works
-                          .filter((w) => w.desc || w.cost)
-                          .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
+                        if (!session) {
+                          setShowSignIn(true);
+                          return;
+                        }
 
-                        generateWorkplaceQuotePdf({
-                          reference: `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`,
-                          contactName: String(data.get("contactName") ?? ""),
-                          email: String(data.get("email") ?? ""),
-                          phone: String(data.get("phone") ?? "") || undefined,
-                          businessName: String(data.get("business") ?? ""),
-                          regNumber: String(data.get("regNo") ?? "") || undefined,
-                          vatNumber: String(data.get("vatNo") ?? "") || undefined,
-                          billingAddress: String(data.get("billingAddress") ?? ""),
-                          siteAddress: String(data.get("site") ?? ""),
-                          sockets: socketsNum,
-                          chargerModel: charger,
-                          chargerUnitCost: chargerCostNum,
-                          labourCost: labourCostNum,
-                          works: workItems,
-                        });
+                        setSubmitError(null);
+                        setSubmitting(true);
+                        try {
+                          const data = new FormData(e.currentTarget);
+                          const workItems = works
+                            .filter((w) => w.desc || w.cost)
+                            .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
-                        setQuoteResult({ netPayable: previewNet, grant: previewGrant, sockets: socketsNum });
+                          const reference = `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+                          const input = {
+                            reference,
+                            contactName: String(data.get("contactName") ?? ""),
+                            email: String(data.get("email") ?? ""),
+                            phone: String(data.get("phone") ?? "") || undefined,
+                            businessName: String(data.get("business") ?? ""),
+                            regNumber: String(data.get("regNo") ?? "") || undefined,
+                            vatNumber: String(data.get("vatNo") ?? "") || undefined,
+                            billingAddress: String(data.get("billingAddress") ?? ""),
+                            siteAddress: String(data.get("site") ?? ""),
+                            sockets: socketsNum,
+                            chargerModel: charger,
+                            chargerUnitCost: chargerCostNum,
+                            labourCost: labourCostNum,
+                            works: workItems,
+                          };
+
+                          const bytes = generateWorkplaceQuotePdf(input);
+                          const fileName = `ocunio-energy-workplace-quote-${reference}.pdf`;
+
+                          const body = new FormData();
+                          body.append("scheme", "WorkplaceChargingScheme");
+                          body.append("reference", reference);
+                          body.append("fileName", fileName);
+                          body.append("file", new Blob([bytes], { type: "application/pdf" }), fileName);
+                          body.append("input", JSON.stringify(input));
+
+                          const res = await fetch("/api/quotes", { method: "POST", body });
+                          const resData = (await res.json()) as { error?: string };
+                          if (!res.ok) {
+                            setSubmitError(resData.error ?? "Something went wrong. Please try again.");
+                            return;
+                          }
+
+                          // Needs admin review before it can be downloaded.
+                          setSubmitted(true);
+                        } finally {
+                          setSubmitting(false);
+                        }
                       }}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -412,21 +448,27 @@ export default function WorkplaceChargingSchemeGuidePage() {
                         </div>
                       </div>
 
-                      <Button type="submit" className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90">
-                        Generate My Quote →
+                      <Button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                      >
+                        {submitting ? "Submitting…" : "Generate My Quote →"}
                       </Button>
 
-                      {quoteResult && (
+                      {submitError && (
+                        <p className="text-sm font-medium text-destructive">{submitError}</p>
+                      )}
+
+                      {submitted && (
                         <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80">
                           <Check className="mt-0.5 size-4 shrink-0 text-success" />
                           <p>
-                            Your pre-filled quote has downloaded as a PDF.
-                            Net amount due: £{quoteResult.netPayable.toFixed(2)}{" "}
-                            (after a £{quoteResult.grant.toFixed(2)} voucher
-                            deduction across {quoteResult.sockets} socket
-                            {quoteResult.sockets === 1 ? "" : "s"}). Keep
-                            this copy — you&apos;ll need it for your voucher
-                            application.
+                            Your quote has been submitted for review.
+                            We&apos;ll check it over and notify you (in your
+                            account and by email) once it&apos;s approved and
+                            ready to download — find it anytime under
+                            Account → Quotes.
                           </p>
                         </div>
                       )}
@@ -592,6 +634,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
         </div>
       </main>
       <SiteFooter />
+      <SignInRequiredDialog open={showSignIn} onOpenChange={setShowSignIn} />
     </div>
   );
 }

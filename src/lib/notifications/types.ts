@@ -1,7 +1,7 @@
 // In-app notification view types — safe to import from client components.
 // Persisted shape is `Notification` in prisma/schema.prisma.
 
-export type NotificationKind = "order" | "enquiry" | "system";
+export type NotificationKind = "order" | "enquiry" | "quote" | "system";
 
 export type NotificationView = {
   id: string;

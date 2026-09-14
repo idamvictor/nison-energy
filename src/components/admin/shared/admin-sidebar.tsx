@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   ArrowUpRight,
   Cable,
+  FileText,
   Inbox,
   LayoutDashboard,
   Newspaper,
@@ -51,9 +52,11 @@ function navItemClass(active: boolean) {
 export function AdminSidebar({
   newLeadCount = 0,
   pendingOrderCount = 0,
+  pendingQuoteCount = 0,
 }: {
   newLeadCount?: number;
   pendingOrderCount?: number;
+  pendingQuoteCount?: number;
 }) {
   const pathname = usePathname();
   const isActive = (href: string) =>
@@ -180,6 +183,21 @@ export function AdminSidebar({
                 {pendingOrderCount > 0 && (
                   <SidebarMenuBadge className="text-primary">
                     {pendingOrderCount}
+                  </SidebarMenuBadge>
+                )}
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/admin/quotes")}
+                  className={navItemClass(isActive("/admin/quotes"))}
+                  render={<Link href="/admin/quotes" />}
+                >
+                  <FileText />
+                  <span>Quotes</span>
+                </SidebarMenuButton>
+                {pendingQuoteCount > 0 && (
+                  <SidebarMenuBadge className="text-primary">
+                    {pendingQuoteCount}
                   </SidebarMenuBadge>
                 )}
               </SidebarMenuItem>

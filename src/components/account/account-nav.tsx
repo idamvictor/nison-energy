@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, Inbox, LayoutDashboard, ShoppingBag, User } from "lucide-react";
+import { FileText, Heart, Inbox, LayoutDashboard, ShoppingBag, User } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/account", label: "Overview", icon: LayoutDashboard },
   { href: "/account/profile", label: "Profile", icon: User },
   { href: "/account/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/account/quotes", label: "Quotes", icon: FileText },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ];

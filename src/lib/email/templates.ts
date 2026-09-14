@@ -219,6 +219,50 @@ export function customerOrderStatusUpdate(order: OrderEmailInput): EmailContent 
   };
 }
 
+// ─── Quotes ──────────────────────────────────────────────────────────────
+
+export type QuoteEmailInput = {
+  reference: string;
+  schemeLabel: string;
+  rejectionReason?: string | null;
+};
+
+export function quoteApprovedEmail(quote: QuoteEmailInput): EmailContent {
+  return {
+    subject: `Your ${quote.schemeLabel} quote is ready`,
+    html: emailLayout({
+      heading: "Your quote has been approved",
+      bodyHtml: [
+        row(
+          `Your <strong>${esc(quote.schemeLabel)}</strong> quote (reference
+           <strong>${esc(quote.reference)}</strong>) has been reviewed and approved — you
+           can download it now.`,
+        ),
+      ].join(""),
+      cta: { label: "Download your quote", href: `${SITE_URL}/account/quotes` },
+    }),
+  };
+}
+
+export function quoteRejectedEmail(quote: QuoteEmailInput): EmailContent {
+  return {
+    subject: `Your ${quote.schemeLabel} quote needs changes`,
+    html: emailLayout({
+      heading: "Your quote needs a few changes",
+      bodyHtml: [
+        row(
+          `Your <strong>${esc(quote.schemeLabel)}</strong> quote (reference
+           <strong>${esc(quote.reference)}</strong>) couldn't be approved as submitted.`,
+        ),
+        quote.rejectionReason
+          ? row(`<strong>Reason:</strong> ${esc(quote.rejectionReason)}`)
+          : "",
+      ].join(""),
+      cta: { label: "View details", href: `${SITE_URL}/account/quotes` },
+    }),
+  };
+}
+
 // ─── Auth ────────────────────────────────────────────────────────────────
 
 export function passwordResetEmail(input: {

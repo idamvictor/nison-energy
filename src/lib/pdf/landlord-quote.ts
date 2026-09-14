@@ -44,7 +44,12 @@ function ensureSpace(doc: jsPDF, y: number, needed: number) {
   return y;
 }
 
-export function generateLandlordQuotePdf(input: LandlordQuotePdfInput) {
+/**
+ * Builds the quote PDF and returns its bytes (rather than triggering a
+ * browser download itself) — the caller decides whether to also save it
+ * client-side and/or upload it via POST /api/quotes.
+ */
+export function generateLandlordQuotePdf(input: LandlordQuotePdfInput): Uint8Array<ArrayBuffer> {
   const doc = new jsPDF();
   let y = MARGIN;
 
@@ -245,5 +250,5 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput) {
   rule();
   body("Nison Limited — Borehamwood, Hertfordshire · www.ocunioenergy.com", 9, "italic", MUTED);
 
-  doc.save(`ocunio-energy-landlord-quote-${input.reference}.pdf`);
+  return new Uint8Array(doc.output("arraybuffer") as ArrayBuffer);
 }

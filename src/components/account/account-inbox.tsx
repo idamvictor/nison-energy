@@ -5,10 +5,10 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
+  FileText,
   Inbox as InboxIcon,
   Mail,
   ShoppingCart,
-  Zap,
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,10 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  GrantApplicationTracker,
-  type ChargerOption,
-} from "@/components/grant-guide/grant-application-tracker";
 import {
   markAllNotificationsRead,
   markNotificationRead,
@@ -36,6 +32,7 @@ import { cn } from "@/lib/utils";
 const kindIcon: Record<NotificationKind, LucideIcon> = {
   order: ShoppingCart,
   enquiry: Mail,
+  quote: FileText,
   system: InboxIcon,
 };
 
@@ -53,52 +50,10 @@ function refreshBadge() {
   window.dispatchEvent(new Event("notifications:refresh"));
 }
 
-function GrantCard({ chargerOptions }: { chargerOptions: ChargerOption[] }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Card
-        role="button"
-        tabIndex={0}
-        onClick={() => setOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") setOpen(true);
-        }}
-        className="cursor-pointer transition-colors hover:bg-secondary/60"
-      >
-        <CardContent className="flex items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Zap className="size-4.5" />
-          </span>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">
-              Your OZEV grant application
-            </p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Track your application status and authorisation code.
-            </p>
-          </div>
-          <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-        </CardContent>
-      </Card>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>OZEV grant application</DialogTitle>
-          </DialogHeader>
-          <GrantApplicationTracker chargerOptions={chargerOptions} />
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
-
 export function AccountInbox({
   notifications,
-  chargerOptions,
 }: {
   notifications: NotificationView[];
-  chargerOptions: ChargerOption[];
 }) {
   const [selected, setSelected] = useState<NotificationView | null>(null);
   const [, startTransition] = useTransition();
@@ -141,8 +96,6 @@ export function AccountInbox({
       </div>
 
       <div className="flex flex-col gap-3">
-        <GrantCard chargerOptions={chargerOptions} />
-
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border px-6 py-16 text-center">
             <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">

@@ -38,7 +38,12 @@ function ensureSpace(doc: jsPDF, y: number, needed: number) {
   return y;
 }
 
-export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
+/**
+ * Builds the quote PDF and returns its bytes (rather than triggering a
+ * browser download itself) — the caller decides whether to also save it
+ * client-side and/or upload it via POST /api/quotes.
+ */
+export function generateRentersQuotePdf(input: RentersQuotePdfInput): Uint8Array<ArrayBuffer> {
   const doc = new jsPDF();
   let y = MARGIN;
 
@@ -232,5 +237,5 @@ export function generateRentersQuotePdf(input: RentersQuotePdfInput) {
   rule();
   body("Nison Limited — Borehamwood, Hertfordshire · www.ocunioenergy.com", 9, "italic", MUTED);
 
-  doc.save(`ocunio-energy-renters-quote-${input.reference}.pdf`);
+  return new Uint8Array(doc.output("arraybuffer") as ArrayBuffer);
 }

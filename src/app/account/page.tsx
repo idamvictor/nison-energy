@@ -5,15 +5,17 @@ import { requireUser } from "@/lib/auth/session";
 import { getLeadsForUser } from "@/lib/leads/queries";
 import { getOrdersForUser } from "@/lib/orders/queries";
 import { getUnreadCount } from "@/lib/notifications/queries";
+import { getQuotesForUser } from "@/lib/quotes/queries";
 
 export const metadata: Metadata = { title: "Overview" };
 
 export default async function AccountOverviewPage() {
   const user = await requireUser();
-  const [leads, orders, unreadCount] = await Promise.all([
+  const [leads, orders, unreadCount, quotes] = await Promise.all([
     getLeadsForUser(user.id, user.email),
     getOrdersForUser(user.id, user.email),
     getUnreadCount(user.id),
+    getQuotesForUser(user.id),
   ]);
   return (
     <AccountOverview
@@ -21,6 +23,7 @@ export default async function AccountOverviewPage() {
       orderCount={orders.length}
       enquiryCount={leads.length}
       unreadCount={unreadCount}
+      quoteCount={quotes.length}
     />
   );
 }

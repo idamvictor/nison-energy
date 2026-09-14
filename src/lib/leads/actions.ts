@@ -54,6 +54,61 @@ export async function submitEnquiry(
   return { status: "success" };
 }
 
+// ─── On-street parking grant intake (renters guide, "warn" outcome) ───────
+
+function field(data: FormData, key: string): string {
+  return String(data.get(key) ?? "").trim();
+}
+
+export async function submitOnStreetParkingIntake(
+  formData: FormData,
+): Promise<LeadActionResult> {
+  const landlordName = field(formData, "landlordName");
+  const landlordContact = field(formData, "landlordContact");
+  const permissionLabel: Record<string, string> = {
+    yes: "Yes, in hand",
+    progress: "In progress",
+    not_started: "Not started",
+    na: "Not applicable",
+  };
+
+  const notes = [
+    `Tenure: ${field(formData, "tenure") || "—"}`,
+    `Third-party permission needed: ${landlordName || landlordContact ? "Yes" : "Not stated"}`,
+    landlordName && `Landlord/freeholder/agent: ${landlordName}`,
+    landlordContact && `Their contact details: ${landlordContact}`,
+    `Written permission status: ${permissionLabel[field(formData, "permissionStatus")] ?? "Not applicable"}`,
+    `On-street parking location: ${field(formData, "parkingLocation") || "—"}`,
+    `Confirms no private off-street parking: Yes`,
+    `Vehicle: ${field(formData, "vehicleModel") || "—"}${field(formData, "vehicleReg") ? ` (${field(formData, "vehicleReg")})` : ""}`,
+    `Vehicle held as: ${field(formData, "vehicleOwnership") || "—"}`,
+    field(formData, "deliveryDate") && `Expected delivery date: ${field(formData, "deliveryDate")}`,
+    `Local highways authority: ${field(formData, "lhaName") || "—"}`,
+    `LHA consent status: ${field(formData, "lhaStatus") || "—"}`,
+    field(formData, "lhaReference") && `LHA consent reference: ${field(formData, "lhaReference")}`,
+    field(formData, "notes") && `Additional notes: ${field(formData, "notes")}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const result = await createLead({
+    firstName: field(formData, "firstName"),
+    lastName: field(formData, "lastName"),
+    phone: field(formData, "phone"),
+    email: field(formData, "email"),
+    areaOfEnquiry: "On-street parking grant",
+    reasonForEnquiry: "On-street parking grant intake",
+    additionalInformation: notes,
+    futureCommunications: true,
+  });
+
+  if (!result.ok) {
+    const firstError = Object.values(result.errors)[0];
+    return { ok: false, error: firstError ?? "Please check the form and try again." };
+  }
+  return { ok: true };
+}
+
 // ─── Admin CRM mutations ───────────────────────────────────────────────────
 
 function revalidateLead(id: string) {

@@ -11,6 +11,13 @@ export const runtime = "nodejs";
 // Handles file bytes — never statically cache this route.
 export const dynamic = "force-dynamic";
 
+// Renters generates a Word-compatible .doc; landlord/workplace generate a
+// real PDF. Anything else is rejected.
+const ALLOWED_QUOTE_TYPES: Record<string, string> = {
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+};
+
 export async function POST(request: Request) {
   // Any signed-in user may submit a quote — this is the sign-in gate itself
   // (the guide pages also check client-side, but this is the real guard).
@@ -55,10 +62,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid input payload." }, { status: 400 });
   }
 
+  const ext = ALLOWED_QUOTE_TYPES[file.type];
+  if (!ext) {
+    return NextResponse.json({ error: "Unsupported file type." }, { status: 400 });
+  }
+
   const bytes = new Uint8Array(await file.arrayBuffer());
   const { key } = await uploadDocument(bytes, {
-    contentType: "application/pdf",
-    ext: "pdf",
+    contentType: file.type,
+    ext,
   });
 
   const quote = await prisma.quoteDocument.create({

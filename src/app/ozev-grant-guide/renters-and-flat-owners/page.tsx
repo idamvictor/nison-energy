@@ -28,8 +28,9 @@ import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
 import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
+import { OnStreetIntakeForm } from "@/components/grant-guide/on-street-intake-form";
 import { getGrantScheme } from "@/lib/content/grant-schemes";
-import { generateRentersQuotePdf } from "@/lib/pdf/renters-quote";
+import { generateRentersQuoteDoc } from "@/lib/pdf/renters-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,9 @@ const chargerModels = [
   "Ocunio Home 7kW Untethered",
   "Ocunio Home 22kW Tethered (three-phase)",
 ];
+
+// Fixed standard installation rate — not user-editable.
+const LABOUR_COST = 450;
 
 type Answers = { property: string | null; parking: string | null; ev: string | null };
 
@@ -103,7 +107,6 @@ export default function RentersFlatOwnersGuidePage() {
   const [answers, setAnswers] = useState<Answers>({ property: null, parking: null, ev: null });
   const [charger, setCharger] = useState(chargerModels[0]);
   const [chargerCost, setChargerCost] = useState("");
-  const [labourCost, setLabourCost] = useState("");
   const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
   const [quoteResult, setQuoteResult] = useState<{ netPayable: number; grant: number } | null>(null);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -129,7 +132,7 @@ export default function RentersFlatOwnersGuidePage() {
   }
 
   const chargerCostNum = parseFloat(chargerCost) || 0;
-  const labourCostNum = parseFloat(labourCost) || 0;
+  const labourCostNum = LABOUR_COST;
   const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
   const previewSubtotal = chargerCostNum + labourCostNum + worksCostNum;
   const previewVat = previewSubtotal * 0.2;
@@ -305,26 +308,28 @@ export default function RentersFlatOwnersGuidePage() {
                             .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
                           const reference = `NSE-${Date.now().toString().slice(-8)}`;
+                          const fullName = String(data.get("fullName") ?? "");
                           const input = {
                             reference,
-                            fullName: String(data.get("fullName") ?? ""),
+                            fullName,
                             email: String(data.get("email") ?? ""),
                             phone: String(data.get("phone") ?? "") || undefined,
                             address: String(data.get("address") ?? ""),
                             chargerModel: charger,
-                            chargerUnitCost: chargerCostNum,
+                            chargerCost: chargerCostNum,
                             labourCost: labourCostNum,
                             works: workItems,
                           };
 
-                          const bytes = generateRentersQuotePdf(input);
-                          const fileName = `ocunio-energy-renters-quote-${reference}.pdf`;
+                          const html = generateRentersQuoteDoc(input);
+                          const fileName = `OZEV-Quote-${fullName.replace(/\s+/g, "-")}.doc`;
+                          const blob = new Blob(["﻿", html], { type: "application/msword" });
 
                           const body = new FormData();
                           body.append("scheme", "Renters");
                           body.append("reference", reference);
                           body.append("fileName", fileName);
-                          body.append("file", new Blob([bytes], { type: "application/pdf" }), fileName);
+                          body.append("file", blob, fileName);
                           body.append("input", JSON.stringify(input));
 
                           const res = await fetch("/api/quotes", { method: "POST", body });
@@ -334,8 +339,7 @@ export default function RentersFlatOwnersGuidePage() {
                             return;
                           }
 
-                          // Self-serve — download immediately, same bytes we uploaded.
-                          const blob = new Blob([bytes], { type: "application/pdf" });
+                          // Self-serve — download immediately, same blob we uploaded.
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement("a");
                           a.href = url;
@@ -389,15 +393,14 @@ export default function RentersFlatOwnersGuidePage() {
                           />
                         </Field>
                         <Field
-                          label="Standard installation labour cost (£, ex VAT)"
-                          hint="Also ex VAT — VAT is added for you in the summary below."
+                          label="Standard installation labour cost"
+                          hint={`Fixed at £${LABOUR_COST.toFixed(2)} ex VAT (£${(LABOUR_COST * 1.2).toFixed(2)} inc VAT) — our standard installation rate.`}
                         >
                           <Input
                             type="text"
-                            inputMode="decimal"
-                            placeholder="e.g. 250"
-                            value={labourCost}
-                            onChange={(e) => setLabourCost(e.target.value)}
+                            readOnly
+                            value={`£${LABOUR_COST.toFixed(2)}`}
+                            className="cursor-not-allowed opacity-75"
                           />
                         </Field>
                       </div>
@@ -448,13 +451,13 @@ export default function RentersFlatOwnersGuidePage() {
                         <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80">
                           <Check className="mt-0.5 size-4 shrink-0 text-success" />
                           <p>
-                            Your pre-filled quote has downloaded as a PDF, and
-                            it&apos;s saved to your account — find it anytime
-                            under Account → Quotes. Net payable: £
-                            {quoteResult.netPayable.toFixed(2)} (after a £
-                            {quoteResult.grant.toFixed(2)} grant deduction).
-                            Keep this copy — you&apos;ll need it for your
-                            grant application.
+                            Your pre-filled quote has downloaded as a Word
+                            document, and it&apos;s saved to your account —
+                            find it anytime under Account → Quotes. Net
+                            payable: £{quoteResult.netPayable.toFixed(2)}{" "}
+                            (after a £{quoteResult.grant.toFixed(2)} grant
+                            deduction). Keep this copy — you&apos;ll need it
+                            for your grant application.
                           </p>
                         </div>
                       )}
@@ -660,6 +663,24 @@ export default function RentersFlatOwnersGuidePage() {
                 are being pre-approved, which is currently slower than usual
                 due to high demand.
               </p>
+            </div>
+          )}
+
+          {outcome === "warn" && (
+            <div className="mt-14 scroll-mt-24">
+              <Reveal>
+                <h2 className="mt-2 mb-5 font-heading text-lg font-semibold text-foreground">
+                  <span className="mr-2 text-primary">↳</span>
+                  On-Street Parking Grant — Customer Intake
+                </h2>
+                <p className="mb-5 text-sm text-muted-foreground">
+                  Tell us about your property, vehicle and parking so we can confirm
+                  eligibility and get your quote moving. Contacting your local highways
+                  authority for cross-pavement consent is your responsibility as the
+                  applicant — each authority has its own rules.
+                </p>
+                <OnStreetIntakeForm />
+              </Reveal>
             </div>
           )}
         </div>

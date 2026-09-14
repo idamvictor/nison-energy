@@ -101,6 +101,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
   const { data: session } = authClient.useSession();
   const [answers, setAnswers] = useState<Answers>({ orgType: null, parking: null, ownership: null });
   const [charger, setCharger] = useState(chargerModels[0]);
+  const [chargepoints, setChargepoints] = useState("");
   const [sockets, setSockets] = useState("");
   const [chargerCost, setChargerCost] = useState("");
   const [labourCost, setLabourCost] = useState("");
@@ -133,11 +134,12 @@ export default function WorkplaceChargingSchemeGuidePage() {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
+  const chargepointsNum = Math.max(parseInt(chargepoints, 10) || 1, 1);
   const socketsNum = Math.min(parseInt(sockets, 10) || 1, 40);
   const chargerCostNum = parseFloat(chargerCost) || 0;
   const labourCostNum = parseFloat(labourCost) || 0;
   const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
-  const previewSubtotal = (chargerCostNum + labourCostNum) * socketsNum + worksCostNum;
+  const previewSubtotal = chargerCostNum + labourCostNum + worksCostNum;
   const previewVat = previewSubtotal * 0.2;
   const previewTotal = previewSubtotal + previewVat;
   const previewGrantCap = Math.min(500 * socketsNum, 20000);
@@ -298,6 +300,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                             .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
                           const reference = `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+                          const vatDigits = String(data.get("vatNo") ?? "").trim();
                           const input = {
                             reference,
                             contactName: String(data.get("contactName") ?? ""),
@@ -305,12 +308,13 @@ export default function WorkplaceChargingSchemeGuidePage() {
                             phone: String(data.get("phone") ?? "") || undefined,
                             businessName: String(data.get("business") ?? ""),
                             regNumber: String(data.get("regNo") ?? "") || undefined,
-                            vatNumber: String(data.get("vatNo") ?? "") || undefined,
+                            vatNumber: vatDigits ? `GB${vatDigits}` : undefined,
                             billingAddress: String(data.get("billingAddress") ?? ""),
                             siteAddress: String(data.get("site") ?? ""),
+                            chargepoints: chargepointsNum,
                             sockets: socketsNum,
                             chargerModel: charger,
-                            chargerUnitCost: chargerCostNum,
+                            chargerCost: chargerCostNum,
                             labourCost: labourCostNum,
                             works: workItems,
                           };
@@ -356,7 +360,12 @@ export default function WorkplaceChargingSchemeGuidePage() {
                           <Input name="regNo" placeholder="e.g. 12345678" />
                         </Field>
                         <Field label="VAT No.">
-                          <Input name="vatNo" placeholder="e.g. GB123456789" />
+                          <div className="flex items-stretch">
+                            <span className="flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-2.5 text-sm text-muted-foreground">
+                              GB
+                            </span>
+                            <Input name="vatNo" className="rounded-l-none" placeholder="123456789" />
+                          </div>
                         </Field>
                         <Field label="Billing address">
                           <Input name="billingAddress" placeholder="e.g. 10 Commercial Way, London, NW10 7LR" />
@@ -365,6 +374,15 @@ export default function WorkplaceChargingSchemeGuidePage() {
                           <Input
                             name="site"
                             placeholder="e.g. Woodgreen Logistics, Site 2, Industrial Estate, Watford"
+                          />
+                        </Field>
+                        <Field label="Number of chargepoints">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="e.g. 1"
+                            value={chargepoints}
+                            onChange={(e) => setChargepoints(e.target.value)}
                           />
                         </Field>
                         <Field label="Number of sockets requested (max 40)">
@@ -391,19 +409,19 @@ export default function WorkplaceChargingSchemeGuidePage() {
                           </Select>
                         </Field>
                         <Field
-                          label="EV chargepoint unit cost per socket (£, ex VAT)"
-                          hint="Enter the cost before VAT — e.g. £500 ex VAT becomes £600 inc VAT automatically."
+                          label="EV chargepoint cost — total for this order (£, ex VAT)"
+                          hint="The total you're paying for the chargepoint hardware, whatever the socket count."
                         >
                           <Input
                             type="text"
                             inputMode="decimal"
-                            placeholder="e.g. 399"
+                            placeholder="e.g. 850"
                             value={chargerCost}
                             onChange={(e) => setChargerCost(e.target.value)}
                           />
                         </Field>
                         <Field
-                          label="Standard installation labour cost per socket (£, ex VAT)"
+                          label="Standard installation cost (£, ex VAT)"
                           hint="Also ex VAT — VAT is added for you in the summary below."
                         >
                           <Input

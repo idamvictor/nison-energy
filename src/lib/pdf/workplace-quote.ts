@@ -27,9 +27,10 @@ export type WorkplaceQuotePdfInput = {
   vatNumber?: string;
   billingAddress: string;
   siteAddress: string;
+  chargepoints: number;
   sockets: number;
   chargerModel: string;
-  chargerUnitCost: number;
+  chargerCost: number;
   labourCost: number;
   works: WorkItem[];
 };
@@ -84,7 +85,7 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8A
   y += 10;
 
   body(
-    "trading as Ocunio Energy · OZEV-Approved Installer, No. 13528 · VAT No. 495472057 · Company Reg. No. 16371062",
+    "trading as Ocunio Energy · OZEV-Approved Installer, No. 13528 · VAT No. GB495472057 · Company Reg. No. 16371062",
     9,
     "normal",
     MUTED
@@ -101,7 +102,7 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8A
   body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
   body("OZEV Installer Number: 13528");
   body("Company Registration No.: 16371062");
-  body("VAT No.: 495472057");
+  body("VAT No.: GB495472057");
   body("Installer Contact: info@ocunioenergy.com · 07525 567054");
   y += 1;
 
@@ -135,8 +136,9 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8A
 
   heading("Itemised Breakdown of Works & Hardware");
 
-  const chargerTotal = input.chargerUnitCost * input.sockets;
-  const labourTotal = input.labourCost * input.sockets;
+  const chargerTotal = input.chargerCost;
+  const chargerUnitPrice = input.chargepoints > 0 ? chargerTotal / input.chargepoints : chargerTotal;
+  const labourTotal = input.labourCost;
   const worksTotal = input.works.reduce((sum, w) => sum + w.cost, 0);
   const subtotal = chargerTotal + labourTotal + worksTotal;
   const vat = subtotal * 0.2;
@@ -150,18 +152,18 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8A
     {
       cells: [
         String(itemNum++),
-        `EV Chargepoint Unit (${input.chargerModel})`,
-        String(input.sockets),
-        currency.format(input.chargerUnitCost),
+        `EV Chargepoint Unit(s) (${input.chargerModel}, ${input.sockets} socket(s) total)`,
+        String(input.chargepoints),
+        currency.format(chargerUnitPrice),
         currency.format(chargerTotal),
       ],
     },
     {
       cells: [
         String(itemNum++),
-        "Installation Labour, Commissioning & Testing",
-        String(input.sockets),
-        currency.format(input.labourCost),
+        "Installation, Commissioning & Testing",
+        "1",
+        currency.format(labourTotal),
         currency.format(labourTotal),
       ],
       shaded: true,
@@ -238,7 +240,7 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8A
   heading("Notes");
   const notes = [
     "This quote must be dated and itemised to be accepted as part of your WCS voucher application.",
-    "You apply directly for your voucher online; Ocunio arranges the site survey and, once installed, claims the grant on your behalf.",
+    "You apply directly for your voucher online; Nison Limited arranges the site survey and, once installed, claims the grant on your behalf.",
     "You'll need a company registration number, VAT number, or business rates bill (or equivalent for charities, NHS surgeries and schools).",
     "Home workers can also apply, provided the address is registered as a place of business and an eligible dual-use chargepoint is installed.",
     "This grant isn't available if installing a chargepoint here is a mandatory requirement (e.g. Part S building regulations or a planning condition).",

@@ -101,6 +101,7 @@ export default function ResidentialLandlordsGuidePage() {
   const [answers, setAnswers] = useState<Answers>({ installType: null, parking: null, registered: null });
   const [charger, setCharger] = useState(chargerModels[0]);
   const [installType, setInstallType] = useState("Single Tenancy Rental");
+  const [chargepoints, setChargepoints] = useState("");
   const [sockets, setSockets] = useState("");
   const [chargerCost, setChargerCost] = useState("");
   const [labourCost, setLabourCost] = useState("");
@@ -133,11 +134,12 @@ export default function ResidentialLandlordsGuidePage() {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
+  const chargepointsNum = Math.max(parseInt(chargepoints, 10) || 1, 1);
   const socketsNum = parseInt(sockets, 10) || 1;
   const chargerCostNum = parseFloat(chargerCost) || 0;
   const labourCostNum = parseFloat(labourCost) || 0;
   const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
-  const previewSubtotal = (chargerCostNum + labourCostNum) * socketsNum + worksCostNum;
+  const previewSubtotal = chargerCostNum + labourCostNum + worksCostNum;
   const previewVat = previewSubtotal * 0.2;
   const previewTotal = previewSubtotal + previewVat;
   const previewGrantCap = 500 * socketsNum;
@@ -342,6 +344,7 @@ export default function ResidentialLandlordsGuidePage() {
                             .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
                           const reference = `NSE-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+                          const vatDigits = String(data.get("vatNo") ?? "").trim();
                           const input = {
                             reference,
                             contactName: String(data.get("contactName") ?? ""),
@@ -349,13 +352,14 @@ export default function ResidentialLandlordsGuidePage() {
                             phone: String(data.get("phone") ?? "") || undefined,
                             businessName: String(data.get("business") ?? ""),
                             regNumber: String(data.get("regNo") ?? "") || undefined,
-                            vatNumber: String(data.get("vatNo") ?? "") || undefined,
+                            vatNumber: vatDigits ? `GB${vatDigits}` : undefined,
                             billingAddress: String(data.get("billingAddress") ?? ""),
                             siteAddress: String(data.get("site") ?? ""),
                             installType,
+                            chargepoints: chargepointsNum,
                             sockets: socketsNum,
                             chargerModel: charger,
-                            chargerUnitCost: chargerCostNum,
+                            chargerCost: chargerCostNum,
                             labourCost: labourCostNum,
                             works: workItems,
                           };
@@ -401,7 +405,12 @@ export default function ResidentialLandlordsGuidePage() {
                           <Input name="regNo" placeholder="e.g. 12345678" />
                         </Field>
                         <Field label="VAT No.">
-                          <Input name="vatNo" placeholder="e.g. GB123456789" />
+                          <div className="flex items-stretch">
+                            <span className="flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-2.5 text-sm text-muted-foreground">
+                              GB
+                            </span>
+                            <Input name="vatNo" className="rounded-l-none" placeholder="123456789" />
+                          </div>
                         </Field>
                         <Field label="Billing address">
                           <Input name="billingAddress" placeholder="e.g. 10 Commercial Way, London, NW10 7LR" />
@@ -419,6 +428,15 @@ export default function ResidentialLandlordsGuidePage() {
                               <SelectItem value="Multi-Unit Block">Multi-Unit / Block of Flats</SelectItem>
                             </SelectContent>
                           </Select>
+                        </Field>
+                        <Field label="Number of chargepoints">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="e.g. 1"
+                            value={chargepoints}
+                            onChange={(e) => setChargepoints(e.target.value)}
+                          />
                         </Field>
                         <Field label="Number of sockets requested">
                           <Input
@@ -444,19 +462,19 @@ export default function ResidentialLandlordsGuidePage() {
                           </Select>
                         </Field>
                         <Field
-                          label="EV chargepoint unit cost per socket (£, ex VAT)"
-                          hint="Enter the cost before VAT — e.g. £500 ex VAT becomes £600 inc VAT automatically."
+                          label="EV chargepoint cost — total for this order (£, ex VAT)"
+                          hint="The total you're paying for the chargepoint hardware, whatever the socket count."
                         >
                           <Input
                             type="text"
                             inputMode="decimal"
-                            placeholder="e.g. 399"
+                            placeholder="e.g. 850"
                             value={chargerCost}
                             onChange={(e) => setChargerCost(e.target.value)}
                           />
                         </Field>
                         <Field
-                          label="Standard installation labour cost per socket (£, ex VAT)"
+                          label="Standard installation cost (£, ex VAT)"
                           hint="Also ex VAT — VAT is added for you in the summary below."
                         >
                           <Input
@@ -613,7 +631,7 @@ export default function ResidentialLandlordsGuidePage() {
                       exactly what to expect before you start.
                     </p>
                     <a
-                      href="/documents/ozev-grant-application-guide.pdf"
+                      href="/documents/ozev-application-guide-residential-landlords.pdf"
                       download
                       className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >

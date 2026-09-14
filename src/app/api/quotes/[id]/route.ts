@@ -41,10 +41,16 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  // Browsers can render a PDF inline; a .doc just downloads either way, so
+  // there's no reason not to let it open in a new tab too — but Word docs
+  // specifically benefit from "attachment" so the browser doesn't try (and
+  // fail) to render it itself.
+  const disposition = object.contentType === "application/pdf" ? "inline" : "attachment";
+
   return new Response(object.body, {
     headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${quote.fileName}"`,
+      "Content-Type": object.contentType,
+      "Content-Disposition": `${disposition}; filename="${quote.fileName}"`,
       // Access is re-checked on every request — never cache this response.
       "Cache-Control": "private, no-store",
     },

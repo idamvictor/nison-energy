@@ -28,9 +28,10 @@ export type LandlordQuotePdfInput = {
   billingAddress: string;
   siteAddress: string;
   installType: string;
+  chargepoints: number;
   sockets: number;
   chargerModel: string;
-  chargerUnitCost: number;
+  chargerCost: number;
   labourCost: number;
   works: WorkItem[];
 };
@@ -85,7 +86,7 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput): Uint8Arr
   y += 10;
 
   body(
-    "trading as Ocunio Energy · OZEV-Approved Installer, No. 13528 · VAT No. 495472057 · Company Reg. No. 16371062",
+    "trading as Ocunio Energy · OZEV-Approved Installer, No. 13528 · VAT No. GB495472057 · Company Reg. No. 16371062",
     9,
     "normal",
     MUTED
@@ -102,7 +103,7 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput): Uint8Arr
   body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
   body("OZEV Installer Number: 13528");
   body("Company Registration No.: 16371062");
-  body("VAT No.: 495472057");
+  body("VAT No.: GB495472057");
   body("Installer Contact: info@ocunioenergy.com · 07525 567054");
   y += 1;
 
@@ -137,8 +138,9 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput): Uint8Arr
 
   heading("Itemised Breakdown of Works & Hardware");
 
-  const chargerTotal = input.chargerUnitCost * input.sockets;
-  const labourTotal = input.labourCost * input.sockets;
+  const chargerTotal = input.chargerCost;
+  const chargerUnitPrice = input.chargepoints > 0 ? chargerTotal / input.chargepoints : chargerTotal;
+  const labourTotal = input.labourCost;
   const worksTotal = input.works.reduce((sum, w) => sum + w.cost, 0);
   const subtotal = chargerTotal + labourTotal + worksTotal;
   const vat = subtotal * 0.2;
@@ -152,18 +154,18 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput): Uint8Arr
     {
       cells: [
         String(itemNum++),
-        `EV Chargepoint Unit (${input.chargerModel})`,
-        String(input.sockets),
-        currency.format(input.chargerUnitCost),
+        `EV Chargepoint Unit(s) (${input.chargerModel}, ${input.sockets} socket(s) total)`,
+        String(input.chargepoints),
+        currency.format(chargerUnitPrice),
         currency.format(chargerTotal),
       ],
     },
     {
       cells: [
         String(itemNum++),
-        "Installation Labour, Commissioning & Testing",
-        String(input.sockets),
-        currency.format(input.labourCost),
+        "Installation, Commissioning & Testing",
+        "1",
+        currency.format(labourTotal),
         currency.format(labourTotal),
       ],
       shaded: true,
@@ -237,7 +239,7 @@ export function generateLandlordQuotePdf(input: LandlordQuotePdfInput): Uint8Arr
   heading("Notes");
   const notes = [
     "This quote must be dated and itemised per socket to be accepted as part of your OZEV grant application.",
-    "You apply directly via the GOV.UK Find a Grant platform; Ocunio reviews your documents on request and handles the grant claim after installation.",
+    "You apply directly via the GOV.UK Find a Grant platform; Nison Limited reviews your documents on request and handles the grant claim after installation.",
     "You'll need a Companies House Reg No or VAT No to complete Section 1 of the application.",
     "For multi-unit blocks, provide freehold title or RTM/management company minutes confirming authority over the parking areas; for single tenancies, provide the Land Registry title deed.",
     "This grant isn't available if installing a chargepoint here is a mandatory requirement (e.g. a new-build planning condition).",

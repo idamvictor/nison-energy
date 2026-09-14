@@ -135,7 +135,7 @@ export default async function QuoteDetailPage({
                 }
               >
                 <ExternalLink />
-                Open PDF
+                Open document
               </Button>
             </CardContent>
           </Card>

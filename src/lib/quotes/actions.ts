@@ -6,6 +6,7 @@ import { after } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
 import { createNotification } from "@/lib/notifications/queries";
+import { deleteDocument } from "@/lib/media/queries";
 import { sendEmail } from "@/lib/email/client";
 import { quoteApprovedEmail, quoteRejectedEmail } from "@/lib/email/templates";
 import { quoteSchemeLabels, type QuoteActionResult } from "@/lib/quotes/types";
@@ -83,5 +84,19 @@ export async function reviewQuote(
   }
 
   revalidate(id);
+  return { ok: true };
+}
+
+export async function deleteQuote(id: string): Promise<QuoteActionResult> {
+  await requireAdmin();
+
+  const existing = await prisma.quoteDocument.findUnique({ where: { id } });
+  if (!existing) return { ok: false, error: "Quote not found." };
+
+  await deleteDocument(existing.fileKey);
+  await prisma.quoteDocument.delete({ where: { id } });
+
+  revalidate(id);
+  revalidatePath(`/admin/users/${existing.userId}`);
   return { ok: true };
 }

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QuoteStatusBadge } from "@/components/admin/quotes/quote-status-badge";
 import { QuoteReviewActions } from "@/components/admin/quotes/quote-review-actions";
+import { DeleteQuoteButton } from "@/components/admin/quotes/delete-quote-button";
 import { getQuote } from "@/lib/quotes/queries";
 import { quoteSchemeLabels } from "@/lib/quotes/types";
 
@@ -146,6 +147,15 @@ export default async function QuoteDetailPage({
             </CardHeader>
             <CardContent>
               <QuoteReviewActions quoteId={quote.id} status={quote.status} />
+            </CardContent>
+          </Card>
+
+          <Card className="h-fit border-destructive/30">
+            <CardHeader>
+              <CardTitle>Danger zone</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <DeleteQuoteButton quoteId={quote.id} reference={quote.reference} />
             </CardContent>
           </Card>
         </div>

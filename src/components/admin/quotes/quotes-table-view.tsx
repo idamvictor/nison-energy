@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { Check, MoreHorizontal, Search, X } from "lucide-react";
+import { Check, MoreHorizontal, Search, Trash2, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { QuoteStatusBadge } from "@/components/admin/quotes/quote-status-badge";
-import { reviewQuote } from "@/lib/quotes/actions";
+import { deleteQuote, reviewQuote } from "@/lib/quotes/actions";
 import {
   quoteSchemeLabels,
   quoteStatuses,
@@ -58,6 +58,7 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
   const [status, setStatus] = useState<QuoteStatus | "all">("all");
   const [rejectTarget, setRejectTarget] = useState<AdminQuoteRow | null>(null);
   const [reason, setReason] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<AdminQuoteRow | null>(null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -87,6 +88,17 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
       const result = await reviewQuote(target.id, "reject", reasonText);
       setRejectTarget(null);
       setReason("");
+      if (!result.ok) setError(result.error);
+    });
+  }
+
+  function confirmDelete() {
+    if (!deleteTarget) return;
+    setError(null);
+    const target = deleteTarget;
+    startTransition(async () => {
+      const result = await deleteQuote(target.id);
+      setDeleteTarget(null);
       if (!result.ok) setError(result.error);
     });
   }
@@ -172,36 +184,46 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
                     <QuoteStatusBadge status={quote.status} />
                   </TableCell>
                   <TableCell>
-                    {quote.status === "Pending" && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          render={<Button variant="ghost" size="icon-sm" />}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={<Button variant="ghost" size="icon-sm" />}
+                      >
+                        <MoreHorizontal />
+                        <span className="sr-only">Quote actions</span>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {quote.status === "Pending" && (
+                          <>
+                            <DropdownMenuItem
+                              disabled={pending}
+                              onClick={() => approve(quote)}
+                            >
+                              <Check />
+                              Approve
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              disabled={pending}
+                              onClick={() => {
+                                setReason("");
+                                setRejectTarget(quote);
+                              }}
+                            >
+                              <X />
+                              Reject…
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        <DropdownMenuItem
+                          variant="destructive"
+                          disabled={pending}
+                          onClick={() => setDeleteTarget(quote)}
                         >
-                          <MoreHorizontal />
-                          <span className="sr-only">Quote actions</span>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            disabled={pending}
-                            onClick={() => approve(quote)}
-                          >
-                            <Check />
-                            Approve
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            disabled={pending}
-                            onClick={() => {
-                              setReason("");
-                              setRejectTarget(quote);
-                            }}
-                          >
-                            <X />
-                            Reject…
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                          <Trash2 />
+                          Delete…
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -233,6 +255,27 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
             <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
             <Button variant="destructive" disabled={pending} onClick={confirmReject}>
               {pending ? "Rejecting…" : "Reject quote"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete {deleteTarget?.userName}&rsquo;s quote?</DialogTitle>
+            <DialogDescription>
+              This permanently removes the document from their account and deletes the
+              underlying file. This can&rsquo;t be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+            <Button variant="destructive" disabled={pending} onClick={confirmDelete}>
+              {pending ? "Deleting…" : "Delete permanently"}
             </Button>
           </DialogFooter>
         </DialogContent>

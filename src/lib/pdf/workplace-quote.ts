@@ -1,23 +1,13 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-
-type JsPDFWithAutoTable = jsPDF & { lastAutoTable: { finalY: number } };
-
-const MARGIN = 18;
-const PAGE_WIDTH = 210;
-const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
-
-const PRIMARY: [number, number, number] = [0, 98, 122];
-const MUTED: [number, number, number] = [91, 107, 114];
-const BODY: [number, number, number] = [30, 41, 46];
-const SHADED: [number, number, number] = [234, 243, 245];
-const RULE: [number, number, number] = [222, 230, 232];
-
-const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+// Workplace Charging Scheme quote — a Word-compatible HTML document (the
+// classic "HTML saved with a .doc extension" trick), not a PDF, matching the
+// reference guide mockup's generateQuote() verbatim. Same fix as renters and
+// landlord: the reference's "Notes" section uses <ul><li>, but Word applies
+// its own fixed "List Paragraph" spacing to real list items regardless of
+// CSS — so Notes here is plain bulleted paragraphs instead.
 
 export type WorkItem = { desc: string; cost: number };
 
-export type WorkplaceQuotePdfInput = {
+export type WorkplaceQuoteDocInput = {
   reference: string;
   contactName: string;
   email: string;
@@ -25,7 +15,6 @@ export type WorkplaceQuotePdfInput = {
   businessName: string;
   regNumber?: string;
   vatNumber?: string;
-  billingAddress: string;
   siteAddress: string;
   chargepoints: number;
   sockets: number;
@@ -35,107 +24,28 @@ export type WorkplaceQuotePdfInput = {
   works: WorkItem[];
 };
 
-function ensureSpace(doc: jsPDF, y: number, needed: number) {
-  const PAGE_HEIGHT = 297;
-  if (y + needed > PAGE_HEIGHT - MARGIN) {
-    doc.addPage();
-    return MARGIN;
-  }
-  return y;
+const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+
+function fmtMoney(n: number): string {
+  return currency.format(n);
+}
+
+function esc(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function bulletLine(text: string, isLast = false): string {
+  return `<p style="margin:0 0 ${isLast ? 0 : 2}px 10px; font-size:8px; line-height:1.15; text-indent:-8px;">&bull;&nbsp; ${text}</p>`;
 }
 
 /**
- * Builds the quote PDF and returns its bytes (rather than triggering a
- * browser download itself) — the caller decides whether to also save it
- * client-side and/or upload it via POST /api/quotes.
+ * Builds the quote as a Word-compatible HTML string. The caller wraps it in
+ * a Blob (`new Blob(["﻿", html], { type: "application/msword" })`).
  */
-export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8Array<ArrayBuffer> {
-  const doc = new jsPDF();
-  let y = MARGIN;
-
-  const heading = (text: string, size = 12) => {
-    y = ensureSpace(doc, y, 14);
-    doc.setFont("times", "bold");
-    doc.setFontSize(size);
-    doc.setTextColor(...PRIMARY);
-    doc.text(text, MARGIN, y);
-    y += size * 0.55 + 2;
-  };
-
-  const body = (text: string, size = 10, style: "normal" | "italic" = "normal", color = BODY) => {
-    doc.setFont("times", style);
-    doc.setFontSize(size);
-    doc.setTextColor(...color);
-    const lines = doc.splitTextToSize(text, CONTENT_WIDTH);
-    y = ensureSpace(doc, y, lines.length * size * 0.45 + 2);
-    doc.text(lines, MARGIN, y);
-    y += lines.length * size * 0.45 + 2;
-  };
-
-  const rule = () => {
-    doc.setDrawColor(...RULE);
-    doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-    y += 6;
-  };
-
-  doc.setFont("times", "bold");
-  doc.setFontSize(20);
-  doc.setTextColor(...PRIMARY);
-  doc.text("NISON LIMITED", MARGIN, y);
-  y += 10;
-
-  body(
-    "trading as Ocunio Energy · OZEV-Approved Installer, No. 13528 · VAT No. GB495472057 · Company Reg. No. 16371062",
-    9,
-    "normal",
-    MUTED
-  );
-  body("info@ocunioenergy.com · 07525 567054", 9, "normal", MUTED);
-  y += 2;
-  rule();
-
-  heading("Workplace Charging Scheme — Itemised Quote", 13);
-  body(`Quote/Invoice No.: ${input.reference}     Date of Issue: ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`);
-  y += 1;
-
-  heading("Installer Details");
-  body("Installer Business Name: Nison Limited (trading as Ocunio Energy)");
-  body("OZEV Installer Number: 13528");
-  body("Company Registration No.: 16371062");
-  body("VAT No.: GB495472057");
-  body("Installer Contact: info@ocunioenergy.com · 07525 567054");
-  y += 1;
-
-  heading("Client Details");
-  doc.setFont("times", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(...BODY);
-  const clientLines = [
-    `Business / Organisation Name: ${input.businessName || "—"}`,
-    `Companies House Registration No.: ${input.regNumber || "—"}`,
-    `VAT No.: ${input.vatNumber || "—"}`,
-    `Billing Address: ${input.billingAddress || "—"}`,
-    `Installation Site Address: ${input.siteAddress || "—"}`,
-    `Contact Name: ${input.contactName}`,
-    `Contact Email & Phone: ${input.email}${input.phone ? ` · ${input.phone}` : ""}`,
-  ];
-  for (const line of clientLines) {
-    y = ensureSpace(doc, y, 5);
-    doc.text(line, MARGIN, y);
-    y += 5;
-  }
-  y += 3;
-
-  heading("OZEV Grant Metadata");
-  body("Scheme: Workplace Charging Scheme (voucher-based)");
-  body("Application Status: Pending Voucher Application (quote issued to support your site survey and voucher application)");
-  body(
-    `Grant Entitlement: Up to £500 per socket × ${input.sockets} socket(s) requested, capped at £20,000 per applicant — exact amount confirmed on voucher issue`
-  );
-  y += 1;
-
-  heading("Itemised Breakdown of Works & Hardware");
-
+export function generateWorkplaceQuoteDoc(input: WorkplaceQuoteDocInput): string {
   const chargerTotal = input.chargerCost;
   const chargerUnitPrice = input.chargepoints > 0 ? chargerTotal / input.chargepoints : chargerTotal;
   const labourTotal = input.labourCost;
@@ -146,112 +56,111 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuotePdfInput): Uint8A
   const grantCap = Math.min(500 * input.sockets, 20000);
   const grant = Math.min(totalIncVat * 0.75, grantCap);
   const netPayable = totalIncVat - grant;
+  const issueDate = new Date().toLocaleDateString("en-GB");
 
   let itemNum = 1;
-  const rows: { cells: [string, string, string, string, string]; shaded?: boolean }[] = [
-    {
-      cells: [
-        String(itemNum++),
-        `EV Chargepoint Unit(s) (${input.chargerModel}, ${input.sockets} socket(s) total)`,
-        String(input.chargepoints),
-        currency.format(chargerUnitPrice),
-        currency.format(chargerTotal),
-      ],
-    },
-    {
-      cells: [
-        String(itemNum++),
-        "Installation, Commissioning & Testing",
-        "1",
-        currency.format(labourTotal),
-        currency.format(labourTotal),
-      ],
-      shaded: true,
-    },
-    ...input.works.map((w, i) => ({
-      cells: [
-        String(itemNum++),
-        w.desc,
-        "1",
-        currency.format(w.cost),
-        currency.format(w.cost),
-      ] as [string, string, string, string, string],
-      shaded: i % 2 !== 0,
-    })),
-  ];
-
-  autoTable(doc, {
-    startY: y,
-    margin: { left: MARGIN, right: MARGIN },
-    head: [["#", "Description", "Qty", "Unit (ex VAT)", "Total (ex VAT)"]],
-    body: rows.map((r) => r.cells),
-    theme: "plain",
-    styles: { font: "times", fontSize: 9, textColor: BODY, cellPadding: { top: 3, bottom: 3, left: 3, right: 3 } },
-    headStyles: { fillColor: PRIMARY, textColor: [255, 255, 255], fontStyle: "bold", halign: "left" },
-    columnStyles: { 0: { cellWidth: 8 }, 2: { halign: "center" }, 3: { halign: "right" }, 4: { halign: "right" } },
-    didParseCell: (data) => {
-      if (data.section !== "body") return;
-      const meta = rows[data.row.index];
-      if (meta?.shaded) data.cell.styles.fillColor = SHADED;
-    },
+  let itemRows =
+    `<tr style="font-size:11px;"><td>${itemNum++}</td><td>EV Chargepoint Unit(s) (${esc(input.chargerModel)}, ${input.sockets} socket(s) total)</td><td align="center">${input.chargepoints}</td><td align="right">${fmtMoney(chargerUnitPrice)}</td><td align="right">${fmtMoney(chargerTotal)}</td></tr>` +
+    `<tr style="background:#EAF1F8; font-size:11px;"><td>${itemNum++}</td><td>Installation, Commissioning &amp; Testing</td><td align="center">1</td><td align="right">${fmtMoney(labourTotal)}</td><td align="right">${fmtMoney(labourTotal)}</td></tr>`;
+  input.works.forEach((w, i) => {
+    const shade = i % 2 === 0 ? "font-size:11px;" : "background:#EAF1F8; font-size:11px;";
+    itemRows += `<tr style="${shade}"><td>${itemNum++}</td><td>${esc(w.desc)}</td><td align="center">1</td><td align="right">${fmtMoney(w.cost)}</td><td align="right">${fmtMoney(w.cost)}</td></tr>`;
   });
-  y = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 8;
 
-  heading("Cost Summary");
-  const summaryRows: [string, string][] = [
-    ["Subtotal (ex. VAT)", currency.format(subtotal)],
-    ["VAT @ 20%", currency.format(vat)],
-    ["Gross Total (inc. VAT)", currency.format(totalIncVat)],
-    [
-      `Less: OZEV Voucher Contribution (${input.sockets} socket(s) @ up to £500/socket, max £20,000)`,
-      `− ${currency.format(grant)}`,
-    ],
-    ["Net Amount Due by Client", currency.format(netPayable)],
-  ];
-  y = ensureSpace(doc, y, summaryRows.length * 9 + 10);
-  autoTable(doc, {
-    startY: y,
-    margin: { left: MARGIN, right: MARGIN },
-    body: summaryRows,
-    theme: "plain",
-    styles: { font: "times", fontSize: 10, textColor: BODY, cellPadding: { top: 3, bottom: 3, left: 3, right: 3 } },
-    columnStyles: { 1: { halign: "right" } },
-    didParseCell: (data) => {
-      if (data.row.index === 2 || data.row.index === 4) {
-        data.cell.styles.fillColor = SHADED;
-        data.cell.styles.fontStyle = "bold";
-      }
-    },
-  });
-  y = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 6;
-
-  body("Grant calculated after VAT: ex-VAT → +20% VAT → inc-VAT → less OZEV voucher.", 9, "italic", MUTED);
-  y += 3;
-
-  heading("Compliance & Statutory Declarations");
-  const declarations = [
-    "Technical Standard: Installation carried out in accordance with BS 7671 (IET Wiring Regulations, 18th Edition) and BS EN 61851.",
-    "Warranty: Hardware and installation warranty terms as per the manufacturer's and Nison Limited's standard documentation, provided separately.",
-    "Grant Deduction: The grant amount shown is an estimate. Do not begin installation before your voucher is issued. Once installed, the confirmed voucher value will be deducted from this invoice and claimed by Nison Limited directly from OZEV — you are not charged for the grant-covered portion in advance.",
-  ];
-  declarations.forEach((d, i) => body(`${i + 1}. ${d}`, 9.5));
-  y += 2;
-
-  heading("Notes");
-  const notes = [
-    "This quote must be dated and itemised to be accepted as part of your WCS voucher application.",
-    "You apply directly for your voucher online; Nison Limited arranges the site survey and, once installed, claims the grant on your behalf.",
-    "You'll need a company registration number, VAT number, or business rates bill (or equivalent for charities, NHS surgeries and schools).",
-    "Home workers can also apply, provided the address is registered as a place of business and an eligible dual-use chargepoint is installed.",
-    "This grant isn't available if installing a chargepoint here is a mandatory requirement (e.g. Part S building regulations or a planning condition).",
-    "Do not begin installation before your voucher is issued — you then have 180 days to complete the work.",
-  ];
-  for (const note of notes) {
-    body(`•  ${note}`, 9.5);
-  }
-
-  rule();
-  body("Nison Limited — Borehamwood, Hertfordshire · www.ocunioenergy.com", 9, "italic", MUTED);
-
-  return new Uint8Array(doc.output("arraybuffer") as ArrayBuffer);
+  return (
+    '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+    '<head><meta charset="utf-8"><title>OZEV WCS Quote</title>' +
+    "<style>" +
+    "@page { size: 21cm 29.7cm; margin: 1.2cm; }" +
+    "body { margin: 0; }" +
+    "h1, h2, h3, p, table { margin: 0; padding: 0; }" +
+    "</style>" +
+    "</head>" +
+    '<body style="font-family:Calibri,Arial,sans-serif; color:#262626; font-size:11px;">' +
+    '<h2 style="color:#1F3864; margin-bottom:2px; font-size:17px;">Nison Limited</h2>' +
+    '<p style="color:#595959; font-size:10px; margin:0 0 6px;">Nison Limited &mdash; OZEV-Approved Installer, No. 13528 &middot; VAT No. GB495472057 &middot; Company Reg. No. 16371062<br>' +
+    "info@ocunioenergy.com &middot; 07525 567054</p>" +
+    '<h1 style="color:#1F3864; border-bottom:2px solid #2E75B6; padding-bottom:4px; margin-bottom:6px; font-size:16px; white-space:nowrap;">Workplace Charging Scheme &mdash; Itemised Quote</h1>' +
+    '<p style="font-size:10px; margin:0 0 8px;"><b>Quote/Invoice No.:</b> ' +
+    input.reference +
+    "&nbsp;&nbsp; <b>Date of Issue:</b> " +
+    issueDate +
+    "</p>" +
+    // Installer + Client details side by side.
+    '<table cellspacing="0" cellpadding="0" style="width:100%; border-collapse:collapse; margin-bottom:8px;">' +
+    '<tr><td style="width:50%; vertical-align:top; padding-right:12px;">' +
+    '<h3 style="color:#1F3864; margin-bottom:3px; font-size:12px;">Installer Details</h3>' +
+    '<p style="margin:0; font-size:10.5px;"><b>Installer Business Name:</b> Nison Limited (trading as Ocunio Energy)<br>' +
+    "<b>OZEV Installer Number:</b> 13528<br>" +
+    "<b>Company Registration No.:</b> 16371062<br>" +
+    "<b>VAT No.:</b> GB495472057<br>" +
+    "<b>Installer Contact:</b> info@ocunioenergy.com &middot; 07525 567054</p>" +
+    "</td>" +
+    '<td style="width:50%; vertical-align:top; padding-left:12px;">' +
+    '<h3 style="color:#1F3864; margin-bottom:3px; font-size:12px;">Client Details</h3>' +
+    '<p style="margin:0; font-size:10.5px;"><b>Business / Organisation Name:</b> ' +
+    esc(input.businessName || "—") +
+    "<br>" +
+    "<b>Companies House Registration No.:</b> " +
+    esc(input.regNumber || "—") +
+    "<br>" +
+    "<b>VAT No.:</b> " +
+    esc(input.vatNumber || "—") +
+    "<br>" +
+    "<b>Installation Site Address:</b> " +
+    esc(input.siteAddress || "—") +
+    "<br>" +
+    "<b>Contact Name:</b> " +
+    esc(input.contactName) +
+    "<br>" +
+    "<b>Contact Email &amp; Phone:</b> " +
+    esc(input.email) +
+    (input.phone ? " · " + esc(input.phone) : "") +
+    "</p>" +
+    "</td></tr></table>" +
+    // Figures the customer actually checks — proper room, not the cramped
+    // treatment the Notes section gets below.
+    '<h3 style="color:#1F3864; margin-bottom:4px; font-size:13px;">Itemised Breakdown of Works &amp; Hardware</h3>' +
+    '<table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse; width:100%; font-size:11px; margin-bottom:10px;">' +
+    '<tr style="background:#1F3864; color:#fff; font-size:11px;"><th>#</th><th>Description</th><th>Qty</th><th>Unit (ex VAT)</th><th>Total (ex VAT)</th></tr>' +
+    itemRows +
+    "</table>" +
+    '<h3 style="color:#1F3864; margin-bottom:4px; font-size:13px;">Cost Summary</h3>' +
+    '<table cellspacing="0" cellpadding="4" style="width:100%; font-size:11px; margin-bottom:8px;">' +
+    '<tr><td><p style="margin:0; font-size:11px;">Subtotal (ex. VAT)</p></td><td align="right"><p style="margin:0; font-size:11px;">' +
+    fmtMoney(subtotal) +
+    "</p></td></tr>" +
+    '<tr><td><p style="margin:0; font-size:11px;">VAT @ 20%</p></td><td align="right"><p style="margin:0; font-size:11px;">' +
+    fmtMoney(vat) +
+    "</p></td></tr>" +
+    '<tr style="background:#EAF1F8;"><td><p style="margin:0; font-size:11px;"><b>Gross Total (inc. VAT)</b></p></td><td align="right"><p style="margin:0; font-size:11px;"><b>' +
+    fmtMoney(totalIncVat) +
+    "</b></p></td></tr>" +
+    '<tr><td><p style="margin:0; font-size:11px;">Less: OZEV Voucher Contribution (' +
+    input.sockets +
+    ' socket(s) @ up to &pound;500/socket, max &pound;20,000)</p></td><td align="right" style="color:#1F6E52;"><p style="margin:0; color:#1F6E52; font-size:11px;">&minus; ' +
+    fmtMoney(grant) +
+    "</p></td></tr>" +
+    '<tr style="background:#EAF1F8;"><td><p style="margin:0; font-size:11px;"><b>Net Amount Due by Client</b></p></td><td align="right"><p style="margin:0; font-size:11px;"><b>' +
+    fmtMoney(netPayable) +
+    "</b></p></td></tr>" +
+    "</table>" +
+    '<p style="font-style:italic; color:#595959; font-size:9.5px; margin:0 0 8px;">Grant calculated after VAT: ex-VAT &rarr; +20% VAT &rarr; inc-VAT &rarr; less OZEV voucher.</p>' +
+    '<h3 style="color:#1F3864; margin-bottom:1px; font-size:10px;">Notes</h3>' +
+    bulletLine("This quote must be dated and itemised to be accepted as part of your WCS voucher application.") +
+    bulletLine(
+      "You apply directly for your voucher online; Nison Limited arranges the site survey and, once installed, claims the grant on your behalf.",
+    ) +
+    bulletLine(
+      "You&rsquo;ll need a company registration number, VAT number, or business rates bill (or equivalent for charities, NHS surgeries and schools).",
+    ) +
+    bulletLine(
+      "Home workers can also apply, provided the address is registered as a place of business and an eligible dual-use chargepoint is installed.",
+    ) +
+    bulletLine(
+      "This grant isn&rsquo;t available if installing a chargepoint here is a mandatory requirement (e.g. Part S building regulations or a planning condition).",
+    ) +
+    bulletLine("Do not begin installation before your voucher is issued &mdash; you then have 180 days to complete the work.", true) +
+    "</body></html>"
+  );
 }

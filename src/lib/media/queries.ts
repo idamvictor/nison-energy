@@ -3,6 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   NoSuchKey,
   PutObjectCommand,
@@ -150,3 +151,8 @@ export async function uploadDocument(
 
 /** Private documents (quote PDFs) — served through an ownership-checked route. */
 export const getDocumentStream = getObjectStream;
+
+/** Removes an object (e.g. a quote document) from the bucket. */
+export async function deleteDocument(key: string): Promise<void> {
+  await s3().send(new DeleteObjectCommand({ Bucket: bucket(), Key: key }));
+}

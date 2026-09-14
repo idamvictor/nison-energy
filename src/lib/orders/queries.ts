@@ -42,6 +42,14 @@ export const getOrder = cache(
     }) as unknown as Promise<OrderWithItems | null>,
 );
 
+export const getOrderByCheckoutSession = cache(
+  (stripeCheckoutSessionId: string) =>
+    prisma.order.findUnique({
+      where: { stripeCheckoutSessionId },
+      include: { items: true },
+    }) as unknown as Promise<OrderWithItems | null>,
+);
+
 export const getOrdersForUser = cache(
   (userId: string, email: string) =>
     prisma.order.findMany({
@@ -72,6 +80,10 @@ export type CreateOrderResult =
   | { ok: true; reference: string }
   | { ok: false; errors: Record<string, string> };
 
+export type CreateDraftOrderResult =
+  | { ok: true; order: OrderWithItems }
+  | { ok: false; errors: Record<string, string> };
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function str(value: unknown): string {
@@ -82,9 +94,22 @@ function newReference(): string {
   return `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-export async function createOrder(
+type ValidatedOrderInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  postcode: string;
+  notes: string | null;
+  lines: OrderLineInput[];
+  subtotal: number;
+  userId: string | null;
+};
+
+async function validateOrderInput(
   input: CreateOrderInput,
-): Promise<CreateOrderResult> {
+): Promise<{ ok: true; data: ValidatedOrderInput } | { ok: false; errors: Record<string, string> }> {
   const firstName = str(input.firstName);
   const lastName = str(input.lastName);
   const email = str(input.email);
@@ -113,23 +138,45 @@ export async function createOrder(
 
   const user = await getCurrentUser();
 
+  return {
+    ok: true,
+    data: {
+      firstName,
+      lastName,
+      email,
+      phone,
+      address,
+      postcode,
+      notes: str(input.notes) || null,
+      lines,
+      subtotal,
+      userId: user?.id ?? null,
+    },
+  };
+}
+
+async function insertOrder(
+  data: ValidatedOrderInput,
+  extra?: { paymentStatus?: "Unpaid" | "Paid" | "Failed" },
+): Promise<OrderWithItems> {
   for (let attempt = 0; attempt < 5; attempt++) {
     const reference = newReference();
     try {
-      const order = await prisma.order.create({
+      return (await prisma.order.create({
         data: {
           reference,
-          firstName,
-          lastName,
-          email,
-          phone,
-          address,
-          postcode,
-          notes: str(input.notes) || null,
-          subtotal,
-          userId: user?.id ?? null,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          postcode: data.postcode,
+          notes: data.notes,
+          subtotal: data.subtotal,
+          userId: data.userId,
+          paymentStatus: extra?.paymentStatus,
           items: {
-            create: lines.map((line) => ({
+            create: data.lines.map((line) => ({
               productId: line.productId,
               category: line.category,
               name: line.name,
@@ -140,35 +187,77 @@ export async function createOrder(
           },
         },
         include: { items: true },
-      });
-
-      await createNotification({
-        userId: order.userId,
-        kind: "order",
-        title: `Order ${order.reference} placed`,
-        body: "We'll be in touch to confirm payment and book your installation.",
-        href: "/account/orders",
-      });
-
-      after(async () => {
-        await sendEmail({
-          to: order.email,
-          ...customerOrderConfirmation(order),
-        });
-        const staff = await getStaffEmails();
-        await sendEmail({
-          to: staff,
-          replyTo: order.email,
-          ...staffOrderAlert(order),
-        });
-      });
-
-      return { ok: true, reference };
+      })) as unknown as OrderWithItems;
     } catch (err) {
       const code = (err as { code?: string })?.code;
       if (code === "P2002") continue; // unique clash on reference — retry
       throw err;
     }
   }
-  return { ok: false, errors: { lines: "Could not place the order. Try again." } };
+  throw new Error("Could not generate a unique order reference.");
+}
+
+export async function createOrder(
+  input: CreateOrderInput,
+): Promise<CreateOrderResult> {
+  const validated = await validateOrderInput(input);
+  if (!validated.ok) return validated;
+
+  let order: OrderWithItems;
+  try {
+    order = await insertOrder(validated.data);
+  } catch {
+    return { ok: false, errors: { lines: "Could not place the order. Try again." } };
+  }
+
+  await createNotification({
+    userId: order.userId,
+    kind: "order",
+    title: `Order ${order.reference} placed`,
+    body: "We'll be in touch to confirm payment and book your installation.",
+    href: "/account/orders",
+  });
+
+  after(async () => {
+    await sendEmail({
+      to: order.email,
+      ...customerOrderConfirmation(order),
+    });
+    const staff = await getStaffEmails();
+    await sendEmail({
+      to: staff,
+      replyTo: order.email,
+      ...staffOrderAlert(order),
+    });
+  });
+
+  return { ok: true, reference: order.reference };
+}
+
+/**
+ * Creates an Order row for the "Pay online now" path — paymentStatus starts
+ * Unpaid and no confirmation email/notification is sent yet. Those fire from
+ * the Stripe webhook once payment is actually confirmed (see
+ * src/app/api/webhooks/stripe/route.ts), never from this synchronous path,
+ * since a customer can close the tab before paying.
+ */
+export async function createDraftOrderForCheckout(
+  input: CreateOrderInput,
+): Promise<CreateDraftOrderResult> {
+  const validated = await validateOrderInput(input);
+  if (!validated.ok) return validated;
+
+  if (validated.data.lines.some((line) => line.unitPrice == null)) {
+    return {
+      ok: false,
+      errors: { lines: "Some items don't have a fixed price yet — use “Place Order” instead." },
+    };
+  }
+
+  try {
+    const order = await insertOrder(validated.data, { paymentStatus: "Unpaid" });
+    return { ok: true, order };
+  } catch {
+    return { ok: false, errors: { lines: "Could not start checkout. Try again." } };
+  }
 }

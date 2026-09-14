@@ -155,11 +155,18 @@ function itemsTable(items: OrderItemEmailInput[]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#44403c;margin:4px 0">${rows}</table>`;
 }
 
-export function customerOrderConfirmation(order: OrderEmailInput): EmailContent {
+export function customerOrderConfirmation(
+  order: OrderEmailInput,
+  opts?: { paid?: boolean },
+): EmailContent {
   return {
-    subject: `Order ${order.reference} received`,
+    subject: opts?.paid
+      ? `Payment received — order ${order.reference}`
+      : `Order ${order.reference} received`,
     html: emailLayout({
-      heading: `Thanks, ${esc(order.firstName)} — we've got your order`,
+      heading: opts?.paid
+        ? `Thanks, ${esc(order.firstName)} — payment received`
+        : `Thanks, ${esc(order.firstName)} — we've got your order`,
       bodyHtml: [
         row(`Your reference is <strong>${esc(order.reference)}</strong>.`),
         row(itemsTable(order.items)),
@@ -171,10 +178,15 @@ export function customerOrderConfirmation(order: OrderEmailInput): EmailContent 
             order.postcode,
           )}`,
         ),
-        row(
-          `No payment is taken online — a member of the team will be in touch to confirm
-           payment and book your installation.`,
-        ),
+        opts?.paid
+          ? row(
+              `Your payment has gone through and a receipt/invoice is on its way from Stripe.
+               A member of the team will be in touch to book your installation.`,
+            )
+          : row(
+              `No payment is taken online — a member of the team will be in touch to confirm
+               payment and book your installation.`,
+            ),
       ].join(""),
       cta: { label: "View your orders", href: `${SITE_URL}/account/orders` },
     }),

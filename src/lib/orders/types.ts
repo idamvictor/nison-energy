@@ -36,6 +36,8 @@ export type OrderItemRecord = {
   options: unknown;
 };
 
+export type PaymentStatus = "Unpaid" | "Paid" | "Failed";
+
 export type OrderRecord = {
   id: string;
   reference: string;
@@ -48,6 +50,11 @@ export type OrderRecord = {
   postcode: string;
   notes: string | null;
   subtotal: number;
+  paymentStatus: PaymentStatus;
+  stripeCheckoutSessionId: string | null;
+  stripePaymentIntentId: string | null;
+  taxAmount: number | null;
+  total: number | null;
   userId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -70,6 +77,10 @@ export type PlaceOrderPayload = {
 
 export type PlaceOrderResult =
   | { ok: true; reference: string }
+  | { ok: false; errors: Record<string, string> };
+
+export type CreateCheckoutSessionResult =
+  | { ok: true; url: string }
   | { ok: false; errors: Record<string, string> };
 
 export type OrderActionResult = { ok: true } | { ok: false; error: string };

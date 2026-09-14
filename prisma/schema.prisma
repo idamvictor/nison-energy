@@ -73,6 +73,12 @@ model Order {
 
   subtotal Int // whole GBP — the catalog is priced in integer pounds
 
+  paymentStatus           PaymentStatus @default(Unpaid)
+  stripeCheckoutSessionId String?       @unique
+  stripePaymentIntentId   String?
+  taxAmount               Int? // whole GBP, from Stripe's total_details.amount_tax
+  total                   Int? // whole GBP, from Stripe's amount_total (subtotal + tax)
+
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -107,6 +113,12 @@ enum OrderStatus {
   Scheduled
   Installed
   Cancelled
+}
+
+enum PaymentStatus {
+  Unpaid
+  Paid
+  Failed
 }
 
 /// A catalog product. `id` is the URL slug. The `Product` / `CommercialProduct`

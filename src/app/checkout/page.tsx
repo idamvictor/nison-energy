@@ -36,8 +36,8 @@ import {
 } from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { COMPANY } from "@/lib/company";
-import { placeOrder } from "@/lib/orders/actions";
-import type { OrderLineInput } from "@/lib/orders/types";
+import { placeOrder, createCheckoutSession } from "@/lib/orders/actions";
+import type { OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -94,6 +94,7 @@ export default function CheckoutPage() {
   const [pendingExtra, setPendingExtra] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [payPending, startPayTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleAddressSelect(suggestion: AddressSuggestion) {
@@ -126,6 +127,51 @@ export default function CheckoutPage() {
   const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
   const subtotal = itemsSubtotal + extrasTotal;
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
+
+  function buildPayload(fd: FormData): PlaceOrderPayload {
+    const orderLines: OrderLineInput[] = [
+      ...lines.map((line) => ({
+        productId: line.id,
+        category: line.category,
+        name: line.name,
+        unitPrice: line.price,
+        quantity: line.quantity,
+        options: line.options,
+      })),
+      ...selectedExtras.map((extra) => ({
+        productId: extra.id,
+        category: "extra" as const,
+        name: extra.name,
+        unitPrice: extra.price,
+        quantity: 1,
+      })),
+    ];
+
+    return {
+      firstName: String(fd.get("firstName") ?? ""),
+      lastName: String(fd.get("lastName") ?? ""),
+      email: String(fd.get("email") ?? ""),
+      phone: String(fd.get("phone") ?? ""),
+      address: String(fd.get("address") ?? ""),
+      postcode: String(fd.get("postcode") ?? ""),
+      lines: orderLines,
+    };
+  }
+
+  function handlePayOnline() {
+    const form = formRef.current;
+    if (!form || !form.reportValidity()) return;
+    const payload = buildPayload(new FormData(form));
+    setError(null);
+    startPayTransition(async () => {
+      const result = await createCheckoutSession(payload);
+      if (!result.ok) {
+        setError(Object.values(result.errors)[0] ?? "Could not start checkout.");
+        return;
+      }
+      window.location.href = result.url;
+    });
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -199,37 +245,11 @@ export default function CheckoutPage() {
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const fd = new FormData(e.currentTarget);
+                  const payload = buildPayload(new FormData(e.currentTarget));
                   setError(null);
 
-                  const orderLines: OrderLineInput[] = [
-                    ...lines.map((line) => ({
-                      productId: line.id,
-                      category: line.category,
-                      name: line.name,
-                      unitPrice: line.price,
-                      quantity: line.quantity,
-                      options: line.options,
-                    })),
-                    ...selectedExtras.map((extra) => ({
-                      productId: extra.id,
-                      category: "extra" as const,
-                      name: extra.name,
-                      unitPrice: extra.price,
-                      quantity: 1,
-                    })),
-                  ];
-
                   startTransition(async () => {
-                    const result = await placeOrder({
-                      firstName: String(fd.get("firstName") ?? ""),
-                      lastName: String(fd.get("lastName") ?? ""),
-                      email: String(fd.get("email") ?? ""),
-                      phone: String(fd.get("phone") ?? ""),
-                      address: String(fd.get("address") ?? ""),
-                      postcode: String(fd.get("postcode") ?? ""),
-                      lines: orderLines,
-                    });
+                    const result = await placeOrder(payload);
                     if (!result.ok) {
                       setError(
                         Object.values(result.errors)[0] ??
@@ -362,23 +382,41 @@ export default function CheckoutPage() {
                       </Field>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      No payment is taken online — this places your order for
-                      review, and we&apos;ll be in touch to confirm payment
-                      and schedule installation.
+                      {hasQuoteOnlyItems
+                        ? "No payment is taken online — this places your order for review, and we’ll be in touch to confirm payment and schedule installation."
+                        : "Pay online now with card, or place your order for review and we’ll be in touch to confirm payment and schedule installation."}
                     </p>
                   </CardContent>
                 </Card>
 
                 {error && <p className="text-sm text-destructive">{error}</p>}
 
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={pending}
-                  className="w-fit bg-accent text-accent-foreground hover:bg-accent/90"
-                >
-                  {pending ? "Placing order…" : "Place Order"}
-                </Button>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    variant={hasQuoteOnlyItems ? "default" : "outline"}
+                    disabled={pending || payPending}
+                    className={
+                      hasQuoteOnlyItems
+                        ? "w-fit bg-accent text-accent-foreground hover:bg-accent/90"
+                        : "w-fit"
+                    }
+                  >
+                    {pending ? "Placing order…" : "Place Order"}
+                  </Button>
+                  {!hasQuoteOnlyItems && (
+                    <Button
+                      type="button"
+                      size="lg"
+                      disabled={pending || payPending}
+                      className="w-fit bg-accent text-accent-foreground hover:bg-accent/90"
+                      onClick={handlePayOnline}
+                    >
+                      {payPending ? "Starting checkout…" : "Pay online now"}
+                    </Button>
+                  )}
+                </div>
               </form>
 
               <Card className="h-fit">

@@ -43,6 +43,11 @@ export async function POST(request: Request) {
       await markOrderFailed(session);
       break;
     }
+    case "checkout.session.expired": {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await deleteAbandonedOrder(session);
+      break;
+    }
     default:
       break;
   }
@@ -110,5 +115,18 @@ async function markOrderFailed(session: Stripe.Checkout.Session) {
   await prisma.order.updateMany({
     where: { id: orderId, paymentStatus: "Unpaid" },
     data: { paymentStatus: "Failed" },
+  });
+}
+
+// A Checkout Session expires 24h after creation if the customer never pays.
+// The draft Order created up front (see createCheckoutSession) never turned
+// into a real transaction, so it's deleted rather than kept around — the
+// same "not still Unpaid" guard as markOrderFailed protects against deleting
+// an order that was actually paid in a last-second race.
+async function deleteAbandonedOrder(session: Stripe.Checkout.Session) {
+  const orderId = session.metadata?.orderId;
+  if (!orderId) return;
+  await prisma.order.deleteMany({
+    where: { id: orderId, paymentStatus: "Unpaid" },
   });
 }

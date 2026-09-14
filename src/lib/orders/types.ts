@@ -38,6 +38,8 @@ export type OrderItemRecord = {
 
 export type PaymentStatus = "Unpaid" | "Paid" | "Failed";
 
+export const paymentStatuses: PaymentStatus[] = ["Unpaid", "Paid", "Failed"];
+
 export type OrderRecord = {
   id: string;
   reference: string;

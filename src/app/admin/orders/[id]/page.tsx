@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -13,8 +13,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { OrderStatusSelect } from "@/components/admin/orders/order-status-select";
+import { PaymentStatusBadge } from "@/components/admin/orders/payment-status-badge";
 import { getOrder } from "@/lib/orders/queries";
 import type { OrderStatus } from "@/lib/orders/types";
+
+function stripeDashboardUrl(paymentIntentId: string): string {
+  const isLiveMode = process.env.STRIPE_SECRET_KEY?.includes("_live_") ?? false;
+  return `https://dashboard.stripe.com/${isLiveMode ? "" : "test/"}payments/${paymentIntentId}`;
+}
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -71,10 +77,13 @@ export default async function OrderDetailPage({
           <ArrowLeft className="size-4" />
           Back to orders
         </Link>
-        <OrderStatusSelect
-          orderId={order.id}
-          initialStatus={order.status as OrderStatus}
-        />
+        <div className="flex items-center gap-3">
+          <PaymentStatusBadge status={order.paymentStatus} />
+          <OrderStatusSelect
+            orderId={order.id}
+            initialStatus={order.status as OrderStatus}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
@@ -118,11 +127,45 @@ export default async function OrderDetailPage({
                   })}
                 </TableBody>
               </Table>
-              <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
-                <p className="text-muted-foreground">Subtotal</p>
-                <p className="font-heading text-lg font-semibold text-foreground">
-                  {currency.format(order.subtotal)}
-                </p>
+              <div className="mt-4 flex flex-col gap-1.5 border-t border-border pt-4 text-sm">
+                {order.total != null ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground">Subtotal</p>
+                      <p className="text-foreground">{currency.format(order.subtotal)}</p>
+                    </div>
+                    {order.taxAmount != null && (
+                      <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground">Tax</p>
+                        <p className="text-foreground">{currency.format(order.taxAmount)}</p>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground">Total paid</p>
+                      <p className="font-heading text-lg font-semibold text-foreground">
+                        {currency.format(order.total)}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground">Subtotal</p>
+                    <p className="font-heading text-lg font-semibold text-foreground">
+                      {currency.format(order.subtotal)}
+                    </p>
+                  </div>
+                )}
+                {order.stripePaymentIntentId && (
+                  <a
+                    href={stripeDashboardUrl(order.stripePaymentIntentId)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 flex items-center gap-1.5 text-sm text-primary hover:underline"
+                  >
+                    View payment in Stripe
+                    <ExternalLink className="size-3.5" />
+                  </a>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -21,10 +21,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { OrderStatusBadge } from "@/components/admin/orders/order-status-badge";
+import { PaymentStatusBadge } from "@/components/admin/orders/payment-status-badge";
 import {
   orderStatuses,
+  paymentStatuses,
   type OrderStatus,
   type OrderWithItems,
+  type PaymentStatus,
 } from "@/lib/orders/types";
 
 const currency = new Intl.NumberFormat("en-GB", {
@@ -44,16 +47,19 @@ function formatDate(date: Date) {
 export function OrdersTableView({ orders }: { orders: OrderWithItems[] }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<OrderStatus | "all">("all");
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | "all">("all");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return orders.filter((order) => {
       const matchesStatus = status === "all" || order.status === status;
+      const matchesPaymentStatus =
+        paymentStatus === "all" || order.paymentStatus === paymentStatus;
       const haystack =
         `${order.reference} ${order.firstName} ${order.lastName} ${order.email}`.toLowerCase();
-      return matchesStatus && (q === "" || haystack.includes(q));
+      return matchesStatus && matchesPaymentStatus && (q === "" || haystack.includes(q));
     });
-  }, [orders, query, status]);
+  }, [orders, query, status, paymentStatus]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -91,6 +97,23 @@ export function OrdersTableView({ orders }: { orders: OrderWithItems[] }) {
             ))}
           </SelectContent>
         </Select>
+
+        <Select
+          value={paymentStatus}
+          onValueChange={(value) => value && setPaymentStatus(value as PaymentStatus | "all")}
+        >
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue placeholder="All payments" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All payments</SelectItem>
+            {paymentStatuses.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {filtered.length === 0 ? (
@@ -108,6 +131,7 @@ export function OrdersTableView({ orders }: { orders: OrderWithItems[] }) {
                 <TableHead>Items</TableHead>
                 <TableHead>Placed</TableHead>
                 <TableHead>Subtotal</TableHead>
+                <TableHead>Payment</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -136,6 +160,9 @@ export function OrdersTableView({ orders }: { orders: OrderWithItems[] }) {
                   </TableCell>
                   <TableCell className="font-heading font-semibold text-primary">
                     {currency.format(order.subtotal)}
+                  </TableCell>
+                  <TableCell>
+                    <PaymentStatusBadge status={order.paymentStatus} />
                   </TableCell>
                   <TableCell>
                     <OrderStatusBadge status={order.status as OrderStatus} />

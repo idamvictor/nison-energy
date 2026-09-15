@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { uploadDocument } from "@/lib/media/queries";
+import { checkRateLimit } from "@/lib/rate-limit/check";
 import { quoteSchemes, type QuoteScheme } from "@/lib/quotes/types";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -34,6 +35,19 @@ export async function POST(request: Request) {
     formData = await request.formData();
   } catch {
     return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+  }
+
+  // Honeypot — bots fill hidden fields. Pretend it worked, store nothing.
+  if (String(formData.get("company_website") ?? "").trim() !== "") {
+    return NextResponse.json({ ok: true, id: "ok", status: "Pending" }, { status: 201 });
+  }
+
+  const allowed = await checkRateLimit(`quote:${user.id}`, { limit: 10, windowMs: 60 * 60_000 });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many attempts — please try again in a bit." },
+      { status: 429 },
+    );
   }
 
   const scheme = formData.get("scheme");

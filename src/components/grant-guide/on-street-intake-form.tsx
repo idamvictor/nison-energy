@@ -110,6 +110,16 @@ export function OnStreetIntakeForm() {
       onSubmit={handleSubmit}
       className="flex flex-col gap-6 rounded-lg border border-border bg-secondary/40 p-4"
     >
+      {/* Honeypot — hidden from users, tempting to bots. */}
+      <input
+        type="text"
+        name="company_website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
+
       <div>
         <p className="mb-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
           1. Your contact details

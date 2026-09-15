@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
 import { createLead } from "@/lib/leads/queries";
 import { createNotification } from "@/lib/notifications/queries";
+import { checkRateLimit } from "@/lib/rate-limit/check";
+import { getClientIp } from "@/lib/rate-limit/ip";
 import {
   grantStatuses,
   installationStages,
@@ -27,6 +29,16 @@ export async function submitEnquiry(
   // Honeypot — bots fill hidden fields. Pretend it worked, store nothing.
   if (String(formData.get("company_website") ?? "").trim() !== "") {
     return { status: "success" };
+  }
+
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`lead:${ip}`, { limit: 5, windowMs: 10 * 60_000 });
+  if (!allowed) {
+    return {
+      status: "error",
+      errors: {},
+      message: "Too many attempts — please try again in a few minutes.",
+    };
   }
 
   const result = await createLead({
@@ -63,6 +75,17 @@ function field(data: FormData, key: string): string {
 export async function submitOnStreetParkingIntake(
   formData: FormData,
 ): Promise<LeadActionResult> {
+  // Honeypot — bots fill hidden fields. Pretend it worked, store nothing.
+  if (field(formData, "company_website") !== "") {
+    return { ok: true };
+  }
+
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`lead:${ip}`, { limit: 5, windowMs: 10 * 60_000 });
+  if (!allowed) {
+    return { ok: false, error: "Too many attempts — please try again in a few minutes." };
+  }
+
   const landlordName = field(formData, "landlordName");
   const landlordContact = field(formData, "landlordContact");
   const permissionLabel: Record<string, string> = {

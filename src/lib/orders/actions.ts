@@ -11,6 +11,8 @@ import { sendEmail } from "@/lib/email/client";
 import { customerOrderStatusUpdate } from "@/lib/email/templates";
 import { stripe } from "@/lib/stripe/client";
 import { SITE_URL } from "@/lib/site";
+import { checkRateLimit } from "@/lib/rate-limit/check";
+import { getClientIp } from "@/lib/rate-limit/ip";
 import {
   orderStatuses,
   type CreateCheckoutSessionResult,
@@ -22,9 +24,34 @@ import {
 
 // ─── Checkout ──────────────────────────────────────────────────────────────
 
+// Shared guard for both checkout paths. Unlike the lead forms' honeypot (which
+// fakes success to deceive spam bots harmlessly), a tripped checkout honeypot
+// returns a real error — there's no safe "pretend this order was placed"
+// outcome for a monetary transaction. Both PlaceOrderResult and
+// CreateCheckoutSessionResult share the same `{ ok: false; errors }` shape.
+async function checkoutGuard(
+  payload: PlaceOrderPayload,
+): Promise<{ ok: false; errors: Record<string, string> } | null> {
+  if ((payload.honeypot ?? "").trim() !== "") {
+    return { ok: false, errors: { lines: "Could not process your request." } };
+  }
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`checkout:${ip}`, { limit: 10, windowMs: 10 * 60_000 });
+  if (!allowed) {
+    return {
+      ok: false,
+      errors: { lines: "Too many attempts — please try again in a few minutes." },
+    };
+  }
+  return null;
+}
+
 export async function placeOrder(
   payload: PlaceOrderPayload,
 ): Promise<PlaceOrderResult> {
+  const blocked = await checkoutGuard(payload);
+  if (blocked) return blocked;
+
   const result = await createOrder(payload);
   if (result.ok) {
     revalidatePath("/admin/orders");
@@ -45,6 +72,9 @@ export async function placeOrder(
 export async function createCheckoutSession(
   payload: PlaceOrderPayload,
 ): Promise<CreateCheckoutSessionResult> {
+  const blocked = await checkoutGuard(payload);
+  if (blocked) return blocked;
+
   const draft = await createDraftOrderForCheckout(payload);
   if (!draft.ok) return draft;
 

@@ -75,6 +75,8 @@ export type PlaceOrderPayload = {
   postcode: string;
   notes?: string;
   lines: OrderLineInput[];
+  /** Honeypot — bots fill hidden fields; humans never see this input. */
+  honeypot?: string;
 };
 
 export type PlaceOrderResult =

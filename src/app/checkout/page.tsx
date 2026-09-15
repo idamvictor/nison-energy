@@ -154,6 +154,7 @@ export default function CheckoutPage() {
       phone: String(fd.get("phone") ?? ""),
       address: String(fd.get("address") ?? ""),
       postcode: String(fd.get("postcode") ?? ""),
+      honeypot: String(fd.get("company_website") ?? ""),
       lines: orderLines,
     };
   }
@@ -263,6 +264,16 @@ export default function CheckoutPage() {
                   });
                 }}
               >
+                {/* Honeypot — hidden from users, tempting to bots. */}
+                <input
+                  type="text"
+                  name="company_website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden
+                  className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                />
+
                 <Card>
                   <CardContent className="flex flex-col gap-3">
                     <StepHeading number={1} title="Survey" />

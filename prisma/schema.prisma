@@ -328,3 +328,14 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+/// A single rate-limited attempt, keyed by an action+identifier string (e.g.
+/// "lead:203.0.113.5", "quote:<userId>"). Rows outside the checked window are
+/// deleted lazily by checkRateLimit itself — no separate cleanup job needed.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}

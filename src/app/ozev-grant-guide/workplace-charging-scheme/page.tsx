@@ -330,6 +330,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                           body.append("fileName", fileName);
                           body.append("file", blob, fileName);
                           body.append("input", JSON.stringify(input));
+                          body.append("company_website", String(data.get("company_website") ?? ""));
 
                           const res = await fetch("/api/quotes", { method: "POST", body });
                           const resData = (await res.json()) as { error?: string };
@@ -345,6 +346,16 @@ export default function WorkplaceChargingSchemeGuidePage() {
                         }
                       }}
                     >
+                      {/* Honeypot — hidden from users, tempting to bots. */}
+                      <input
+                        type="text"
+                        name="company_website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        aria-hidden
+                        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                      />
+
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <Field label="Contact name">
                           <Input name="contactName" required placeholder="Jane Doe" />

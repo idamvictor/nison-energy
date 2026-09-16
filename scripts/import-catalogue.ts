@@ -183,6 +183,27 @@ function driveImageUrl(shareUrl: string): string | null {
   return m ? `https://lh3.googleusercontent.com/d/${m[1]}` : null;
 }
 
+// ─── Write-up line classification (Description vs Product Features) ────────
+// Standalone leftover section headers from the source document — not real
+// content for either tab.
+const HEADER_ARTIFACTS = new Set([
+  "product detail",
+  "product details",
+  "specification",
+  "specifications",
+  "description",
+  "features",
+  "overview",
+]);
+
+// Long, sentence-like lines are marketing prose (Description tab); short
+// callout/badge lines ("3 YEAR WARRANTY", "FREE DELIVERY") are Product
+// Features instead.
+function isDescriptionLine(line: string): boolean {
+  const words = line.trim().split(/\s+/).filter(Boolean);
+  return words.length > 7;
+}
+
 // ─── Slug generation ─────────────────────────────────────────────────────────
 const usedSlugs = new Set<string>();
 function slugify(...parts: string[]): string {
@@ -222,6 +243,8 @@ type BuiltProduct = {
   price: number | null;
   tagline: string | null;
   description: string[];
+  features: string[];
+  specs: { label: string; value: string }[];
   netRows: { name: string; sku: string; net: number }[];
 };
 
@@ -260,18 +283,73 @@ async function main() {
     const text = String(r[0] ?? "").trim();
     if (text && familyKeys.has(text)) headingIdx.push({ i, text });
   });
-  function writeupBody(key: string): string[] {
+  // The write-up sheet turns out to have real structure, not just flowing
+  // text: each block is [SKU/badge lines] [intro paragraphs] "Product Detail"
+  // [bullet features] "Technical Specification" [label | value spec table,
+  // using BOTH columns]. Parse around those section headers instead of
+  // guessing from line length.
+  const PRODUCT_DETAIL_HEADERS = new Set(["product detail", "product details"]);
+  const SPEC_HEADERS = new Set(["technical specification", "specification", "specifications"]);
+
+  function parseWriteupSections(key: string): {
+    tagline: string | null;
+    description: string[];
+    features: string[];
+    specs: { label: string; value: string }[];
+  } {
     const idx = headingIdx.findIndex((h) => h.text === key);
-    if (idx === -1) return [];
+    if (idx === -1) return { tagline: null, description: [], features: [], specs: [] };
     const start = headingIdx[idx].i + 1;
-    const end = idx + 1 < headingIdx.length ? headingIdx[idx + 1].i : start + 12;
-    return writeups
-      .slice(start, end)
+    const end = idx + 1 < headingIdx.length ? headingIdx[idx + 1].i : writeups.length;
+    const rows = writeups.slice(start, end);
+
+    let productDetailAt = -1;
+    let specAt = -1;
+    rows.forEach((r, i) => {
+      const a = String(r[0] ?? "").trim().toLowerCase();
+      if (productDetailAt === -1 && PRODUCT_DETAIL_HEADERS.has(a)) productDetailAt = i;
+      if (specAt === -1 && SPEC_HEADERS.has(a)) specAt = i;
+    });
+
+    const preEnd = productDetailAt !== -1 ? productDetailAt : specAt !== -1 ? specAt : rows.length;
+    const preLines = rows
+      .slice(0, preEnd)
       .map((r) => String(r[0] ?? "").trim())
       .filter(Boolean)
-      // Metadata lines (SKU refs, price notes) sit right under the heading in
-      // most blocks — real marketing copy, not a tagline/description line.
-      .filter((line) => !/^SKU:?\s*/i.test(line) && !/£\d/.test(line));
+      // SKU/price lines and stray section labels ("Features", "Description")
+      // aren't real content for either tab.
+      .filter((line) => !/^SKU:?\s*/i.test(line) && !/£\d/.test(line))
+      .filter((line) => !HEADER_ARTIFACTS.has(line.toLowerCase()));
+
+    const tagline = preLines[0] ?? null;
+    const preRest = preLines.slice(1);
+    // Among the intro block: long lines are real marketing prose, short ones
+    // are badges ("3 YEAR WARRANTY", "FREE DELIVERY") — treat those as
+    // features too, same as the structured "Product Detail" bullets below.
+    const description = preRest.filter((line) => isDescriptionLine(line));
+    const preFeatures = preRest.filter((line) => !isDescriptionLine(line));
+
+    const detailFeatures =
+      productDetailAt !== -1
+        ? rows
+            .slice(productDetailAt + 1, specAt !== -1 ? specAt : rows.length)
+            .map((r) => String(r[0] ?? "").trim())
+            .filter(Boolean)
+        : [];
+
+    const specs: { label: string; value: string }[] = [];
+    if (specAt !== -1) {
+      for (let i = specAt + 1; i < rows.length; i++) {
+        const label = String(rows[i][0] ?? "").trim();
+        const value = String(rows[i][1] ?? "").trim();
+        if (!label || !value) continue;
+        // The table's own header row ("Category" | "Specification").
+        if (label.toLowerCase() === "category" && value.toLowerCase() === "specification") continue;
+        specs.push({ label, value });
+      }
+    }
+
+    return { tagline, description, features: [...preFeatures, ...detailFeatures], specs };
   }
 
   const STOPWORDS = new Set([
@@ -338,9 +416,12 @@ async function main() {
       subGroups.get(subKey)!.push(r);
     }
 
-    const body = writeupBody(familyKey);
-    const tagline = body[0] ?? null;
-    const description = body.slice(1);
+    const {
+      tagline,
+      description,
+      features: writeupFeatures,
+      specs: writeupSpecs,
+    } = parseWriteupSections(familyKey);
 
     for (const [subKey, subRows] of subGroups) {
       const [colour, conn] = subKey.split("::");
@@ -422,31 +503,56 @@ async function main() {
         net: Number(r[COL.NET_PRICE] || 0),
       }));
 
+      // Specification tab: prefer the write-up's own "Technical Specification"
+      // table (real label/value pairs — dimensions, IP rating, protocols,
+      // etc.) when the source has one; fall back to fields already parsed
+      // precisely during import for the products that don't.
+      const brand = brandOf(descriptiveName);
+      const fallbackSpecs: { label: string; value: string }[] = [
+        { label: "Brand", value: brand },
+        { label: "Colour", value: colour },
+      ];
+      const features = writeupFeatures;
+
       if (category === "Accessory") {
+        const style = "Straight";
+        const phase = phaseOf(descriptiveName);
+        fallbackSpecs.push({ label: "Style", value: style }, { label: "Phase", value: phase });
+        if (lengths.length) fallbackSpecs.push({ label: "Length options", value: lengths.join(", ") });
+        const specs = writeupSpecs.length > 0 ? writeupSpecs : fallbackSpecs;
+
         built.push({
           id,
           category,
           name,
-          brand: brandOf(descriptiveName),
+          brand,
           colour,
           cardImage: photos[0] ?? "",
           gallery: photos,
           variantGroup,
-          style: "Straight",
-          phase: phaseOf(descriptiveName),
+          style,
+          phase,
           lengthOptions: lengths,
           cableLengthOptions: [],
           price,
           tagline,
           description,
+          features,
+          specs,
           netRows,
         });
       } else {
+        const powerOutput = powerOutputOf(descriptiveName);
+        fallbackSpecs.push({ label: "Connection type", value: conn });
+        if (powerOutput) fallbackSpecs.push({ label: "Power output", value: powerOutput });
+        if (lengths.length) fallbackSpecs.push({ label: "Cable length", value: lengths.join(", ") });
+        const specs = writeupSpecs.length > 0 ? writeupSpecs : fallbackSpecs;
+
         built.push({
           id,
           category,
           name,
-          brand: brandOf(descriptiveName),
+          brand,
           colour,
           cardImage: photos[0] ?? "",
           gallery: photos,
@@ -454,11 +560,13 @@ async function main() {
           connectionType: conn,
           cableLength: lengths[0] ?? undefined,
           cableLengthOptions: lengths,
-          powerOutput: powerOutputOf(descriptiveName),
+          powerOutput,
           lengthOptions: [],
           price,
           tagline,
           description,
+          features,
+          specs,
           netRows,
         });
       }
@@ -481,7 +589,7 @@ async function main() {
   console.log("\n=== Full product list ===");
   for (const p of built) {
     console.log(
-      `[${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  colour=${p.colour}  images=${p.gallery.length}  options=${(p.cableLengthOptions.length || p.lengthOptions.length)}  desc-paragraphs=${p.description.length}`,
+      `[${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  colour=${p.colour}  images=${p.gallery.length}  options=${(p.cableLengthOptions.length || p.lengthOptions.length)}  desc=${p.description.length}  features=${p.features.length}  specs=${p.specs.length}`,
     );
   }
 
@@ -530,8 +638,8 @@ async function main() {
         lengthOptions: p.lengthOptions,
         tagline: p.tagline,
         description: p.description,
-        features: [],
-        specs: p.powerOutput ? [{ label: "Power output", value: p.powerOutput }] : [],
+        features: p.features,
+        specs: p.specs,
         warranty: null,
       })),
     }),

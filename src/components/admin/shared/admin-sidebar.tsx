@@ -13,7 +13,6 @@ import {
   ShoppingBag,
   Users,
   Zap,
-  Package,
 } from "lucide-react";
 
 import {
@@ -37,8 +36,7 @@ const overviewLinks = [
 ];
 
 const catalogLinks = [
-  { href: "/admin/residential", label: "Residential Chargers", icon: Zap },
-  { href: "/admin/commercial", label: "Commercial Chargers", icon: Package },
+  { href: "/admin/chargers", label: "Chargers", icon: Zap },
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
 ];
 
@@ -59,8 +57,19 @@ export function AdminSidebar({
   pendingQuoteCount?: number;
 }) {
   const pathname = usePathname();
-  const isActive = (href: string) =>
-    href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/admin") return pathname === "/admin";
+    // Per-product edit pages still live under their original category
+    // routes — treat those as part of the unified "Chargers" section too.
+    if (href === "/admin/chargers") {
+      return (
+        pathname.startsWith("/admin/chargers") ||
+        pathname.startsWith("/admin/residential") ||
+        pathname.startsWith("/admin/commercial")
+      );
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <Sidebar collapsible="offcanvas" className="border-sidebar-border">

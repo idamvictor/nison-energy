@@ -9,6 +9,7 @@ import { authClient } from "@/lib/auth/client";
 
 function pageTitle(pathname: string): string {
   if (pathname === "/admin") return "Dashboard";
+  if (pathname.startsWith("/admin/chargers")) return "Chargers";
   if (pathname.startsWith("/admin/residential")) return "Residential Chargers";
   if (pathname.startsWith("/admin/commercial")) return "Commercial Chargers";
   if (pathname.startsWith("/admin/accessories")) return "Accessories";

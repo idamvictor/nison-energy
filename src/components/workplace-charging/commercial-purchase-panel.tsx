@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Heart, ShieldCheck, Zap } from "lucide-react";
+import { Check, ChevronDown, Heart, ShieldCheck, Zap } from "lucide-react";
 
 import type { CommercialProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -27,17 +27,28 @@ export function CommercialPurchasePanel({
   siblings: CommercialProduct[];
 }) {
   const router = useRouter();
+  const [installation, setInstallation] = useState<"standard" | "none" | null>(null);
+  const [installationOpen, setInstallationOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
 
-  const total = product.price * quantity;
+  const installFee = product.installFee ?? 0;
+  const unitPrice = product.price + (installation === "standard" ? installFee : 0);
+  const total = unitPrice * quantity;
   const totalExVat = Math.round(total / 1.2);
 
   const colourSiblings =
     product.variantGroup && siblings.length > 0 ? siblings : [product];
+
+  const installationLabel =
+    installation === "standard"
+      ? `Standard installation (+£${installFee})`
+      : installation === "none"
+        ? "No installation (device only)"
+        : "Choose option";
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -49,7 +60,7 @@ export function CommercialPurchasePanel({
           </span>
         </p>
         <p className="text-sm text-muted-foreground">
-          £{totalExVat} <span>ex VAT</span> · supply &amp; fit
+          £{totalExVat} <span>ex VAT</span>
         </p>
       </div>
 
@@ -77,12 +88,69 @@ export function CommercialPurchasePanel({
             <option value="10m">10m (charger to fuse box)</option>
           </select>
         </label>
+
+        <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
+          Installation option
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setInstallationOpen((open) => !open)}
+              className={cn(
+                selectClass,
+                "flex items-center justify-between text-left font-normal",
+                installation === null && "text-muted-foreground"
+              )}
+            >
+              {installationLabel}
+              <ChevronDown
+                className={cn(
+                  "size-4 shrink-0 transition-transform",
+                  installationOpen && "rotate-180"
+                )}
+              />
+            </button>
+
+            {installationOpen && (
+              <div className="absolute z-10 mt-1.5 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInstallation("standard");
+                    setInstallationOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                >
+                  Standard installation (+£{installFee})
+                  {installation === "standard" && <Check className="size-4 text-primary" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInstallation("none");
+                    setInstallationOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between border-t border-border px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                >
+                  No installation (device only)
+                  {installation === "none" && <Check className="size-4 text-primary" />}
+                </button>
+              </div>
+            )}
+          </div>
+          {installation === null && (
+            <p className="text-xs font-normal text-muted-foreground">
+              Select an installation option to continue.
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-        <p className="text-sm text-foreground">{warranty}</p>
-      </div>
+      {warranty && (
+        <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p className="text-sm text-foreground">{warranty}</p>
+        </div>
+      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>
@@ -93,8 +161,10 @@ export function CommercialPurchasePanel({
 
       <Button
         size="lg"
+        disabled={installation === null}
         className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
         onClick={() => {
+          if (installation === null) return;
           addItem(
             {
               id: product.id,
@@ -102,9 +172,10 @@ export function CommercialPurchasePanel({
               name: product.name,
               brand: product.brand,
               image: product.image,
-              price: product.price,
+              price: unitPrice,
             },
             quantity,
+            { installation },
           );
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2000);

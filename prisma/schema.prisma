@@ -143,6 +143,7 @@ model Product {
   cableLength    String?
   powerOutput    String?
   price          Int?
+  installFee     Int?
 
   // Residential only
   cableLengthOptions String[] @default([])

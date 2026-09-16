@@ -56,6 +56,7 @@ export type Product = {
   variantGroup?: string;
   compatibleTariffs?: string[];
   price: number;
+  installFee?: number;
   tags: string[];
   image: string;
   warranty?: string;
@@ -75,6 +76,7 @@ export type CommercialProduct = {
   powerOutput: string;
   variantGroup?: string;
   price: number;
+  installFee?: number;
   tags: string[];
   image: string;
   warranty?: string;
@@ -128,6 +130,7 @@ export type ProductInput = {
   cableLength: string | null;
   powerOutput: string | null;
   price: number | null;
+  installFee: number | null;
   cableLengthOptions: string[];
   compatibleTariffs: string[];
   style: string | null;

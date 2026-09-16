@@ -38,6 +38,7 @@ export function dbToResidential(row: ProductRow): Product {
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
     price: row.price ?? 0,
+    installFee: row.installFee ?? undefined,
     tags: row.tags,
     image: row.cardImage,
     warranty: row.warranty ?? undefined,
@@ -59,6 +60,7 @@ export function dbToCommercial(row: ProductRow): CommercialProduct {
     powerOutput: row.powerOutput ?? "",
     variantGroup: row.variantGroup ?? undefined,
     price: row.price ?? 0,
+    installFee: row.installFee ?? undefined,
     tags: row.tags,
     image: row.cardImage,
     warranty: row.warranty ?? undefined,
@@ -212,6 +214,7 @@ function toData(input: ProductInput) {
     cableLength: input.cableLength?.trim() || null,
     powerOutput: input.powerOutput?.trim() || null,
     price: input.price ?? null,
+    installFee: input.installFee ?? null,
     cableLengthOptions: input.cableLengthOptions,
     compatibleTariffs: input.compatibleTariffs,
     style: input.style || null,

@@ -100,6 +100,9 @@ export function ProductForm({
   const [cableLength, setCableLength] = useState(row?.cableLength ?? "");
   const [powerOutput, setPowerOutput] = useState(row?.powerOutput ?? "");
   const [price, setPrice] = useState(row?.price != null ? String(row.price) : "");
+  const [installFee, setInstallFee] = useState(
+    row?.installFee != null ? String(row.installFee) : "",
+  );
   const [cableLengthOptions, setCableLengthOptions] = useState(
     toCsv(row?.cableLengthOptions ?? []),
   );
@@ -151,6 +154,7 @@ export function ProductForm({
       cableLength: isCharger ? cableLength.trim() || null : null,
       powerOutput: isCharger ? powerOutput.trim() || null : null,
       price: isCharger && price.trim() !== "" ? Number(price) : null,
+      installFee: isCharger && installFee.trim() !== "" ? Number(installFee) : null,
       cableLengthOptions:
         category === "Residential" ? fromCsv(cableLengthOptions) : [],
       compatibleTariffs:
@@ -384,6 +388,14 @@ export function ProductForm({
                 min={0}
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+              />
+            </Field>
+            <Field label="Installation fee (£)">
+              <Input
+                type="number"
+                min={0}
+                value={installFee}
+                onChange={(e) => setInstallFee(e.target.value)}
               />
             </Field>
             {category === "Residential" && (

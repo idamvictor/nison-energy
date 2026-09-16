@@ -11,7 +11,6 @@ import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 
-const INSTALL_FEE = 499;
 const OZEV_GRANT_GUIDE_URL = "https://nison-energy.vercel.app/ozev-grant-guide";
 
 const selectClass =
@@ -36,8 +35,8 @@ export function PurchasePanel({
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
 
-  const devicePrice = product.price - INSTALL_FEE;
-  const unitPrice = devicePrice + (installation === "standard" ? INSTALL_FEE : 0);
+  const installFee = product.installFee ?? 0;
+  const unitPrice = product.price + (installation === "standard" ? installFee : 0);
   const total = unitPrice * quantity;
   const totalExVat = Math.round(total / 1.2);
 
@@ -48,7 +47,7 @@ export function PurchasePanel({
 
   const installationLabel =
     installation === "standard"
-      ? `Standard installation (+£${INSTALL_FEE})`
+      ? `Standard installation (+£${installFee})`
       : installation === "none"
         ? "No installation (device only)"
         : "Choose option";
@@ -135,7 +134,7 @@ export function PurchasePanel({
                   }}
                   className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
-                  Standard installation (+£{INSTALL_FEE})
+                  Standard installation (+£{installFee})
                   {installation === "standard" && <Check className="size-4 text-primary" />}
                 </button>
                 <button
@@ -160,12 +159,14 @@ export function PurchasePanel({
         </div>
       </div>
 
-      <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-        <p className="text-sm text-foreground">
-          <span className="font-medium">Warranty:</span> {warranty} included
-        </p>
-      </div>
+      {warranty && (
+        <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p className="text-sm text-foreground">
+            <span className="font-medium">Warranty:</span> {warranty} included
+          </p>
+        </div>
+      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>
@@ -187,7 +188,7 @@ export function PurchasePanel({
               name: product.name,
               brand: product.brand,
               image: product.image,
-              price: product.price,
+              price: unitPrice,
             },
             quantity,
             {

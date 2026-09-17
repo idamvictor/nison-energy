@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
@@ -6,6 +7,7 @@ import { uploadDocument } from "@/lib/media/queries";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { quoteSchemes, type QuoteScheme } from "@/lib/quotes/types";
 import type { Prisma } from "@/generated/prisma/client";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 
 // Uses the S3 SDK — not edge-compatible.
 export const runtime = "nodejs";
@@ -99,6 +101,7 @@ export async function POST(request: Request) {
       input: input as Prisma.InputJsonValue,
     },
   });
+  revalidateTag(CACHE_TAGS.quotes, { expire: 0 });
 
   return NextResponse.json(
     { ok: true, id: quote.id, status: quote.status },

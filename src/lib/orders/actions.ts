@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
@@ -13,6 +13,7 @@ import { stripe } from "@/lib/stripe/client";
 import { SITE_URL } from "@/lib/site";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getClientIp } from "@/lib/rate-limit/ip";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import {
   orderStatuses,
   type CreateCheckoutSessionResult,
@@ -151,5 +152,6 @@ export async function updateOrderStatus(
   revalidatePath("/admin");
   revalidatePath("/account/orders");
   revalidatePath("/account/inbox");
+  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
   return { ok: true };
 }

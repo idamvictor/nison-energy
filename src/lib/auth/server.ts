@@ -18,6 +18,14 @@ export const userAdditionalFields = {
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  // Signed-cookie session cache: avoids a DB round trip on every request for
+  // an existing session (getSession() reads the cookie instead). Off by
+  // default for a stateful (DB-backed) config like this one. A revoked
+  // admin role/ban takes up to maxAge to take effect for an already-signed-in
+  // browser — a deliberate, bounded trade-off.
+  session: {
+    cookieCache: { enabled: true, maxAge: 60 },
+  },
   user: {
     additionalFields: userAdditionalFields,
   },

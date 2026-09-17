@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
@@ -10,6 +10,7 @@ import { deleteDocument } from "@/lib/media/queries";
 import { sendEmail } from "@/lib/email/client";
 import { quoteApprovedEmail, quoteRejectedEmail } from "@/lib/email/templates";
 import { quoteSchemeLabels, type QuoteActionResult } from "@/lib/quotes/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 
 function revalidate(id: string) {
   revalidatePath("/admin/quotes");
@@ -17,6 +18,7 @@ function revalidate(id: string) {
   revalidatePath("/admin");
   revalidatePath("/account/quotes");
   revalidatePath("/account/inbox");
+  revalidateTag(CACHE_TAGS.quotes, { expire: 0 });
 }
 
 export async function reviewQuote(

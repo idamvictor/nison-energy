@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import {
   createProduct,
@@ -13,6 +13,7 @@ import {
   type ProductInput,
   type WriteResult,
 } from "@/lib/catalog/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 
 const adminRoute: Record<ProductCategory, string> = {
   Residential: "/admin/residential",
@@ -27,6 +28,7 @@ function revalidate(category: ProductCategory) {
   revalidatePath("/admin");
   revalidatePath("/");
   revalidatePath("/account/wishlist");
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
 }
 
 export async function saveProduct(

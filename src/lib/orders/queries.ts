@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { after } from "next/server";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -13,6 +14,8 @@ import {
   staffOrderAlert,
 } from "@/lib/email/templates";
 import type { OrderLineInput, OrderWithItems } from "@/lib/orders/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 
 export type {
   OrderStatus,
@@ -59,8 +62,12 @@ export const getOrdersForUser = cache(
     }) as unknown as Promise<OrderWithItems[]>,
 );
 
-export const getPendingOrderCount = cache(() =>
-  prisma.order.count({ where: { status: "Pending" } }),
+export const getPendingOrderCount = cache(
+  unstable_cache(
+    () => prisma.order.count({ where: { status: "Pending" } }),
+    ["orders-pending-count"],
+    { tags: [CACHE_TAGS.orders], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );
 
 // ─── Create ─────────────────────────────────────────────────────────────────
@@ -162,7 +169,7 @@ async function insertOrder(
   for (let attempt = 0; attempt < 5; attempt++) {
     const reference = newReference();
     try {
-      return (await prisma.order.create({
+      const order = (await prisma.order.create({
         data: {
           reference,
           firstName: data.firstName,
@@ -188,6 +195,8 @@ async function insertOrder(
         },
         include: { items: true },
       })) as unknown as OrderWithItems;
+      revalidateTag(CACHE_TAGS.orders, { expire: 0 });
+      return order;
     } catch (err) {
       const code = (err as { code?: string })?.code;
       if (code === "P2002") continue; // unique clash on reference — retry

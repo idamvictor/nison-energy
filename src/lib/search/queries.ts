@@ -1,8 +1,12 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
 import { prisma } from "@/lib/db";
 import type { ProductCategory } from "@/lib/catalog/types";
 import type { SearchResult } from "@/lib/search/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 
 // Strips tsquery operator characters from a token so user input can never be
 // interpreted as query syntax, then marks it for prefix matching so results
@@ -39,13 +43,8 @@ type SearchRow = {
  * building the tsvector inline at query time, with no stored column or GIN
  * index, is plenty fast — no migration needed.
  */
-export async function searchProducts(
-  query: string,
-  limit = 30,
-): Promise<SearchResult[]> {
-  const tsQuery = toPrefixTsQuery(query);
-  if (!tsQuery) return [];
-
+const searchProductsCached = unstable_cache(
+  async (tsQuery: string, limit: number): Promise<SearchResult[]> => {
   const rows = await prisma.$queryRaw<SearchRow[]>`
     WITH scored AS (
       SELECT
@@ -92,4 +91,16 @@ export async function searchProducts(
     price: row.price,
     tags: row.tags,
   }));
+  },
+  ["search-products"],
+  { tags: [CACHE_TAGS.products], revalidate: CACHE_TTL.search },
+);
+
+export async function searchProducts(
+  query: string,
+  limit = 30,
+): Promise<SearchResult[]> {
+  const tsQuery = toPrefixTsQuery(query);
+  if (!tsQuery) return [];
+  return searchProductsCached(tsQuery, limit);
 }

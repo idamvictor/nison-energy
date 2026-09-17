@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
@@ -8,6 +8,7 @@ import { createLead } from "@/lib/leads/queries";
 import { createNotification } from "@/lib/notifications/queries";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getClientIp } from "@/lib/rate-limit/ip";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import {
   grantStatuses,
   installationStages,
@@ -139,6 +140,7 @@ function revalidateLead(id: string) {
   revalidatePath(`/admin/leads/${id}`);
   revalidatePath("/admin");
   revalidatePath("/account/inbox");
+  revalidateTag(CACHE_TAGS.leads, { expire: 0 });
 }
 
 export async function updateLeadStatus(

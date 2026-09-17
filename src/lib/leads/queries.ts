@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { after } from "next/server";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -9,6 +10,8 @@ import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { getStaffEmails } from "@/lib/email/recipients";
 import { customerEnquiryAck, staffLeadAlert } from "@/lib/email/templates";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 import type {
   AdminLead,
   GrantStatus,
@@ -79,8 +82,12 @@ export const getLeadsForUser = cache(
   },
 );
 
-export const getNewLeadCount = cache(() =>
-  prisma.lead.count({ where: { status: "New" } }),
+export const getNewLeadCount = cache(
+  unstable_cache(
+    () => prisma.lead.count({ where: { status: "New" } }),
+    ["leads-new-count"],
+    { tags: [CACHE_TAGS.leads], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );
 
 // ─── Create (shared by the contact-form action and POST /api/leads) ──────────
@@ -154,6 +161,7 @@ export async function createLead(
       userId: user?.id ?? null,
     },
   });
+  revalidateTag(CACHE_TAGS.leads, { expire: 0 });
 
   await createNotification({
     userId: lead.userId,

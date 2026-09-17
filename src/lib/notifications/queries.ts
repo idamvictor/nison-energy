@@ -1,10 +1,13 @@
 import "server-only";
 
 import { cache } from "react";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import type { Notification as NotificationRow } from "@/generated/prisma/client";
 import type { NotificationKind, NotificationView } from "@/lib/notifications/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 
 export function dbToNotification(row: NotificationRow): NotificationView {
   return {
@@ -29,8 +32,13 @@ export const getNotificationsForUser = cache(
   },
 );
 
-export const getUnreadCount = cache((userId: string): Promise<number> =>
-  prisma.notification.count({ where: { userId, readAt: null } }),
+export const getUnreadCount = cache(
+  unstable_cache(
+    (userId: string): Promise<number> =>
+      prisma.notification.count({ where: { userId, readAt: null } }),
+    ["notifications-unread-count"],
+    { tags: [CACHE_TAGS.notifications], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );
 
 /**
@@ -55,4 +63,5 @@ export async function createNotification(input: {
       href: input.href ?? null,
     },
   });
+  revalidateTag(CACHE_TAGS.notifications, { expire: 0 });
 }

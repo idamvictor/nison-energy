@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { after } from "next/server";
+import { revalidateTag } from "next/cache";
 import type Stripe from "stripe";
 
 import { prisma } from "@/lib/db";
@@ -8,6 +9,7 @@ import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { getStaffEmails } from "@/lib/email/recipients";
 import { customerOrderConfirmation, staffOrderAlert } from "@/lib/email/templates";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 
 // Uses the raw request body for signature verification — never statically cache.
 export const runtime = "nodejs";
@@ -84,6 +86,7 @@ async function markOrderPaid(session: Stripe.Checkout.Session) {
     },
   });
   if (count === 0) return; // already processed (duplicate delivery) or order missing
+  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 
   const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
   if (!order) return;
@@ -116,6 +119,7 @@ async function markOrderFailed(session: Stripe.Checkout.Session) {
     where: { id: orderId, paymentStatus: "Unpaid" },
     data: { paymentStatus: "Failed" },
   });
+  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 }
 
 // A Checkout Session expires 24h after creation if the customer never pays.
@@ -129,4 +133,5 @@ async function deleteAbandonedOrder(session: Stripe.Checkout.Session) {
   await prisma.order.deleteMany({
     where: { id: orderId, paymentStatus: "Unpaid" },
   });
+  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 }

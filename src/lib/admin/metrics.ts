@@ -1,11 +1,14 @@
 import "server-only";
 
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { dbLeadToAdminLead } from "@/lib/leads/queries";
 import { leadStatuses, type AdminLead, type LeadStatus } from "@/lib/leads/types";
 import { orderStatuses, type OrderStatus } from "@/lib/orders/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -53,7 +56,8 @@ export type TimeSeriesPoint = {
 };
 
 export const getTimeSeries = cache(
-  async (days: number): Promise<TimeSeriesPoint[]> => {
+  unstable_cache(
+    async (days: number): Promise<TimeSeriesPoint[]> => {
     const since = new Date(Date.now() - days * DAY_MS);
     const [leads, orders] = await Promise.all([
       prisma.lead.findMany({
@@ -89,7 +93,10 @@ export const getTimeSeries = cache(
       orders: buckets.get(day)?.orders ?? 0,
       value: buckets.get(day)?.value ?? 0,
     }));
-  },
+    },
+    ["admin-metrics-time-series"],
+    { tags: [CACHE_TAGS.leads, CACHE_TAGS.orders], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );
 
 // ─── KPIs (current window vs immediately-preceding window) ─────────────────
@@ -101,7 +108,9 @@ export type Kpis = {
   conversion: Metric; // percentage points (Won ÷ total leads in window), 0–100
 };
 
-export const getKpis = cache(async (days: number): Promise<Kpis> => {
+export const getKpis = cache(
+  unstable_cache(
+    async (days: number): Promise<Kpis> => {
   const now = Date.now();
   const since = new Date(now - days * DAY_MS);
   const prevSince = new Date(now - 2 * days * DAY_MS);
@@ -155,41 +164,61 @@ export const getKpis = cache(async (days: number): Promise<Kpis> => {
     pipeline: metric(valueNow._sum.subtotal ?? 0, valuePrev._sum.subtotal ?? 0),
     conversion: metric(wonRate(leadStatusNow), wonRate(leadStatusPrev)),
   };
-});
+    },
+    ["admin-metrics-kpis"],
+    { tags: [CACHE_TAGS.leads, CACHE_TAGS.orders], revalidate: CACHE_TTL.adminMetrics },
+  ),
+);
 
 // ─── Funnel / pipeline (current-status snapshot, all time) ─────────────────
 
 export type StatusCount<T extends string> = { status: T; count: number };
 
-export const getLeadFunnel = cache(async (): Promise<StatusCount<LeadStatus>[]> => {
-  const rows = await prisma.lead.groupBy({
-    by: ["status"],
-    _count: { _all: true },
-  });
-  const map = new Map(rows.map((r) => [r.status as LeadStatus, r._count._all]));
-  return leadStatuses.map((status) => ({ status, count: map.get(status) ?? 0 }));
-});
+export const getLeadFunnel = cache(
+  unstable_cache(
+    async (): Promise<StatusCount<LeadStatus>[]> => {
+      const rows = await prisma.lead.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      });
+      const map = new Map(rows.map((r) => [r.status as LeadStatus, r._count._all]));
+      return leadStatuses.map((status) => ({ status, count: map.get(status) ?? 0 }));
+    },
+    ["admin-metrics-lead-funnel"],
+    { tags: [CACHE_TAGS.leads], revalidate: CACHE_TTL.adminMetrics },
+  ),
+);
 
 export const getOrderPipeline = cache(
-  async (): Promise<StatusCount<OrderStatus>[]> => {
-    const rows = await prisma.order.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-    });
-    const map = new Map(rows.map((r) => [r.status as OrderStatus, r._count._all]));
-    return orderStatuses.map((status) => ({ status, count: map.get(status) ?? 0 }));
-  },
+  unstable_cache(
+    async (): Promise<StatusCount<OrderStatus>[]> => {
+      const rows = await prisma.order.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      });
+      const map = new Map(rows.map((r) => [r.status as OrderStatus, r._count._all]));
+      return orderStatuses.map((status) => ({ status, count: map.get(status) ?? 0 }));
+    },
+    ["admin-metrics-order-pipeline"],
+    { tags: [CACHE_TAGS.orders], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );
 
 // ─── Recent leads (for the dashboard table) ───────────────────────────────
 
-export const getRecentLeads = cache(async (limit = 5): Promise<AdminLead[]> => {
-  const rows = await prisma.lead.findMany({
-    orderBy: { submittedAt: "desc" },
-    take: limit,
-  });
-  return rows.map(dbLeadToAdminLead);
-});
+export const getRecentLeads = cache(
+  unstable_cache(
+    async (limit = 5): Promise<AdminLead[]> => {
+      const rows = await prisma.lead.findMany({
+        orderBy: { submittedAt: "desc" },
+        take: limit,
+      });
+      return rows.map(dbLeadToAdminLead);
+    },
+    ["admin-metrics-recent-leads"],
+    { tags: [CACHE_TAGS.leads], revalidate: CACHE_TTL.adminMetrics },
+  ),
+);
 
 // ─── Recent activity feed ─────────────────────────────────────────────────
 
@@ -214,6 +243,7 @@ export type ActivityItem =
     };
 
 export const getRecentActivity = cache(
+  unstable_cache(
   async (limit = 8): Promise<ActivityItem[]> => {
     const [leads, orders] = await Promise.all([
       prisma.lead.findMany({
@@ -271,4 +301,7 @@ export const getRecentActivity = cache(
       .sort((a, b) => b.at.localeCompare(a.at))
       .slice(0, limit);
   },
+    ["admin-metrics-recent-activity"],
+    { tags: [CACHE_TAGS.leads, CACHE_TAGS.orders], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );

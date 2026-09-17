@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
@@ -15,6 +16,8 @@ import type {
   Spec,
   WriteResult,
 } from "@/lib/catalog/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 
 // ─── Row → view-type mappers ────────────────────────────────────────────────
 
@@ -154,19 +157,25 @@ export const getFeatured = cache(
     }),
 );
 
-export const getProductCounts = cache(async () => {
-  const grouped = await prisma.product.groupBy({
-    by: ["category"],
-    _count: { _all: true },
-  });
-  const count = (c: ProductCategory) =>
-    grouped.find((g) => g.category === c)?._count._all ?? 0;
-  return {
-    residential: count("Residential"),
-    commercial: count("Commercial"),
-    accessory: count("Accessory"),
-  };
-});
+export const getProductCounts = cache(
+  unstable_cache(
+    async () => {
+      const grouped = await prisma.product.groupBy({
+        by: ["category"],
+        _count: { _all: true },
+      });
+      const count = (c: ProductCategory) =>
+        grouped.find((g) => g.category === c)?._count._all ?? 0;
+      return {
+        residential: count("Residential"),
+        commercial: count("Commercial"),
+        accessory: count("Accessory"),
+      };
+    },
+    ["catalog-product-counts"],
+    { tags: [CACHE_TAGS.products], revalidate: CACHE_TTL.adminMetrics },
+  ),
+);
 
 export const getChargerOptions = cache(() =>
   prisma.product.findMany({

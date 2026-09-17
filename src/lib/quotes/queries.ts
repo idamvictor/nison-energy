@@ -1,10 +1,13 @@
 import "server-only";
 
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import type { QuoteDocument as QuoteDocumentRow } from "@/generated/prisma/client";
 import type { AdminQuoteRow, QuoteDocumentView } from "@/lib/quotes/types";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { CACHE_TTL } from "@/lib/cache/config";
 
 function toView(row: QuoteDocumentRow): QuoteDocumentView {
   return {
@@ -62,5 +65,9 @@ export const getAllQuotes = cache(
 );
 
 export const getPendingQuoteCount = cache(
-  async () => prisma.quoteDocument.count({ where: { status: "Pending" } }),
+  unstable_cache(
+    async () => prisma.quoteDocument.count({ where: { status: "Pending" } }),
+    ["quotes-pending-count"],
+    { tags: [CACHE_TAGS.quotes], revalidate: CACHE_TTL.adminMetrics },
+  ),
 );

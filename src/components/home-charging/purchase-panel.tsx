@@ -26,7 +26,6 @@ export function PurchasePanel({
   siblings: Product[];
 }) {
   const router = useRouter();
-  const [cableLength, setCableLength] = useState(product.cableLength ?? "");
   const [installation, setInstallation] = useState<"standard" | "none" | null>(null);
   const [installationOpen, setInstallationOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -42,8 +41,16 @@ export function PurchasePanel({
 
   const colourSiblings =
     product.variantGroup && siblings.length > 0 ? siblings : [product];
-  const cableLengthOptions = product.cableLengthOptions ??
-    (product.cableLength ? [product.cableLength] : []);
+  // One entry per distinct colour — siblings include every colour × length
+  // combination in this variantGroup, so dedupe for the Colour dropdown.
+  const colourOptions = colourSiblings.filter(
+    (p, i) => colourSiblings.findIndex((q) => q.colour === p.colour) === i,
+  );
+  // Lengths available for the currently selected colour, shortest first —
+  // each length is now its own real, correctly-priced product row.
+  const lengthSiblings = colourSiblings
+    .filter((p) => p.colour === product.colour && p.cableLength)
+    .sort((a, b) => parseFloat(a.cableLength ?? "0") - parseFloat(b.cableLength ?? "0"));
 
   const installationLabel =
     installation === "standard"
@@ -70,12 +77,17 @@ export function PurchasePanel({
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Colour
           <select
-            value={product.id}
-            onChange={(e) => router.push(`/home-charging/${e.target.value}`)}
+            value={product.colour}
+            onChange={(e) => {
+              const candidates = colourSiblings.filter((p) => p.colour === e.target.value);
+              const match =
+                candidates.find((p) => p.cableLength === product.cableLength) ?? candidates[0];
+              if (match) router.push(`/home-charging/${match.id}`);
+            }}
             className={selectClass}
           >
-            {colourSiblings.map((p) => (
-              <option key={p.id} value={p.id}>
+            {colourOptions.map((p) => (
+              <option key={p.colour} value={p.colour}>
                 {p.colour}
               </option>
             ))}
@@ -84,15 +96,15 @@ export function PurchasePanel({
 
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Cable length
-          {cableLengthOptions.length > 0 ? (
+          {lengthSiblings.length > 0 ? (
             <select
-              value={cableLength}
-              onChange={(e) => setCableLength(e.target.value)}
+              value={product.id}
+              onChange={(e) => router.push(`/home-charging/${e.target.value}`)}
               className={selectClass}
             >
-              {cableLengthOptions.map((length) => (
-                <option key={length} value={length}>
-                  {length}
+              {lengthSiblings.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.cableLength}
                 </option>
               ))}
             </select>
@@ -192,7 +204,7 @@ export function PurchasePanel({
             },
             quantity,
             {
-              cableLength: cableLength || undefined,
+              cableLength: product.cableLength,
               installation,
             },
           );

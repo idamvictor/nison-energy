@@ -205,14 +205,24 @@ function isDescriptionLine(line: string): boolean {
 }
 
 // ─── Slug generation ─────────────────────────────────────────────────────────
-const usedSlugs = new Set<string>();
-function slugify(...parts: string[]): string {
-  const base = parts
+// Plain slug transform, no uniqueness — used for variantGroup, which must
+// stay IDENTICAL across a family's colour/length siblings to group them.
+// (Deduping this the way product ids are deduped would force siblings whose
+// cleaned name happens to be identical — e.g. Hypervolt, whose write-up
+// reference text is colour-specific — onto artificially different
+// variantGroups, breaking the colour/length dropdowns entirely.)
+function rawSlug(...parts: string[]): string {
+  return parts
     .join(" ")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/-{2,}/g, "-");
+}
+
+const usedSlugs = new Set<string>();
+function slugify(...parts: string[]): string {
+  const base = rawSlug(...parts);
   let slug = base;
   let n = 2;
   while (usedSlugs.has(slug)) {
@@ -398,20 +408,31 @@ async function main() {
       /\s*[-–]\s*(Black|White|Space Grey|Grey|Red|Green|Blue)\s*$/i,
       "",
     ).trim();
-    const variantGroup = slugify(cleanFamilyKey);
+    const variantGroup = rawSlug(cleanFamilyKey);
     // A short row name like a bare "Grey" says nothing about connection type —
     // inherit the family's own type in that case rather than defaulting blind.
     const familyConn = connectionTypeOf(familyKey);
 
-    // Sub-group rows within the family by (colour, connectionType) — these
-    // become separate Product rows; length differences fold into options.
+    // Sub-group rows within the family by (colour, connectionType, length) —
+    // these become separate Product rows. Length is a real priced variant
+    // for some families (Hypervolt, Zev, Wottz — different net price per
+    // length), not a cosmetic label, so it's part of the key just like
+    // colour is — each length gets its own correctly-priced row instead of
+    // every length folding into one row's `cableLengthOptions`/`lengthOptions`
+    // with only the cheapest length's price surviving.
+    const familyLengths = new Set(
+      rows.map((r) => lengthOf(String(r[COL.NAME]))).filter(Boolean),
+    );
+    const familyHasMultipleLengths = familyLengths.size > 1;
+
     const subGroups = new Map<string, Row[]>();
     for (const r of rows) {
       const name = String(r[COL.NAME]);
       const sku = String(r[COL.SKU] ?? "");
       const colour = isWottzCable ? (wottzColourFromSku(sku) ?? colourOf(name)) : colourOf(name);
       const conn = significantWords(name).size >= 2 ? connectionTypeOf(name) : familyConn;
-      const subKey = `${colour}::${conn}`;
+      const length = lengthOf(name) ?? "";
+      const subKey = `${colour}::${conn}::${length}`;
       if (!subGroups.has(subKey)) subGroups.set(subKey, []);
       subGroups.get(subKey)!.push(r);
     }
@@ -424,7 +445,7 @@ async function main() {
     } = parseWriteupSections(familyKey);
 
     for (const [subKey, subRows] of subGroups) {
-      const [colour, conn] = subKey.split("::");
+      const [colour, conn, subGroupLength] = subKey.split("::");
 
       // Two different "representative" rows for two different purposes:
       // the cheapest row gives the price (shorter cable = lower net price,
@@ -465,10 +486,17 @@ async function main() {
       // untethered when both share one write-up (e.g. FastAmps).
       const rowNameIsReal = significantWords(descriptiveName).size >= 2;
       const rawBase = rowNameIsReal ? descriptiveName : cleanFamilyKey;
-      // Only strip a trailing length when several lengths are being collapsed
-      // into this one product's options — if there's just one, it's part of
-      // what distinguishes this family from a sibling (e.g. Ohme Home Pro 5m
-      // vs 8m are two separate write-ups, not variants of each other).
+      // Only strip a trailing length when the FAMILY spans several lengths
+      // (across all its sub-groups) — if there's just one length overall,
+      // it's part of what distinguishes this family from a sibling (e.g.
+      // Ohme Home Pro 5m vs 8m are two separate write-ups, not variants of
+      // each other). Now that length is part of the sub-group key, always
+      // normalize (strip) whatever length text happened to survive in this
+      // row's own name for a multi-length family, then re-append this
+      // sub-group's own definitive length explicitly below — don't rely on
+      // incidental text already being correct/present (a terse per-row name
+      // like "7.5m - Black" can fail the rowNameIsReal check above and fall
+      // back to cleanFamilyKey, silently losing that row's own length).
       // Strip any colour word wherever it appears (not just trailing) — a few
       // rows keep a stale colour in the middle of the text (e.g. a Wottz
       // "Yellow" cable whose row name still literally says "Black").
@@ -480,9 +508,14 @@ async function main() {
         .replace(/\s{2,}/g, " ")
         .replace(/\s*[-–]\s*$/, "")
         .trim();
-      if (lengths.length > 1) {
+      if (familyHasMultipleLengths) {
+        // Strip length wherever it appears (not just trailing) — some rows
+        // state it mid-string (e.g. "Wottz Portable EV Granny Charger 2m -
+        // Vehicle Socket Type 2 (UK10A Max)"), same reasoning as colour above.
         nameWithoutColourOrLength = nameWithoutColourOrLength
-          .replace(/\s*[-–]?\s*\d+(?:\.\d+)?\s*m\b\s*$/i, "")
+          .replace(/\s*[-–]?\s*\d+(?:\.\d+)?\s*m\b/gi, "")
+          .replace(/\s{2,}/g, " ")
+          .replace(/\s*[-–]\s*$/, "")
           .trim();
       }
       const baseForName =
@@ -491,11 +524,19 @@ async function main() {
           : /tethered/i.test(nameWithoutColourOrLength)
             ? nameWithoutColourOrLength.replace(/untethered|tethered/i, conn)
             : `${nameWithoutColourOrLength} ${conn}`;
-      const name = new RegExp(`\\b${colour}\\b\\s*$`, "i").test(baseForName)
-        ? baseForName
-        : `${baseForName} - ${colour}`;
+      // Re-append this sub-group's own length (the one used to build subKey,
+      // not whatever text may or may not have survived above) so multi-length
+      // siblings get distinct, meaningful names/slugs — e.g. "... 5m",
+      // "... 7.5m", "... 10m" — instead of colliding on one name.
+      const baseForNameWithLength =
+        familyHasMultipleLengths && subGroupLength
+          ? `${baseForName} ${subGroupLength}`
+          : baseForName;
+      const name = new RegExp(`\\b${colour}\\b\\s*$`, "i").test(baseForNameWithLength)
+        ? baseForNameWithLength
+        : `${baseForNameWithLength} - ${colour}`;
 
-      const id = slugify(baseForName, colour);
+      const id = slugify(baseForNameWithLength, colour);
 
       const netRows = subRows.map((r) => ({
         name: String(r[COL.NAME]),
@@ -643,7 +684,7 @@ async function main() {
         warranty: null,
       })),
     }),
-  ]);
+  ], { timeout: 30000 });
   console.log(`Deleted ${deleted.count} old products. Inserted ${inserted.count} new products.`);
 
   console.log("Done.");

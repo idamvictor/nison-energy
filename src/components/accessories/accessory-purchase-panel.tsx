@@ -22,7 +22,6 @@ export function AccessoryPurchasePanel({
   siblings: AccessoryProduct[];
 }) {
   const router = useRouter();
-  const [length, setLength] = useState(product.lengthOptions[0]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
@@ -31,6 +30,18 @@ export function AccessoryPurchasePanel({
 
   const variantSiblings =
     siblings.length > 0 ? siblings : [product];
+  // One entry per distinct (style, colour) pair.
+  const styleColourOptions = variantSiblings.filter(
+    (p, i) =>
+      variantSiblings.findIndex((q) => q.style === p.style && q.colour === p.colour) === i,
+  );
+  // Lengths available for the currently selected style+colour, shortest
+  // first — each length is now its own real product row.
+  const lengthSiblings = variantSiblings
+    .filter((p) => p.style === product.style && p.colour === product.colour)
+    .sort(
+      (a, b) => parseFloat(a.lengthOptions[0] ?? "0") - parseFloat(b.lengthOptions[0] ?? "0"),
+    );
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -47,12 +58,21 @@ export function AccessoryPurchasePanel({
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Style / colour
           <select
-            value={product.id}
-            onChange={(e) => router.push(`/accessories/${e.target.value}`)}
+            value={`${product.style}::${product.colour}`}
+            onChange={(e) => {
+              const [newStyle, newColour] = e.target.value.split("::");
+              const candidates = variantSiblings.filter(
+                (p) => p.style === newStyle && p.colour === newColour,
+              );
+              const match =
+                candidates.find((p) => p.lengthOptions[0] === product.lengthOptions[0]) ??
+                candidates[0];
+              if (match) router.push(`/accessories/${match.id}`);
+            }}
             className={selectClass}
           >
-            {variantSiblings.map((p) => (
-              <option key={p.id} value={p.id}>
+            {styleColourOptions.map((p) => (
+              <option key={`${p.style}::${p.colour}`} value={`${p.style}::${p.colour}`}>
                 {p.style} · {p.colour}
               </option>
             ))}
@@ -61,17 +81,23 @@ export function AccessoryPurchasePanel({
 
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Length
-          <select
-            value={length}
-            onChange={(e) => setLength(e.target.value)}
-            className={selectClass}
-          >
-            {product.lengthOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
+          {lengthSiblings.length > 0 ? (
+            <select
+              value={product.id}
+              onChange={(e) => router.push(`/accessories/${e.target.value}`)}
+              className={selectClass}
+            >
+              {lengthSiblings.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.lengthOptions[0]}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select value="na" disabled className={cn(selectClass, "text-muted-foreground")}>
+              <option value="na">N/A</option>
+            </select>
+          )}
         </label>
       </div>
 

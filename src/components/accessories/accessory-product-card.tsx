@@ -99,11 +99,8 @@ export function AccessoryProductCard({
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {product.phase} · {product.colour} · {product.lengthOptions.join(" / ")}
-        </p>
-        <p className="mt-1 text-lg font-semibold text-foreground">
-          Request a quote
+        <p className="mt-1 text-2xl font-semibold text-foreground">
+          £{product.price}
         </p>
       </CardContent>
       <CardFooter className="relative z-10 border-t-0 bg-transparent p-5 pt-3">

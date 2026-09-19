@@ -188,7 +188,7 @@ export function ProductForm({
       connectionType: isCharger ? connectionType || null : null,
       cableLength: isCharger ? cableLength.trim() || null : null,
       powerOutput: isCharger ? powerOutput.trim() || null : null,
-      price: isCharger && price.trim() !== "" ? Number(price) : null,
+      price: price.trim() !== "" ? Number(price) : null,
       installFee: isCharger && installFee.trim() !== "" ? Number(installFee) : null,
       cableLengthOptions:
         category === "Residential" ? fromCsv(cableLengthOptions) : [],
@@ -505,10 +505,14 @@ export function ProductForm({
                 placeholder="5m, 10m"
               />
             </Field>
-            <p className="text-xs text-muted-foreground sm:col-span-2">
-              Accessories show &ldquo;Request a quote&rdquo; on the storefront —
-              there is no price field.
-            </p>
+            <Field label="Price (£, inc. VAT)">
+              <Input
+                type="number"
+                min={0}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </Field>
           </CardContent>
         </Card>
       )}

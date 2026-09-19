@@ -132,8 +132,8 @@ export default function CartPage() {
                   </div>
                   {hasQuoteOnlyItems && (
                     <p className="text-xs text-muted-foreground">
-                      Accessories are priced per quote — we&apos;ll confirm
-                      the full total when we&apos;re in touch.
+                      Some items don&apos;t have a fixed price yet —
+                      we&apos;ll confirm the full total when we&apos;re in touch.
                     </p>
                   )}
                   <Button

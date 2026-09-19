@@ -30,6 +30,9 @@ export function AccessoryPurchasePanel({
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
 
+  const total = product.price * quantity;
+  const totalExVat = Math.round(total / 1.2);
+
   const variantSiblings =
     siblings.length > 0 ? siblings : [product];
   // One entry per distinct (style, colour) pair.
@@ -48,11 +51,14 @@ export function AccessoryPurchasePanel({
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
       <div>
-        <p className="text-2xl font-semibold text-foreground">
-          Request a quote
+        <p className="text-3xl font-semibold text-foreground">
+          £{total}
+          <span className="ml-1.5 text-sm font-normal text-muted-foreground">
+            inc VAT
+          </span>
         </p>
         <p className="text-sm text-muted-foreground">
-          Priced per length — get in touch for a fast quote.
+          £{totalExVat} <span>ex VAT</span>
         </p>
       </div>
 
@@ -130,7 +136,7 @@ export function AccessoryPurchasePanel({
               name: product.name,
               brand: product.brand,
               image: product.image,
-              price: null,
+              price: product.price,
             },
             quantity,
           );

@@ -82,6 +82,7 @@ export function dbToAccessory(row: ProductRow): AccessoryProduct {
     phase: (row.phase as AccessoryProduct["phase"]) ?? "Single Phase",
     lengthOptions: row.lengthOptions,
     variantGroup: row.variantGroup ?? "",
+    price: row.price ?? 0,
     tags: row.tags,
     image: row.cardImage,
     active: row.active,

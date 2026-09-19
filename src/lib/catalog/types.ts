@@ -102,6 +102,7 @@ export type AccessoryProduct = {
   phase: "Single Phase" | "3 Phase";
   lengthOptions: string[];
   variantGroup: string;
+  price: number;
   tags: string[];
   image: string;
   active?: boolean;

@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const rows: { label: string; value: (p: AccessoryProduct) => React.ReactNode }[] = [
+  { label: "Price", value: (p) => `£${p.price}` },
   { label: "Brand", value: (p) => p.brand },
   { label: "Phase", value: (p) => p.phase },
   { label: "Style", value: (p) => p.style },

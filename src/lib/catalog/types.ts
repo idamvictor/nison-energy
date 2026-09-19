@@ -113,6 +113,7 @@ export type Spec = { label: string; value: string };
 
 export type ProductDetail = {
   tagline: string;
+  sku?: string;
   gallery: string[];
   description: string[];
   features: string[];
@@ -126,6 +127,7 @@ export type ProductInput = {
   category: ProductCategory;
   name: string;
   brand: string;
+  sku: string | null;
   colour: string;
   cardImage: string;
   tags: string[];

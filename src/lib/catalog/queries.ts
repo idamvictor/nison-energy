@@ -94,6 +94,7 @@ export function toAdminRow(row: ProductRow) {
     id: row.id,
     name: row.name,
     brand: row.brand,
+    sku: row.sku ?? undefined,
     colour: row.colour,
     image: row.cardImage,
     tags: row.tags,
@@ -106,12 +107,14 @@ export function toAdminRow(row: ProductRow) {
 }
 
 export function dbToDetail(row: ProductRow): ProductDetail {
+  const specs = specsOf(row);
   return {
     tagline: row.tagline ?? "",
+    sku: row.sku ?? undefined,
     gallery: row.gallery.length > 0 ? row.gallery : [row.cardImage],
     description: row.description,
     features: row.features,
-    specs: specsOf(row),
+    specs: row.sku ? [{ label: "SKU", value: row.sku }, ...specs] : specs,
     warranty: row.warranty ?? "",
   };
 }
@@ -211,6 +214,7 @@ function toData(input: ProductInput) {
     category: input.category,
     name: input.name.trim(),
     brand: input.brand.trim(),
+    sku: input.sku?.trim() || null,
     colour: input.colour.trim(),
     cardImage: input.cardImage.trim(),
     tags: input.tags,

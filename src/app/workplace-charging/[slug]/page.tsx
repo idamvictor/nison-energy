@@ -127,6 +127,9 @@ export default async function CommercialProductDetailPage({
                   </h1>
                   <AdminEditLink href={`${adminRoute.Commercial}/${product.id}`} />
                 </div>
+                {detail.sku && (
+                  <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>
+                )}
               </div>
 
               {product.tags.length > 0 && (

@@ -129,6 +129,7 @@ model Product {
   category     ProductCategory
   name         String
   brand        String
+  sku          String?
   colour       String
   cardImage    String
   tags         String[]        @default([])

@@ -4,8 +4,9 @@
  * spreadsheet. See the approved plan for the full rationale (pricing formula,
  * category classification, exclusions).
  *
- *   npx tsx scripts/import-catalogue.ts            # dry run — prints only
- *   npx tsx scripts/import-catalogue.ts --commit    # deletes old + inserts new
+ *   npx tsx scripts/import-catalogue.ts                 # dry run — prints only
+ *   npx tsx scripts/import-catalogue.ts --commit         # deletes old + inserts new
+ *   npx tsx scripts/import-catalogue.ts --backfill-sku   # non-destructive: sku column only
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -17,6 +18,13 @@ const XLSX_PATH =
   "C:/Users/User/Downloads/Ocunio Energy - Master Product Catalogue_1.xlsx";
 
 const COMMIT = process.argv.includes("--commit");
+// Non-destructive: updates only the `sku` column on already-existing
+// products (matched by the same deterministic `id` this script already
+// produces), instead of the full deleteMany+createMany replace. Used to
+// backfill SKU onto the 124 products already live without disturbing the
+// re-hosted images / warranty / install-fee / brand data layered on top
+// since the original import.
+const BACKFILL_SKU = process.argv.includes("--backfill-sku");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
@@ -239,6 +247,7 @@ type BuiltProduct = {
   category: ProductCategory;
   name: string;
   brand: string;
+  sku: string | null;
   colour: string;
   cardImage: string;
   gallery: string[];
@@ -461,6 +470,10 @@ async function main() {
       )[0];
       const descriptiveName = String(nameRow[COL.NAME]).trim();
 
+      // Tied to the priced variant row, not whichever row had the most
+      // descriptive name — same reasoning as price itself.
+      const sku = String(priceRow[COL.SKU] ?? "").trim() || null;
+
       const netPrice = Number(priceRow[COL.NET_PRICE] || 0);
       const price = netPrice > 0 ? Math.round(netPrice * 1.2) : null;
 
@@ -573,6 +586,7 @@ async function main() {
           category,
           name,
           brand,
+          sku,
           colour,
           cardImage: photos[0] ?? "",
           gallery: photos,
@@ -600,6 +614,7 @@ async function main() {
           category,
           name,
           brand,
+          sku,
           colour,
           cardImage: photos[0] ?? "",
           gallery: photos,
@@ -649,6 +664,29 @@ async function main() {
     console.log(`\n⚠ ${missingPrice.length} product(s) with no price:`, missingPrice.map((p) => p.id));
   }
 
+  if (BACKFILL_SKU) {
+    console.log(`\nBackfilling sku on ${built.length} existing product(s) (non-destructive)...`);
+    const results = await Promise.all(
+      built.map((p) =>
+        prisma.product
+          .update({ where: { id: p.id }, data: { sku: p.sku } })
+          .then(() => ({ id: p.id, ok: true as const }))
+          .catch(() => ({ id: p.id, ok: false as const })),
+      ),
+    );
+    const updated = results.filter((r) => r.ok);
+    const missing = results.filter((r) => !r.ok);
+    console.log(`Updated sku on ${updated.length} product(s).`);
+    if (missing.length) {
+      console.log(
+        `⚠ ${missing.length} id(s) from this run had no matching existing product (skipped):`,
+        missing.map((r) => r.id),
+      );
+    }
+    console.log("Done.");
+    return;
+  }
+
   if (!COMMIT) {
     console.log("\nDry run only — no database changes made. Re-run with --commit to apply.");
     return;
@@ -666,6 +704,7 @@ async function main() {
         category: p.category,
         name: p.name,
         brand: p.brand,
+        sku: p.sku,
         colour: p.colour,
         cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
         gallery: p.gallery,

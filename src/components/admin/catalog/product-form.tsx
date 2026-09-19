@@ -104,6 +104,7 @@ export function ProductForm({
   const [slugTouched, setSlugTouched] = useState(!isNew);
   const [name, setName] = useState(row?.name ?? "");
   const [brand, setBrand] = useState(row?.brand ?? "");
+  const [sku, setSku] = useState(row?.sku ?? "");
   const [colour, setColour] = useState(row?.colour ?? "");
   const [cardImage, setCardImage] = useState(row?.cardImage ?? "");
   const [tags, setTags] = useState(toCsv(row?.tags ?? []));
@@ -175,6 +176,7 @@ export function ProductForm({
       category,
       name,
       brand,
+      sku: sku.trim() || null,
       colour,
       cardImage,
       tags: fromCsv(tags),
@@ -326,6 +328,9 @@ export function ProductForm({
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
             />
+          </Field>
+          <Field label="SKU">
+            <Input value={sku} onChange={(e) => setSku(e.target.value)} />
           </Field>
           <Field label="Colour">
             <Input

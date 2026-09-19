@@ -55,6 +55,7 @@ export type AdminProductRow = {
   id: string;
   name: string;
   brand: string;
+  sku?: string;
   colour: string;
   image: string;
   tags: string[];
@@ -166,6 +167,7 @@ export function ProductsView({
             <TableHeader>
               <TableRow className="bg-secondary/60 hover:bg-secondary/60">
                 <TableHead>Product</TableHead>
+                <TableHead>SKU</TableHead>
                 <TableHead>Colour</TableHead>
                 <TableHead>{isCharger ? "Price" : "Style / Phase"}</TableHead>
                 <TableHead>Status</TableHead>
@@ -196,6 +198,9 @@ export function ProductsView({
                         <p className="text-xs text-muted-foreground">{item.brand}</p>
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                    {item.sku ?? "—"}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{item.colour}</TableCell>
                   <TableCell className="font-heading font-semibold text-primary">

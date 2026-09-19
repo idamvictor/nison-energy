@@ -161,6 +161,7 @@ export function ChargersView({ products }: { products: ChargerAdminRow[] }) {
             <TableHeader>
               <TableRow className="bg-secondary/60 hover:bg-secondary/60">
                 <TableHead>Product</TableHead>
+                <TableHead>SKU</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Colour</TableHead>
                 <TableHead>Price</TableHead>
@@ -199,6 +200,9 @@ export function ChargersView({ products }: { products: ChargerAdminRow[] }) {
                       <Badge variant={item.category === "Residential" ? "secondary" : "outline"}>
                         {item.category}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-muted-foreground">
+                      {item.sku ?? "—"}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{item.colour}</TableCell>
                     <TableCell className="font-heading font-semibold text-primary">

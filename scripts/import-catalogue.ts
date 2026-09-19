@@ -4,9 +4,9 @@
  * spreadsheet. See the approved plan for the full rationale (pricing formula,
  * category classification, exclusions).
  *
- *   npx tsx scripts/import-catalogue.ts                 # dry run — prints only
- *   npx tsx scripts/import-catalogue.ts --commit         # deletes old + inserts new
- *   npx tsx scripts/import-catalogue.ts --backfill-sku   # non-destructive: sku column only
+ *   npx tsx scripts/import-catalogue.ts             # dry run — prints only
+ *   npx tsx scripts/import-catalogue.ts --commit     # deletes old + inserts new
+ *   npx tsx scripts/import-catalogue.ts --backfill   # non-destructive: sku + price columns only
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -18,19 +18,21 @@ const XLSX_PATH =
   "C:/Users/User/Downloads/Ocunio Energy - Master Product Catalogue_1.xlsx";
 
 const COMMIT = process.argv.includes("--commit");
-// Non-destructive: updates only the `sku` column on already-existing
+// Non-destructive: updates only the `sku`/`price` columns on already-existing
 // products (matched by the same deterministic `id` this script already
 // produces), instead of the full deleteMany+createMany replace. Used to
-// backfill SKU onto the 124 products already live without disturbing the
-// re-hosted images / warranty / install-fee / brand data layered on top
-// since the original import.
-const BACKFILL_SKU = process.argv.includes("--backfill-sku");
+// backfill corrections onto the 124 products already live without disturbing
+// the re-hosted images / warranty / install-fee / brand data layered on top
+// since the original import. `--backfill-sku` kept as an alias for the first
+// run of this flag (SKU-only) — both now do the same full backfill.
+const BACKFILL = process.argv.includes("--backfill") || process.argv.includes("--backfill-sku");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
   NAME: 0,
   SKU: 1,
   NET_PRICE: 3,
+  MARKUP: 4,
   WRITEUP: 16,
   PHOTO_START: 17,
   PHOTO_END: 28,
@@ -474,7 +476,12 @@ async function main() {
       // descriptive name — same reasoning as price itself.
       const sku = String(priceRow[COL.SKU] ?? "").trim() || null;
 
-      const netPrice = Number(priceRow[COL.NET_PRICE] || 0);
+      // "Net Price" (the column right after Mark up) is the true pricing
+      // basis — confirmed empty as typed data in the source sheet, so it's
+      // computed here exactly as its position/name implies: Net price +
+      // Mark up (a flat £ add-on that varies per row, not a percentage).
+      const netPrice =
+        Number(priceRow[COL.NET_PRICE] || 0) + Number(priceRow[COL.MARKUP] || 0);
       const price = netPrice > 0 ? Math.round(netPrice * 1.2) : null;
 
       const photos: string[] = [];
@@ -664,19 +671,19 @@ async function main() {
     console.log(`\n⚠ ${missingPrice.length} product(s) with no price:`, missingPrice.map((p) => p.id));
   }
 
-  if (BACKFILL_SKU) {
-    console.log(`\nBackfilling sku on ${built.length} existing product(s) (non-destructive)...`);
+  if (BACKFILL) {
+    console.log(`\nBackfilling sku + price on ${built.length} existing product(s) (non-destructive)...`);
     const results = await Promise.all(
       built.map((p) =>
         prisma.product
-          .update({ where: { id: p.id }, data: { sku: p.sku } })
+          .update({ where: { id: p.id }, data: { sku: p.sku, price: p.price } })
           .then(() => ({ id: p.id, ok: true as const }))
           .catch(() => ({ id: p.id, ok: false as const })),
       ),
     );
     const updated = results.filter((r) => r.ok);
     const missing = results.filter((r) => !r.ok);
-    console.log(`Updated sku on ${updated.length} product(s).`);
+    console.log(`Updated sku + price on ${updated.length} product(s).`);
     if (missing.length) {
       console.log(
         `⚠ ${missing.length} id(s) from this run had no matching existing product (skipped):`,

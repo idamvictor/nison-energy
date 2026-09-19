@@ -21,6 +21,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
+import { PartnerBadges } from "@/components/shared/partner-badges";
 import { CommercialPurchasePanel } from "@/components/workplace-charging/commercial-purchase-panel";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
@@ -130,6 +131,7 @@ export default async function CommercialProductDetailPage({
                 {detail.sku && (
                   <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>
                 )}
+                <PartnerBadges tariffs={product.compatibleTariffs} />
               </div>
 
               {product.tags.length > 0 && (

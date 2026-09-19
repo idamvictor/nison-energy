@@ -22,7 +22,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { PurchasePanel } from "@/components/home-charging/purchase-panel";
-import { TariffBadges } from "@/components/home-charging/tariff-badges";
+import { PartnerBadges } from "@/components/shared/partner-badges";
 import { ProductCard } from "@/components/shared/product-card";
 import { tagClass } from "@/components/shared/product-tag";
 import { Badge } from "@/components/ui/badge";
@@ -131,6 +131,7 @@ export default async function ProductDetailPage({
                 {detail.sku && (
                   <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>
                 )}
+                <PartnerBadges tariffs={product.compatibleTariffs} />
               </div>
 
               {product.tags.length > 0 && (
@@ -142,8 +143,6 @@ export default async function ProductDetailPage({
                   ))}
                 </div>
               )}
-
-              <TariffBadges tariffs={product.compatibleTariffs} />
 
               <PurchasePanel
                 product={product}

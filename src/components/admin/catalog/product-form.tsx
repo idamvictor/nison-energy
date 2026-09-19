@@ -124,8 +124,11 @@ export function ProductForm({
   const [cableLengthOptions, setCableLengthOptions] = useState(
     toCsv(row?.cableLengthOptions ?? []),
   );
-  const [compatibleTariffs, setCompatibleTariffs] = useState(
-    toCsv(row?.compatibleTariffs ?? []),
+  const [octopusPartner, setOctopusPartner] = useState(
+    (row?.compatibleTariffs ?? []).includes("Octopus Energy"),
+  );
+  const [ovoPartner, setOvoPartner] = useState(
+    (row?.compatibleTariffs ?? []).includes("OVO Energy"),
   );
 
   const [style, setStyle] = useState(row?.style ?? "");
@@ -192,8 +195,10 @@ export function ProductForm({
       installFee: isCharger && installFee.trim() !== "" ? Number(installFee) : null,
       cableLengthOptions:
         category === "Residential" ? fromCsv(cableLengthOptions) : [],
-      compatibleTariffs:
-        category === "Residential" ? fromCsv(compatibleTariffs) : [],
+      compatibleTariffs: [
+        ...(octopusPartner ? ["Octopus Energy"] : []),
+        ...(ovoPartner ? ["OVO Energy"] : []),
+      ],
       style: category === "Accessory" ? style || null : null,
       phase: category === "Accessory" ? phase || null : null,
       lengthOptions: category === "Accessory" ? fromCsv(lengthOptions) : [],
@@ -375,6 +380,24 @@ export function ProductForm({
               />
               Featured on home page
             </label>
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                className="size-4 accent-primary"
+                checked={octopusPartner}
+                onChange={(e) => setOctopusPartner(e.target.checked)}
+              />
+              Octopus Energy partner
+            </label>
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                className="size-4 accent-primary"
+                checked={ovoPartner}
+                onChange={(e) => setOvoPartner(e.target.checked)}
+              />
+              OVO Energy partner
+            </label>
           </div>
         </CardContent>
       </Card>
@@ -440,22 +463,13 @@ export function ProductForm({
               />
             </Field>
             {category === "Residential" && (
-              <>
-                <Field label="Cable length options (comma separated)">
-                  <Input
-                    value={cableLengthOptions}
-                    onChange={(e) => setCableLengthOptions(e.target.value)}
-                    placeholder="5m, 7.5m, 10m"
-                  />
-                </Field>
-                <Field label="Compatible tariffs (comma separated)">
-                  <Input
-                    value={compatibleTariffs}
-                    onChange={(e) => setCompatibleTariffs(e.target.value)}
-                    placeholder="Octopus Energy, OVO Energy"
-                  />
-                </Field>
-              </>
+              <Field label="Cable length options (comma separated)">
+                <Input
+                  value={cableLengthOptions}
+                  onChange={(e) => setCableLengthOptions(e.target.value)}
+                  placeholder="5m, 7.5m, 10m"
+                />
+              </Field>
             )}
           </CardContent>
         </Card>

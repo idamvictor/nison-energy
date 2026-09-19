@@ -62,6 +62,8 @@ export function dbToCommercial(row: ProductRow): CommercialProduct {
     colour: row.colour,
     powerOutput: row.powerOutput ?? "",
     variantGroup: row.variantGroup ?? undefined,
+    compatibleTariffs:
+      row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
     price: row.price ?? 0,
     installFee: row.installFee ?? undefined,
     tags: row.tags,
@@ -82,6 +84,8 @@ export function dbToAccessory(row: ProductRow): AccessoryProduct {
     phase: (row.phase as AccessoryProduct["phase"]) ?? "Single Phase",
     lengthOptions: row.lengthOptions,
     variantGroup: row.variantGroup ?? "",
+    compatibleTariffs:
+      row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
     price: row.price ?? 0,
     tags: row.tags,
     image: row.cardImage,

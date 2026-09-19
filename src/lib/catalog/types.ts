@@ -83,6 +83,7 @@ export type CommercialProduct = {
   colour: string;
   powerOutput: string;
   variantGroup?: string;
+  compatibleTariffs?: string[];
   price: number;
   installFee?: number;
   tags: string[];
@@ -102,6 +103,7 @@ export type AccessoryProduct = {
   phase: "Single Phase" | "3 Phase";
   lengthOptions: string[];
   variantGroup: string;
+  compatibleTariffs?: string[];
   price: number;
   tags: string[];
   image: string;

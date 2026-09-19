@@ -116,7 +116,6 @@ export function ProductForm({
     toCsv(row?.lengthOptions ?? []),
   );
 
-  const [tagline, setTagline] = useState(row?.tagline ?? "");
   const [gallery, setGallery] = useState<string[]>(() => {
     const g = row?.gallery ?? [];
     return g.length > 0 ? g : [row?.cardImage ?? ""];
@@ -162,7 +161,7 @@ export function ProductForm({
       style: category === "Accessory" ? style || null : null,
       phase: category === "Accessory" ? phase || null : null,
       lengthOptions: category === "Accessory" ? fromCsv(lengthOptions) : [],
-      tagline: tagline.trim() || null,
+      tagline: null,
       gallery: galleryImages,
       description: fromParas(description),
       features: fromLines(features),
@@ -477,12 +476,6 @@ export function ProductForm({
           <CardTitle>Detail page content</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Field label="Tagline">
-            <Input
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-            />
-          </Field>
           <Field label="Description (blank line between paragraphs)">
             <Textarea
               rows={5}

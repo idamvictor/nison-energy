@@ -105,7 +105,6 @@ export default async function AccessoryDetailPage({
                 <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
                   {product.name}
                 </h1>
-                <p className="mt-2 text-muted-foreground">{detail.tagline}</p>
               </div>
 
               {product.tags.length > 0 && (
@@ -118,7 +117,11 @@ export default async function AccessoryDetailPage({
                 </div>
               )}
 
-              <AccessoryPurchasePanel product={product} siblings={siblings} />
+              <AccessoryPurchasePanel
+                product={product}
+                warranty={detail.warranty}
+                siblings={siblings}
+              />
             </div>
           </div>
         </section>

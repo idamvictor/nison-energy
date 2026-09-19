@@ -148,7 +148,9 @@ export function CommercialPurchasePanel({
       {warranty && (
         <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
           <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-          <p className="text-sm text-foreground">{warranty}</p>
+          <p className="text-sm text-foreground">
+            <span className="font-medium">Warranty:</span> {warranty}
+          </p>
         </div>
       )}
 

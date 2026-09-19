@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Heart } from "lucide-react";
+import { Check, Heart, ShieldCheck } from "lucide-react";
 
 import type { AccessoryProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,11 @@ const selectClass =
 
 export function AccessoryPurchasePanel({
   product,
+  warranty,
   siblings,
 }: {
   product: AccessoryProduct;
+  warranty: string;
   siblings: AccessoryProduct[];
 }) {
   const router = useRouter();
@@ -100,6 +102,15 @@ export function AccessoryPurchasePanel({
           )}
         </label>
       </div>
+
+      {warranty && (
+        <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p className="text-sm text-foreground">
+            <span className="font-medium">Warranty:</span> {warranty}
+          </p>
+        </div>
+      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>

@@ -548,7 +548,13 @@ async function main() {
       // table (real label/value pairs — dimensions, IP rating, protocols,
       // etc.) when the source has one; fall back to fields already parsed
       // precisely during import for the products that don't.
-      const brand = brandOf(descriptiveName);
+      // Brand from `rawBase`, not the raw `descriptiveName` — same fallback
+      // as the name-building above: some sub-variant rows are just a bare
+      // colour word ("Grey") with no brand text at all, so detecting brand
+      // off the row's own name directly (rather than the family key it
+      // falls back to) was silently producing "Unknown" for those variants
+      // even though sibling variants of the same product were branded fine.
+      const brand = brandOf(rawBase);
       const fallbackSpecs: { label: string; value: string }[] = [
         { label: "Brand", value: brand },
         { label: "Colour", value: colour },

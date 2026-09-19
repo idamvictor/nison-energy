@@ -14,7 +14,8 @@ import {
 
 // How many thumbnails render (and therefore actually fetch) at a time —
 // the full URL list can be a couple hundred long, but nothing past this
-// count gets an <Image> mounted until "Load more" is clicked.
+// count gets an <Image> mounted until the sentinel below the grid scrolls
+// into view and reveals the next batch.
 const BATCH_SIZE = 24;
 
 /**
@@ -37,7 +38,31 @@ export function MediaLibraryDialog({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const loading = open && urls === null && !error;
+  const hasMore = !!urls && visibleCount < urls.length;
+
+  // Infinite scroll: reveal the next batch once the sentinel at the bottom
+  // of the grid comes into view within the dialog's own scroll container —
+  // the full url list is already in memory, so "loading more" just mounts
+  // more <Image>s rather than an actual network fetch.
+  useEffect(() => {
+    if (!open || !hasMore) return;
+    const root = scrollRef.current;
+    const sentinel = sentinelRef.current;
+    if (!root || !sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((c) => c + BATCH_SIZE);
+        }
+      },
+      { root, rootMargin: "200px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [open, hasMore, visibleCount]);
 
   useEffect(() => {
     if (!open) return;
@@ -85,7 +110,6 @@ export function MediaLibraryDialog({
   }
 
   const visibleUrls = urls?.slice(0, visibleCount) ?? [];
-  const hasMore = !!urls && visibleCount < urls.length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -121,7 +145,7 @@ export function MediaLibraryDialog({
           {error && <p className="text-xs font-medium text-destructive">{error}</p>}
         </div>
 
-        <div className="max-h-128 overflow-y-auto pr-1">
+        <div ref={scrollRef} className="max-h-128 overflow-y-auto pr-1">
           {loading ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
               <Loader2 className="size-5 animate-spin" />
@@ -152,15 +176,11 @@ export function MediaLibraryDialog({
                 ))}
               </div>
               {hasMore && (
-                <div className="mt-4 flex justify-center">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setVisibleCount((c) => c + BATCH_SIZE)}
-                  >
-                    Load more
-                  </Button>
+                <div
+                  ref={sentinelRef}
+                  className="mt-4 flex justify-center py-4"
+                >
+                  <Loader2 className="size-4 animate-spin text-muted-foreground" />
                 </div>
               )}
             </>

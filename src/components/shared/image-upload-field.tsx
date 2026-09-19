@@ -1,17 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { ImageOff, Loader2, Upload } from "lucide-react";
+import { ImageOff, LibraryBig } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MediaLibraryDialog } from "@/components/shared/media-library-dialog";
 
 /**
- * Drop-in replacement for a plain image-URL <Input>. Offers both the
- * existing "paste a link" flow and uploading a file straight to our bucket
- * (POST /api/media — see src/lib/media/queries.ts for the upload/serve side).
+ * Drop-in replacement for a plain image-URL <Input>. Offers the existing
+ * "paste a link" flow plus a "Media Library" picker — browse every image
+ * already in use across the catalogue/blog, or upload a new one from this
+ * device, all from one popup (see media-library-dialog.tsx).
  */
 export function ImageUploadField({
   value,
@@ -22,31 +24,7 @@ export function ImageUploadField({
   onChange: (url: string) => void;
   label?: string;
 }) {
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  async function handleFile(file: File | undefined) {
-    if (!file) return;
-    setError(null);
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/media", { method: "POST", body: formData });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        setError(data.error ?? "Upload failed.");
-        return;
-      }
-      onChange(data.url);
-    } catch {
-      setError("Upload failed. Check your connection and try again.");
-    } finally {
-      setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  }
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-2">
@@ -63,7 +41,7 @@ export function ImageUploadField({
         <Tabs defaultValue="link" className="flex-1">
           <TabsList className="mb-1.5">
             <TabsTrigger value="link">Link</TabsTrigger>
-            <TabsTrigger value="upload">Upload</TabsTrigger>
+            <TabsTrigger value="library">Media Library</TabsTrigger>
           </TabsList>
           <TabsContent value="link">
             <Input
@@ -74,32 +52,24 @@ export function ImageUploadField({
               aria-label={label}
             />
           </TabsContent>
-          <TabsContent value="upload">
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
-              hidden
-              onChange={(e) => handleFile(e.target.files?.[0])}
-            />
+          <TabsContent value="library">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              disabled={uploading}
-              onClick={() => inputRef.current?.click()}
+              onClick={() => setLibraryOpen(true)}
             >
-              {uploading ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Upload />
-              )}
-              {uploading ? "Uploading…" : "Choose image"}
+              <LibraryBig />
+              Browse or upload
             </Button>
           </TabsContent>
         </Tabs>
       </div>
-      {error && <p className="text-xs font-medium text-destructive">{error}</p>}
+      <MediaLibraryDialog
+        open={libraryOpen}
+        onOpenChange={setLibraryOpen}
+        onSelect={onChange}
+      />
     </div>
   );
 }

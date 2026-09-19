@@ -3,7 +3,24 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ImageOff, Plus, X } from "lucide-react";
+import { ArrowLeft, GripVertical, ImageOff, Plus, X } from "lucide-react";
+import {
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -116,9 +133,10 @@ export function ProductForm({
     toCsv(row?.lengthOptions ?? []),
   );
 
-  const [gallery, setGallery] = useState<string[]>(() => {
+  const [gallery, setGallery] = useState<{ id: string; url: string }[]>(() => {
     const g = row?.gallery ?? [];
-    return g.length > 0 ? g : [row?.cardImage ?? ""];
+    const urls = g.length > 0 ? g : [row?.cardImage ?? ""];
+    return urls.map((url) => ({ id: crypto.randomUUID(), url }));
   });
   const [description, setDescription] = useState(toParas(row?.description ?? []));
   const [features, setFeatures] = useState(toLines(row?.features ?? []));
@@ -131,7 +149,23 @@ export function ProductForm({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const galleryImages = gallery.filter((s) => s.trim() !== "");
+  const galleryImages = gallery.map((g) => g.url).filter((s) => s.trim() !== "");
+
+  const dndSensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function handleGalleryDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setGallery((prev) => {
+      const oldIndex = prev.findIndex((g) => g.id === active.id);
+      const newIndex = prev.findIndex((g) => g.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -218,39 +252,42 @@ export function ProductForm({
             <p className="pt-1 text-xs font-medium text-muted-foreground">
               Gallery images (detail page)
             </p>
-            {gallery.map((src, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <div className="flex-1">
-                  <ImageUploadField
-                    value={src}
+            <DndContext
+              sensors={dndSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleGalleryDragEnd}
+            >
+              <SortableContext
+                items={gallery.map((g) => g.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {gallery.map((item, index) => (
+                  <SortableGalleryItem
+                    key={item.id}
+                    id={item.id}
+                    url={item.url}
+                    index={index}
+                    removable={gallery.length > 1}
                     onChange={(url) =>
                       setGallery((prev) =>
-                        prev.map((s, i) => (i === index ? url : s)),
+                        prev.map((g) => (g.id === item.id ? { ...g, url } : g)),
                       )
                     }
-                    label={`Gallery image ${index + 1}`}
+                    onRemove={() =>
+                      setGallery((prev) => prev.filter((g) => g.id !== item.id))
+                    }
                   />
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="mt-0.5 shrink-0 text-muted-foreground hover:text-destructive"
-                  disabled={gallery.length === 1}
-                  onClick={() =>
-                    setGallery((prev) => prev.filter((_, i) => i !== index))
-                  }
-                >
-                  <X />
-                </Button>
-              </div>
-            ))}
+                ))}
+              </SortableContext>
+            </DndContext>
             <Button
               type="button"
               variant="outline"
               size="sm"
               className="w-fit border-primary/25 text-primary hover:bg-primary/5"
-              onClick={() => setGallery((prev) => [...prev, ""])}
+              onClick={() =>
+                setGallery((prev) => [...prev, { id: crypto.randomUUID(), url: "" }])
+              }
             >
               <Plus />
               Add gallery image
@@ -569,6 +606,60 @@ export function ProductForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+function SortableGalleryItem({
+  id,
+  url,
+  index,
+  removable,
+  onChange,
+  onRemove,
+}: {
+  id: string;
+  url: string;
+  index: number;
+  removable: boolean;
+  onChange: (url: string) => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-start gap-2 ${isDragging ? "z-10 opacity-70" : ""}`}
+    >
+      <button
+        type="button"
+        aria-label="Drag to reorder"
+        className="mt-2.5 shrink-0 cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="size-4" />
+      </button>
+      <div className="flex-1">
+        <ImageUploadField
+          value={url}
+          onChange={onChange}
+          label={`Gallery image ${index + 1}`}
+        />
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        className="mt-0.5 shrink-0 text-muted-foreground hover:text-destructive"
+        disabled={!removable}
+        onClick={onRemove}
+      >
+        <X />
+      </Button>
+    </div>
   );
 }
 

@@ -9,6 +9,8 @@ import {
   dbToResidential,
   dbToDetail,
 } from "@/lib/catalog/queries";
+import { adminRoute } from "@/lib/catalog/types";
+import { AdminEditLink } from "@/components/shared/admin-edit-link";
 import {
   installationProcessMarkdown,
   deliveryPolicyMarkdown,
@@ -120,9 +122,12 @@ export default async function ProductDetailPage({
                 <p className="text-sm font-medium tracking-wide text-primary uppercase">
                   {product.brand}
                 </p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-                  {product.name}
-                </h1>
+                <div className="mt-1 flex items-center gap-2">
+                  <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
+                    {product.name}
+                  </h1>
+                  <AdminEditLink href={`${adminRoute.Residential}/${product.id}`} />
+                </div>
               </div>
 
               {product.tags.length > 0 && (
@@ -147,9 +152,8 @@ export default async function ProductDetailPage({
         </section>
 
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <Tabs defaultValue="features">
+          <Tabs defaultValue="description">
             <TabsList variant="line" className="border-b border-border">
-              <TabsTrigger value="features">Product Features</TabsTrigger>
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specification">Specification</TabsTrigger>
               <TabsTrigger value="installation">Installation</TabsTrigger>
@@ -157,8 +161,13 @@ export default async function ProductDetailPage({
               <TabsTrigger value="returns">Returns</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="features" className="py-6">
-              <ul className="grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
+            <TabsContent value="description" className="py-6">
+              <div className="flex flex-col gap-4 text-foreground/80">
+                {detail.description.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+              <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
                 {detail.features.map((feature) => (
                   <li
                     key={feature}
@@ -169,14 +178,6 @@ export default async function ProductDetailPage({
                   </li>
                 ))}
               </ul>
-            </TabsContent>
-
-            <TabsContent value="description" className="py-6">
-              <div className="flex flex-col gap-4 text-foreground/80">
-                {detail.description.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
             </TabsContent>
 
             <TabsContent value="specification" className="py-6">

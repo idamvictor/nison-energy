@@ -8,18 +8,13 @@ import {
   deleteProduct,
 } from "@/lib/catalog/queries";
 import {
+  adminRoute,
   categoryRoute,
   type ProductCategory,
   type ProductInput,
   type WriteResult,
 } from "@/lib/catalog/types";
 import { CACHE_TAGS } from "@/lib/cache/tags";
-
-const adminRoute: Record<ProductCategory, string> = {
-  Residential: "/admin/residential",
-  Commercial: "/admin/commercial",
-  Accessory: "/admin/accessories",
-};
 
 function revalidate(category: ProductCategory) {
   revalidatePath(categoryRoute[category]);

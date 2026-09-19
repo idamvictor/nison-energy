@@ -1,6 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
+import { cache } from "react";
 
 import {
   DeleteObjectCommand,
@@ -9,6 +10,8 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+
+import { prisma } from "@/lib/db";
 
 // Prisma Object Store bucket (S3-compatible). Two kinds of object: public
 // images under `uploads/` (see image-upload-field.tsx) and private
@@ -156,3 +159,25 @@ export const getDocumentStream = getObjectStream;
 export async function deleteDocument(key: string): Promise<void> {
   await s3().send(new DeleteObjectCommand({ Bucket: bucket(), Key: key }));
 }
+
+/**
+ * Every image URL currently referenced by a product (card + gallery) or a
+ * blog post (cover image) — the "file manager" picker in
+ * src/components/shared/image-upload-field.tsx browses this list instead of
+ * re-uploading an image that's already in use elsewhere.
+ */
+export const getMediaLibrary = cache(async (): Promise<string[]> => {
+  const [products, posts] = await Promise.all([
+    prisma.product.findMany({ select: { cardImage: true, gallery: true } }),
+    prisma.post.findMany({ select: { coverImage: true } }),
+  ]);
+  const urls = new Set<string>();
+  for (const p of products) {
+    if (p.cardImage) urls.add(p.cardImage);
+    p.gallery.forEach((u) => urls.add(u));
+  }
+  for (const post of posts) {
+    if (post.coverImage) urls.add(post.coverImage);
+  }
+  return Array.from(urls);
+});

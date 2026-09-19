@@ -9,6 +9,8 @@ import {
   dbToAccessory,
   dbToDetail,
 } from "@/lib/catalog/queries";
+import { adminRoute } from "@/lib/catalog/types";
+import { AdminEditLink } from "@/components/shared/admin-edit-link";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -102,9 +104,12 @@ export default async function AccessoryDetailPage({
                 <p className="text-sm font-medium tracking-wide text-primary uppercase">
                   {product.brand}
                 </p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-                  {product.name}
-                </h1>
+                <div className="mt-1 flex items-center gap-2">
+                  <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
+                    {product.name}
+                  </h1>
+                  <AdminEditLink href={`${adminRoute.Accessory}/${product.id}`} />
+                </div>
               </div>
 
               {product.tags.length > 0 && (
@@ -127,15 +132,19 @@ export default async function AccessoryDetailPage({
         </section>
 
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <Tabs defaultValue="features">
+          <Tabs defaultValue="description">
             <TabsList variant="line" className="border-b border-border">
-              <TabsTrigger value="features">Product Features</TabsTrigger>
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specification">Specification</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="features" className="max-w-2xl py-6">
-              <ul className="flex flex-col gap-2.5">
+            <TabsContent value="description" className="max-w-3xl py-6">
+              <div className="flex flex-col gap-4 text-foreground/80">
+                {detail.description.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+              <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
                 {detail.features.map((feature) => (
                   <li
                     key={feature}
@@ -146,14 +155,6 @@ export default async function AccessoryDetailPage({
                   </li>
                 ))}
               </ul>
-            </TabsContent>
-
-            <TabsContent value="description" className="max-w-3xl py-6">
-              <div className="flex flex-col gap-4 text-foreground/80">
-                {detail.description.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
             </TabsContent>
 
             <TabsContent value="specification" className="py-6">

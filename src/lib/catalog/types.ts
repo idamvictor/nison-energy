@@ -18,6 +18,14 @@ export const categoryRoute: Record<ProductCategory, string> = {
   Accessory: "/accessories",
 };
 
+// The admin edit route for each catalog category — same `[slug]` param as
+// the storefront route (a product's `id` is shared by both).
+export const adminRoute: Record<ProductCategory, string> = {
+  Residential: "/admin/residential",
+  Commercial: "/admin/commercial",
+  Accessory: "/admin/accessories",
+};
+
 export type CartCategory = "residential" | "commercial" | "accessories";
 
 export const categoryToCart: Record<ProductCategory, CartCategory> = {

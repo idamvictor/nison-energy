@@ -7,6 +7,8 @@
  *   npx tsx scripts/import-catalogue.ts             # dry run — prints only
  *   npx tsx scripts/import-catalogue.ts --commit     # deletes old + inserts new
  *   npx tsx scripts/import-catalogue.ts --backfill   # non-destructive: sku + price columns only
+ *   npx tsx scripts/import-catalogue.ts --add-tesla [--commit]  # additive: create just the
+ *                                                                 2 newly-fixed Tesla products
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -26,6 +28,11 @@ const COMMIT = process.argv.includes("--commit");
 // since the original import. `--backfill-sku` kept as an alias for the first
 // run of this flag (SKU-only) — both now do the same full backfill.
 const BACKFILL = process.argv.includes("--backfill") || process.argv.includes("--backfill-sku");
+// Additive: create only the 2 newly-fixed Tesla products (see ROW_FIXES /
+// FAMILY_CATEGORY above — identified by brand, since Tesla is brand-new to
+// the catalogue), leaving every other already-imported product completely
+// untouched — unlike --commit, which replaces the whole catalogue.
+const ADD_TESLA = process.argv.includes("--add-tesla");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
@@ -38,11 +45,39 @@ const COL = {
   PHOTO_END: 28,
 };
 
+// ─── Row-level corrections — known-bad cells in specific rows, fixed by SKU
+// rather than guessed at. Applied right after the sheet is read, before any
+// grouping/exclusion logic runs.
+const ROW_FIXES: Record<string, { name?: string; writeup?: string }> = {
+  // Row 20: product name was pasted twice into one cell.
+  "1529455-02-D": {
+    name: "Tesla 7kW/22kW Type 2 Tethered Wall Connector EV Charger (Gen 3)",
+  },
+  // Row 21: Write-up column wrongly points at the Wall Connector's write-up
+  // (row 20's) instead of its own — its real write-up exists separately at
+  // Write-ups row 1239, just orphaned because nothing referenced it.
+  "SP-EVCP-R": {
+    writeup: "Tesla Matt:e Single Phase Monitoring and Protection Unit with built in RCBO",
+  },
+};
+
+// Spec-table values to normalise into the site's plain "X years" warranty
+// format, keyed by family key + spec label — the source wording for these
+// two write-ups is verbose/mixed (residential vs commercial durations)
+// rather than the clean "X years" every other write-up already uses.
+const SPEC_VALUE_FIXES: Record<string, Record<string, string>> = {
+  "Tesla 7kW/22kW Type 2 Tethered Wall Connector EV Charger (Gen 3)": {
+    Warranty: "4 years",
+  },
+  "Tesla Matt:e Single Phase Monitoring and Protection Unit with built in RCBO": {
+    Warranty: "3 years",
+  },
+};
+
 // ─── Families to exclude — corrupted source data, not guessed at ───────────
 const EXCLUDED_FAMILIES = new Set([
   "Myenergi Zappi EV Charger Smart 22kW Type 2 Tethered Multiphase",
   "Myenergi Zappi EV Charger Smart 22kW Type 2 Untethered Multiphase Black",
-  "Tesla 7kW/22kW Type 2 Tethered Wall Connector EV Charger (Gen 3)",
   // These two families' write-up references got cross-assigned in the source
   // (family A's only row is literally named after family B's own write-up
   // title, and vice versa) — same class of copy-paste error as the two
@@ -86,6 +121,7 @@ const FAMILY_CATEGORY: Record<string, ProductCategory> = {
   "Evec VecGO 7.4 kW Duo - Socketed With 5M Cable (Charge Two Cars Together)": "Residential",
   "FastAmps 7.4kW Alpha7 Gen4 Tethered EV Charger – Black": "Residential",
   "waEV-charge EV1i Smart Solar 7.4kW Charger Tethered 5m with WiFi / LAN": "Residential",
+  "Tesla 7kW/22kW Type 2 Tethered Wall Connector EV Charger (Gen 3)": "Residential",
 
   "Easee Charge 22kW Commercial & Home EV Charger Type 2 Multiphase": "Commercial",
   "VCHRGD TwentyTwo Dual Socket 22kW EV Charger": "Commercial",
@@ -103,6 +139,7 @@ const FAMILY_CATEGORY: Record<string, ProductCategory> = {
   "Wottz Untethered EV Charging Cable": "Accessory",
   "Wottz Compact Adaptor - Type 2 Vehicle": "Accessory",
   "Wottz Portable EV Granny Charger": "Accessory",
+  "Tesla Matt:e Single Phase Monitoring and Protection Unit with built in RCBO": "Accessory",
 };
 
 // ─── Brand lookup (prefix match against the row name) ───────────────────────
@@ -126,6 +163,7 @@ const BRAND_PREFIXES: [string, string][] = [
   ["waev-charge", "waEV-charge"],
   ["zev", "ZEV"],
   ["wottz", "Wottz"],
+  ["tesla", "Tesla"],
 ];
 
 function brandOf(name: string): string {
@@ -279,6 +317,13 @@ async function main() {
     header: 1,
     defval: "",
   }) as Row[];
+
+  for (const r of chargers) {
+    const fix = ROW_FIXES[String(r[COL.SKU] ?? "").trim()];
+    if (!fix) continue;
+    if (fix.name) r[COL.NAME] = fix.name;
+    if (fix.writeup) r[COL.WRITEUP] = fix.writeup;
+  }
 
   const dataRows = chargers
     .slice(1)
@@ -454,6 +499,13 @@ async function main() {
       features: writeupFeatures,
       specs: writeupSpecs,
     } = parseWriteupSections(familyKey);
+    const specValueFixes = SPEC_VALUE_FIXES[familyKey];
+    if (specValueFixes) {
+      for (const spec of writeupSpecs) {
+        const fixed = specValueFixes[spec.label];
+        if (fixed) spec.value = fixed;
+      }
+    }
 
     for (const [subKey, subRows] of subGroups) {
       const [colour, conn, subGroupLength] = subKey.split("::");
@@ -691,6 +743,65 @@ async function main() {
       );
     }
     console.log("Done.");
+    return;
+  }
+
+  if (ADD_TESLA) {
+    const teslaProducts = built.filter((p) => p.brand === "Tesla");
+    console.log(`\nFound ${teslaProducts.length} Tesla product(s) to add:`);
+    for (const p of teslaProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      console.log(
+        `  [${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  warranty=${warranty ?? "—"}`,
+      );
+    }
+
+    if (!COMMIT) {
+      console.log("\nDry run only — no database changes made. Re-run with --add-tesla --commit to apply.");
+      return;
+    }
+
+    const { _max } = await prisma.product.aggregate({ _max: { sortOrder: true } });
+    let nextSortOrder = (_max.sortOrder ?? 0) + 1;
+
+    for (const p of teslaProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          category: p.category,
+          name: p.name,
+          brand: p.brand,
+          sku: p.sku,
+          colour: p.colour,
+          cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
+          gallery: p.gallery,
+          tags: [],
+          variantGroup: p.variantGroup,
+          active: true,
+          featured: false,
+          sortOrder: nextSortOrder++,
+          spec: p.powerOutput ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim() : null,
+          connectionType: p.connectionType ?? null,
+          cableLength: p.cableLength ?? null,
+          cableLengthOptions: p.cableLengthOptions,
+          powerOutput: p.powerOutput || null,
+          price: p.price,
+          installFee: p.category === "Residential" ? 540 : null,
+          style: p.style ?? null,
+          phase: p.phase ?? null,
+          lengthOptions: p.lengthOptions,
+          tagline: p.tagline,
+          description: p.description,
+          features: p.features,
+          specs: p.specs,
+          warranty,
+        },
+      });
+      console.log(`Created ${p.id}.`);
+    }
+
+    console.log(`\nDone. Created ${teslaProducts.length} product(s).`);
     return;
   }
 

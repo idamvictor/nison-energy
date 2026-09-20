@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
 import {
   Building2,
   GraduationCap,
   Home,
   MapPin,
-  Phone,
   ShieldCheck,
   User,
 } from "lucide-react";
@@ -18,7 +16,6 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
-import { Button } from "@/components/ui/button";
 import { GrantSchemeCard } from "@/components/grants/grant-scheme-card";
 import { grantSchemes } from "@/lib/content/grant-schemes";
 
@@ -72,39 +69,14 @@ export default function OzevGrantsPage() {
             <Reveal>
               <SectionKicker center tone="invert" />
               <h1 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Which OZEV Grant Could Save You Up to 75%?
+                Get an Instant OZEV Grant Quote
               </h1>
               <p className="mx-auto mt-4 max-w-2xl text-primary-foreground/80">
-                You&apos;ll learn more about OZEV grant scheme — for renters,
-                flat owners, residential landlords, workplaces, on-street
-                parking households, and state-funded education settings.
-                Whatever your situation, there&apos;s likely a grant to help
-                cover your EV charger installation costs. As an OZEV-Approved
-                Installer, Ocunio Energy matches you to the right scheme and
-                manages the process from start to finish. Get in touch to
-                find out which one applies to you.
+                Select the grant you&apos;re interested in, and we&apos;ll
+                walk you through eligibility, calculate your instant itemised
+                quote, and guide you through the exact application steps —
+                with nothing charged until OZEV approves.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Button
-                  size="lg"
-                  className="h-11 gap-2 bg-accent px-5 text-accent-foreground hover:bg-accent/90"
-                  nativeButton={false}
-                  render={<Link href="/contact-us" />}
-                >
-                  <ShieldCheck className="size-4" />
-                  Check my eligibility
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-11 border-white/25 bg-transparent px-5 text-primary-foreground hover:bg-white/10"
-                  nativeButton={false}
-                  render={<a href="tel:07525567054" />}
-                >
-                  <Phone className="size-4" />
-                  07525 567054
-                </Button>
-              </div>
             </Reveal>
 
             <Reveal delay={100}>

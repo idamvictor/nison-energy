@@ -17,6 +17,7 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { PartnerBadges } from "@/components/shared/partner-badges";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { AccessoryPurchasePanel } from "@/components/accessories/accessory-purchase-panel";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { tagClass } from "@/components/accessories/accessory-product-tag";
@@ -102,9 +103,7 @@ export default async function AccessoryDetailPage({
 
             <div className="flex flex-col gap-6">
               <div>
-                <p className="text-sm font-medium tracking-wide text-primary uppercase">
-                  {product.brand}
-                </p>
+                <BrandLogo brand={product.brand} />
                 <div className="mt-1 flex items-center gap-2">
                   <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
                     {product.name}

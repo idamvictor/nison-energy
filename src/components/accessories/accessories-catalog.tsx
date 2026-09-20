@@ -9,12 +9,7 @@ import { AccessoryCompareBar } from "@/components/accessories/accessory-compare-
 import { AccessoryCompareDialog } from "@/components/accessories/accessory-compare-dialog";
 import { Reveal } from "@/components/shared/reveal";
 import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import {
   Sheet,
   SheetContent,
@@ -22,6 +17,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
+import { brandLogos } from "@/lib/content/brand-logos";
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
@@ -30,28 +27,14 @@ const sortOptions = [
 
 type SortValue = (typeof sortOptions)[number]["value"];
 
-const filterKeys = ["colour", "style", "phase", "length"];
-
-function useCounts<T extends string>(values: T[]) {
-  return useMemo(() => {
-    const counts = new Map<T, number>();
-    for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
-    return counts;
-  }, [values]);
-}
-
-function toggle<T>(set: Set<T>, value: T) {
-  const next = new Set(set);
-  if (next.has(value)) next.delete(value);
-  else next.add(value);
-  return next;
-}
+const filterKeys = ["brand", "colour", "style", "phase", "length"];
 
 export function AccessoriesCatalog({
   products: accessoryProducts,
 }: {
   products: AccessoryProduct[];
 }) {
+  const [brands, setBrands] = useState<Set<string>>(new Set());
   const [colours, setColours] = useState<Set<string>>(new Set());
   const [styles, setStyles] = useState<Set<string>>(new Set());
   const [phases, setPhases] = useState<Set<string>>(new Set());
@@ -69,6 +52,7 @@ export function AccessoriesCatalog({
     });
   };
 
+  const brandCounts = useCounts(accessoryProducts.map((p) => p.brand));
   const colourCounts = useCounts(accessoryProducts.map((p) => p.colour));
   const styleCounts = useCounts(accessoryProducts.map((p) => p.style));
   const phaseCounts = useCounts(accessoryProducts.map((p) => p.phase));
@@ -78,6 +62,7 @@ export function AccessoriesCatalog({
 
   const filtered = useMemo(() => {
     let list = accessoryProducts.filter((p: AccessoryProduct) => {
+      if (brands.size > 0 && !brands.has(p.brand)) return false;
       if (colours.size > 0 && !colours.has(p.colour)) return false;
       if (styles.size > 0 && !styles.has(p.style)) return false;
       if (phases.size > 0 && !phases.has(p.phase)) return false;
@@ -95,10 +80,22 @@ export function AccessoriesCatalog({
     });
 
     return list;
-  }, [accessoryProducts, colours, styles, phases, lengths, sort]);
+  }, [accessoryProducts, brands, colours, styles, phases, lengths, sort]);
 
   const filterGroups = (
     <Accordion multiple defaultValue={filterKeys}>
+      <FilterGroup
+        value="brand"
+        title="Brand"
+        items={[...brandCounts.entries()].map(([value, count]) => ({
+          value,
+          label: value,
+          count,
+        }))}
+        selected={brands}
+        onToggle={(v) => setBrands((s) => toggle(s, v))}
+        logos={brandLogos}
+      />
       <FilterGroup
         value="colour"
         title="Colour"
@@ -229,48 +226,5 @@ export function AccessoriesCatalog({
         onRemove={toggleCompare}
       />
     </section>
-  );
-}
-
-function FilterGroup({
-  value,
-  title,
-  items,
-  selected,
-  onToggle,
-}: {
-  value: string;
-  title: string;
-  items: { value: string; label: string; count: number }[];
-  selected: Set<string>;
-  onToggle: (value: string) => void;
-}) {
-  return (
-    <AccordionItem value={value}>
-      <AccordionTrigger className="font-heading text-sm font-semibold text-foreground hover:no-underline">
-        {title}
-      </AccordionTrigger>
-      <AccordionContent>
-        <div className="flex flex-col gap-2.5">
-          {items.map(({ value: itemValue, label, count }) => (
-            <label
-              key={itemValue}
-              className="flex cursor-pointer items-center justify-between gap-2 text-sm"
-            >
-              <span className="flex items-center gap-2 text-foreground/80">
-                <input
-                  type="checkbox"
-                  checked={selected.has(itemValue)}
-                  onChange={() => onToggle(itemValue)}
-                  className="size-4 accent-primary"
-                />
-                {label}
-              </span>
-              <span className="text-xs text-muted-foreground">{count}</span>
-            </label>
-          ))}
-        </div>
-      </AccordionContent>
-    </AccordionItem>
   );
 }

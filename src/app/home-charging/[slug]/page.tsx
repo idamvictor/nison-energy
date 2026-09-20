@@ -23,6 +23,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { PurchasePanel } from "@/components/home-charging/purchase-panel";
 import { PartnerBadges } from "@/components/shared/partner-badges";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { ProductCard } from "@/components/shared/product-card";
 import { tagClass } from "@/components/shared/product-tag";
 import { Badge } from "@/components/ui/badge";
@@ -119,9 +120,7 @@ export default async function ProductDetailPage({
 
             <div className="flex flex-col gap-6">
               <div>
-                <p className="text-sm font-medium tracking-wide text-primary uppercase">
-                  {product.brand}
-                </p>
+                <BrandLogo brand={product.brand} />
                 <div className="mt-1 flex items-center gap-2">
                   <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
                     {product.name}

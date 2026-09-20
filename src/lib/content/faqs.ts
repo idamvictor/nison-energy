@@ -17,11 +17,6 @@ export const homeFaqCategories: FaqCategory[] = [
           "When you order through our site, you can choose to purchase the charger only or bundle it with professional installation by one of our certified engineers. If you already have a charger and just need it fitted, we can also arrange installation separately.",
       },
       {
-        question: "How long does delivery take?",
-        answer:
-          "In-stock chargers and accessories are typically dispatched within 1–2 working days, with next-day delivery available at checkout for most postcodes. If your order includes installation, we'll coordinate delivery to align with your scheduled fitting date.",
-      },
-      {
         question: "Can I pay in instalments?",
         answer:
           "Yes, we offer buy now, pay later options (such as pay in 3) with Paypal and Klarna at checkout for eligible orders, in addition to full upfront payment.",
@@ -140,12 +135,6 @@ export const homeFaqCategories: FaqCategory[] = [
         question: "Do your products come with a warranty?",
         answer:
           "Yes, all chargers come with a manufacturer warranty, typically 2–3 years depending on the model.",
-      },
-      {
-        question:
-          "What warranty and support do I get after installation, and what if something goes wrong?",
-        answer:
-          "All chargers come with a manufacturer's warranty (typically 3 years, depending on the model). Alongside this, our team provides ongoing technical support and can arrange a call-out if you experience a fault or issue with your charger after installation.",
       },
     ],
   },

@@ -1,5 +1,6 @@
 // Real installation/delivery/returns policy content, shared across the
-// residential and commercial product detail pages — rendered through
+// residential and commercial product detail pages (and, for delivery, the
+// standalone /delivery-information page too) — rendered through
 // BlogMarkdown (src/components/blog/blog-markdown.tsx) so it gets the same
 // on-brand heading/list/table treatment as the blog, without re-building a
 // bespoke renderer for it.
@@ -164,39 +165,6 @@ This section applies where Ocunio Energy has agreed to supply and install a char
 ## Part F — Your Statutory Rights
 
 Nothing in this policy limits your statutory rights, including your rights under the Consumer Rights Act 2015 in respect of goods or installation services that are faulty, not as described, or not fit for purpose.`;
-
-// Standalone "Delivery Information" page (linked from the footer) — how
-// EV charger equipment orders are dispatched and tracked. Distinct from
-// deliveryPolicyMarkdown above, which covers the product-page delivery tab.
-export const deliveryInformationMarkdown = `At Ocunio Energy, we keep things simple from order to installation. Equipment is dispatched via Royal Mail Tracked, with same-day dispatch on orders placed before 1pm (Monday to Friday). You'll receive a tracking link by email or SMS as soon as your order is on its way.
-
-## Delivery Options
-
-We use Royal Mail Tracked services for all parcels. You'll receive tracking details via email or SMS as soon as your item has been dispatched.
-
-| Delivery Type | Cost | Estimated Time |
-|---|---|---|
-| Royal Mail Tracked 48 | Free | 2–3 working days |
-| Royal Mail Tracked 24 | From £4.95 | 1–2 working days |
-| Royal Mail Special Delivery (Guaranteed by 1pm) | From £7.95 | Next working day |
-
-## When Will My Item Be Dispatched?
-
-- Orders placed before 1pm (Monday to Friday) will usually be dispatched the same day.
-- Orders placed after 1pm or on weekends will be dispatched the next working day.
-- We do not dispatch on bank holidays or weekends.
-
-## Where Do We Deliver?
-
-We deliver to mainland UK, including Northern Ireland, using Royal Mail's extensive network. For remote or offshore locations, delivery may take an additional day.
-
-Please ensure someone is available to receive the parcel at the delivery address, or use Royal Mail's Safeplace or Local Collect services for flexibility.
-
-## Track Your Delivery
-
-Once your order is dispatched, you'll receive a Royal Mail tracking link so you can follow your parcel every step of the way — track your item at [royalmail.com/track-your-item](https://www.royalmail.com/track-your-item).
-
-**Damaged or missing items:** if your item arrives damaged or goes missing, contact our team within 48 hours of delivery at [info@ocunioenergy.com](mailto:info@ocunioenergy.com). We'll work with Royal Mail to resolve the issue quickly.`;
 
 // Standalone "Terms and Conditions" and "Privacy Policy" pages (footer
 // links). Written to cover the same real, business-specific practices and

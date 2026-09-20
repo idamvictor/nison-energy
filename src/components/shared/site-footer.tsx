@@ -19,8 +19,7 @@ const quickLinks = [
   { label: "Contact Us", href: "/contact-us" },
   { label: "Blog", href: "/blog" },
   { label: "FAQ", href: "/faq" },
-  { label: "OZEV Grant Eligibility", href: "/ozev-grants" },
-  { label: "Workplace Grant Eligibility", href: "/ozev-grants/workplace-charging-scheme" },
+  { label: "OZEV Grant Eligibility", href: "/ozev-grant-guide" },
   { label: "Independent Subcontractor", href: "/independent-subcontractor" },
 ];
 
@@ -102,10 +101,11 @@ export function SiteFooter() {
 
             <div>
               <p className="font-heading text-sm font-semibold">
-                Weekly insights
+                Stay in the Loop
               </p>
               <p className="mt-1 text-xs text-white/60">
-                Charging news and grant updates, occasionally.
+                Subscribe for the latest news, updates and exclusive offers,
+                delivered straight to your inbox.
               </p>
               <form
                 className="mt-3 flex gap-2"

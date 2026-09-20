@@ -91,23 +91,6 @@ export default async function GrantSchemePage({
                   {scheme.title}
                 </h1>
                 <p className="mt-3 text-muted-foreground">{scheme.tagline}</p>
-                <p className="mt-4 text-2xl font-semibold text-primary">
-                  {scheme.grantAmount}
-                </p>
-
-                {scheme.applyCta && (
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <Button
-                      size="lg"
-                      className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
-                      nativeButton={false}
-                      render={<Link href={scheme.applyCta.href} />}
-                    >
-                      {scheme.applyCta.label}
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                )}
               </div>
 
               <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-secondary">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { LegalPageLayout } from "@/components/shared/legal-page-layout";
-import { deliveryInformationMarkdown } from "@/lib/content/legal";
+import { deliveryPolicyMarkdown } from "@/lib/content/legal";
 
 export const metadata: Metadata = {
   title: "Delivery Information | Ocunio Energy",
@@ -10,10 +10,13 @@ export const metadata: Metadata = {
 };
 
 const sections = [
-  { id: "delivery-options", label: "Delivery Options" },
-  { id: "when-will-my-item-be-dispatched", label: "Dispatch Timescales" },
-  { id: "where-do-we-deliver", label: "Where We Deliver" },
-  { id: "track-your-delivery", label: "Track Your Delivery" },
+  { id: "delivery-coverage-lead-times", label: "Coverage & Lead Times" },
+  { id: "delivery-charges", label: "Delivery Charges" },
+  { id: "managing-your-delivery", label: "Managing Your Delivery" },
+  { id: "receiving-inspecting-your-goods", label: "Receiving Your Goods" },
+  { id: "specialist-delivery", label: "Specialist Delivery" },
+  { id: "delivery-coverage", label: "Delivery Coverage" },
+  { id: "need-help", label: "Need Help?" },
 ];
 
 export default function DeliveryInformationPage() {
@@ -22,7 +25,7 @@ export default function DeliveryInformationPage() {
       title="Delivery Information"
       subtitle="How we dispatch, ship, and track your EV charger equipment orders across the UK."
       sections={sections}
-      content={deliveryInformationMarkdown}
+      content={deliveryPolicyMarkdown}
     />
   );
 }

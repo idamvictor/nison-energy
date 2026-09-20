@@ -10,7 +10,6 @@ export type GrantScheme = {
   image: string;
   status: GrantStatus;
   statusNote?: string;
-  grantAmount: string;
   grantDetails?: string[];
   overview: string[];
   eligibility: string[];
@@ -18,7 +17,6 @@ export type GrantScheme = {
   requirements?: string[];
   documentation?: string[];
   applicationSteps?: string[];
-  applyCta?: { label: string; href: string };
   moreInfoHref: string;
   resources: { label: string; href: string }[];
 };
@@ -46,7 +44,6 @@ export const grantSchemes: GrantScheme[] = [
     tagline: "Live in a flat or rent your property? Save up to £500 with OZEV funding",
     image: `${IMG}/side-view-man-charging-his-car-min-scaled.webp`,
     status: "open",
-    grantAmount: "75% of cost, up to £500 per socket",
     overview: [
       "If you rent your home or own a flat, you could save money on the cost of an EV chargepoint through OZEV funding.",
       "The EV Chargepoint Grant for Renters and Flat Owners covers 75% of the cost of buying and installing a home chargepoint, up to £500 per socket. The grant is paid straight to your OZEV-approved installer and deducted from your invoice — you never handle the money yourself.",
@@ -102,7 +99,6 @@ export const grantSchemes: GrantScheme[] = [
     tagline: "Are you a residential landlord? Save up to £500 per socket with OZEV funding",
     image: `${IMG}/Home-Charging-Image.jpg`,
     status: "open",
-    grantAmount: "75% of cost, up to £500 per socket",
     overview: [
       "The EV Chargepoint Grant for Residential Landlords has been extended and remains open to new applications. Landlords can claim 75% of the cost of buying and installing an EV chargepoint, up to £500 per socket for up to 200 sockets per year across their properties. The grant is paid directly to the OZEV-approved installer and deducted from the landlord's invoice.",
     ],
@@ -112,7 +108,6 @@ export const grantSchemes: GrantScheme[] = [
       "Have a company registration or VAT number (individuals, RTM/RMC companies, freeholders, management companies, social housing providers, and public sector landlords all qualify)",
       "Not be installing the chargepoint because it's a mandatory requirement (e.g. a new-build planning condition)",
     ],
-    applyCta: { label: "More information & apply now", href: "/workplace-charging" },
     moreInfoHref:
       "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-residential-landlords/",
     resources: govResources,
@@ -125,7 +120,6 @@ export const grantSchemes: GrantScheme[] = [
     tagline: "Are you a business, charity, or public sector organisation? Save up to £20,000 with OZEV funding",
     image: `${IMG}/pexels-kindelmedia-9800036-scaled.webp`,
     status: "open",
-    grantAmount: "75% of cost (incl. VAT), up to £500 per socket",
     overview: [
       "The Workplace Charging Scheme (WCS) is a voucher-based grant from OZEV and DVLA that covers 75% of the cost of buying and installing EV chargepoints (including VAT), up to £500 per socket, for up to 40 sockets per applicant — a maximum of £20,000. The grant is issued as a voucher and deducted from your final invoice by your OZEV-authorised installer, who must not charge you until the grant has been paid.",
       "Home workers can also apply, provided their address is registered as a place of business and an eligible dual-use (residential/commercial) chargepoint is installed.",
@@ -144,7 +138,6 @@ export const grantSchemes: GrantScheme[] = [
       "Share the voucher with your installer and complete installation within 180 days (don't install before the voucher is issued)",
       "Your installer claims the grant on your behalf and deducts it from your invoice",
     ],
-    applyCta: { label: "More information & apply now", href: "/workplace-charging" },
     moreInfoHref:
       "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-businesses-charities-and-public-sector/",
     resources: [
@@ -162,7 +155,6 @@ export const grantSchemes: GrantScheme[] = [
     tagline: "Got on-street parking? Save up to £500 with OZEV funding",
     image: `${IMG}/freepik__the-style-is-candid-image-photography-with-natural__60490.jpeg`,
     status: "open",
-    grantAmount: "75% of cost, up to £500 per socket",
     overview: [
       "The EV Chargepoint Grant for Households with On-Street Parking supports residents without private off-street parking. It covers 75% of the combined cost of a chargepoint and its installation, up to £500 per socket, but a permanent cross-pavement charging solution (such as a cable channel cut into the pavement) must be installed at the same time. The grant is paid directly to your OZEV-approved installer and deducted from your invoice.",
       "Note: the grant doesn't cover the cross-pavement solution itself — only the chargepoint purchase and installation costs are eligible. Local highways authority consent can take time to arrange, so it's worth contacting them early.",
@@ -181,10 +173,6 @@ export const grantSchemes: GrantScheme[] = [
       "Have previously claimed this grant or the Renters and Flat Owners grant at this address",
       "Are moving or planning to move",
     ],
-    applyCta: {
-      label: "More information & apply now",
-      href: "/ozev-grant-guide/renters-and-flat-owners",
-    },
     moreInfoHref:
       "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-households-with-on-street-parking/",
     resources: [
@@ -206,7 +194,6 @@ export const grantSchemes: GrantScheme[] = [
     tagline: "Are you a state-funded school or education institution? Save up to £2,000 per socket with OZEV funding",
     image: `${IMG}/indra-smart-pro-tethered-in-situ-4.webp`,
     status: "open",
-    grantAmount: "75% of cost (incl. VAT), up to £2,000 per socket",
     overview: [
       "The Workplace Charging Scheme (WCS) for State-Funded Education Institutions is a voucher-based grant from OZEV and DVLA. It covers 75% of the total purchase and installation cost (including VAT), up to £2,000 per socket from 1 April 2026, for up to 40 sockets across all sites. The grant will be deducted from your invoice by your OZEV-authorised installer once the claim is made on your behalf.",
     ],
@@ -229,7 +216,6 @@ export const grantSchemes: GrantScheme[] = [
       "Your installer completes the work within the 180-day voucher validity period",
       "Your installer submits the claim, including photographs, a cost breakdown, and a site plan, and deducts the grant from your invoice",
     ],
-    applyCta: { label: "More information & apply now", href: "/workplace-charging" },
     moreInfoHref:
       "https://ocunioenergy.com/ozev-grants/workplace-charging-scheme-for-state-funded-education-institutions/",
     resources: [

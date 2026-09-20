@@ -159,7 +159,7 @@ export default async function CommercialProductDetailPage({
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specification">Specification</TabsTrigger>
               <TabsTrigger value="installation">Installation</TabsTrigger>
-              <TabsTrigger value="delivery">Delivery Policy</TabsTrigger>
+              <TabsTrigger value="delivery">Delivery Information</TabsTrigger>
               <TabsTrigger value="returns">Returns</TabsTrigger>
             </TabsList>
 

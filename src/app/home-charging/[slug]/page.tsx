@@ -23,6 +23,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { PurchasePanel } from "@/components/home-charging/purchase-panel";
 import { PartnerBadges } from "@/components/shared/partner-badges";
+import { FreeDeliveryBadge } from "@/components/shared/free-delivery-badge";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { ProductCard } from "@/components/shared/product-card";
 import { tagClass } from "@/components/shared/product-tag";
@@ -131,6 +132,7 @@ export default async function ProductDetailPage({
                   <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>
                 )}
                 <PartnerBadges tariffs={product.compatibleTariffs} />
+                <FreeDeliveryBadge show={detail.freeDelivery} />
               </div>
 
               {product.tags.length > 0 && (
@@ -168,17 +170,24 @@ export default async function ProductDetailPage({
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
-              <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
-                {detail.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-start gap-2 text-sm text-foreground/80"
-                  >
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+              {detail.features.length > 0 && (
+                <>
+                  <h2 className="mt-8 font-heading text-lg font-semibold text-foreground">
+                    Features
+                  </h2>
+                  <ul className="mt-4 flex flex-col gap-2.5">
+                    {detail.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2 text-sm text-foreground/80"
+                      >
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </TabsContent>
 
             <TabsContent value="specification" className="py-6">

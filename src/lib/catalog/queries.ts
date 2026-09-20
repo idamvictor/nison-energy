@@ -118,7 +118,8 @@ export function dbToDetail(row: ProductRow): ProductDetail {
     sku: row.sku ?? undefined,
     gallery: row.gallery.length > 0 ? row.gallery : [row.cardImage],
     description: row.description,
-    features: row.features,
+    features: row.features.filter((f) => f !== "FREE DELIVERY"),
+    freeDelivery: row.features.includes("FREE DELIVERY"),
     specs: row.sku ? [{ label: "SKU", value: row.sku }, ...specs] : specs,
     warranty: row.warranty ?? "",
   };

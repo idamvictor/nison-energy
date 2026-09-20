@@ -9,7 +9,7 @@ export const installationProcessMarkdown = `## Ocunio EV Solutions — Nationwid
 
 Fast, compliant smart charger installations backed by certified OZEV, NICEIC and NAPIT engineers, with grant savings available on eligible installs.
 
-### Standard Installation Package — £549 (inc. VAT) per chargepoint
+### Standard Installation Package — £540 (inc. VAT) per chargepoint
 
 The package includes:
 
@@ -28,24 +28,13 @@ Every job is backed by a 5-year workmanship guarantee, NAPIT-backed.
 4. **Certified installation & 4-point photo audit.** Our engineer fits the charger and SPD and takes four statutory compliance photos: the charger close-up, serial/model badge, parking space relation, and wide building context.
 5. **Commissioning & grant claim.** Your charger is tested and paired to your homeowner app. We handle evidence submission and claim your grant (£500 or 75%, whichever is lower) directly with OZEV.
 
-## OZEV Grant Integration: Customer vs Installer Split
-
-The OZEV grant process is a 2-stage model, split between what you complete and what we complete. It's important to understand this separation, as your side must be submitted and approved before we can finalise the claim.
-
-| Stage 1: Consumer Portal (Find a Grant) | Stage 2: Ocunio Digital Claim Submission |
-|---|---|
-| Initiated and completed digitally by the tenant or flat owner | Ocunio opens the unique tracked link received via OZEV email |
-| Enter Ocunio's registered OZEV installer number and business details | Inputs itemised financials matching the uploaded customer invoice |
-| Upload Ocunio's dated, itemised installation quote | Enters the exact OZEV-approved hardware make, model, and serial number |
-| Hard gate: await formal approval email before physical installation begins | Uploads the compiled 4-photo audit PDF; OZEV pays Ocunio directly |
-
 ## Transparent Rate Card & Optional Extras
 
 The standard package covers most typical home installs. If your setup needs more, here's what applies:
 
 | Specification / Boundary | Unit Price (inc. VAT) |
 |---|---|
-| Includes 1m cable, 3m trunking, SPD, labour and 5-year NAPIT guarantee | £549.00 |
+| Includes 1m cable, 3m trunking, SPD, labour and 5-year NAPIT guarantee | £540.00 |
 | Pre-installation home inspection by a certified electrician | £120.00 inc. VAT |
 | EV Ultra / armoured cable exceeding the 1m standard allowance | £15.00 / metre inc. VAT |
 | Extra trunking beyond the 3m allowance | £8.00 / metre — inc. VAT |

@@ -192,11 +192,13 @@ export default async function CommercialProductDetailPage({
 
             <TabsContent value="specification" className="py-6">
               <div className="overflow-hidden rounded-xl border border-border">
-                <Table>
+                <Table className="table-fixed">
                   <TableHeader>
                     <TableRow className="bg-secondary/60 hover:bg-secondary/60">
-                      <TableHead>Specification</TableHead>
-                      <TableHead>Value</TableHead>
+                      <TableHead className="w-2/5">Specification</TableHead>
+                      <TableHead>
+                        <span className="sr-only">Value</span>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -205,7 +207,7 @@ export default async function CommercialProductDetailPage({
                         <TableCell className="text-muted-foreground">
                           {spec.label}
                         </TableCell>
-                        <TableCell className="font-medium text-foreground">
+                        <TableCell className="font-medium text-foreground whitespace-normal wrap-break-word">
                           {spec.value}
                         </TableCell>
                       </TableRow>
@@ -224,7 +226,7 @@ export default async function CommercialProductDetailPage({
                   nativeButton={false}
                   render={<Link href="/contact-us" />}
                 >
-                  Book Installation (£549)
+                  Book Installation
                 </Button>
                 <Button
                   size="lg"

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
 import { brandLogos } from "@/lib/content/brand-logos";
+import { groupByVariant } from "@/lib/catalog/variant-grouping";
 
 const priceBuckets = [
   { key: "under-1500", label: "Under £1,500", test: (p: number) => p < 1500 },
@@ -111,6 +112,11 @@ export function CommercialCatalog({
     sort,
   ]);
 
+  const groups = useMemo(
+    () => groupByVariant(filtered, (p) => p.connectionType),
+    [filtered]
+  );
+
   const filterGroups = (
     <Accordion multiple defaultValue={filterKeys}>
       <FilterGroup
@@ -183,8 +189,8 @@ export function CommercialCatalog({
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
               <p className="text-sm text-muted-foreground">
-                {filtered.length}{" "}
-                {filtered.length === 1 ? "product" : "products"}
+                {groups.length}{" "}
+                {groups.length === 1 ? "product" : "products"}
               </p>
               <div className="flex items-center gap-2">
                 <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
@@ -219,17 +225,17 @@ export function CommercialCatalog({
               </div>
             </div>
 
-            {filtered.length === 0 ? (
+            {groups.length === 0 ? (
               <p className="py-16 text-center text-muted-foreground">
                 No chargers match those filters. Try clearing one or two.
               </p>
             ) : (
               <div className="mt-8 grid grid-cols-1 gap-7 pb-20 sm:grid-cols-2 xl:grid-cols-3">
-                {filtered.map((product, index) => (
-                  <Reveal key={product.id} delay={(index % 3) * 60}>
+                {groups.map((group, index) => (
+                  <Reveal key={group.key} delay={(index % 3) * 60}>
                     <CommercialProductCard
-                      product={product}
-                      compareSelected={compareIds.includes(product.id)}
+                      variants={group.variants}
+                      compareIds={compareIds}
                       onToggleCompare={toggleCompare}
                     />
                   </Reveal>

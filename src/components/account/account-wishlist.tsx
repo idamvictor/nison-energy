@@ -53,21 +53,21 @@ export function AccountWishlist({
       {savedResidential.length > 0 && (
         <WishlistSection title="Residential Chargers">
           {savedResidential.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} variants={[product]} />
           ))}
         </WishlistSection>
       )}
       {savedCommercial.length > 0 && (
         <WishlistSection title="Commercial Chargers">
           {savedCommercial.map((product) => (
-            <CommercialProductCard key={product.id} product={product} />
+            <CommercialProductCard key={product.id} variants={[product]} />
           ))}
         </WishlistSection>
       )}
       {savedAccessories.length > 0 && (
         <WishlistSection title="Accessories">
           {savedAccessories.map((product) => (
-            <AccessoryProductCard key={product.id} product={product} />
+            <AccessoryProductCard key={product.id} variants={[product]} />
           ))}
         </WishlistSection>
       )}

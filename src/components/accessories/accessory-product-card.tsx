@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Heart } from "lucide-react";
@@ -17,16 +18,32 @@ import type { AccessoryProduct } from "@/lib/catalog/types";
 import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/accessories/accessory-product-tag";
 import { useWishlist } from "@/lib/wishlist/store";
+import { cleanVariantName } from "@/lib/catalog/variant-grouping";
 
 export function AccessoryProductCard({
-  product,
-  compareSelected,
+  variants,
+  compareIds,
   onToggleCompare,
 }: {
-  product: AccessoryProduct;
-  compareSelected?: boolean;
+  variants: AccessoryProduct[];
+  compareIds?: string[];
   onToggleCompare?: (id: string) => void;
 }) {
+  const cheapest = variants.reduce((a, b) => (b.price < a.price ? b : a));
+  const [activeId, setActiveId] = useState(cheapest.id);
+  const product = variants.find((v) => v.id === activeId) ?? cheapest;
+  const compareSelected = compareIds?.includes(product.id);
+
+  const colours = [...new Set(variants.map((v) => v.colour))].map((colour) => {
+    const cheapestOfColour = variants
+      .filter((v) => v.colour === colour)
+      .reduce((a, b) => (b.price < a.price ? b : a));
+    return { colour, image: cheapestOfColour.image, id: cheapestOfColour.id };
+  });
+  const hasPriceRange = new Set(variants.map((v) => v.price)).size > 1;
+  const displayName =
+    variants.length > 1 ? cleanVariantName(product.name) : product.name;
+
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
   const href = `/accessories/${product.id}`;
@@ -98,10 +115,45 @@ export function AccessoryProductCard({
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
-        <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
+        <CardTitle className="text-lg leading-snug">{displayName}</CardTitle>
         <p className="mt-1 text-2xl font-semibold text-foreground">
+          {hasPriceRange && (
+            <span className="mr-1 text-sm font-normal text-muted-foreground">
+              From
+            </span>
+          )}
           £{product.price}
         </p>
+        {colours.length > 1 && (
+          <div className="relative z-10 flex flex-wrap gap-1.5">
+            {colours.map((c) => (
+              <button
+                key={c.colour}
+                type="button"
+                title={c.colour}
+                aria-label={c.colour}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveId(c.id);
+                }}
+                className={cn(
+                  "relative size-8 shrink-0 overflow-hidden rounded-md bg-white ring-1 transition-all",
+                  c.colour === product.colour
+                    ? "ring-2 ring-primary"
+                    : "ring-border hover:ring-primary/40"
+                )}
+              >
+                <Image
+                  src={c.image}
+                  alt={c.colour}
+                  fill
+                  sizes="32px"
+                  className="object-contain p-1"
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </CardContent>
       <CardFooter className="relative z-10 border-t-0 bg-transparent p-5 pt-3">
         <Button

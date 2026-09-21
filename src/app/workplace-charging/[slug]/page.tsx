@@ -257,7 +257,7 @@ export default async function CommercialProductDetailPage({
               </h2>
               <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {similar.map((p) => (
-                  <CommercialProductCard key={p.id} product={p} />
+                  <CommercialProductCard key={p.id} variants={[p]} />
                 ))}
               </div>
             </div>

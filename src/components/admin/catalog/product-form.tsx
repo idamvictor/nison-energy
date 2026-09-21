@@ -271,8 +271,6 @@ export function ProductForm({
           {row && (
             <Link
               href={`${storefrontBase}/${row.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
             >
               View on site

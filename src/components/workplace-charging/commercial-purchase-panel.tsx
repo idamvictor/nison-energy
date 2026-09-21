@@ -82,12 +82,14 @@ export function CommercialPurchasePanel({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Cable length
-          <select value="10m" disabled className={cn(selectClass, "text-muted-foreground")}>
-            <option value="10m">10m (charger to fuse box)</option>
-          </select>
-        </label>
+        {product.connectionType === "Tethered" && (
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+            Cable length
+            <p className={cn(selectClass, "flex items-center text-muted-foreground")}>
+              Tethered — fixed charging cable
+            </p>
+          </label>
+        )}
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
           Installation option

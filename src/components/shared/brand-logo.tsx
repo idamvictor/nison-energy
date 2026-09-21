@@ -21,7 +21,7 @@ export function BrandLogo({
     <img
       src={logo}
       alt={brand}
-      className={className ?? "h-6 w-auto object-contain"}
+      className={className ?? "h-16 w-auto object-contain"}
     />
   );
 }

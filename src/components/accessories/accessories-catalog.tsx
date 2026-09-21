@@ -138,11 +138,13 @@ export function AccessoriesCatalog({
       <FilterGroup
         value="length"
         title="Length"
-        items={[...lengthCounts.entries()].map(([value, count]) => ({
-          value,
-          label: value,
-          count,
-        }))}
+        items={[...lengthCounts.entries()]
+          .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
+          .map(([value, count]) => ({
+            value,
+            label: value,
+            count,
+          }))}
         selected={lengths}
         onToggle={(v) => setLengths((s) => toggle(s, v))}
       />
@@ -153,7 +155,7 @@ export function AccessoriesCatalog({
     <section className="bg-background">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-          <aside className="hidden w-64 shrink-0 lg:sticky lg:top-24 lg:block">
+          <aside className="hidden w-64 shrink-0 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
             {filterGroups}
           </aside>
 

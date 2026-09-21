@@ -66,7 +66,7 @@ export function FilterGroup({
                       src={logo}
                       alt={label}
                       title={label}
-                      className="h-4.5 w-auto max-w-24 object-contain"
+                      className="h-11 w-auto max-w-40 object-contain"
                     />
                   ) : (
                     label

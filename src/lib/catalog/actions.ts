@@ -28,13 +28,14 @@ function revalidate(category: ProductCategory) {
 
 export async function saveProduct(
   category: ProductCategory,
+  originalId: string,
   slug: string,
   isNew: boolean,
   input: ProductInput,
 ): Promise<WriteResult> {
   const result = isNew
     ? await createProduct(slug, { ...input, category })
-    : await updateProduct(slug, { ...input, category });
+    : await updateProduct(originalId, slug, { ...input, category });
   if (result.ok) revalidate(category);
   return result;
 }

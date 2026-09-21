@@ -268,13 +268,28 @@ export async function createProduct(
 
 export async function updateProduct(
   id: string,
+  newId: string,
   input: ProductInput,
 ): Promise<WriteResult> {
   await requireAdmin();
   const err = validate(input);
   if (err) return { ok: false, error: err };
-  await prisma.product.update({ where: { id }, data: toData(input) });
-  return { ok: true, id };
+
+  const nextId = newId.trim().toLowerCase();
+  if (!SLUG_RE.test(nextId)) {
+    return { ok: false, error: "Slug must be lowercase words separated by hyphens." };
+  }
+  if (nextId !== id) {
+    if (await prisma.product.findUnique({ where: { id: nextId }, select: { id: true } })) {
+      return { ok: false, error: `A product with slug "${nextId}" already exists.` };
+    }
+  }
+
+  await prisma.product.update({
+    where: { id },
+    data: { id: nextId, ...toData(input) },
+  });
+  return { ok: true, id: nextId };
 }
 
 export async function deleteProduct(id: string): Promise<WriteResult> {

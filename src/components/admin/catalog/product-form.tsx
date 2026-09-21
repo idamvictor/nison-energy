@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, GripVertical, ImageOff, Plus, X } from "lucide-react";
+import { ArrowLeft, ExternalLink, GripVertical, ImageOff, Plus, X } from "lucide-react";
 import {
   DndContext,
   type DragEndEvent,
@@ -91,18 +91,29 @@ export function ProductForm({
 }) {
   const router = useRouter();
   const isNew = row === null;
+  const originalId = row?.id ?? "";
   const adminBack =
     category === "Residential"
       ? "/admin/residential"
       : category === "Commercial"
         ? "/admin/commercial"
         : "/admin/accessories";
+  const storefrontBase =
+    category === "Residential"
+      ? "/home-charging"
+      : category === "Commercial"
+        ? "/workplace-charging"
+        : "/accessories";
 
   const isCharger = category !== "Accessory";
 
   const [slug, setSlug] = useState(row?.id ?? "");
-  const [slugTouched, setSlugTouched] = useState(!isNew);
+  const [slugTouched, setSlugTouched] = useState(false);
   const [name, setName] = useState(row?.name ?? "");
+  // Auto-follows the name (slugified) until the admin edits the slug field
+  // directly, at which point it locks to whatever they typed — same pattern
+  // used for brand-new products, now applied to edits of existing ones too.
+  const currentSlug = slugTouched ? slug : slugify(name);
   const [brand, setBrand] = useState(row?.brand ?? "");
   const [sku, setSku] = useState(row?.sku ?? "");
   const [colour, setColour] = useState(row?.colour ?? "");
@@ -152,30 +163,12 @@ export function ProductForm({
 
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const galleryImages = gallery.map((g) => g.url).filter((s) => s.trim() !== "");
 
-  const dndSensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
-
-  function handleGalleryDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setGallery((prev) => {
-      const oldIndex = prev.findIndex((g) => g.id === active.id);
-      const newIndex = prev.findIndex((g) => g.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return prev;
-      return arrayMove(prev, oldIndex, newIndex);
-    });
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-
-    const input: ProductInput = {
+  function buildInput(): ProductInput {
+    return {
       category,
       name,
       brand,
@@ -209,16 +202,56 @@ export function ProductForm({
       specs: specs.filter((s) => s.label.trim() && s.value.trim()),
       warranty: warranty.trim() || null,
     };
+  }
 
-    const finalSlug = (isNew ? slug || slugify(name) : row!.id).trim();
+  const [baseline, setBaseline] = useState(() => JSON.stringify(buildInput()));
+  const isDirty =
+    isNew || currentSlug !== originalId || JSON.stringify(buildInput()) !== baseline;
+
+  const dndSensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function handleGalleryDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setGallery((prev) => {
+      const oldIndex = prev.findIndex((g) => g.id === active.id);
+      const newIndex = prev.findIndex((g) => g.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setSaved(false);
+
+    const input = buildInput();
+    const finalSlug = currentSlug.trim();
 
     startTransition(async () => {
-      const result = await saveProduct(category, finalSlug, isNew, input);
+      const result = await saveProduct(category, originalId, finalSlug, isNew, input);
       if (!result.ok) {
         setError(result.error);
         return;
       }
-      router.push(adminBack);
+      if (isNew) {
+        router.push(adminBack);
+        router.refresh();
+        return;
+      }
+      if (result.id !== originalId) {
+        // The slug/id changed — the current URL no longer resolves to this
+        // product, so follow it to its new edit URL instead of refreshing
+        // in place.
+        router.replace(`${adminBack}/${result.id}`);
+        return;
+      }
+      setBaseline(JSON.stringify(input));
+      setSaved(true);
       router.refresh();
     });
   }
@@ -233,7 +266,20 @@ export function ProductForm({
           <ArrowLeft className="size-4" />
           Back
         </Link>
-        {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+        <div className="flex items-center gap-4">
+          {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+          {row && (
+            <Link
+              href={`${storefrontBase}/${row.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              View on site
+              <ExternalLink className="size-4" />
+            </Link>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -311,14 +357,19 @@ export function ProductForm({
           <Field label="URL slug">
             <Input
               required
-              disabled={!isNew}
-              value={isNew && !slugTouched ? slug || slugify(name) : slug}
+              value={currentSlug}
               onChange={(e) => {
                 setSlug(e.target.value);
                 setSlugTouched(true);
               }}
               placeholder="e.g. easee-one"
             />
+            {!isNew && currentSlug !== originalId && (
+              <p className="text-xs font-normal text-muted-foreground">
+                Changing this changes the product&apos;s URL — old links to it
+                will stop working.
+              </p>
+            )}
           </Field>
           <Field label="Product name">
             <Input
@@ -615,7 +666,10 @@ export function ProductForm({
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm supports-backdrop-filter:bg-background/80 sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-3 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm supports-backdrop-filter:bg-background/80 sm:-mx-6 sm:px-6">
+        {!pending && saved && !isDirty && (
+          <p className="text-sm font-medium text-success">Saved</p>
+        )}
         <Button
           type="button"
           variant="outline"
@@ -624,7 +678,7 @@ export function ProductForm({
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending || !isDirty}>
           {pending ? "Saving…" : isNew ? "Create product" : "Save changes"}
         </Button>
       </div>

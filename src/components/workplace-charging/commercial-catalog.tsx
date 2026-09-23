@@ -17,9 +17,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
+import { FilterGroup, toggle } from "@/components/shared/filter-group";
 import { brandLogos } from "@/lib/content/brand-logos";
-import { groupByVariant } from "@/lib/catalog/variant-grouping";
+import {
+  groupByVariant,
+  groupedFacetCounts,
+  groupedBucketCounts,
+} from "@/lib/catalog/variant-grouping";
 
 const priceBuckets = [
   { key: "under-1500", label: "Under £1,500", test: (p: number) => p < 1500 },
@@ -62,22 +66,27 @@ export function CommercialCatalog({
     });
   };
 
-  const brandCounts = useCounts(commercialProducts.map((p) => p.brand));
-  const connectionCounts = useCounts(
-    commercialProducts.map((p) => p.connectionType)
+  const typeOf = (p: CommercialProduct) => p.connectionType;
+  const brandCounts = useMemo(
+    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.brand),
+    [commercialProducts]
   );
-  const colourCounts = useCounts(commercialProducts.map((p) => p.colour));
-  const powerCounts = useCounts(commercialProducts.map((p) => p.powerOutput));
-  const bucketCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const bucket of priceBuckets) {
-      counts.set(
-        bucket.key,
-        commercialProducts.filter((p) => bucket.test(p.price)).length
-      );
-    }
-    return counts;
-  }, [commercialProducts]);
+  const connectionCounts = useMemo(
+    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.connectionType),
+    [commercialProducts]
+  );
+  const colourCounts = useMemo(
+    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.colour),
+    [commercialProducts]
+  );
+  const powerCounts = useMemo(
+    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.powerOutput),
+    [commercialProducts]
+  );
+  const bucketCounts = useMemo(
+    () => groupedBucketCounts(commercialProducts, typeOf, priceBuckets),
+    [commercialProducts]
+  );
 
   const filtered = useMemo(() => {
     let list = commercialProducts.filter((p: CommercialProduct) => {

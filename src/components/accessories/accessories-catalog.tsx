@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
 import { brandLogos } from "@/lib/content/brand-logos";
-import { groupByVariant } from "@/lib/catalog/variant-grouping";
+import { groupByVariant, groupedFacetCounts } from "@/lib/catalog/variant-grouping";
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
@@ -53,10 +53,22 @@ export function AccessoriesCatalog({
     });
   };
 
-  const brandCounts = useCounts(accessoryProducts.map((p) => p.brand));
-  const colourCounts = useCounts(accessoryProducts.map((p) => p.colour));
-  const styleCounts = useCounts(accessoryProducts.map((p) => p.style));
-  const phaseCounts = useCounts(accessoryProducts.map((p) => p.phase));
+  const brandCounts = useMemo(
+    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.brand),
+    [accessoryProducts]
+  );
+  const colourCounts = useMemo(
+    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.colour),
+    [accessoryProducts]
+  );
+  const styleCounts = useMemo(
+    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.style),
+    [accessoryProducts]
+  );
+  const phaseCounts = useMemo(
+    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.phase),
+    [accessoryProducts]
+  );
   const lengthCounts = useCounts(
     accessoryProducts.flatMap((p) => p.lengthOptions)
   );

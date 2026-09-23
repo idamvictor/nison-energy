@@ -19,7 +19,11 @@ import {
 } from "@/components/ui/sheet";
 import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
 import { brandLogos } from "@/lib/content/brand-logos";
-import { groupByVariant } from "@/lib/catalog/variant-grouping";
+import {
+  groupByVariant,
+  groupedFacetCounts,
+  groupedBucketCounts,
+} from "@/lib/catalog/variant-grouping";
 
 const priceBuckets = [
   { key: "under-1000", label: "Under £1,000", test: (p: number) => p < 1000 },
@@ -66,23 +70,30 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
     });
   };
 
-  const brandCounts = useCounts(products.map((p) => p.brand));
-  const connectionCounts = useCounts(products.map((p) => p.connectionType));
-  const colourCounts = useCounts(products.map((p) => p.colour));
-  const powerCounts = useCounts(products.map((p) => p.powerOutput));
+  const typeOf = (p: Product) => p.connectionType;
+  const brandCounts = useMemo(
+    () => groupedFacetCounts(products, typeOf, (p) => p.brand),
+    [products]
+  );
+  const connectionCounts = useMemo(
+    () => groupedFacetCounts(products, typeOf, (p) => p.connectionType),
+    [products]
+  );
+  const colourCounts = useMemo(
+    () => groupedFacetCounts(products, typeOf, (p) => p.colour),
+    [products]
+  );
+  const powerCounts = useMemo(
+    () => groupedFacetCounts(products, typeOf, (p) => p.powerOutput),
+    [products]
+  );
   const cableLengthCounts = useCounts(
     products.filter((p) => p.cableLength).map((p) => p.cableLength as string)
   );
-  const bucketCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const bucket of priceBuckets) {
-      counts.set(
-        bucket.key,
-        products.filter((p) => bucket.test(p.price)).length
-      );
-    }
-    return counts;
-  }, [products]);
+  const bucketCounts = useMemo(
+    () => groupedBucketCounts(products, typeOf, priceBuckets),
+    [products]
+  );
 
   const filtered = useMemo(() => {
     let list = products.filter((p: Product) => {

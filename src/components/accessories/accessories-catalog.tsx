@@ -52,20 +52,22 @@ export function AccessoriesCatalog({
     });
   };
 
+  const typeOf = (p: AccessoryProduct) => p.style;
+  const lengthOf = (p: AccessoryProduct) => p.lengthOptions[0];
   const brandCounts = useMemo(
-    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.brand),
+    () => groupedFacetCounts(accessoryProducts, typeOf, lengthOf, (p) => p.brand),
     [accessoryProducts]
   );
   const colourCounts = useMemo(
-    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.colour),
+    () => groupedFacetCounts(accessoryProducts, typeOf, lengthOf, (p) => p.colour),
     [accessoryProducts]
   );
   const styleCounts = useMemo(
-    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.style),
+    () => groupedFacetCounts(accessoryProducts, typeOf, lengthOf, (p) => p.style),
     [accessoryProducts]
   );
   const phaseCounts = useMemo(
-    () => groupedFacetCounts(accessoryProducts, (p) => p.style, (p) => p.phase),
+    () => groupedFacetCounts(accessoryProducts, typeOf, lengthOf, (p) => p.phase),
     [accessoryProducts]
   );
   const lengthCounts = useCounts(
@@ -95,7 +97,7 @@ export function AccessoriesCatalog({
   }, [accessoryProducts, brands, colours, styles, phases, lengths, sort]);
 
   const groups = useMemo(
-    () => groupByVariant(filtered, (p) => p.style),
+    () => groupByVariant(filtered, typeOf, lengthOf),
     [filtered]
   );
 

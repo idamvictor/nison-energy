@@ -66,24 +66,26 @@ export function CommercialCatalog({
   };
 
   const typeOf = (p: CommercialProduct) => p.connectionType;
+  const lengthOf = (p: CommercialProduct) => p.cableLength;
   const brandCounts = useMemo(
-    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.brand),
+    () => groupedFacetCounts(commercialProducts, typeOf, lengthOf, (p) => p.brand),
     [commercialProducts]
   );
   const connectionCounts = useMemo(
-    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.connectionType),
+    () =>
+      groupedFacetCounts(commercialProducts, typeOf, lengthOf, (p) => p.connectionType),
     [commercialProducts]
   );
   const colourCounts = useMemo(
-    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.colour),
+    () => groupedFacetCounts(commercialProducts, typeOf, lengthOf, (p) => p.colour),
     [commercialProducts]
   );
   const powerCounts = useMemo(
-    () => groupedFacetCounts(commercialProducts, typeOf, (p) => p.powerOutput),
+    () => groupedFacetCounts(commercialProducts, typeOf, lengthOf, (p) => p.powerOutput),
     [commercialProducts]
   );
   const bucketCounts = useMemo(
-    () => groupedBucketCounts(commercialProducts, typeOf, priceBuckets),
+    () => groupedBucketCounts(commercialProducts, typeOf, lengthOf, priceBuckets),
     [commercialProducts]
   );
 
@@ -121,7 +123,7 @@ export function CommercialCatalog({
   ]);
 
   const groups = useMemo(
-    () => groupByVariant(filtered, (p) => p.connectionType),
+    () => groupByVariant(filtered, typeOf, lengthOf),
     [filtered]
   );
 

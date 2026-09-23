@@ -102,7 +102,7 @@ export function CommercialProductCard({
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
-        <p className="mt-1 text-2xl font-semibold text-foreground">
+        <p className="mt-auto text-2xl font-semibold text-foreground">
           £{product.price}
           <span className="ml-1.5 text-sm font-normal text-muted-foreground">
             inc VAT

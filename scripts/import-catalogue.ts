@@ -589,6 +589,10 @@ async function main() {
     // A short row name like a bare "Grey" says nothing about connection type —
     // inherit the family's own type in that case rather than defaulting blind.
     const familyConn = connectionTypeOf(familyKey);
+    // Same reasoning — a bare "Grey"/"Red" row has no kW figure in it at
+    // all, but the rating is a family-wide constant, always present in the
+    // write-up heading.
+    const familyPower = powerOutputOf(familyKey);
 
     // Sub-group rows within the family by (colour, connectionType, length) —
     // these become separate Product rows. Length is a real priced variant
@@ -783,7 +787,15 @@ async function main() {
           netRows,
         });
       } else {
-        const powerOutput = powerOutputOf(descriptiveName);
+        // Last resort: some write-ups (Indra) never state the kW rating in
+        // either the row name or the family key, only inside the parsed
+        // "Charging Power" spec row itself (e.g. "Max output 7.4kW...").
+        const chargingPowerSpec =
+          writeupSpecs.find((s) => /charging power/i.test(s.label))?.value ?? "";
+        const powerOutput =
+          powerOutputOf(descriptiveName) ||
+          familyPower ||
+          powerOutputOf(chargingPowerSpec);
         fallbackSpecs.push({ label: "Connection type", value: conn });
         if (powerOutput) fallbackSpecs.push({ label: "Power output", value: powerOutput });
         if (lengths.length) fallbackSpecs.push({ label: "Cable length", value: lengths.join(", ") });
@@ -856,18 +868,28 @@ async function main() {
   }
 
   if (BACKFILL) {
-    console.log(`\nBackfilling sku + price on ${built.length} existing product(s) (non-destructive)...`);
+    console.log(`\nBackfilling sku + price + powerOutput + spec on ${built.length} existing product(s) (non-destructive)...`);
     const results = await Promise.all(
       built.map((p) =>
         prisma.product
-          .update({ where: { id: p.id }, data: { sku: p.sku, price: p.price } })
+          .update({
+            where: { id: p.id },
+            data: {
+              sku: p.sku,
+              price: p.price,
+              powerOutput: p.powerOutput || null,
+              spec: p.powerOutput
+                ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim()
+                : null,
+            },
+          })
           .then(() => ({ id: p.id, ok: true as const }))
           .catch(() => ({ id: p.id, ok: false as const })),
       ),
     );
     const updated = results.filter((r) => r.ok);
     const missing = results.filter((r) => !r.ok);
-    console.log(`Updated sku + price on ${updated.length} product(s).`);
+    console.log(`Updated sku + price + powerOutput + spec on ${updated.length} product(s).`);
     if (missing.length) {
       console.log(
         `⚠ ${missing.length} id(s) from this run had no matching existing product (skipped):`,

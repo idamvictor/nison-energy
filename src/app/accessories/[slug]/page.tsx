@@ -84,7 +84,7 @@ export default async function AccessoryDetailPage({
         <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-1.5 text-sm text-muted-foreground"
+            className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground"
           >
             <Link href="/" className="hover:text-foreground">
               Home

@@ -30,8 +30,6 @@ export function CommercialProductCard({
   const product = variants.reduce((a, b) => (b.price < a.price ? b : a));
   const compareSelected = compareIds?.includes(product.id);
 
-  const hasPriceRange = new Set(variants.map((v) => v.price)).size > 1;
-
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
   const href = `/workplace-charging/${product.id}`;
@@ -105,11 +103,6 @@ export function CommercialProductCard({
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <p className="mt-1 text-2xl font-semibold text-foreground">
-          {hasPriceRange && (
-            <span className="mr-1 text-sm font-normal text-muted-foreground">
-              From
-            </span>
-          )}
           £{product.price}
         </p>
       </CardContent>

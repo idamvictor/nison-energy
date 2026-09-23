@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ExternalLink, GripVertical, ImageOff, Plus, X } from "lucide-react";
+import { ArrowLeft, ExternalLink, GripVertical, ImageOff, Plus, Star, X } from "lucide-react";
 import {
   DndContext,
   type DragEndEvent,
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { ImageUploadField } from "@/components/shared/image-upload-field";
+import { cn } from "@/lib/utils";
 import {
   accessoryPhases,
   accessoryStyles,
@@ -286,7 +287,12 @@ export function ProductForm({
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
           {galleryImages.length > 0 ? (
-            <ProductGallery images={galleryImages} name={name || "Preview"} />
+            <ProductGallery
+              images={galleryImages}
+              name={name || "Preview"}
+              thumbnailImage={cardImage}
+              onSelectThumbnail={setCardImage}
+            />
           ) : (
             <div className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-border bg-muted">
               <ImageOff className="size-8 text-muted-foreground" />
@@ -319,6 +325,7 @@ export function ProductForm({
                     url={item.url}
                     index={index}
                     removable={gallery.length > 1}
+                    isThumbnail={item.url.trim() !== "" && item.url === cardImage}
                     onChange={(url) =>
                       setGallery((prev) =>
                         prev.map((g) => (g.id === item.id ? { ...g, url } : g)),
@@ -327,6 +334,7 @@ export function ProductForm({
                     onRemove={() =>
                       setGallery((prev) => prev.filter((g) => g.id !== item.id))
                     }
+                    onSetThumbnail={() => setCardImage(item.url)}
                   />
                 ))}
               </SortableContext>
@@ -689,15 +697,19 @@ function SortableGalleryItem({
   url,
   index,
   removable,
+  isThumbnail,
   onChange,
   onRemove,
+  onSetThumbnail,
 }: {
   id: string;
   url: string;
   index: number;
   removable: boolean;
+  isThumbnail: boolean;
   onChange: (url: string) => void;
   onRemove: () => void;
+  onSetThumbnail: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
@@ -724,6 +736,23 @@ function SortableGalleryItem({
           label={`Gallery image ${index + 1}`}
         />
       </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        className={cn(
+          "mt-0.5 shrink-0",
+          isThumbnail
+            ? "text-primary hover:text-primary"
+            : "text-muted-foreground hover:text-primary"
+        )}
+        disabled={!url.trim()}
+        onClick={onSetThumbnail}
+        title={isThumbnail ? "Current thumbnail image" : "Set as thumbnail image"}
+        aria-label={isThumbnail ? "Current thumbnail image" : "Set as thumbnail image"}
+      >
+        <Star className={cn("size-4", isThumbnail && "fill-current")} />
+      </Button>
       <Button
         type="button"
         variant="ghost"

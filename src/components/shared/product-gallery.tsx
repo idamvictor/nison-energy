@@ -2,16 +2,22 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 export function ProductGallery({
   images,
   name,
+  thumbnailImage,
+  onSelectThumbnail,
 }: {
   images: string[];
   name: string;
+  /** Admin-only: the image currently used as the card/thumbnail image. */
+  thumbnailImage?: string;
+  /** Admin-only: lets each swatch be picked as the card/thumbnail image. */
+  onSelectThumbnail?: (image: string) => void;
 }) {
   const [active, setActive] = useState(0);
 
@@ -58,26 +64,56 @@ export function ProductGallery({
       {images.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-1">
           {images.map((image, index) => (
-            <button
-              key={image}
-              type="button"
-              onClick={() => setActive(index)}
-              aria-label={`Show image ${index + 1}`}
-              className={cn(
-                "relative size-16 shrink-0 overflow-hidden rounded-lg bg-white ring-1 transition-all",
-                index === active
-                  ? "ring-2 ring-primary"
-                  : "ring-border hover:ring-primary/40"
+            <div key={image} className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setActive(index)}
+                aria-label={`Show image ${index + 1}`}
+                className={cn(
+                  "relative size-16 overflow-hidden rounded-lg bg-white ring-1 transition-all",
+                  index === active
+                    ? "ring-2 ring-primary"
+                    : "ring-border hover:ring-primary/40"
+                )}
+              >
+                <Image
+                  src={image}
+                  alt=""
+                  fill
+                  sizes="64px"
+                  className="object-contain p-1.5"
+                />
+              </button>
+              {onSelectThumbnail && (
+                <button
+                  type="button"
+                  onClick={() => onSelectThumbnail(image)}
+                  aria-label={
+                    image === thumbnailImage
+                      ? "Current thumbnail image"
+                      : "Set as thumbnail image"
+                  }
+                  title={
+                    image === thumbnailImage
+                      ? "Current thumbnail image"
+                      : "Set as thumbnail image"
+                  }
+                  className={cn(
+                    "absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full ring-2 ring-background transition-colors",
+                    image === thumbnailImage
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-white text-muted-foreground hover:text-primary"
+                  )}
+                >
+                  <Star
+                    className={cn(
+                      "size-3",
+                      image === thumbnailImage && "fill-current"
+                    )}
+                  />
+                </button>
               )}
-            >
-              <Image
-                src={image}
-                alt=""
-                fill
-                sizes="64px"
-                className="object-contain p-1.5"
-              />
-            </button>
+            </div>
           ))}
         </div>
       )}

@@ -61,7 +61,7 @@ export function CommercialPurchasePanel({
       ? `Standard installation (+£${installFee})`
       : installation === "none"
         ? "No installation (device only)"
-        : "Choose option";
+        : "Select";
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -117,7 +117,7 @@ export function CommercialPurchasePanel({
         </label>
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
-          Installation option
+          Add Installation
           <div className="relative">
             <button
               type="button"

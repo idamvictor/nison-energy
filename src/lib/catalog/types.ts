@@ -120,7 +120,6 @@ export type ProductDetail = {
   gallery: string[];
   description: string[];
   features: string[];
-  freeDelivery: boolean;
   specs: Spec[];
   warranty: string;
 };

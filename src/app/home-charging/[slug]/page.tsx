@@ -132,7 +132,7 @@ export default async function ProductDetailPage({
                   <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>
                 )}
                 <PartnerBadges tariffs={product.compatibleTariffs} />
-                <FreeDeliveryBadge show={detail.freeDelivery} />
+                <FreeDeliveryBadge />
               </div>
 
               {product.tags.length > 0 && (

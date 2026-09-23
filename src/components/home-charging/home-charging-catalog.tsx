@@ -18,7 +18,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
-import { brandLogos } from "@/lib/content/brand-logos";
 import {
   groupByVariant,
   groupedFacetCounts,
@@ -151,7 +150,6 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
         }))}
         selected={brands}
         onToggle={(v) => setBrands((s) => toggle(s, v))}
-        logos={brandLogos}
       />
       <FilterGroup
         value="price"

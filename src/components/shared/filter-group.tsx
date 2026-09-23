@@ -29,15 +29,12 @@ export function FilterGroup({
   items,
   selected,
   onToggle,
-  logos,
 }: {
   value: string;
   title: string;
   items: { value: string; label: string; count: number }[];
   selected: Set<string>;
   onToggle: (value: string) => void;
-  /** Optional label -> logo URL lookup; falls back to text when absent. */
-  logos?: Record<string, string>;
 }) {
   return (
     <AccordionItem value={value}>
@@ -46,36 +43,23 @@ export function FilterGroup({
       </AccordionTrigger>
       <AccordionContent>
         <div className="flex flex-col gap-2.5">
-          {items.map(({ value: itemValue, label, count }) => {
-            const logo = logos?.[label];
-            return (
-              <label
-                key={itemValue}
-                className="flex cursor-pointer items-center justify-between gap-2 text-sm"
-              >
-                <span className="flex items-center gap-2 text-foreground/80">
-                  <input
-                    type="checkbox"
-                    checked={selected.has(itemValue)}
-                    onChange={() => onToggle(itemValue)}
-                    className="size-4 accent-primary"
-                  />
-                  {logo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={logo}
-                      alt={label}
-                      title={label}
-                      className="h-11 w-auto max-w-40 object-contain"
-                    />
-                  ) : (
-                    label
-                  )}
-                </span>
-                <span className="text-xs text-muted-foreground">{count}</span>
-              </label>
-            );
-          })}
+          {items.map(({ value: itemValue, label, count }) => (
+            <label
+              key={itemValue}
+              className="flex cursor-pointer items-center justify-between gap-2 text-sm"
+            >
+              <span className="flex items-center gap-2 text-foreground/80">
+                <input
+                  type="checkbox"
+                  checked={selected.has(itemValue)}
+                  onChange={() => onToggle(itemValue)}
+                  className="size-4 accent-primary"
+                />
+                {label}
+              </span>
+              <span className="text-xs text-muted-foreground">{count}</span>
+            </label>
+          ))}
         </div>
       </AccordionContent>
     </AccordionItem>

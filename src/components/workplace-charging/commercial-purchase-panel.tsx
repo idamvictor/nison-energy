@@ -70,7 +70,7 @@ export function CommercialPurchasePanel({
           <select
             value={product.id}
             onChange={(e) =>
-              router.push(`/workplace-charging/${e.target.value}`)
+              router.push(`/workplace-charging/${e.target.value}`, { scroll: false })
             }
             className={selectClass}
           >

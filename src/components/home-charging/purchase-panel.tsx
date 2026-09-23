@@ -82,7 +82,7 @@ export function PurchasePanel({
               const candidates = colourSiblings.filter((p) => p.colour === e.target.value);
               const match =
                 candidates.find((p) => p.cableLength === product.cableLength) ?? candidates[0];
-              if (match) router.push(`/home-charging/${match.id}`);
+              if (match) router.push(`/home-charging/${match.id}`, { scroll: false });
             }}
             className={selectClass}
           >
@@ -99,7 +99,9 @@ export function PurchasePanel({
           {lengthSiblings.length > 0 ? (
             <select
               value={product.id}
-              onChange={(e) => router.push(`/home-charging/${e.target.value}`)}
+              onChange={(e) =>
+                router.push(`/home-charging/${e.target.value}`, { scroll: false })
+              }
               className={selectClass}
             >
               {lengthSiblings.map((p) => (

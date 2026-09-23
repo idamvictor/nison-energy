@@ -75,7 +75,7 @@ export function AccessoryPurchasePanel({
               const match =
                 candidates.find((p) => p.lengthOptions[0] === product.lengthOptions[0]) ??
                 candidates[0];
-              if (match) router.push(`/accessories/${match.id}`);
+              if (match) router.push(`/accessories/${match.id}`, { scroll: false });
             }}
             className={selectClass}
           >
@@ -92,7 +92,9 @@ export function AccessoryPurchasePanel({
           {lengthSiblings.length > 0 ? (
             <select
               value={product.id}
-              onChange={(e) => router.push(`/accessories/${e.target.value}`)}
+              onChange={(e) =>
+                router.push(`/accessories/${e.target.value}`, { scroll: false })
+              }
               className={selectClass}
             >
               {lengthSiblings.map((p) => (

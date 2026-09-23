@@ -70,7 +70,7 @@
   --card-foreground: #000000;
   --popover: #ffffff;
   --popover-foreground: #000000;
-  --primary: #1579e6;
+  --primary: #04b4e1;
   --primary-foreground: #ffffff;
   --secondary: color-mix(in oklch, var(--primary), white 90%);
   --secondary-foreground: var(--primary);

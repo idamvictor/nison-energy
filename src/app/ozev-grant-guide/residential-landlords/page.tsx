@@ -75,7 +75,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
       className={cn(
         "rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all",
         active
-          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-4px_rgba(21,121,230,0.5)]"
+          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-4px_rgba(4,180,225,0.5)]"
           : "border-foreground/25 bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
       )}
     >

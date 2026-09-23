@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, Heart } from "lucide-react";
+import { ArrowRight, Check, GitCompare, Heart } from "lucide-react";
 
 import {
   Card,
@@ -59,25 +59,25 @@ export function AccessoryProductCard({
           )}
           <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
             {onToggleCompare && (
-              <label className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 py-1 pr-2.5 pl-1.5 text-xs font-medium text-foreground shadow-sm ring-1 ring-border">
-                <span
-                  className={cn(
-                    "flex size-4 items-center justify-center rounded-sm border transition-colors",
-                    compareSelected
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-input bg-background"
-                  )}
-                >
-                  {compareSelected && <Check className="size-3" />}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={Boolean(compareSelected)}
-                  onChange={() => onToggleCompare(product.id)}
-                  className="sr-only"
-                />
-                Compare
-              </label>
+              <button
+                type="button"
+                onClick={() => onToggleCompare(product.id)}
+                aria-pressed={Boolean(compareSelected)}
+                aria-label={compareSelected ? "Remove from compare" : "Add to compare"}
+                title={compareSelected ? "Remove from compare" : "Add to compare"}
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full shadow-sm ring-1 transition-colors",
+                  compareSelected
+                    ? "bg-primary text-primary-foreground ring-primary"
+                    : "bg-white/95 text-foreground/60 ring-border hover:bg-white"
+                )}
+              >
+                {compareSelected ? (
+                  <Check className="size-4" />
+                ) : (
+                  <GitCompare className="size-4" />
+                )}
+              </button>
             )}
             <button
               type="button"
@@ -104,6 +104,9 @@ export function AccessoryProductCard({
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <p className="mt-1 text-2xl font-semibold text-foreground">
           £{product.price}
+          <span className="ml-1.5 text-sm font-normal text-muted-foreground">
+            inc VAT
+          </span>
         </p>
       </CardContent>
       <CardFooter className="relative z-10 border-t-0 bg-transparent p-5 pt-3">

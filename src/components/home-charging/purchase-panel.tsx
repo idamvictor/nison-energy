@@ -41,14 +41,22 @@ export function PurchasePanel({
 
   const colourSiblings =
     product.variantGroup && siblings.length > 0 ? siblings : [product];
+  // A variantGroup can span both Tethered and Untethered rows (a real
+  // product distinction, not cosmetic — see variant-grouping.ts) — restrict
+  // to the current product's own connection type first, so an Untethered
+  // page can never pick up a Tethered sibling's cable length or colour
+  // options that only exist under the other connection type.
+  const sameConnectionSiblings = colourSiblings.filter(
+    (p) => p.connectionType === product.connectionType,
+  );
   // One entry per distinct colour — siblings include every colour × length
   // combination in this variantGroup, so dedupe for the Colour dropdown.
-  const colourOptions = colourSiblings.filter(
-    (p, i) => colourSiblings.findIndex((q) => q.colour === p.colour) === i,
+  const colourOptions = sameConnectionSiblings.filter(
+    (p, i) => sameConnectionSiblings.findIndex((q) => q.colour === p.colour) === i,
   );
   // Lengths available for the currently selected colour, shortest first —
   // each length is now its own real, correctly-priced product row.
-  const lengthSiblings = colourSiblings
+  const lengthSiblings = sameConnectionSiblings
     .filter((p) => p.colour === product.colour && p.cableLength)
     .sort((a, b) => parseFloat(a.cableLength ?? "0") - parseFloat(b.cableLength ?? "0"));
 
@@ -79,7 +87,7 @@ export function PurchasePanel({
           <select
             value={product.colour}
             onChange={(e) => {
-              const candidates = colourSiblings.filter((p) => p.colour === e.target.value);
+              const candidates = sameConnectionSiblings.filter((p) => p.colour === e.target.value);
               const match =
                 candidates.find((p) => p.cableLength === product.cableLength) ?? candidates[0];
               if (match) router.push(`/home-charging/${match.id}`, { scroll: false });

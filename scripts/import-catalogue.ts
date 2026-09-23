@@ -11,6 +11,8 @@
  *                                                                 2 newly-fixed Tesla products
  *   npx tsx scripts/import-catalogue.ts --add-myenergi-22kw [--commit]  # additive: create just
  *                                                                 the 4 newly-fixed Zappi 22kW products
+ *   npx tsx scripts/import-catalogue.ts --add-waev-wifi [--commit]  # additive: create just the
+ *                                                                 1 newly-fixed waEV EV1S product
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -41,6 +43,10 @@ const ADD_TESLA = process.argv.includes("--add-tesla");
 // distinct from the already-live 7kW residential Zappi chargers' "2H07"
 // SKUs), leaving every other already-imported product untouched.
 const ADD_MYENERGI_22KW = process.argv.includes("--add-myenergi-22kw");
+// Additive: create only the 1 newly-fixed waEV-charge EV1S product (see the
+// ROW_FIXES / CONTENT_FIXES / FAMILY_CATEGORY entries above — identified by
+// its unique SKU), leaving every other already-imported product untouched.
+const ADD_WAEV_WIFI = process.argv.includes("--add-waev-wifi");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
@@ -76,6 +82,22 @@ const ROW_FIXES: Record<string, { name?: string; writeup?: string }> = {
   "2H22TW": {
     name: "Myenergi Zappi EV Charger Smart 22kW Type 2 Tethered Multiphase - White",
   },
+  // Row 67 ("waEV-charge EV Smart 7.4kW Charger Tethered 5m with WiFi"):
+  // Write-up column is blank in the source — no heading anywhere in the
+  // Write-ups sheet references this SKU (confirmed by search), unlike every
+  // other product. Also mislabeled "Tethered 5m" in its own Name cell even
+  // though it's genuinely untethered (no integrated cable) — real content
+  // supplied separately (see CONTENT_FIXES) explicitly says "charger
+  // supplied without a cable," and the "5m" is a leftover artifact from
+  // copying the Tethered EV1i row's name template. Corrected name drops the
+  // wrong "5m" and fixes Tethered -> Untethered; write-up self-references
+  // the corrected name so this row forms its own single-row family (no
+  // matching heading exists, so CONTENT_FIXES supplies the real content
+  // directly instead of relying on heading/paragraph parsing).
+  "WAEVEV17WIFI": {
+    name: "waEV-charge EV Smart 7.4kW Charger Untethered with WiFi",
+    writeup: "waEV-charge EV Smart 7.4kW Charger Untethered with WiFi",
+  },
 };
 
 // Spec-table values to normalise into the site's plain "X years" warranty
@@ -88,6 +110,70 @@ const SPEC_VALUE_FIXES: Record<string, Record<string, string>> = {
   },
   "Tesla Matt:e Single Phase Monitoring and Protection Unit with built in RCBO": {
     Warranty: "3 years",
+  },
+};
+
+// Full write-up content for products with no matching heading anywhere in
+// the Write-ups sheet (confirmed by search) — supplied directly rather than
+// parsed from spreadsheet paragraphs. Applied to the built product after
+// normal construction, keyed by SKU.
+const CONTENT_FIXES: Record<
+  string,
+  {
+    description: string[];
+    features: string[];
+    specs: { label: string; value: string }[];
+  }
+> = {
+  "WAEVEV17WIFI": {
+    description: [
+      "Discover the waEV-charge EV1S Smart EV Charger. Untethered 7.4kW/22kW IP65 wallbox featuring ev.energy app control, direct solar inverter integration, and Tap Electric monetisation.",
+      "The waEV-charge EV1S EV Charger is a high-performance, future-proof smart charging solution built with quality, electrical safety, and cutting-edge EV technology at its core. Engineered for both single-phase (7.4kW) and three-phase (22kW) supplies, this unit features a universal untethered Type 2 socket, providing drivers with complete flexibility to use their preferred charging cable. Housed in a robust, IP65-certified weatherproof enclosure, the EV1S is designed to endure a lifetime of daily use across demanding indoor and outdoor domestic or commercial environments.",
+      "Designed for maximum eco-efficiency and cost reduction, the charger integrates seamlessly with the industry-leading ev.energy app to enable direct pairing with popular solar inverters, delivering exceptionally accurate solar tracking and zero-carbon charging from self-generated power. Built-in smart tariff integration automatically shifts charging sessions to off-peak hours when electricity prices are lowest, while a secure socket-locking mechanism restricts access strictly to authorized users to prevent unauthorized charging and cable tampering.",
+      "Connectivity is comprehensive and versatile, featuring built-in Wi-Fi, Bluetooth, and hardwired Ethernet to ensure stable communication and real-time charging insights at all times.",
+      "For commercial hosts and property owners looking to monetize their parking infrastructure, integrated compatibility with Tap Electric allows you to take complete control of your charge points, manage tariffs, and boost your revenue effortlessly through flexible, app-based public or guest management.",
+    ],
+    features: [
+      "EV1S EV charger — 7kW/22kW options",
+      "Powered by ev.energy scheduling and analytics",
+      "Solar charging integration with ev.energy",
+      "RFID secure charging, 2 cards included",
+      "Use your own charging cable",
+      "OCPP 1.6J for managed commercial charging",
+      "WiFi, Bluetooth, and LAN connectivity",
+      "Compatible with all Octopus and OVO tariffs",
+      "PEN protection, no earth rod required",
+    ],
+    specs: [
+      {
+        label: "Charging Power",
+        value:
+          "7kW at 32A 1 phase (25-30 miles/hr); 11/22kW at 32A 3 phase (70-90 miles/hr); up to 7x faster than a 3-pin plug",
+      },
+      {
+        label: "Connector",
+        value:
+          "IEC62196-2 (Type 2) as standard, SAE J1772 (Type 1) optional, charger supplied without a cable",
+      },
+      {
+        label: "Connectivity & Integration",
+        value:
+          "OCPP 1.6J, LAN (RFID Edition), WiFi & Bluetooth (WiFi Edition), 5G (Plug & Play), RFID NFC / ISO 14443",
+      },
+      {
+        label: "Smart Features & Tariff Compatibility",
+        value:
+          "MID smart meter, solar integration (CT), OCPP 2.0, ISO15118 V2G plug & charge functionality, compatible with all Octopus and OVO tariffs",
+      },
+      { label: "Compatibility", value: "Compatible with all plug-in vehicle brands" },
+      {
+        label: "Protection",
+        value:
+          "PEN protection (no earth rod required), integrated 6mA DC protection (RDC-DD), UVP, OVP, SPD, ground fault protection, OCP, OTP, control pilot fault protection",
+      },
+      { label: "Certifications", value: "TUV CE & UKCA" },
+      { label: "Warranty", value: "3 years" },
+    ],
   },
 };
 
@@ -136,6 +222,7 @@ const FAMILY_CATEGORY: Record<string, ProductCategory> = {
   "Evec VecGO 7.4 kW Duo - Socketed With 5M Cable (Charge Two Cars Together)": "Residential",
   "FastAmps 7.4kW Alpha7 Gen4 Tethered EV Charger – Black": "Residential",
   "waEV-charge EV1i Smart Solar 7.4kW Charger Tethered 5m with WiFi / LAN": "Residential",
+  "waEV-charge EV Smart 7.4kW Charger Untethered with WiFi": "Residential",
   "Tesla 7kW/22kW Type 2 Tethered Wall Connector EV Charger (Gen 3)": "Residential",
 
   "Easee Charge 22kW Commercial & Home EV Charger Type 2 Multiphase": "Commercial",
@@ -728,6 +815,17 @@ async function main() {
     }
   }
 
+  // Overlay hand-supplied content for products whose write-up has no
+  // matching heading anywhere in the sheet (see CONTENT_FIXES above).
+  for (const p of built) {
+    const fix = p.sku ? CONTENT_FIXES[p.sku.trim()] : undefined;
+    if (fix) {
+      p.description = fix.description;
+      p.features = fix.features;
+      p.specs = fix.specs;
+    }
+  }
+
   // ─── Report ────────────────────────────────────────────────────────────
   console.log(`Families available: ${families.size} (excluded: ${EXCLUDED_FAMILIES.size})`);
   console.log(`Products built: ${built.length}`);
@@ -895,6 +993,65 @@ async function main() {
     }
 
     console.log(`\nDone. Created ${myenergiProducts.length} product(s).`);
+    return;
+  }
+
+  if (ADD_WAEV_WIFI) {
+    const waevProducts = built.filter((p) => p.sku?.trim() === "WAEVEV17WIFI");
+    console.log(`\nFound ${waevProducts.length} waEV EV1S product(s) to add:`);
+    for (const p of waevProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      console.log(
+        `  [${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  warranty=${warranty ?? "—"}`,
+      );
+    }
+
+    if (!COMMIT) {
+      console.log("\nDry run only — no database changes made. Re-run with --add-waev-wifi --commit to apply.");
+      return;
+    }
+
+    const { _max } = await prisma.product.aggregate({ _max: { sortOrder: true } });
+    let nextSortOrder = (_max.sortOrder ?? 0) + 1;
+
+    for (const p of waevProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          category: p.category,
+          name: p.name,
+          brand: p.brand,
+          sku: p.sku,
+          colour: p.colour,
+          cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
+          gallery: p.gallery,
+          tags: [],
+          variantGroup: p.variantGroup,
+          active: true,
+          featured: false,
+          sortOrder: nextSortOrder++,
+          spec: p.powerOutput ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim() : null,
+          connectionType: p.connectionType ?? null,
+          cableLength: p.cableLength ?? null,
+          cableLengthOptions: p.cableLengthOptions,
+          powerOutput: p.powerOutput || null,
+          price: p.price,
+          installFee: p.category === "Residential" ? 540 : null,
+          style: p.style ?? null,
+          phase: p.phase ?? null,
+          lengthOptions: p.lengthOptions,
+          tagline: p.tagline,
+          description: p.description,
+          features: p.features,
+          specs: p.specs,
+          warranty,
+        },
+      });
+      console.log(`Created ${p.id}.`);
+    }
+
+    console.log(`\nDone. Created ${waevProducts.length} product(s).`);
     return;
   }
 

@@ -9,6 +9,8 @@
  *   npx tsx scripts/import-catalogue.ts --backfill   # non-destructive: sku + price columns only
  *   npx tsx scripts/import-catalogue.ts --add-tesla [--commit]  # additive: create just the
  *                                                                 2 newly-fixed Tesla products
+ *   npx tsx scripts/import-catalogue.ts --add-myenergi-22kw [--commit]  # additive: create just
+ *                                                                 the 4 newly-fixed Zappi 22kW products
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -33,6 +35,12 @@ const BACKFILL = process.argv.includes("--backfill") || process.argv.includes("-
 // the catalogue), leaving every other already-imported product completely
 // untouched — unlike --commit, which replaces the whole catalogue.
 const ADD_TESLA = process.argv.includes("--add-tesla");
+// Additive: create only the 4 newly-fixed Myenergi Zappi 22kW Multiphase
+// products (see the row-16 fix / EXCLUDED_FAMILIES / FAMILY_CATEGORY above —
+// identified by SKU prefix, since "2H22" is unique to these 4 rows and
+// distinct from the already-live 7kW residential Zappi chargers' "2H07"
+// SKUs), leaving every other already-imported product untouched.
+const ADD_MYENERGI_22KW = process.argv.includes("--add-myenergi-22kw");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
@@ -59,6 +67,15 @@ const ROW_FIXES: Record<string, { name?: string; writeup?: string }> = {
   "SP-EVCP-R": {
     writeup: "Tesla Matt:e Single Phase Monitoring and Protection Unit with built in RCBO",
   },
+  // Row 14: this family's head row states no colour at all in its name
+  // (unlike its sibling row 15 "Black"), so colourOf() silently falls back
+  // to its "Black" default — colliding with row 15's explicit "Black" and
+  // losing this row entirely. Its SKU suffix ("...TW") and the sibling
+  // 22kW Untethered family's parallel W/B SKU pair (2H22UW/2H22UB) both
+  // confirm this row is the White variant.
+  "2H22TW": {
+    name: "Myenergi Zappi EV Charger Smart 22kW Type 2 Tethered Multiphase - White",
+  },
 };
 
 // Spec-table values to normalise into the site's plain "X years" warranty
@@ -76,14 +93,12 @@ const SPEC_VALUE_FIXES: Record<string, Record<string, string>> = {
 
 // ─── Families to exclude — corrupted source data, not guessed at ───────────
 const EXCLUDED_FAMILIES = new Set([
-  "Myenergi Zappi EV Charger Smart 22kW Type 2 Tethered Multiphase",
-  "Myenergi Zappi EV Charger Smart 22kW Type 2 Untethered Multiphase Black",
   // These two families' write-up references got cross-assigned in the source
   // (family A's only row is literally named after family B's own write-up
-  // title, and vice versa) — same class of copy-paste error as the two
-  // above, just with generic enough wording ("Charge"/"Charger"/"22kW") that
-  // the automatic word-overlap check below doesn't catch it. Confirmed by
-  // hand against the raw sheet data.
+  // title, and vice versa) — same class of copy-paste error as the Zappi
+  // 22kW row fixed via ROW_FIXES above, just with generic enough wording
+  // ("Charge"/"Charger"/"22kW") that the automatic word-overlap check below
+  // doesn't catch it. Confirmed by hand against the raw sheet data.
   "Easee Charge 22kW Commercial & Home EV Charger Type 2 Multiphase",
   "Easee Charger Max Untethered EV Charger 7.4kW-22kW with Mid Meter",
 ]);
@@ -124,6 +139,8 @@ const FAMILY_CATEGORY: Record<string, ProductCategory> = {
   "Tesla 7kW/22kW Type 2 Tethered Wall Connector EV Charger (Gen 3)": "Residential",
 
   "Easee Charge 22kW Commercial & Home EV Charger Type 2 Multiphase": "Commercial",
+  "Myenergi Zappi EV Charger Smart 22kW Type 2 Tethered Multiphase": "Commercial",
+  "Myenergi Zappi EV Charger Smart 22kW Type 2 Untethered Multiphase Black": "Commercial",
   "VCHRGD TwentyTwo Dual Socket 22kW EV Charger": "Commercial",
   "SolaX Smart Three Phase 22kW EV Charger G2 - Tethered": "Commercial",
   "Zaptec Go 2 7.4kW/22kW Smart EV Charger V2G-Ready": "Commercial",
@@ -323,6 +340,23 @@ async function main() {
     if (!fix) continue;
     if (fix.name) r[COL.NAME] = fix.name;
     if (fix.writeup) r[COL.WRITEUP] = fix.writeup;
+  }
+
+  // Chargers row 16: SKU + Write-up both copy-pasted from row 15 above
+  // (classic "copied the row above, forgot to update" error) — the real SKU
+  // can't be fixed via ROW_FIXES since the wrong SKU (2H22TB) collides with
+  // row 15's own, so this row is matched by its distinctive name instead.
+  // Confirmed by the Untethered write-up's own body text, which references
+  // "(2H22UB & 2H22UW)" directly.
+  for (const r of chargers) {
+    if (
+      String(r[COL.NAME]).trim() ===
+      "Myenergi Zappi EV Charger Smart 22kW Type 2 Untethered Multiphase -  Black"
+    ) {
+      r[COL.SKU] = "2H22UB";
+      r[COL.WRITEUP] =
+        "Myenergi Zappi EV Charger Smart 22kW Type 2 Untethered Multiphase Black";
+    }
   }
 
   const dataRows = chargers
@@ -802,6 +836,65 @@ async function main() {
     }
 
     console.log(`\nDone. Created ${teslaProducts.length} product(s).`);
+    return;
+  }
+
+  if (ADD_MYENERGI_22KW) {
+    const myenergiProducts = built.filter((p) => p.sku?.startsWith("2H22"));
+    console.log(`\nFound ${myenergiProducts.length} Myenergi Zappi 22kW product(s) to add:`);
+    for (const p of myenergiProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      console.log(
+        `  [${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  warranty=${warranty ?? "—"}`,
+      );
+    }
+
+    if (!COMMIT) {
+      console.log("\nDry run only — no database changes made. Re-run with --add-myenergi-22kw --commit to apply.");
+      return;
+    }
+
+    const { _max } = await prisma.product.aggregate({ _max: { sortOrder: true } });
+    let nextSortOrder = (_max.sortOrder ?? 0) + 1;
+
+    for (const p of myenergiProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          category: p.category,
+          name: p.name,
+          brand: p.brand,
+          sku: p.sku,
+          colour: p.colour,
+          cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
+          gallery: p.gallery,
+          tags: [],
+          variantGroup: p.variantGroup,
+          active: true,
+          featured: false,
+          sortOrder: nextSortOrder++,
+          spec: p.powerOutput ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim() : null,
+          connectionType: p.connectionType ?? null,
+          cableLength: p.cableLength ?? null,
+          cableLengthOptions: p.cableLengthOptions,
+          powerOutput: p.powerOutput || null,
+          price: p.price,
+          installFee: p.category === "Residential" ? 540 : null,
+          style: p.style ?? null,
+          phase: p.phase ?? null,
+          lengthOptions: p.lengthOptions,
+          tagline: p.tagline,
+          description: p.description,
+          features: p.features,
+          specs: p.specs,
+          warranty,
+        },
+      });
+      console.log(`Created ${p.id}.`);
+    }
+
+    console.log(`\nDone. Created ${myenergiProducts.length} product(s).`);
     return;
   }
 

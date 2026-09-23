@@ -42,6 +42,19 @@ export function CommercialPurchasePanel({
 
   const colourSiblings =
     product.variantGroup && siblings.length > 0 ? siblings : [product];
+  // One entry per distinct colour — siblings include every colour ×
+  // connection-type combination in this variantGroup, so dedupe for the
+  // Colour dropdown.
+  const colourOptions = colourSiblings.filter(
+    (p, i) => colourSiblings.findIndex((q) => q.colour === p.colour) === i,
+  );
+  // Connection types available for the currently selected colour.
+  const connectionSiblings = colourSiblings
+    .filter((p) => p.colour === product.colour)
+    .filter(
+      (p, i, arr) =>
+        arr.findIndex((q) => q.connectionType === p.connectionType) === i,
+    );
 
   const installationLabel =
     installation === "standard"
@@ -66,7 +79,28 @@ export function CommercialPurchasePanel({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Colour / connection
+          Colour
+          <select
+            value={product.colour}
+            onChange={(e) => {
+              const candidates = colourSiblings.filter((p) => p.colour === e.target.value);
+              const match =
+                candidates.find((p) => p.connectionType === product.connectionType) ??
+                candidates[0];
+              if (match) router.push(`/workplace-charging/${match.id}`, { scroll: false });
+            }}
+            className={selectClass}
+          >
+            {colourOptions.map((p) => (
+              <option key={p.colour} value={p.colour}>
+                {p.colour}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+          Connection Type
           <select
             value={product.id}
             onChange={(e) =>
@@ -74,22 +108,13 @@ export function CommercialPurchasePanel({
             }
             className={selectClass}
           >
-            {colourSiblings.map((p) => (
+            {connectionSiblings.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.colour} · {p.connectionType}
+                {p.connectionType}
               </option>
             ))}
           </select>
         </label>
-
-        {product.connectionType === "Tethered" && (
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-            Cable length
-            <p className={cn(selectClass, "flex items-center text-muted-foreground")}>
-              Tethered — fixed charging cable
-            </p>
-          </label>
-        )}
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
           Installation option

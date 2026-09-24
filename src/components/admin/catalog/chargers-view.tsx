@@ -49,12 +49,7 @@ import {
 import { categoryRoute, type ProductCategory } from "@/lib/catalog/types";
 import { removeProduct } from "@/lib/catalog/actions";
 import type { AdminProductRow } from "@/components/admin/catalog/products-view";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 export type ChargerAdminRow = AdminProductRow & {
   category: "Residential" | "Commercial";
@@ -206,7 +201,7 @@ export function ChargersView({ products }: { products: ChargerAdminRow[] }) {
                     </TableCell>
                     <TableCell className="text-muted-foreground">{item.colour}</TableCell>
                     <TableCell className="font-heading font-semibold text-primary">
-                      {item.price != null ? currency.format(item.price) : "—"}
+                      {item.price != null ? formatCurrency(item.price) : "—"}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">

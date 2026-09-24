@@ -74,7 +74,7 @@ const searchProductsCached = unstable_cache(
       FROM "Product"
       WHERE "active" = true
     )
-    SELECT "id", "category", "name", "brand", "cardImage", "price", "tags", spec, tagline
+    SELECT "id", "category", "name", "brand", "cardImage", "price"::float8 AS "price", "tags", spec, tagline
     FROM scored
     WHERE doc @@ to_tsquery('english', ${tsQuery})
     ORDER BY ts_rank(doc, to_tsquery('english', ${tsQuery})) DESC, "id" ASC

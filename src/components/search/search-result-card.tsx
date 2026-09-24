@@ -13,12 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { categoryRoute } from "@/lib/catalog/types";
 import type { SearchResult } from "@/lib/search/types";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 const categoryLabel: Record<SearchResult["category"], string> = {
   Residential: "Home Charging",
@@ -58,7 +53,7 @@ export function SearchResultCard({ result }: { result: SearchResult }) {
         )}
         {result.price != null && (
           <p className="mt-1 text-2xl font-semibold text-foreground">
-            {currency.format(result.price)}
+            {formatCurrency(result.price)}
           </p>
         )}
       </CardContent>

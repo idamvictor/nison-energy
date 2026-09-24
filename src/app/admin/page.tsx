@@ -27,12 +27,7 @@ import {
   getTimeSeries,
 } from "@/lib/admin/metrics";
 import { getProductCounts } from "@/lib/catalog/queries";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 const RANGE_DAYS: Record<string, number> = { "7d": 7, "30d": 30, "90d": 90 };
 const RANGE_LABEL: Record<string, string> = {
@@ -89,7 +84,7 @@ export default async function AdminDashboardPage({
         />
         <StatCard
           label="Pipeline value"
-          value={currency.format(kpis.pipeline.value)}
+          value={formatCurrency(kpis.pipeline.value)}
           subtext="ex VAT · order subtotals"
           delta={{ pct: kpis.pipeline.deltaPct, label: deltaLabel }}
           icon={Package}

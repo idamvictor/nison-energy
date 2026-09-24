@@ -25,6 +25,13 @@ function specsOf(row: ProductRow): Spec[] {
   return Array.isArray(row.specs) ? (row.specs as unknown as Spec[]) : [];
 }
 
+// Prisma returns Decimal columns as Decimal objects, not plain numbers (and
+// Next.js Server->Client props must be plain-serializable) — convert once,
+// here, so every consumer downstream keeps working with a plain `number`.
+function toNumber(value: { toNumber(): number } | null): number | undefined {
+  return value == null ? undefined : value.toNumber();
+}
+
 export function dbToResidential(row: ProductRow): Product {
   return {
     id: row.id,
@@ -40,8 +47,8 @@ export function dbToResidential(row: ProductRow): Product {
     variantGroup: row.variantGroup ?? undefined,
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
-    price: row.price ?? 0,
-    installFee: row.installFee ?? undefined,
+    price: toNumber(row.price) ?? 0,
+    installFee: toNumber(row.installFee),
     tags: row.tags,
     image: row.cardImage,
     warranty: row.warranty ?? undefined,
@@ -64,8 +71,8 @@ export function dbToCommercial(row: ProductRow): CommercialProduct {
     variantGroup: row.variantGroup ?? undefined,
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
-    price: row.price ?? 0,
-    installFee: row.installFee ?? undefined,
+    price: toNumber(row.price) ?? 0,
+    installFee: toNumber(row.installFee),
     tags: row.tags,
     image: row.cardImage,
     warranty: row.warranty ?? undefined,
@@ -86,11 +93,29 @@ export function dbToAccessory(row: ProductRow): AccessoryProduct {
     variantGroup: row.variantGroup ?? "",
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
-    price: row.price ?? 0,
+    price: toNumber(row.price) ?? 0,
     tags: row.tags,
     image: row.cardImage,
     active: row.active,
     featured: row.featured,
+  };
+}
+
+// Next.js Server -> Client Component props must be plain-serializable — a
+// Prisma Decimal is a class instance, not a plain object, so raw `ProductRow`
+// can't be passed straight into a "use client" component (e.g. ProductForm)
+// the way every other field on it already can. Convert just the two Decimal
+// fields once, here, at the boundary.
+export type SerializableProductRow = Omit<ProductRow, "price" | "installFee"> & {
+  price: number | null;
+  installFee: number | null;
+};
+
+export function toSerializableRow(row: ProductRow): SerializableProductRow {
+  return {
+    ...row,
+    price: toNumber(row.price) ?? null,
+    installFee: toNumber(row.installFee) ?? null,
   };
 }
 
@@ -103,7 +128,7 @@ export function toAdminRow(row: ProductRow) {
     colour: row.colour,
     image: row.cardImage,
     tags: row.tags,
-    price: row.price ?? undefined,
+    price: toNumber(row.price),
     style: row.style ?? undefined,
     phase: row.phase ?? undefined,
     active: row.active,

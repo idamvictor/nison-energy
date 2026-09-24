@@ -30,12 +30,7 @@ import { getOrdersForUser } from "@/lib/orders/queries";
 import { getNotificationsForUser } from "@/lib/notifications/queries";
 import { getQuotesForUser } from "@/lib/quotes/queries";
 import { quoteSchemeLabels } from "@/lib/quotes/types";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 const ACCOUNT_LABELS: Record<string, string> = {
   credential: "Email & password",
@@ -205,7 +200,7 @@ export default async function UserDetailPage({
                           {order.reference}
                         </span>
                         <span className="flex shrink-0 items-center gap-2 text-muted-foreground">
-                          {currency.format(order.subtotal)}
+                          {formatCurrency(order.subtotal)}
                           <OrderStatusBadge status={order.status} />
                         </span>
                       </Link>

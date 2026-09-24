@@ -6,12 +6,7 @@ import { Badge, type badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { VariantProps } from "class-variance-authority";
 import type { OrderStatus, OrderWithItems } from "@/lib/orders/types";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
 
@@ -102,7 +97,7 @@ export function AccountOrders({ orders }: { orders: OrderWithItems[] }) {
                 <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
                   <p className="text-muted-foreground">{statusHint[status]}</p>
                   <p className="font-heading font-semibold text-foreground">
-                    {currency.format(order.subtotal)}
+                    {formatCurrency(order.subtotal)}
                   </p>
                 </div>
               </CardContent>

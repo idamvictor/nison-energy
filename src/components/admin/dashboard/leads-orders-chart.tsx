@@ -11,12 +11,7 @@ import {
 } from "recharts";
 
 import type { TimeSeriesPoint } from "@/lib/admin/metrics";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 function shortDay(day: string) {
   return new Date(day).toLocaleDateString("en-GB", {
@@ -43,7 +38,7 @@ function ChartTooltip({
       <p className="text-accent">{point.orders} orders</p>
       {point.value > 0 && (
         <p className="mt-1 text-muted-foreground">
-          {currency.format(point.value)} pipeline
+          {formatCurrency(point.value)} pipeline
         </p>
       )}
     </div>

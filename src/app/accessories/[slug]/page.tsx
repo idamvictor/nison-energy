@@ -11,6 +11,11 @@ import {
 } from "@/lib/catalog/queries";
 import { adminRoute } from "@/lib/catalog/types";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
+import {
+  installationProcessMarkdown,
+  deliveryPolicyMarkdown,
+  returnsPolicyMarkdown,
+} from "@/lib/content/legal";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -23,12 +28,22 @@ import { AccessoryPurchasePanel } from "@/components/accessories/accessory-purch
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { tagClass } from "@/components/accessories/accessory-product-tag";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { BlogMarkdown } from "@/components/blog/blog-markdown";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const dynamicParams = true;
 export const revalidate = 3600;
@@ -142,9 +157,12 @@ export default async function AccessoryDetailPage({
             <TabsList variant="line" className="border-b border-border">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specification">Specification</TabsTrigger>
+              <TabsTrigger value="installation">Installation</TabsTrigger>
+              <TabsTrigger value="delivery">Delivery Information</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="description" className="max-w-3xl py-6">
+            <TabsContent value="description" className="py-6">
               <div className="flex flex-col gap-4 text-foreground/80">
                 {detail.description.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -171,21 +189,60 @@ export default async function AccessoryDetailPage({
             </TabsContent>
 
             <TabsContent value="specification" className="py-6">
-              <dl className="grid max-w-2xl grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:gap-x-8 sm:divide-y-0">
-                {detail.specs.map((spec) => (
-                  <div
-                    key={spec.label}
-                    className="flex items-center justify-between gap-4 border-b border-border py-3 sm:justify-start"
-                  >
-                    <dt className="text-sm text-muted-foreground">
-                      {spec.label}
-                    </dt>
-                    <dd className="text-sm font-medium text-foreground sm:ml-auto">
-                      {spec.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <div className="overflow-hidden rounded-xl border border-border">
+                <Table className="table-fixed">
+                  <TableHeader>
+                    <TableRow className="bg-secondary/60 hover:bg-secondary/60">
+                      <TableHead className="w-2/5">Specification</TableHead>
+                      <TableHead>
+                        <span className="sr-only">Value</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {detail.specs.map((spec) => (
+                      <TableRow key={spec.label}>
+                        <TableCell className="whitespace-normal wrap-break-word text-muted-foreground">
+                          {spec.label}
+                        </TableCell>
+                        <TableCell className="font-medium text-foreground whitespace-normal wrap-break-word">
+                          {spec.value}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="installation" className="py-6">
+              <BlogMarkdown content={installationProcessMarkdown} />
+              <div className="mt-2 flex flex-wrap gap-3">
+                <Button
+                  size="lg"
+                  className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                  nativeButton={false}
+                  render={<Link href="/contact-us" />}
+                >
+                  Book Installation
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  nativeButton={false}
+                  render={<Link href="/ozev-grant-guide" />}
+                >
+                  Check OZEV Grant Eligibility
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="delivery" className="py-6">
+              <BlogMarkdown content={deliveryPolicyMarkdown} />
+            </TabsContent>
+
+            <TabsContent value="returns" className="py-6">
+              <BlogMarkdown content={returnsPolicyMarkdown} />
             </TabsContent>
           </Tabs>
         </section>

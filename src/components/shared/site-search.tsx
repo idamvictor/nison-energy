@@ -12,12 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { categoryRoute } from "@/lib/catalog/types";
 import type { SearchResult } from "@/lib/search/types";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 const categoryLabel: Record<SearchResult["category"], string> = {
   Residential: "Home Charging",
@@ -148,7 +143,7 @@ export function SiteSearch() {
                 </div>
                 {result.price != null && (
                   <span className="shrink-0 text-sm font-semibold text-foreground">
-                    {currency.format(result.price)}
+                    {formatCurrency(result.price)}
                   </span>
                 )}
               </Link>

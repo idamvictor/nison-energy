@@ -16,17 +16,12 @@ import { OrderStatusSelect } from "@/components/admin/orders/order-status-select
 import { PaymentStatusBadge } from "@/components/admin/orders/payment-status-badge";
 import { getOrder } from "@/lib/orders/queries";
 import type { OrderStatus } from "@/lib/orders/types";
+import { formatCurrency } from "@/lib/currency";
 
 function stripeDashboardUrl(paymentIntentId: string): string {
   const isLiveMode = process.env.STRIPE_SECRET_KEY?.includes("_live_") ?? false;
   return `https://dashboard.stripe.com/${isLiveMode ? "" : "test/"}payments/${paymentIntentId}`;
 }
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
 
 function formatDateTime(date: Date) {
   return new Date(date).toLocaleString("en-GB", {
@@ -119,7 +114,7 @@ export default async function OrderDetailPage({
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell className="text-right">
                           {item.unitPrice != null
-                            ? currency.format(item.unitPrice * item.quantity)
+                            ? formatCurrency(item.unitPrice * item.quantity)
                             : "Quote"}
                         </TableCell>
                       </TableRow>
@@ -132,18 +127,18 @@ export default async function OrderDetailPage({
                   <>
                     <div className="flex items-center justify-between">
                       <p className="text-muted-foreground">Subtotal</p>
-                      <p className="text-foreground">{currency.format(order.subtotal)}</p>
+                      <p className="text-foreground">{formatCurrency(order.subtotal)}</p>
                     </div>
                     {order.taxAmount != null && (
                       <div className="flex items-center justify-between">
                         <p className="text-muted-foreground">Tax</p>
-                        <p className="text-foreground">{currency.format(order.taxAmount)}</p>
+                        <p className="text-foreground">{formatCurrency(order.taxAmount)}</p>
                       </div>
                     )}
                     <div className="flex items-center justify-between">
                       <p className="text-muted-foreground">Total paid</p>
                       <p className="font-heading text-lg font-semibold text-foreground">
-                        {currency.format(order.total)}
+                        {formatCurrency(order.total)}
                       </p>
                     </div>
                   </>
@@ -151,7 +146,7 @@ export default async function OrderDetailPage({
                   <div className="flex items-center justify-between">
                     <p className="text-muted-foreground">Subtotal</p>
                     <p className="font-heading text-lg font-semibold text-foreground">
-                      {currency.format(order.subtotal)}
+                      {formatCurrency(order.subtotal)}
                     </p>
                   </div>
                 )}

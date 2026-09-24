@@ -11,11 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-});
+import { formatCurrency } from "@/lib/currency";
 
 export default function CartPage() {
   const items = useCart((s) => s.items);
@@ -26,10 +22,10 @@ export default function CartPage() {
     .map((item) => resolveCartItem(item))
     .filter((line): line is NonNullable<typeof line> => line !== null);
 
-  const subtotal = lines.reduce(
-    (sum, line) => sum + (line.price ?? 0) * line.quantity,
-    0
-  );
+  const subtotal =
+    Math.round(
+      lines.reduce((sum, line) => sum + (line.price ?? 0) * line.quantity, 0) * 100
+    ) / 100;
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
 
   return (
@@ -95,7 +91,7 @@ export default function CartPage() {
                           </div>
                           <p className="text-lg font-semibold text-foreground">
                             {line.price != null
-                              ? currency.format(line.price * line.quantity)
+                              ? formatCurrency(line.price * line.quantity)
                               : "Quote"}
                           </p>
                         </div>
@@ -127,7 +123,7 @@ export default function CartPage() {
                   <div className="flex items-center justify-between text-sm">
                     <p className="text-muted-foreground">Subtotal</p>
                     <p className="font-medium text-foreground">
-                      {currency.format(subtotal)}
+                      {formatCurrency(subtotal)}
                     </p>
                   </div>
                   {hasQuoteOnlyItems && (

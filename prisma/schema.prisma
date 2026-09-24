@@ -71,13 +71,13 @@ model Order {
   postcode  String
   notes     String?
 
-  subtotal Int // whole GBP — the catalog is priced in integer pounds
+  subtotal Decimal @db.Decimal(10, 2) // GBP, penny-precise — matches what was actually charged
 
   paymentStatus           PaymentStatus @default(Unpaid)
   stripeCheckoutSessionId String?       @unique
   stripePaymentIntentId   String?
-  taxAmount               Int? // whole GBP, from Stripe's total_details.amount_tax
-  total                   Int? // whole GBP, from Stripe's amount_total (subtotal + tax)
+  taxAmount               Decimal? @db.Decimal(10, 2) // GBP, from Stripe's total_details.amount_tax
+  total                   Decimal? @db.Decimal(10, 2) // GBP, from Stripe's amount_total (subtotal + tax)
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -100,7 +100,7 @@ model OrderItem {
   productId String // catalog id, or an extra's id
   category  String // residential | commercial | accessories | extra
   name      String // snapshot at time of order
-  unitPrice Int? // whole GBP; null for quote-only accessories
+  unitPrice Decimal? @db.Decimal(10, 2) // GBP, penny-precise; null for quote-only accessories
   quantity  Int
   options   Json? // { cableLength?, installation? }
 
@@ -143,8 +143,8 @@ model Product {
   connectionType String?
   cableLength    String?
   powerOutput    String?
-  price          Int?
-  installFee     Int?
+  price          Decimal? @db.Decimal(10, 2) // GBP, penny-precise inc. VAT
+  installFee     Decimal? @db.Decimal(10, 2) // GBP, penny-precise
 
   // Residential only
   cableLengthOptions String[] @default([])

@@ -659,7 +659,11 @@ async function main() {
       // Mark up (a flat £ add-on that varies per row, not a percentage).
       const netPrice =
         Number(priceRow[COL.NET_PRICE] || 0) + Number(priceRow[COL.MARKUP] || 0);
-      const price = netPrice > 0 ? Math.round(netPrice * 1.2) : null;
+      // Round to the nearest penny (2dp) — a real price, not the nearest
+      // whole pound. The ×1.2 VAT multiply can produce a third decimal
+      // digit (e.g. 393.31 × 1.2 = 471.972), which isn't a real amount of
+      // money, so this still rounds — just to the finest unit that exists.
+      const price = netPrice > 0 ? Math.round(netPrice * 1.2 * 100) / 100 : null;
 
       const photos: string[] = [];
       for (let c = COL.PHOTO_START; c <= COL.PHOTO_END; c++) {

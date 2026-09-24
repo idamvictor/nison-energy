@@ -12,9 +12,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/currency";
 
 const rows: { label: string; value: (p: Product) => React.ReactNode }[] = [
-  { label: "Price", value: (p) => `£${p.price}` },
+  { label: "Price", value: (p) => formatCurrency(p.price) },
   { label: "Brand", value: (p) => p.brand },
   { label: "Connection type", value: (p) => p.connectionType },
   { label: "Cable length", value: (p) => p.cableLength ?? "—" },

@@ -44,12 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { categoryRoute, type ProductCategory } from "@/lib/catalog/types";
 import { removeProduct } from "@/lib/catalog/actions";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 export type AdminProductRow = {
   id: string;
@@ -206,7 +201,7 @@ export function ProductsView({
                   <TableCell className="font-heading font-semibold text-primary">
                     {isCharger
                       ? item.price != null
-                        ? currency.format(item.price)
+                        ? formatCurrency(item.price)
                         : "—"
                       : `${item.style ?? "—"} · ${item.phase ?? "—"}`}
                   </TableCell>

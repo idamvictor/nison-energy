@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ProductForm } from "@/components/admin/catalog/product-form";
-import { getProductRow } from "@/lib/catalog/queries";
+import { getProductRow, toSerializableRow } from "@/lib/catalog/queries";
 
 export async function generateMetadata({
   params,
@@ -25,7 +25,7 @@ export default async function EditCommercialProductPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <ProductForm category="Commercial" row={row} />
+      <ProductForm category="Commercial" row={toSerializableRow(row)} />
     </div>
   );
 }

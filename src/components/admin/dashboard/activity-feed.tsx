@@ -5,12 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/admin/shared/status-badge";
 import { OrderStatusBadge } from "@/components/admin/orders/order-status-badge";
 import type { ActivityItem } from "@/lib/admin/metrics";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -67,7 +62,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
                   ) : (
                     <>
                       <span>
-                        {item.reference} · {currency.format(item.amount)}
+                        {item.reference} · {formatCurrency(item.amount)}
                       </span>
                       <OrderStatusBadge status={item.status} />
                     </>

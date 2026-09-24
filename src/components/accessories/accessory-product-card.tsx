@@ -17,6 +17,7 @@ import type { AccessoryProduct } from "@/lib/catalog/types";
 import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/accessories/accessory-product-tag";
 import { useWishlist } from "@/lib/wishlist/store";
+import { formatCurrency } from "@/lib/currency";
 
 export function AccessoryProductCard({
   variants,
@@ -103,7 +104,7 @@ export function AccessoryProductCard({
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <p className="mt-auto text-2xl font-semibold text-foreground">
-          £{product.price}
+          {formatCurrency(product.price)}
           <span className="ml-1.5 text-sm font-normal text-muted-foreground">
             inc VAT
           </span>

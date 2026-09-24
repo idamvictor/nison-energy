@@ -10,6 +10,7 @@ import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -31,7 +32,7 @@ export function AccessoryPurchasePanel({
   const wishlisted = isWishlisted(product.id);
 
   const total = product.price * quantity;
-  const totalExVat = Math.round(total / 1.2);
+  const totalExVat = Math.round((total / 1.2) * 100) / 100;
 
   const variantSiblings =
     siblings.length > 0 ? siblings : [product];
@@ -52,13 +53,13 @@ export function AccessoryPurchasePanel({
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
       <div>
         <p className="text-3xl font-semibold text-foreground">
-          £{total}
+          {formatCurrency(total)}
           <span className="ml-1.5 text-sm font-normal text-muted-foreground">
             inc VAT
           </span>
         </p>
         <p className="text-sm text-muted-foreground">
-          £{totalExVat} <span>ex VAT</span>
+          {formatCurrency(totalExVat)} <span>ex VAT</span>
         </p>
       </div>
 

@@ -29,12 +29,7 @@ import {
   type OrderWithItems,
   type PaymentStatus,
 } from "@/lib/orders/types";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 function formatDate(date: Date) {
   return new Date(date).toLocaleDateString("en-GB", {
@@ -159,7 +154,7 @@ export function OrdersTableView({ orders }: { orders: OrderWithItems[] }) {
                     {formatDate(order.createdAt)}
                   </TableCell>
                   <TableCell className="font-heading font-semibold text-primary">
-                    {currency.format(order.subtotal)}
+                    {formatCurrency(order.subtotal)}
                   </TableCell>
                   <TableCell>
                     <PaymentStatusBadge status={order.paymentStatus} />

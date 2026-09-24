@@ -10,6 +10,7 @@ import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 
 const OZEV_GRANT_GUIDE_URL = "https://nison-energy.vercel.app/ozev-grant-guide";
 
@@ -37,7 +38,7 @@ export function PurchasePanel({
   const installFee = product.installFee ?? 0;
   const unitPrice = product.price + (installation === "standard" ? installFee : 0);
   const total = unitPrice * quantity;
-  const totalExVat = Math.round(total / 1.2);
+  const totalExVat = Math.round((total / 1.2) * 100) / 100;
 
   const colourSiblings =
     product.variantGroup && siblings.length > 0 ? siblings : [product];
@@ -62,7 +63,7 @@ export function PurchasePanel({
 
   const installationLabel =
     installation === "standard"
-      ? `Standard installation (+£${installFee})`
+      ? `Standard installation (+${formatCurrency(installFee)})`
       : installation === "none"
         ? "No installation (device only)"
         : "Choose option";
@@ -71,13 +72,13 @@ export function PurchasePanel({
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
       <div>
         <p className="text-3xl font-semibold text-foreground">
-          £{total}
+          {formatCurrency(total)}
           <span className="ml-1.5 text-sm font-normal text-muted-foreground">
             inc VAT
           </span>
         </p>
         <p className="text-sm text-muted-foreground">
-          £{totalExVat} <span>ex VAT</span>
+          {formatCurrency(totalExVat)} <span>ex VAT</span>
         </p>
       </div>
 
@@ -156,7 +157,7 @@ export function PurchasePanel({
                   }}
                   className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
-                  Standard installation (+£{installFee})
+                  Standard installation (+{formatCurrency(installFee)})
                   {installation === "standard" && <Check className="size-4 text-primary" />}
                 </button>
                 <button

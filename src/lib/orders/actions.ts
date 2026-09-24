@@ -5,7 +5,7 @@ import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
-import { createOrder, createDraftOrderForCheckout } from "@/lib/orders/queries";
+import { createOrder, createDraftOrderForCheckout, toOrderRecord } from "@/lib/orders/queries";
 import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { customerOrderStatusUpdate } from "@/lib/email/templates";
@@ -126,11 +126,13 @@ export async function updateOrderStatus(
   if (!orderStatuses.includes(status as OrderStatus)) {
     return { ok: false, error: "Unknown status." };
   }
-  const order = await prisma.order.update({
-    where: { id },
-    data: { status: status as OrderStatus },
-    include: { items: true },
-  });
+  const order = toOrderRecord(
+    await prisma.order.update({
+      where: { id },
+      data: { status: status as OrderStatus },
+      include: { items: true },
+    }),
+  );
 
   if (status !== "Pending") {
     await createNotification({

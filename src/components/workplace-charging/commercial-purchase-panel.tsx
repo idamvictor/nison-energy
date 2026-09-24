@@ -10,6 +10,7 @@ import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -38,7 +39,7 @@ export function CommercialPurchasePanel({
   const installFee = product.installFee ?? 0;
   const unitPrice = product.price + (installation === "standard" ? installFee : 0);
   const total = unitPrice * quantity;
-  const totalExVat = Math.round(total / 1.2);
+  const totalExVat = Math.round((total / 1.2) * 100) / 100;
 
   const colourSiblings =
     product.variantGroup && siblings.length > 0 ? siblings : [product];
@@ -58,7 +59,7 @@ export function CommercialPurchasePanel({
 
   const installationLabel =
     installation === "standard"
-      ? `Standard installation (+£${installFee})`
+      ? `Standard installation (+${formatCurrency(installFee)})`
       : installation === "none"
         ? "No installation (device only)"
         : "Select";
@@ -67,13 +68,13 @@ export function CommercialPurchasePanel({
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
       <div>
         <p className="text-3xl font-semibold text-foreground">
-          £{total}
+          {formatCurrency(total)}
           <span className="ml-1.5 text-sm font-normal text-muted-foreground">
             inc VAT
           </span>
         </p>
         <p className="text-sm text-muted-foreground">
-          £{totalExVat} <span>ex VAT</span>
+          {formatCurrency(totalExVat)} <span>ex VAT</span>
         </p>
       </div>
 
@@ -147,7 +148,7 @@ export function CommercialPurchasePanel({
                   }}
                   className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
-                  Standard installation (+£{installFee})
+                  Standard installation (+{formatCurrency(installFee)})
                   {installation === "standard" && <Check className="size-4 text-primary" />}
                 </button>
                 <button

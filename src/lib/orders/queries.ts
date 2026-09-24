@@ -13,7 +13,7 @@ import {
   customerOrderConfirmation,
   staffOrderAlert,
 } from "@/lib/email/templates";
-import type { OrderLineInput, OrderWithItems } from "@/lib/orders/types";
+import type { OrderItemRecord, OrderLineInput, OrderWithItems } from "@/lib/orders/types";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { CACHE_TTL } from "@/lib/cache/config";
 
@@ -28,39 +28,64 @@ export { orderStatuses } from "@/lib/orders/types";
 
 // ─── Reads ──────────────────────────────────────────────────────────────────
 
-export const getOrders = cache(
-  () =>
-    prisma.order.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 500,
-      include: { items: true },
-    }) as unknown as Promise<OrderWithItems[]>,
-);
+// Prisma returns Decimal columns (subtotal/taxAmount/total/unitPrice) as
+// Decimal objects, not plain numbers — a Server Component can't hand one to
+// a "use client" component (Next.js props must be plain-serializable), and
+// the app-facing OrderRecord/OrderItemRecord types are declared as `number`
+// throughout. Convert once, here, rather than at every call site.
+type RawOrder = Awaited<ReturnType<typeof prisma.order.findFirst>>;
+type RawOrderItem = { [K in keyof OrderItemRecord]: unknown };
 
-export const getOrder = cache(
-  (id: string) =>
-    prisma.order.findUnique({
-      where: { id },
-      include: { items: true },
-    }) as unknown as Promise<OrderWithItems | null>,
-);
+export function toOrderRecord(
+  order: NonNullable<RawOrder> & { items: RawOrderItem[] },
+): OrderWithItems {
+  return {
+    ...order,
+    subtotal: Number(order.subtotal),
+    taxAmount: order.taxAmount == null ? null : Number(order.taxAmount),
+    total: order.total == null ? null : Number(order.total),
+    items: order.items.map((item) => ({
+      ...item,
+      unitPrice: item.unitPrice == null ? null : Number(item.unitPrice),
+    })) as OrderWithItems["items"],
+  } as OrderWithItems;
+}
+
+export const getOrders = cache(async () => {
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 500,
+    include: { items: true },
+  });
+  return orders.map(toOrderRecord);
+});
+
+export const getOrder = cache(async (id: string) => {
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: { items: true },
+  });
+  return order ? toOrderRecord(order) : null;
+});
 
 export const getOrderByCheckoutSession = cache(
-  (stripeCheckoutSessionId: string) =>
-    prisma.order.findUnique({
+  async (stripeCheckoutSessionId: string) => {
+    const order = await prisma.order.findUnique({
       where: { stripeCheckoutSessionId },
       include: { items: true },
-    }) as unknown as Promise<OrderWithItems | null>,
+    });
+    return order ? toOrderRecord(order) : null;
+  },
 );
 
-export const getOrdersForUser = cache(
-  (userId: string, email: string) =>
-    prisma.order.findMany({
-      where: { OR: [{ userId }, { email }] },
-      orderBy: { createdAt: "desc" },
-      include: { items: true },
-    }) as unknown as Promise<OrderWithItems[]>,
-);
+export const getOrdersForUser = cache(async (userId: string, email: string) => {
+  const orders = await prisma.order.findMany({
+    where: { OR: [{ userId }, { email }] },
+    orderBy: { createdAt: "desc" },
+    include: { items: true },
+  });
+  return orders.map(toOrderRecord);
+});
 
 export const getPendingOrderCount = cache(
   unstable_cache(
@@ -138,10 +163,13 @@ async function validateOrderInput(
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
-  const subtotal = lines.reduce(
-    (sum, line) => sum + (line.unitPrice ?? 0) * Math.max(1, line.quantity),
-    0,
-  );
+  const subtotal =
+    Math.round(
+      lines.reduce(
+        (sum, line) => sum + (line.unitPrice ?? 0) * Math.max(1, line.quantity),
+        0,
+      ) * 100,
+    ) / 100;
 
   const user = await getCurrentUser();
 
@@ -169,7 +197,7 @@ async function insertOrder(
   for (let attempt = 0; attempt < 5; attempt++) {
     const reference = newReference();
     try {
-      const order = (await prisma.order.create({
+      const order = await prisma.order.create({
         data: {
           reference,
           firstName: data.firstName,
@@ -194,9 +222,9 @@ async function insertOrder(
           },
         },
         include: { items: true },
-      })) as unknown as OrderWithItems;
+      });
       revalidateTag(CACHE_TAGS.orders, { expire: 0 });
-      return order;
+      return toOrderRecord(order);
     } catch (err) {
       const code = (err as { code?: string })?.code;
       if (code === "P2002") continue; // unique clash on reference — retry

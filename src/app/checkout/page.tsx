@@ -38,11 +38,7 @@ import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { COMPANY } from "@/lib/company";
 import { placeOrder, createCheckoutSession } from "@/lib/orders/actions";
 import type { OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-});
+import { formatCurrency } from "@/lib/currency";
 
 type ExtraId = "surge-protection" | "extra-cable" | "cable-cover" | "smart-setup";
 
@@ -125,7 +121,7 @@ export default function CheckoutPage() {
     0
   );
   const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
-  const subtotal = itemsSubtotal + extrasTotal;
+  const subtotal = Math.round((itemsSubtotal + extrasTotal) * 100) / 100;
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
 
   function buildPayload(fd: FormData): PlaceOrderPayload {
@@ -313,7 +309,7 @@ export default function CheckoutPage() {
                                   {extra.name}
                                 </p>
                                 <p className="text-sm font-semibold text-foreground">
-                                  {currency.format(extra.price)}
+                                  {formatCurrency(extra.price)}
                                 </p>
                               </div>
                               <p className="mt-0.5 text-sm text-muted-foreground">
@@ -352,7 +348,7 @@ export default function CheckoutPage() {
                         <SelectContent>
                           {remainingExtras.map((extra) => (
                             <SelectItem key={extra.id} value={extra.id}>
-                              {extra.name} — {currency.format(extra.price)}
+                              {extra.name} — {formatCurrency(extra.price)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -459,7 +455,7 @@ export default function CheckoutPage() {
                         </div>
                         <p className="text-sm font-semibold text-foreground">
                           {line.price != null
-                            ? currency.format(line.price * line.quantity)
+                            ? formatCurrency(line.price * line.quantity)
                             : "Quote"}
                         </p>
                       </div>
@@ -476,7 +472,7 @@ export default function CheckoutPage() {
                           <p className="text-xs text-muted-foreground">Qty 1</p>
                         </div>
                         <p className="text-sm font-semibold text-foreground">
-                          {currency.format(extra.price)}
+                          {formatCurrency(extra.price)}
                         </p>
                       </div>
                     ))}
@@ -484,7 +480,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
                     <p className="text-muted-foreground">Subtotal</p>
                     <p className="font-heading text-lg font-semibold text-foreground">
-                      {currency.format(subtotal)}
+                      {formatCurrency(subtotal)}
                     </p>
                   </div>
                   {hasQuoteOnlyItems && (

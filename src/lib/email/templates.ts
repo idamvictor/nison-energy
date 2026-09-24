@@ -1,11 +1,6 @@
 import { COMPANY } from "@/lib/company";
 import { SITE_URL } from "@/lib/site";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/currency";
 
 function esc(value: string): string {
   return value
@@ -58,8 +53,8 @@ function row(html: string): string {
   return `<tr><td style="padding:4px 0">${html}</td></tr>`;
 }
 
-function money(pence: number | null): string {
-  return pence == null ? "Quote on request" : currency.format(pence);
+function money(amount: number | null): string {
+  return amount == null ? "Quote on request" : formatCurrency(amount);
 }
 
 // ─── Inputs ──────────────────────────────────────────────────────────────
@@ -171,7 +166,7 @@ export function customerOrderConfirmation(
         row(`Your reference is <strong>${esc(order.reference)}</strong>.`),
         row(itemsTable(order.items)),
         row(
-          `<strong>Subtotal (ex VAT): ${currency.format(order.subtotal)}</strong>`,
+          `<strong>Subtotal (ex VAT): ${formatCurrency(order.subtotal)}</strong>`,
         ),
         row(
           `<strong>Installation address</strong><br>${esc(order.address)}, ${esc(
@@ -195,14 +190,14 @@ export function customerOrderConfirmation(
 
 export function staffOrderAlert(order: OrderEmailInput): EmailContent {
   return {
-    subject: `New order ${order.reference} — ${currency.format(order.subtotal)}`,
+    subject: `New order ${order.reference} — ${formatCurrency(order.subtotal)}`,
     html: emailLayout({
       heading: `New order from ${esc(order.firstName)} ${esc(order.lastName)}`,
       bodyHtml: [
         row(`<strong>Reference</strong><br>${esc(order.reference)}`),
         row(`<strong>Contact</strong><br>${esc(order.email)}`),
         row(itemsTable(order.items)),
-        row(`<strong>Subtotal (ex VAT): ${currency.format(order.subtotal)}</strong>`),
+        row(`<strong>Subtotal (ex VAT): ${formatCurrency(order.subtotal)}</strong>`),
         row(`<strong>Address</strong><br>${esc(order.address)}, ${esc(order.postcode)}`),
       ].join(""),
       cta: { label: "Open in admin", href: `${SITE_URL}/admin/orders/${order.id}` },

@@ -84,7 +84,7 @@ export const getTimeSeries = cache(
     for (const order of orders) {
       const b = get(londonDayKey(order.createdAt));
       b.orders += 1;
-      b.value += order.subtotal;
+      b.value += Number(order.subtotal);
     }
 
     return dayRange(days).map((day) => ({
@@ -161,7 +161,7 @@ export const getKpis = cache(
   return {
     leads: metric(leadsNow, leadsPrev),
     orders: metric(ordersNow, ordersPrev),
-    pipeline: metric(valueNow._sum.subtotal ?? 0, valuePrev._sum.subtotal ?? 0),
+    pipeline: metric(Number(valueNow._sum.subtotal ?? 0), Number(valuePrev._sum.subtotal ?? 0)),
     conversion: metric(wonRate(leadStatusNow), wonRate(leadStatusPrev)),
   };
     },
@@ -291,7 +291,7 @@ export const getRecentActivity = cache(
           status: o.status as OrderStatus,
           at: o.createdAt.toISOString(),
           href: `/admin/orders/${o.id}`,
-          amount: o.subtotal,
+          amount: Number(o.subtotal),
           reference: o.reference,
         }),
       ),

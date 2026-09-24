@@ -9,6 +9,7 @@ import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { getStaffEmails } from "@/lib/email/recipients";
 import { customerOrderConfirmation, staffOrderAlert } from "@/lib/email/templates";
+import { toOrderRecord } from "@/lib/orders/queries";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 
 // Uses the raw request body for signature verification — never statically cache.
@@ -65,11 +66,14 @@ async function markOrderPaid(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.orderId;
   if (!orderId) return;
 
+  // Stripe's amounts are always integer pence, so dividing by 100 gives an
+  // exact penny-precise pound value — no rounding needed (rounding here was
+  // the bug: it discarded the pence Stripe actually charged).
   const taxAmount =
     session.total_details?.amount_tax != null
-      ? Math.round(session.total_details.amount_tax / 100)
+      ? session.total_details.amount_tax / 100
       : null;
-  const total = session.amount_total != null ? Math.round(session.amount_total / 100) : null;
+  const total = session.amount_total != null ? session.amount_total / 100 : null;
   const paymentIntentId =
     typeof session.payment_intent === "string"
       ? session.payment_intent
@@ -88,8 +92,9 @@ async function markOrderPaid(session: Stripe.Checkout.Session) {
   if (count === 0) return; // already processed (duplicate delivery) or order missing
   revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 
-  const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
-  if (!order) return;
+  const rawOrder = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
+  if (!rawOrder) return;
+  const order = toOrderRecord(rawOrder);
 
   await createNotification({
     userId: order.userId,

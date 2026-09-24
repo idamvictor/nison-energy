@@ -43,8 +43,8 @@ import {
   type ProductCategory,
   type ProductInput,
 } from "@/lib/catalog/types";
-import type { Product as ProductRow } from "@/generated/prisma/client";
 import { saveProduct } from "@/lib/catalog/actions";
+import type { SerializableProductRow } from "@/lib/catalog/queries";
 
 type Spec = { label: string; value: string };
 
@@ -88,7 +88,7 @@ export function ProductForm({
   row,
 }: {
   category: ProductCategory;
-  row: ProductRow | null;
+  row: SerializableProductRow | null;
 }) {
   const router = useRouter();
   const isNew = row === null;
@@ -507,6 +507,7 @@ export function ProductForm({
               <Input
                 type="number"
                 min={0}
+                step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
@@ -515,6 +516,7 @@ export function ProductForm({
               <Input
                 type="number"
                 min={0}
+                step="0.01"
                 value={installFee}
                 onChange={(e) => setInstallFee(e.target.value)}
               />
@@ -580,6 +582,7 @@ export function ProductForm({
               <Input
                 type="number"
                 min={0}
+                step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />

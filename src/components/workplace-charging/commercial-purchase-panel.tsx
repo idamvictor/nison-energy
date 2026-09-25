@@ -56,6 +56,18 @@ export function CommercialPurchasePanel({
       (p, i, arr) =>
         arr.findIndex((q) => q.connectionType === p.connectionType) === i,
     );
+  // Lengths available for the current colour + connection type, shortest
+  // first — mirrors the residential purchase panel exactly. Most commercial
+  // products have no recorded length at all (falls to the N/A placeholder
+  // below), but some genuinely do once an admin sets one.
+  const lengthSiblings = colourSiblings
+    .filter(
+      (p) =>
+        p.colour === product.colour &&
+        p.connectionType === product.connectionType &&
+        p.cableLength,
+    )
+    .sort((a, b) => parseFloat(a.cableLength ?? "0") - parseFloat(b.cableLength ?? "0"));
 
   const installationLabel =
     installation === "standard"
@@ -86,6 +98,11 @@ export function CommercialPurchasePanel({
             onChange={(e) => {
               const candidates = colourSiblings.filter((p) => p.colour === e.target.value);
               const match =
+                candidates.find(
+                  (p) =>
+                    p.connectionType === product.connectionType &&
+                    p.cableLength === product.cableLength,
+                ) ??
                 candidates.find((p) => p.connectionType === product.connectionType) ??
                 candidates[0];
               if (match) router.push(`/workplace-charging/${match.id}`, { scroll: false });
@@ -115,6 +132,29 @@ export function CommercialPurchasePanel({
               </option>
             ))}
           </select>
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
+          Cable length
+          {lengthSiblings.length > 0 ? (
+            <select
+              value={product.id}
+              onChange={(e) =>
+                router.push(`/workplace-charging/${e.target.value}`, { scroll: false })
+              }
+              className={selectClass}
+            >
+              {lengthSiblings.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.cableLength}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select value="na" disabled className={cn(selectClass, "text-muted-foreground")}>
+              <option value="na">N/A — untethered</option>
+            </select>
+          )}
         </label>
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">

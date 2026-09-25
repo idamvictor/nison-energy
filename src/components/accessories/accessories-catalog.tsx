@@ -17,7 +17,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
+import {
+  FilterGroup,
+  useCounts,
+  toggle,
+  useFilterParam,
+  useSortParam,
+} from "@/components/shared/filter-group";
 import { groupByVariant, groupedFacetCounts } from "@/lib/catalog/variant-grouping";
 
 const sortOptions = [
@@ -34,12 +40,12 @@ export function AccessoriesCatalog({
 }: {
   products: AccessoryProduct[];
 }) {
-  const [brands, setBrands] = useState<Set<string>>(new Set());
-  const [colours, setColours] = useState<Set<string>>(new Set());
-  const [styles, setStyles] = useState<Set<string>>(new Set());
-  const [phases, setPhases] = useState<Set<string>>(new Set());
-  const [lengths, setLengths] = useState<Set<string>>(new Set());
-  const [sort, setSort] = useState<SortValue>("featured");
+  const [brands, setBrands] = useFilterParam("brand");
+  const [colours, setColours] = useFilterParam("colour");
+  const [styles, setStyles] = useFilterParam("style");
+  const [phases, setPhases] = useFilterParam("phase");
+  const [lengths, setLengths] = useFilterParam("length");
+  const [sort, setSort] = useSortParam<SortValue>("featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);

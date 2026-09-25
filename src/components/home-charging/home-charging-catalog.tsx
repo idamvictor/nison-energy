@@ -17,7 +17,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FilterGroup, useCounts, toggle } from "@/components/shared/filter-group";
+import {
+  FilterGroup,
+  useCounts,
+  toggle,
+  useFilterParam,
+  useSortParam,
+} from "@/components/shared/filter-group";
 import {
   groupByVariant,
   groupedFacetCounts,
@@ -48,15 +54,13 @@ const filterKeys = [
 ];
 
 export function HomeChargingCatalog({ products }: { products: Product[] }) {
-  const [brands, setBrands] = useState<Set<string>>(new Set());
-  const [connectionTypes, setConnectionTypes] = useState<Set<string>>(
-    new Set()
-  );
-  const [cableLengths, setCableLengths] = useState<Set<string>>(new Set());
-  const [colours, setColours] = useState<Set<string>>(new Set());
-  const [powerOutputs, setPowerOutputs] = useState<Set<string>>(new Set());
-  const [buckets, setBuckets] = useState<Set<string>>(new Set());
-  const [sort, setSort] = useState<SortValue>("featured");
+  const [brands, setBrands] = useFilterParam("brand");
+  const [connectionTypes, setConnectionTypes] = useFilterParam("connection");
+  const [cableLengths, setCableLengths] = useFilterParam("cable");
+  const [colours, setColours] = useFilterParam("colour");
+  const [powerOutputs, setPowerOutputs] = useFilterParam("power");
+  const [buckets, setBuckets] = useFilterParam("price");
+  const [sort, setSort] = useSortParam<SortValue>("featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);

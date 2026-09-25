@@ -13,6 +13,8 @@
  *                                                                 the 4 newly-fixed Zappi 22kW products
  *   npx tsx scripts/import-catalogue.ts --add-waev-wifi [--commit]  # additive: create just the
  *                                                                 1 newly-fixed waEV EV1S product
+ *   npx tsx scripts/import-catalogue.ts --add-easee [--commit]  # additive: create just the
+ *                                                                 2 newly-unexcluded Easee products
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -47,6 +49,10 @@ const ADD_MYENERGI_22KW = process.argv.includes("--add-myenergi-22kw");
 // ROW_FIXES / CONTENT_FIXES / FAMILY_CATEGORY entries above — identified by
 // its unique SKU), leaving every other already-imported product untouched.
 const ADD_WAEV_WIFI = process.argv.includes("--add-waev-wifi");
+// Additive: create only the 2 newly-unexcluded Easee "Charge Max" / "Charge
+// 22kW" products (see EXCLUDED_FAMILIES above — identified by their unique
+// SKUs), leaving every other already-imported product untouched.
+const ADD_EASEE = process.argv.includes("--add-easee");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
@@ -178,16 +184,13 @@ const CONTENT_FIXES: Record<
 };
 
 // ─── Families to exclude — corrupted source data, not guessed at ───────────
-const EXCLUDED_FAMILIES = new Set([
-  // These two families' write-up references got cross-assigned in the source
-  // (family A's only row is literally named after family B's own write-up
-  // title, and vice versa) — same class of copy-paste error as the Zappi
-  // 22kW row fixed via ROW_FIXES above, just with generic enough wording
-  // ("Charge"/"Charger"/"22kW") that the automatic word-overlap check below
-  // doesn't catch it. Confirmed by hand against the raw sheet data.
-  "Easee Charge 22kW Commercial & Home EV Charger Type 2 Multiphase",
-  "Easee Charger Max Untethered EV Charger 7.4kW-22kW with Mid Meter",
-]);
+// (The Easee "Charge Max" / "Charge 22kW" pair once lived here too, flagged
+// as suspected write-up cross-assignment — re-verified against the raw
+// sheet's embedded "SKU:" lines and confirmed both rows already point at
+// their own genuine write-up, just worded differently from their own Name
+// cell. Un-excluded; see FAMILY_CATEGORY below, which already had the right
+// classification waiting from the original approved plan.)
+const EXCLUDED_FAMILIES = new Set<string>([]);
 
 // ─── Family -> category (per the approved plan's explicit classification) ──
 const FAMILY_CATEGORY: Record<string, ProductCategory> = {
@@ -1078,6 +1081,67 @@ async function main() {
     }
 
     console.log(`\nDone. Created ${waevProducts.length} product(s).`);
+    return;
+  }
+
+  if (ADD_EASEE) {
+    const easeeProducts = built.filter(
+      (p) => p.sku?.trim() === "10243" || p.sku?.trim() === "10233",
+    );
+    console.log(`\nFound ${easeeProducts.length} Easee product(s) to add:`);
+    for (const p of easeeProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      console.log(
+        `  [${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  warranty=${warranty ?? "—"}`,
+      );
+    }
+
+    if (!COMMIT) {
+      console.log("\nDry run only — no database changes made. Re-run with --add-easee --commit to apply.");
+      return;
+    }
+
+    const { _max } = await prisma.product.aggregate({ _max: { sortOrder: true } });
+    let nextSortOrder = (_max.sortOrder ?? 0) + 1;
+
+    for (const p of easeeProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          category: p.category,
+          name: p.name,
+          brand: p.brand,
+          sku: p.sku,
+          colour: p.colour,
+          cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
+          gallery: p.gallery,
+          tags: [],
+          variantGroup: p.variantGroup,
+          active: true,
+          featured: false,
+          sortOrder: nextSortOrder++,
+          spec: p.powerOutput ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim() : null,
+          connectionType: p.connectionType ?? null,
+          cableLength: p.cableLength ?? null,
+          cableLengthOptions: p.cableLengthOptions,
+          powerOutput: p.powerOutput || null,
+          price: p.price,
+          installFee: p.category === "Residential" ? 540 : null,
+          style: p.style ?? null,
+          phase: p.phase ?? null,
+          lengthOptions: p.lengthOptions,
+          tagline: p.tagline,
+          description: p.description,
+          features: p.features,
+          specs: p.specs,
+          warranty,
+        },
+      });
+      console.log(`Created ${p.id}.`);
+    }
+
+    console.log(`\nDone. Created ${easeeProducts.length} product(s).`);
     return;
   }
 

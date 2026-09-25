@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -36,7 +37,9 @@ export default async function WorkplaceChargingPage() {
           image={`${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`}
         />
 
-        <CommercialCatalog products={products} />
+        <Suspense fallback={null}>
+          <CommercialCatalog products={products} />
+        </Suspense>
 
         <section className="bg-primary text-primary-foreground">
           <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">

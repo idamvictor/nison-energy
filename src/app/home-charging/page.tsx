@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -33,7 +34,9 @@ export default async function HomeChargingPage() {
           subtitle="Our full range of OZEV-approved home chargers, professionally installed by certified engineers."
           image={`${IMG}/2025/05/EV_OneStop_Website_Home_Chargers.png`}
         />
-        <HomeChargingCatalog products={products} />
+        <Suspense fallback={null}>
+          <HomeChargingCatalog products={products} />
+        </Suspense>
         <FaqSection
           categories={residentialFaqCategories}
           title="Residential Charger FAQs"

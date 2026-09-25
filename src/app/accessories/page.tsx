@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -33,7 +34,9 @@ export default async function AccessoriesPage() {
             </p>
           </div>
         </div>
-        <AccessoriesCatalog products={products} />
+        <Suspense fallback={null}>
+          <AccessoriesCatalog products={products} />
+        </Suspense>
         <HelpSection />
       </main>
       <SiteFooter />

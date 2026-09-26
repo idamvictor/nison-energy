@@ -58,7 +58,11 @@ export function AccessoriesCatalog({
     });
   };
 
-  const typeOf = (p: AccessoryProduct) => p.style;
+  // Phase (Single vs 3 Phase) is a real product distinction — same treatment
+  // connection type gets for chargers — so it must split the group too, or a
+  // Single Phase and 3 Phase cable of the same colour silently merge into
+  // one card (see the Zev cables, the only family where this varies).
+  const typeOf = (p: AccessoryProduct) => `${p.style}::${p.phase}`;
   const lengthOf = (p: AccessoryProduct) => p.lengthOptions[0];
   const brandCounts = useMemo(
     () => groupedFacetCounts(accessoryProducts, typeOf, lengthOf, (p) => p.brand),

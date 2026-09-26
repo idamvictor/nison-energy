@@ -15,6 +15,10 @@
  *                                                                 1 newly-fixed waEV EV1S product
  *   npx tsx scripts/import-catalogue.ts --add-easee [--commit]  # additive: create just the
  *                                                                 2 newly-unexcluded Easee products
+ *   npx tsx scripts/import-catalogue.ts --add-harvi [--commit]  # additive: create just the
+ *                                                                 1 newly-fixed Harvi sensor product
+ *   npx tsx scripts/import-catalogue.ts --add-zev-3phase [--commit]  # additive: create just the
+ *                                                                 4 newly-unblocked Zev 3-Phase cables
  */
 import "dotenv/config";
 import XLSX from "xlsx";
@@ -53,6 +57,17 @@ const ADD_WAEV_WIFI = process.argv.includes("--add-waev-wifi");
 // 22kW" products (see EXCLUDED_FAMILIES above — identified by their unique
 // SKUs), leaving every other already-imported product untouched.
 const ADD_EASEE = process.argv.includes("--add-easee");
+// Additive: create only the 1 newly-fixed Myenergi Harvi energy-harvesting
+// sensor product (see ROW_FIXES / CONTENT_FIXES / FAMILY_CATEGORY above —
+// identified by its unique SKU), leaving every other already-imported
+// product untouched.
+const ADD_HARVI = process.argv.includes("--add-harvi");
+// Additive: create only the 4 Zev 3-Phase charging cables that were silently
+// discarded by the subgroup-key phase-collision bug (see the subKey fix and
+// Zevcabs09 ROW_FIXES entry above — identified by their unique SKUs), leaving
+// every other already-imported product (including the 6 existing Zev Single
+// Phase cables) untouched.
+const ADD_ZEV_3PHASE = process.argv.includes("--add-zev-3phase");
 
 // ─── Column indices (Chargers sheet) ────────────────────────────────────────
 const COL = {
@@ -103,6 +118,22 @@ const ROW_FIXES: Record<string, { name?: string; writeup?: string }> = {
   "WAEVEV17WIFI": {
     name: "waEV-charge EV Smart 7.4kW Charger Untethered with WiFi",
     writeup: "waEV-charge EV Smart 7.4kW Charger Untethered with WiFi",
+  },
+  // Row 19 ("Myenergi Harvi Energy Harvesting Wireless Sensor"): Write-up
+  // column is blank in the source — no heading anywhere in the Write-ups
+  // sheet mentions "Harvi" at all (confirmed by full-sheet search), so this
+  // row was silently dropped by every import to date. Self-references its
+  // own (already-clean) name so it forms its own single-row family; real
+  // content supplied directly via CONTENT_FIXES below.
+  "HARVI-65A3P": {
+    writeup: "Myenergi Harvi Energy Harvesting Wireless Sensor",
+  },
+  // Row 94 ("...Discreet Grey  -7. 5m"): stray space between "7." and "5m"
+  // breaks lengthOf()'s regex, which reads it as "5m" instead of "7.5m" —
+  // colliding this row with the real Grey 5m 3-Phase row (Zevcabs07) instead
+  // of forming its own Grey 7.5m 3-Phase product.
+  "Zevcabs09": {
+    name: "Zev Type 2, 32A, 3 Phase EV Charging Cable, Straight, Discreet Grey - 7.5m",
   },
 };
 
@@ -181,6 +212,36 @@ const CONTENT_FIXES: Record<
       { label: "Warranty", value: "3 years" },
     ],
   },
+  "HARVI-65A3P": {
+    description: [
+      "The harvi wireless energy monitor is a versatile energy harvesting sensor that helps streamline your energy management with myenergi's products, like zappi and eddi. This compact, battery-free device gathers essential data on your home's or commercial property's energy generation and consumption, ensuring a fully wireless setup that eliminates the need for hardwired connections.",
+      "Through its intelligent wireless energy harvesting, harvi supports remote monitoring and real-time insights into energy usage, helping users make the most of their self-generated solar or renewable power. Its straightforward installation makes harvi an ideal choice for those looking to simplify energy tracking, control, and cost-saving.",
+    ],
+    features: [
+      "No wiring or batteries needed",
+      "Quick, easy Zappi & Eddi install",
+      "No hardwiring, no messy cabling",
+      "Smart tariff tracking, grid decisions",
+      "MyEnergi app data monitoring",
+      "Uses supplied MyEnergi CT clamps",
+      "3 CT inputs, 3-phase supplies",
+      "Fast, accurate energy measurement",
+      "Wall mountable",
+    ],
+    specs: [
+      { label: "Measurement Range", value: "25W to 15kW" },
+      { label: "Energy Harvesting Range", value: "0.2A to 65A" },
+      { label: "Accuracy", value: "2%" },
+      {
+        label: "Transmission Rate",
+        value: "1 second @ 1A+; <10 seconds at 0.5A-1A; <30 seconds @ <0.5A",
+      },
+      { label: "Mounting Location", value: "Indoor or housed in an IP-rated box" },
+      { label: "Operating Temperature", value: "-30°C to +50°C" },
+      { label: "Dimensions", value: "98 x 98 x 36mm (H x W x D)" },
+      { label: "Warranty", value: "3 years" },
+    ],
+  },
 };
 
 // ─── Families to exclude — corrupted source data, not guessed at ───────────
@@ -247,6 +308,7 @@ const FAMILY_CATEGORY: Record<string, ProductCategory> = {
   "Wottz Compact Adaptor - Type 2 Vehicle": "Accessory",
   "Wottz Portable EV Granny Charger": "Accessory",
   "Tesla Matt:e Single Phase Monitoring and Protection Unit with built in RCBO": "Accessory",
+  "Myenergi Harvi Energy Harvesting Wireless Sensor": "Accessory",
 };
 
 // ─── Brand lookup (prefix match against the row name) ───────────────────────
@@ -616,7 +678,14 @@ async function main() {
       const colour = isWottzCable ? (wottzColourFromSku(sku) ?? colourOf(name)) : colourOf(name);
       const conn = significantWords(name).size >= 2 ? connectionTypeOf(name) : familyConn;
       const length = lengthOf(name) ?? "";
-      const subKey = `${colour}::${conn}::${length}`;
+      // Phase is appended (not destructured back out below — colour/conn/
+      // length are the only segments read after the split) purely to stop
+      // same-colour/length rows of different phase (e.g. the Zev cables,
+      // which mix Single Phase and 3 Phase under one write-up) from
+      // colliding into the same subgroup and silently discarding whichever
+      // row has the higher net price.
+      const phase = phaseOf(name);
+      const subKey = `${colour}::${conn}::${length}::${phase}`;
       if (!subGroups.has(subKey)) subGroups.set(subKey, []);
       subGroups.get(subKey)!.push(r);
     }
@@ -1142,6 +1211,125 @@ async function main() {
     }
 
     console.log(`\nDone. Created ${easeeProducts.length} product(s).`);
+    return;
+  }
+
+  if (ADD_HARVI) {
+    const harviProducts = built.filter((p) => p.sku?.trim() === "HARVI-65A3P");
+    console.log(`\nFound ${harviProducts.length} Harvi product(s) to add:`);
+    for (const p of harviProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      console.log(
+        `  [${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  warranty=${warranty ?? "—"}`,
+      );
+    }
+
+    if (!COMMIT) {
+      console.log("\nDry run only — no database changes made. Re-run with --add-harvi --commit to apply.");
+      return;
+    }
+
+    const { _max } = await prisma.product.aggregate({ _max: { sortOrder: true } });
+    let nextSortOrder = (_max.sortOrder ?? 0) + 1;
+
+    for (const p of harviProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          category: p.category,
+          name: p.name,
+          brand: p.brand,
+          sku: p.sku,
+          colour: p.colour,
+          cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
+          gallery: p.gallery,
+          tags: [],
+          variantGroup: p.variantGroup,
+          active: true,
+          featured: false,
+          sortOrder: nextSortOrder++,
+          spec: p.powerOutput ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim() : null,
+          connectionType: p.connectionType ?? null,
+          cableLength: p.cableLength ?? null,
+          cableLengthOptions: p.cableLengthOptions,
+          powerOutput: p.powerOutput || null,
+          price: p.price,
+          installFee: p.category === "Residential" ? 540 : null,
+          style: p.style ?? null,
+          phase: p.phase ?? null,
+          lengthOptions: p.lengthOptions,
+          tagline: p.tagline,
+          description: p.description,
+          features: p.features,
+          specs: p.specs,
+          warranty,
+        },
+      });
+      console.log(`Created ${p.id}.`);
+    }
+
+    console.log(`\nDone. Created ${harviProducts.length} product(s).`);
+    return;
+  }
+
+  if (ADD_ZEV_3PHASE) {
+    const zev3PhaseSkus = new Set(["Zevcabs07", "Zevcabs08", "Zevcabs09", "Zevcabs10"]);
+    const zev3PhaseProducts = built.filter((p) => p.sku && zev3PhaseSkus.has(p.sku.trim()));
+    console.log(`\nFound ${zev3PhaseProducts.length} Zev 3-Phase cable product(s) to add:`);
+    for (const p of zev3PhaseProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      console.log(
+        `  [${p.category}] ${p.id}  "${p.name}"  £${p.price ?? "—"}  warranty=${warranty ?? "—"}`,
+      );
+    }
+
+    if (!COMMIT) {
+      console.log("\nDry run only — no database changes made. Re-run with --add-zev-3phase --commit to apply.");
+      return;
+    }
+
+    const { _max } = await prisma.product.aggregate({ _max: { sortOrder: true } });
+    let nextSortOrder = (_max.sortOrder ?? 0) + 1;
+
+    for (const p of zev3PhaseProducts) {
+      const warranty = p.specs.find((s) => s.label === "Warranty")?.value ?? null;
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          category: p.category,
+          name: p.name,
+          brand: p.brand,
+          sku: p.sku,
+          colour: p.colour,
+          cardImage: p.cardImage || "https://placehold.co/600x600?text=Photo+coming+soon",
+          gallery: p.gallery,
+          tags: [],
+          variantGroup: p.variantGroup,
+          active: true,
+          featured: false,
+          sortOrder: nextSortOrder++,
+          spec: p.powerOutput ? `${p.powerOutput} · ${p.connectionType ?? ""}`.trim() : null,
+          connectionType: p.connectionType ?? null,
+          cableLength: p.cableLength ?? null,
+          cableLengthOptions: p.cableLengthOptions,
+          powerOutput: p.powerOutput || null,
+          price: p.price,
+          installFee: p.category === "Residential" ? 540 : null,
+          style: p.style ?? null,
+          phase: p.phase ?? null,
+          lengthOptions: p.lengthOptions,
+          tagline: p.tagline,
+          description: p.description,
+          features: p.features,
+          specs: p.specs,
+          warranty,
+        },
+      });
+      console.log(`Created ${p.id}.`);
+    }
+
+    console.log(`\nDone. Created ${zev3PhaseProducts.length} product(s).`);
     return;
   }
 

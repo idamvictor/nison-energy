@@ -130,7 +130,7 @@ export default async function AccessoryDetailPage({
                   <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>
                 )}
                 <PartnerBadges tariffs={product.compatibleTariffs} />
-                <FreeDeliveryBadge />
+                <FreeDeliveryBadge warranty={detail.warranty} />
               </div>
 
               {product.tags.length > 0 && (
@@ -145,7 +145,6 @@ export default async function AccessoryDetailPage({
 
               <AccessoryPurchasePanel
                 product={product}
-                warranty={detail.warranty}
                 siblings={siblings}
               />
             </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, Heart, ShieldCheck, Zap } from "lucide-react";
+import { Check, ChevronDown, Heart, Zap } from "lucide-react";
 
 import type { CommercialProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,9 @@ const OZEV_GRANT_GUIDE_URL =
 
 export function CommercialPurchasePanel({
   product,
-  warranty,
   siblings,
 }: {
   product: CommercialProduct;
-  warranty: string;
   siblings: CommercialProduct[];
 }) {
   const router = useRouter();
@@ -49,17 +47,10 @@ export function CommercialPurchasePanel({
   const colourOptions = colourSiblings.filter(
     (p, i) => colourSiblings.findIndex((q) => q.colour === p.colour) === i,
   );
-  // Connection types available for the currently selected colour.
-  const connectionSiblings = colourSiblings
-    .filter((p) => p.colour === product.colour)
-    .filter(
-      (p, i, arr) =>
-        arr.findIndex((q) => q.connectionType === p.connectionType) === i,
-    );
   // Lengths available for the current colour + connection type, shortest
   // first — mirrors the residential purchase panel exactly. Most commercial
-  // products have no recorded length at all (falls to the N/A placeholder
-  // below), but some genuinely do once an admin sets one.
+  // products have no recorded length at all (the Cable length field is then
+  // hidden), but some genuinely do once an admin sets one.
   const lengthSiblings = colourSiblings
     .filter(
       (p) =>
@@ -117,26 +108,9 @@ export function CommercialPurchasePanel({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Connection Type
-          <select
-            value={product.id}
-            onChange={(e) =>
-              router.push(`/workplace-charging/${e.target.value}`, { scroll: false })
-            }
-            className={selectClass}
-          >
-            {connectionSiblings.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.connectionType}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
-          Cable length
-          {lengthSiblings.length > 0 ? (
+        {lengthSiblings.length > 0 && (
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
+            Cable length
             <select
               value={product.id}
               onChange={(e) =>
@@ -150,12 +124,8 @@ export function CommercialPurchasePanel({
                 </option>
               ))}
             </select>
-          ) : (
-            <select value="na" disabled className={cn(selectClass, "text-muted-foreground")}>
-              <option value="na">N/A — untethered</option>
-            </select>
-          )}
-        </label>
+          </label>
+        )}
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
           Add Installation
@@ -213,14 +183,6 @@ export function CommercialPurchasePanel({
         </div>
       </div>
 
-      {warranty && (
-        <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
-          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-          <p className="text-sm text-foreground">
-            <span className="font-medium">Warranty:</span> {warranty}
-          </p>
-        </div>
-      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>

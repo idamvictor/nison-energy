@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Heart, ShieldCheck } from "lucide-react";
+import { Check, Heart } from "lucide-react";
 
 import type { AccessoryProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -17,11 +17,9 @@ const selectClass =
 
 export function AccessoryPurchasePanel({
   product,
-  warranty,
   siblings,
 }: {
   product: AccessoryProduct;
-  warranty: string;
   siblings: AccessoryProduct[];
 }) {
   const router = useRouter();
@@ -36,18 +34,27 @@ export function AccessoryPurchasePanel({
 
   const variantSiblings =
     siblings.length > 0 ? siblings : [product];
-  // One entry per distinct (style, colour) pair.
-  const styleColourOptions = variantSiblings.filter(
-    (p, i) =>
-      variantSiblings.findIndex((q) => q.style === p.style && q.colour === p.colour) === i,
+  // Phase is a real product distinction (different cable spec/price), not a
+  // cosmetic one — never offer a colour/length choice that would silently
+  // swap the customer onto a different-phase cable.
+  const phaseSiblings = variantSiblings.filter((p) => p.phase === product.phase);
+  // One entry per distinct colour.
+  const colourOptions = phaseSiblings.filter(
+    (p, i) => phaseSiblings.findIndex((q) => q.colour === p.colour) === i,
   );
   // Lengths available for the currently selected style+colour, shortest
-  // first — each length is now its own real product row.
-  const lengthSiblings = variantSiblings
-    .filter((p) => p.style === product.style && p.colour === product.colour)
+  // first — each length is now its own real product row. Rows with no
+  // recorded length (e.g. adaptors) are excluded so they don't render as
+  // a blank option.
+  const lengthSiblings = phaseSiblings
+    .filter(
+      (p) => p.style === product.style && p.colour === product.colour && p.lengthOptions[0],
+    )
     .sort(
       (a, b) => parseFloat(a.lengthOptions[0] ?? "0") - parseFloat(b.lengthOptions[0] ?? "0"),
     );
+  // No lengths — hide the Length field and let Colour take the full row.
+  const hasLengths = lengthSiblings.length > 0;
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
@@ -64,33 +71,37 @@ export function AccessoryPurchasePanel({
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Style / colour
+        <label
+          className={cn(
+            "flex flex-col gap-1.5 text-sm font-medium text-foreground",
+            !hasLengths && "sm:col-span-2",
+          )}
+        >
+          Colour
           <select
-            value={`${product.style}::${product.colour}`}
+            value={product.colour}
             onChange={(e) => {
-              const [newStyle, newColour] = e.target.value.split("::");
-              const candidates = variantSiblings.filter(
-                (p) => p.style === newStyle && p.colour === newColour,
-              );
+              const candidates = phaseSiblings.filter((p) => p.colour === e.target.value);
+              const sameStyle = candidates.filter((p) => p.style === product.style);
               const match =
-                candidates.find((p) => p.lengthOptions[0] === product.lengthOptions[0]) ??
+                sameStyle.find((p) => p.lengthOptions[0] === product.lengthOptions[0]) ??
+                sameStyle[0] ??
                 candidates[0];
               if (match) router.push(`/accessories/${match.id}`, { scroll: false });
             }}
             className={selectClass}
           >
-            {styleColourOptions.map((p) => (
-              <option key={`${p.style}::${p.colour}`} value={`${p.style}::${p.colour}`}>
-                {p.style} · {p.colour}
+            {colourOptions.map((p) => (
+              <option key={p.colour} value={p.colour}>
+                {p.colour}
               </option>
             ))}
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Length
-          {lengthSiblings.length > 0 ? (
+        {hasLengths && (
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+            Length
             <select
               value={product.id}
               onChange={(e) =>
@@ -104,22 +115,10 @@ export function AccessoryPurchasePanel({
                 </option>
               ))}
             </select>
-          ) : (
-            <select value="na" disabled className={cn(selectClass, "text-muted-foreground")}>
-              <option value="na">N/A</option>
-            </select>
-          )}
-        </label>
+          </label>
+        )}
       </div>
 
-      {warranty && (
-        <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
-          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-          <p className="text-sm text-foreground">
-            <span className="font-medium">Warranty:</span> {warranty}
-          </p>
-        </div>
-      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>

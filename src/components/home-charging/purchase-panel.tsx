@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, Heart, ShieldCheck, Zap } from "lucide-react";
+import { Check, ChevronDown, Heart, Zap } from "lucide-react";
 
 import type { Product } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,9 @@ const selectClass =
 
 export function PurchasePanel({
   product,
-  warranty,
   siblings,
 }: {
   product: Product;
-  warranty: string;
   siblings: Product[];
 }) {
   const router = useRouter();
@@ -60,6 +58,9 @@ export function PurchasePanel({
   const lengthSiblings = sameConnectionSiblings
     .filter((p) => p.colour === product.colour && p.cableLength)
     .sort((a, b) => parseFloat(a.cableLength ?? "0") - parseFloat(b.cableLength ?? "0"));
+  // No recorded lengths (e.g. untethered) — hide the Cable length field
+  // entirely and let Colour take the full row.
+  const hasLengths = lengthSiblings.length > 0;
 
   const installationLabel =
     installation === "standard"
@@ -83,7 +84,12 @@ export function PurchasePanel({
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+        <label
+          className={cn(
+            "flex flex-col gap-1.5 text-sm font-medium text-foreground",
+            !hasLengths && "sm:col-span-2",
+          )}
+        >
           Colour
           <select
             value={product.colour}
@@ -103,9 +109,9 @@ export function PurchasePanel({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
-          Cable length
-          {lengthSiblings.length > 0 ? (
+        {hasLengths && (
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+            Cable length
             <select
               value={product.id}
               onChange={(e) =>
@@ -119,12 +125,8 @@ export function PurchasePanel({
                 </option>
               ))}
             </select>
-          ) : (
-            <select value="na" disabled className={cn(selectClass, "text-muted-foreground")}>
-              <option value="na">N/A — untethered</option>
-            </select>
-          )}
-        </label>
+          </label>
+        )}
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
           Add Installation
@@ -182,14 +184,6 @@ export function PurchasePanel({
         </div>
       </div>
 
-      {warranty && (
-        <div className="flex items-start gap-2 rounded-lg bg-secondary px-3 py-2.5">
-          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-          <p className="text-sm text-foreground">
-            <span className="font-medium">Warranty:</span> {warranty}
-          </p>
-        </div>
-      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>

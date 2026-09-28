@@ -139,7 +139,9 @@ export default function WorkplaceChargingSchemeGuidePage() {
   const chargerCostNum = parseFloat(chargerCost) || 0;
   const labourCostNum = parseFloat(labourCost) || 0;
   const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
-  const previewSubtotal = chargerCostNum + labourCostNum + worksCostNum;
+  // The chargepoint cost is entered per unit — multiply by the number of chargepoints.
+  const chargerTotal = chargerCostNum * chargepointsNum;
+  const previewSubtotal = chargerTotal + labourCostNum + worksCostNum;
   const previewVat = previewSubtotal * 0.2;
   const previewTotal = previewSubtotal + previewVat;
   const previewGrantCap = Math.min(500 * socketsNum, 20000);
@@ -419,13 +421,13 @@ export default function WorkplaceChargingSchemeGuidePage() {
                           </Select>
                         </Field>
                         <Field
-                          label="EV chargepoint cost — total for this order (£, ex VAT)"
-                          hint="The total you're paying for the chargepoint hardware, whatever the socket count."
+                          label="EV chargepoint cost — per chargepoint (£, ex VAT)"
+                          hint="The price of one chargepoint unit — we'll multiply by the number of chargepoints for you."
                         >
                           <Input
                             type="text"
                             inputMode="decimal"
-                            placeholder="e.g. 850"
+                            placeholder="e.g. 800"
                             value={chargerCost}
                             onChange={(e) => setChargerCost(e.target.value)}
                           />
@@ -570,8 +572,8 @@ export default function WorkplaceChargingSchemeGuidePage() {
                       exactly what to expect before you start.
                     </p>
                     <a
-                      href="/documents/ozev-grant-application-guide.pdf"
-                      download
+                      href="/documents/ozev-application-guide-workplace.pdf"
+                      download="OZEV Grant Application Guide - Workplace Charging Scheme.pdf"
                       className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />
@@ -618,22 +620,9 @@ export default function WorkplaceChargingSchemeGuidePage() {
                     <p className="text-sm text-foreground/80">
                       Once installation is complete, Ocunio claims the
                       voucher value on your behalf and deducts it directly
-                      from your invoice — as an OZEV-authorised installer,
-                      we&apos;re not permitted to charge you until the
-                      grant has been paid, so there&apos;s nothing to
-                      settle upfront on the grant-covered portion.
+                      from your invoice, so there&apos;s nothing to settle
+                      upfront on the grant-covered portion.
                     </p>
-
-                    <p className="mt-4 text-sm text-foreground/80">
-                      Download our Installation Guide for what to expect
-                      on the day — access requirements, how long it takes,
-                      and how to get your charger set up afterwards.
-                    </p>
-                    <div className="mt-2 flex items-center gap-2 rounded-lg border border-dashed border-border px-3.5 py-2.5 text-xs text-muted-foreground">
-                      <span className="size-1.5 shrink-0 rounded-full bg-accent" />
-                      Installation Guide — attachment not provided
-                      (original draft: File 2)
-                    </div>
 
                     <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
                       <span className="font-semibold text-accent">!</span>

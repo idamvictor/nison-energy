@@ -9,6 +9,7 @@ import {
   dbToCommercial,
   dbToDetail,
 } from "@/lib/catalog/queries";
+import { warmDatasheet } from "@/lib/media/queries";
 import { adminRoute } from "@/lib/catalog/types";
 import { groupByVariant } from "@/lib/catalog/variant-grouping";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
@@ -24,6 +25,7 @@ import { HelpSection } from "@/components/shared/help-section";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { PartnerBadges } from "@/components/shared/partner-badges";
 import { FreeDeliveryBadge } from "@/components/shared/free-delivery-badge";
+import { ProductDatasheet } from "@/components/shared/product-datasheet";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { CommercialPurchasePanel } from "@/components/workplace-charging/commercial-purchase-panel";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
@@ -81,6 +83,8 @@ export default async function CommercialProductDetailPage({
 
   const product = dbToCommercial(row);
   const detail = dbToDetail(row);
+  // Pull the datasheet into memory now so the viewer finds it cached on first click.
+  warmDatasheet(detail.datasheet);
 
   const catalog = await getCommercialCatalog();
   const siblings = product.variantGroup
@@ -165,6 +169,9 @@ export default async function CommercialProductDetailPage({
               <TabsTrigger value="installation">Installation</TabsTrigger>
               <TabsTrigger value="delivery">Delivery Information</TabsTrigger>
               <TabsTrigger value="returns">Returns</TabsTrigger>
+              {detail.datasheet && (
+                <TabsTrigger value="datasheet">Datasheet</TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="description" className="py-6">
@@ -249,6 +256,12 @@ export default async function CommercialProductDetailPage({
             <TabsContent value="returns" className="py-6">
               <BlogMarkdown content={returnsPolicyMarkdown} />
             </TabsContent>
+
+            {detail.datasheet && (
+              <TabsContent value="datasheet" className="py-6">
+                <ProductDatasheet url={detail.datasheet} />
+              </TabsContent>
+            )}
           </Tabs>
         </section>
 

@@ -122,6 +122,7 @@ export type ProductDetail = {
   features: string[];
   specs: Spec[];
   warranty: string;
+  datasheet?: string;
 };
 
 // ─── Admin write shapes ────────────────────────────────────────────────────
@@ -155,6 +156,7 @@ export type ProductInput = {
   features: string[];
   specs: Spec[];
   warranty: string | null;
+  datasheet: string | null;
 };
 
 export type WriteResult =

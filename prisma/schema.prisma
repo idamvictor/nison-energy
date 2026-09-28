@@ -162,6 +162,7 @@ model Product {
   features    String[] @default([])
   specs       Json?
   warranty    String?
+  datasheet   String? // /api/media/datasheets/<uuid>.pdf
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -340,4 +341,15 @@ model RateLimitHit {
   createdAt DateTime @default(now())
 
   @@index([key, createdAt])
+}
+
+/// Datasheet PDFs + their page-1 preview images, keyed by the same object key
+/// used in their /api/media URL (datasheets/<uuid>/<name>.pdf, …/preview).
+/// Kept in Postgres rather than the object store, which streams at ~15KB/s
+/// (a 700KB PDF took 40s+) — too slow for the in-page PDF viewer.
+model DatasheetFile {
+  key         String   @id
+  contentType String
+  bytes       Bytes
+  createdAt   DateTime @default(now())
 }

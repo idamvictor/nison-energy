@@ -12,6 +12,16 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { prisma } from "@/lib/db";
+import {
+  DATASHEET_PREVIEW_TYPES,
+  DATASHEET_URL_PREFIX,
+  MAX_DATASHEET_PREVIEW_BYTES,
+  datasheetPreviewKey,
+  datasheetPreviewUrl,
+  datasheetSafeName,
+} from "@/lib/media/datasheet";
+
+export { DATASHEET_URL_PREFIX };
 
 // Prisma Object Store bucket (S3-compatible). Two kinds of object: public
 // images under `uploads/` (see image-upload-field.tsx) and private
@@ -88,6 +98,189 @@ export async function uploadImage(file: File): Promise<
   );
 
   return { ok: true, image: { key, url: `/api/media/${key}` } };
+}
+
+export const MAX_DATASHEET_BYTES = 5 * 1024 * 1024; // 5MB
+
+type UploadResult = { ok: true; url: string } | { ok: false; error: string };
+
+/**
+ * Validates and stores a product datasheet PDF (`datasheets/<uuid>/<name>.pdf`)
+ * plus its optional page-1 preview image (rendered in the admin's browser —
+ * see renderPdfPreview) at `datasheets/<uuid>/preview`. Both live in the
+ * DatasheetFile table and are served publicly through /api/media.
+ */
+export async function uploadDatasheet(
+  file: File,
+  preview: File | null,
+): Promise<UploadResult> {
+  if (file.type !== "application/pdf") {
+    return { ok: false, error: "Unsupported file type. Upload a PDF." };
+  }
+  if (file.size > MAX_DATASHEET_BYTES) {
+    return { ok: false, error: "PDF is too large (max 5MB)." };
+  }
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  // Check the "%PDF-" magic bytes so a renamed non-PDF can't slip through.
+  if (!startsWith(bytes, PDF_MAGIC)) {
+    return { ok: false, error: "That file isn't a valid PDF." };
+  }
+
+  // The preview is a nice-to-have: skip (rather than fail the upload) if it's
+  // missing or doesn't look like the WebP/PNG we asked the browser for.
+  let previewObject: CachedObject | null = null;
+  if (
+    preview &&
+    DATASHEET_PREVIEW_TYPES.includes(preview.type) &&
+    preview.size <= MAX_DATASHEET_PREVIEW_BYTES
+  ) {
+    const candidate = new Uint8Array(await preview.arrayBuffer());
+    if (isWebp(candidate) || startsWith(candidate, PNG_MAGIC)) {
+      previewObject = { bytes: candidate, contentType: preview.type };
+    }
+  }
+
+  // Keep the original name in the key so the UI (and downloads) can show it.
+  const key = `datasheets/${randomUUID()}/${datasheetSafeName(file.name)}.pdf`;
+  const pdfObject: CachedObject = { bytes, contentType: "application/pdf" };
+  const previewKey = datasheetPreviewKey(key);
+  await prisma.datasheetFile.createMany({
+    data: [
+      { key, contentType: pdfObject.contentType, bytes },
+      ...(previewObject
+        ? [{ key: previewKey, contentType: previewObject.contentType, bytes: previewObject.bytes }]
+        : []),
+    ],
+  });
+  // Warm the (process-wide) cache so the card/preview right after upload is instant.
+  rememberDatasheet(key, pdfObject);
+  if (previewObject) rememberDatasheet(previewKey, previewObject);
+  return { ok: true, url: `/api/media/${key}` };
+}
+
+const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2d]; // "%PDF-"
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
+
+function startsWith(bytes: Uint8Array, magic: number[], offset = 0): boolean {
+  return magic.every((b, i) => bytes[offset + i] === b);
+}
+
+function isWebp(bytes: Uint8Array): boolean {
+  // "RIFF" .... "WEBP"
+  return startsWith(bytes, [0x52, 0x49, 0x46, 0x46]) && startsWith(bytes, [0x57, 0x45, 0x42, 0x50], 8);
+}
+
+// Recently used datasheet files in memory, on top of Postgres. Kept on
+// globalThis because Next bundles each route separately — a module-level Map
+// would give the upload route, the media route and page renders each their
+// own cache, so warming it in one would never help another.
+type CachedObject = { bytes: Uint8Array<ArrayBuffer>; contentType: string };
+type DatasheetCache = {
+  entries: Map<string, CachedObject>;
+  inflight: Map<string, Promise<CachedObject | null>>;
+  bytes: number;
+};
+const DATASHEET_CACHE_MAX_BYTES = 64 * 1024 * 1024;
+const globalForDatasheets = globalThis as unknown as { datasheetCache?: DatasheetCache };
+const datasheetCache = (globalForDatasheets.datasheetCache ??= {
+  entries: new Map(),
+  inflight: new Map(),
+  bytes: 0,
+});
+
+function forgetDatasheet(key: string) {
+  const existing = datasheetCache.entries.get(key);
+  if (existing) {
+    datasheetCache.entries.delete(key);
+    datasheetCache.bytes -= existing.bytes.byteLength;
+  }
+}
+
+function rememberDatasheet(key: string, object: CachedObject) {
+  forgetDatasheet(key);
+  datasheetCache.entries.set(key, object);
+  datasheetCache.bytes += object.bytes.byteLength;
+  // Map iteration order is insertion order, so the first key is the least recently used.
+  for (const [oldKey] of datasheetCache.entries) {
+    if (datasheetCache.bytes <= DATASHEET_CACHE_MAX_BYTES) break;
+    forgetDatasheet(oldKey);
+  }
+}
+
+/** Reads a datasheet file from Postgres; migrates legacy object-store copies on first read. */
+async function loadDatasheet(key: string): Promise<CachedObject | null> {
+  const row = await prisma.datasheetFile.findUnique({ where: { key } });
+  if (row) return { bytes: new Uint8Array(row.bytes), contentType: row.contentType };
+
+  // Uploaded before datasheets moved to Postgres — fetch from the (slow)
+  // bucket once and copy it across so every later read is fast.
+  const object = await getObjectStream(key);
+  if (!object) return null;
+  const bytes = new Uint8Array(await new Response(object.body).arrayBuffer());
+  await prisma.datasheetFile.upsert({
+    where: { key },
+    create: { key, contentType: object.contentType, bytes },
+    update: {},
+  });
+  return { bytes, contentType: object.contentType };
+}
+
+/**
+ * A datasheet file (PDF or preview image) in full — from memory, else one
+ * shared Postgres read. Null if missing.
+ */
+export async function getDatasheetObject(key: string): Promise<CachedObject | null> {
+  const cached = datasheetCache.entries.get(key);
+  if (cached) {
+    rememberDatasheet(key, cached); // bump to most recently used
+    return cached;
+  }
+  let pending = datasheetCache.inflight.get(key);
+  if (!pending) {
+    pending = loadDatasheet(key)
+      .then((object) => {
+        if (object) rememberDatasheet(key, object);
+        return object;
+      })
+      .finally(() => datasheetCache.inflight.delete(key));
+    datasheetCache.inflight.set(key, pending);
+  }
+  return pending;
+}
+
+/**
+ * Fire-and-forget: pull a datasheet (and its preview) into memory while its
+ * product page renders, so the viewer usually finds it cached on first click.
+ */
+export function warmDatasheet(url: string | null | undefined): void {
+  if (!url?.startsWith(DATASHEET_URL_PREFIX)) return;
+  const key = url.slice("/api/media/".length);
+  const keys = datasheetPreviewUrl(url) ? [key, datasheetPreviewKey(key)] : [key];
+  for (const k of keys) {
+    getDatasheetObject(k).catch((error) =>
+      console.error("Failed to warm datasheet cache", error),
+    );
+  }
+}
+
+/**
+ * Deletes a datasheet (and its preview image, if any) by its
+ * `/api/media/datasheets/…` URL; ignores other URLs.
+ */
+export async function deleteDatasheet(url: string | null | undefined): Promise<void> {
+  if (!url?.startsWith(DATASHEET_URL_PREFIX)) return;
+  const key = url.slice("/api/media/".length);
+  const keys = datasheetPreviewUrl(url) ? [key, datasheetPreviewKey(key)] : [key];
+  keys.forEach(forgetDatasheet);
+  try {
+    await prisma.datasheetFile.deleteMany({ where: { key: { in: keys } } });
+    // Older uploads may also still sit in the bucket (deleting a missing key is a no-op).
+    await Promise.all(keys.map((k) => deleteDocument(k)));
+  } catch (error) {
+    // Orphaned bytes are harmless — never fail the product save over this.
+    console.error("Failed to delete old datasheet", error);
+  }
 }
 
 type ObjectStream = {

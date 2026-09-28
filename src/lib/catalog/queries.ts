@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
+import { DATASHEET_URL_PREFIX, deleteDatasheet } from "@/lib/media/queries";
 import type { Product as ProductRow } from "@/generated/prisma/client";
 import type {
   AccessoryProduct,
@@ -146,6 +147,7 @@ export function dbToDetail(row: ProductRow): ProductDetail {
     features: row.features.filter((f) => f !== "FREE DELIVERY"),
     specs: row.sku ? [{ label: "SKU", value: row.sku }, ...specs] : specs,
     warranty: row.warranty ?? "",
+    datasheet: row.datasheet || undefined,
   };
 }
 
@@ -236,6 +238,9 @@ function validate(input: ProductInput): string | null {
   if (!input.brand.trim()) return "Brand is required.";
   if (!input.colour.trim()) return "Colour is required.";
   if (!input.cardImage.trim()) return "A card image URL is required.";
+  if (input.datasheet && !input.datasheet.startsWith(DATASHEET_URL_PREFIX)) {
+    return "The datasheet must be a PDF uploaded from this form.";
+  }
   return null;
 }
 
@@ -269,6 +274,7 @@ function toData(input: ProductInput) {
     features: input.features,
     specs: input.specs as object,
     warranty: input.warranty?.trim() || null,
+    datasheet: input.datasheet?.trim() || null,
   };
 }
 
@@ -309,15 +315,25 @@ export async function updateProduct(
     }
   }
 
+  const previous = await prisma.product.findUnique({
+    where: { id },
+    select: { datasheet: true },
+  });
+  const data = toData(input);
   await prisma.product.update({
     where: { id },
-    data: { id: nextId, ...toData(input) },
+    data: { id: nextId, ...data },
   });
+  // Replaced or removed — drop the old PDF so the bucket doesn't fill up.
+  if (previous?.datasheet && previous.datasheet !== data.datasheet) {
+    await deleteDatasheet(previous.datasheet);
+  }
   return { ok: true, id: nextId };
 }
 
 export async function deleteProduct(id: string): Promise<WriteResult> {
   await requireAdmin();
-  await prisma.product.delete({ where: { id } });
+  const removed = await prisma.product.delete({ where: { id } });
+  await deleteDatasheet(removed.datasheet);
   return { ok: true, id };
 }

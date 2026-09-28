@@ -69,13 +69,17 @@ export default function OzevGrantsPage() {
             <Reveal>
               <SectionKicker center tone="invert" />
               <h1 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Get an Instant OZEV Grant Quote
+                Which OZEV Grant Could Save You Up to 75%?
               </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-primary-foreground/80">
-                Select the grant you&apos;re interested in, and we&apos;ll
-                walk you through eligibility, calculate your instant itemised
-                quote, and guide you through the exact application steps —
-                with nothing charged until OZEV approves.
+              <p className="mx-auto mt-4 max-w-3xl text-primary-foreground/80">
+                You&apos;ll learn more about OZEV grant scheme — for renters,
+                flat owners, residential landlords, workplaces, on-street
+                parking households, and state-funded education settings.
+                Whatever your situation, there&apos;s likely a grant to help
+                cover your EV charger installation costs. As an OZEV-Approved
+                Installer, Ocunio Energy matches you to the right scheme and
+                manages the process from start to finish. Get in touch to find
+                out which one applies to you.
               </p>
             </Reveal>
 

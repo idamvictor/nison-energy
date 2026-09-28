@@ -3,17 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  AuthHeading,
+  FormAlert,
+  GoogleIcon,
+  PasswordField,
+  SubmitButton,
+  TextField,
+} from "@/components/auth/auth-fields";
+import { cn } from "@/lib/utils";
 
 function safeRedirect(target: string | null): string {
   // Only allow same-origin relative paths.
@@ -78,115 +80,130 @@ export function SignInForm() {
   const isSignUp = mode === "sign-up";
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>
-          {isSignUp ? "Create your account" : "Sign in to Ocunio Energy"}
-        </CardTitle>
-        <CardDescription>
-          {isSignUp
+    <div className="flex flex-col gap-8">
+      <AuthHeading
+        title={isSignUp ? "Create your account" : "Welcome back"}
+        description={
+          isSignUp
             ? "Track your orders and OZEV grant application in one place."
-            : "Welcome back."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+            : "Sign in to track your orders, installation and grant."
+        }
+      />
+
+      <div
+        role="tablist"
+        aria-label="Account"
+        className="grid grid-cols-2 rounded-xl bg-muted p-1"
+      >
+        {(["sign-in", "sign-up"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            role="tab"
+            aria-selected={mode === m}
+            onClick={() => {
+              setMode(m);
+              setError(null);
+            }}
+            className={cn(
+              "h-9 rounded-lg text-sm font-medium transition-all focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+              mode === m
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {m === "sign-in" ? "Sign in" : "Create account"}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-5">
         <Button
           type="button"
           variant="outline"
           size="lg"
-          className="w-full"
+          className="h-11 w-full gap-2.5 rounded-xl bg-card text-sm font-medium shadow-xs"
           disabled={pending !== null}
           onClick={handleGoogleSignIn}
         >
-          {pending === "google" ? "Redirecting…" : "Continue with Google"}
+          {pending === "google" ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Redirecting…
+            </>
+          ) : (
+            <>
+              <GoogleIcon />
+              Continue with Google
+            </>
+          )}
         </Button>
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" />
-          or
+          or with email
           <span className="h-px flex-1 bg-border" />
         </div>
 
-        <form className="flex flex-col gap-3" onSubmit={handleEmailSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleEmailSubmit}>
           {isSignUp && (
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
-              Name
-              <Input
-                type="text"
-                required
-                autoComplete="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
+            <TextField
+              label="Name"
+              type="text"
+              required
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           )}
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Email
-            <Input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Password
-            <Input
-              type="password"
-              required
-              minLength={8}
-              autoComplete={isSignUp ? "new-password" : "current-password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-
-          {!isSignUp && (
-            <Link
-              href="/forgot-password"
-              className="-mt-1 self-start text-sm text-muted-foreground underline-offset-4 hover:underline"
-            >
-              Forgot password?
-            </Link>
+          <TextField
+            label="Email"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <PasswordField
+            label="Password"
+            required
+            minLength={8}
+            autoComplete={isSignUp ? "new-password" : "current-password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aside={
+              !isSignUp && (
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-normal text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              )
+            }
+          />
+          {isSignUp && (
+            <p className="-mt-2 text-xs text-muted-foreground">At least 8 characters.</p>
           )}
 
           {justReset && !error && (
-            <p className="text-sm text-success">
+            <FormAlert tone="success">
               Password updated — sign in with your new password.
-            </p>
+            </FormAlert>
           )}
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <FormAlert tone="error">{error}</FormAlert>}
 
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={pending !== null}
-          >
-            {pending === "email"
-              ? isSignUp
-                ? "Creating…"
-                : "Signing in…"
-              : isSignUp
-                ? "Create account"
-                : "Sign in"}
-          </Button>
+          <div className="pt-1">
+            <SubmitButton
+              pending={pending === "email"}
+              pendingLabel={isSignUp ? "Creating account…" : "Signing in…"}
+            >
+              {isSignUp ? "Create account" : "Sign in"}
+            </SubmitButton>
+          </div>
         </form>
-
-        <button
-          type="button"
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-          onClick={() => {
-            setMode(isSignUp ? "sign-in" : "sign-up");
-            setError(null);
-          }}
-        >
-          {isSignUp
-            ? "Already have an account? Sign in"
-            : "First time here? Create an account"}
-        </button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

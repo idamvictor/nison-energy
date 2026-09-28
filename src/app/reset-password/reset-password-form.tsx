@@ -3,17 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, LinkIcon, LockKeyhole } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  AuthHeading,
+  FormAlert,
+  PasswordField,
+  SubmitButton,
+} from "@/components/auth/auth-fields";
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -49,55 +48,64 @@ export function ResetPasswordForm() {
     router.push("/sign-in?reset=1");
   }
 
+  if (invalid) {
+    return (
+      <div className="flex flex-col gap-8">
+        <AuthHeading
+          icon={<LinkIcon />}
+          title="This reset link isn't valid"
+          description="It may have expired or already been used. Reset links last one hour — request a new one and we'll email it over."
+        />
+        <Button
+          size="lg"
+          nativeButton={false}
+          render={<Link href="/forgot-password" />}
+          className="h-11 w-full rounded-xl bg-foreground text-sm font-semibold text-background hover:bg-foreground/85"
+        >
+          Request a new link
+        </Button>
+        <Link
+          href="/sign-in"
+          className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Back to sign in
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Set a new password</CardTitle>
-        <CardDescription>
-          {invalid
-            ? "This reset link is invalid or has expired."
-            : "Choose a new password for your account."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        {invalid ? (
-          <Button
-            nativeButton={false}
-            render={<Link href="/forgot-password" />}
-          >
-            Request a new link
-          </Button>
-        ) : (
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
-              New password
-              <Input
-                type="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </label>
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
-              Confirm password
-              <Input
-                type="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-              />
-            </label>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" size="lg" className="w-full" disabled={pending}>
-              {pending ? "Saving…" : "Save new password"}
-            </Button>
-          </form>
-        )}
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-8">
+      <AuthHeading
+        icon={<LockKeyhole />}
+        title="Set a new password"
+        description="Choose a new password for your account. Use at least 8 characters."
+      />
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <PasswordField
+          label="New password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <PasswordField
+          label="Confirm password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+        />
+        {error && <FormAlert tone="error">{error}</FormAlert>}
+        <div className="pt-1">
+          <SubmitButton pending={pending} pendingLabel="Saving…">
+            Save new password
+          </SubmitButton>
+        </div>
+      </form>
+    </div>
   );
 }

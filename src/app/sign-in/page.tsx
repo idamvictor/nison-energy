@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth/session";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { SignInForm } from "./sign-in-form";
 
 export const metadata: Metadata = {
@@ -22,10 +23,10 @@ export default async function SignInPage({
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center bg-muted/30 p-4">
+    <AuthShell>
       <Suspense>
         <SignInForm />
       </Suspense>
-    </main>
+    </AuthShell>
   );
 }

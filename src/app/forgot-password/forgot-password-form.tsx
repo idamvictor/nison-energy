@@ -2,17 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ArrowLeft, KeyRound, MailCheck } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { AuthHeading, SubmitButton, TextField } from "@/components/auth/auth-fields";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -32,55 +26,64 @@ export function ForgotPasswordForm() {
     setSent(true);
   }
 
+  if (sent) {
+    return (
+      <div className="flex flex-col gap-8">
+        <AuthHeading
+          icon={<MailCheck />}
+          title="Check your email"
+          description={
+            <>
+              If an account exists for{" "}
+              <span className="font-medium text-foreground">{email}</span>, a password
+              reset link is on its way. It expires in one hour.
+            </>
+          }
+        />
+        <Button
+          variant="outline"
+          size="lg"
+          nativeButton={false}
+          render={<Link href="/sign-in" />}
+          className="h-11 w-full gap-2 rounded-xl bg-card text-sm font-medium shadow-xs"
+        >
+          <ArrowLeft className="size-4" />
+          Back to sign in
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Reset your password</CardTitle>
-        <CardDescription>
-          {sent
-            ? "Check your email."
-            : "Enter your email and we'll send you a reset link."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        {sent ? (
-          <>
-            <p className="text-sm text-muted-foreground">
-              If an account exists for <span className="font-medium">{email}</span>,
-              a password reset link is on its way. It expires in one hour.
-            </p>
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/sign-in" />}
-            >
-              Back to sign in
-            </Button>
-          </>
-        ) : (
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
-              Email
-              <Input
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <Button type="submit" size="lg" className="w-full" disabled={pending}>
-              {pending ? "Sending…" : "Send reset link"}
-            </Button>
-            <Link
-              href="/sign-in"
-              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-            >
-              Back to sign in
-            </Link>
-          </form>
-        )}
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-8">
+      <AuthHeading
+        icon={<KeyRound />}
+        title="Reset your password"
+        description="Enter the email you signed up with and we'll send you a reset link."
+      />
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <TextField
+          label="Email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <div className="pt-1">
+          <SubmitButton pending={pending} pendingLabel="Sending link…">
+            Send reset link
+          </SubmitButton>
+        </div>
+      </form>
+      <Link
+        href="/sign-in"
+        className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" />
+        Back to sign in
+      </Link>
+    </div>
   );
 }

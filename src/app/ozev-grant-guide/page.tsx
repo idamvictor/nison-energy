@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 export const metadata: Metadata = {
   title: "OZEV Grant Guide | Ocunio Energy",
   description:
-    "Answer three quick questions and we'll walk you through applying for your OZEV grant — with nothing charged until it's approved.",
+    "Select your OZEV grant and we'll walk you through eligibility, calculate your instant itemised quote, and guide you through the application — with nothing charged until OZEV approves.",
 };
 
 const paths: { title: string; copy: string; href: string; icon: LucideIcon }[] = [
@@ -47,12 +47,13 @@ export default function OzevGrantGuideSelectorPage() {
           <div className="mx-auto max-w-3xl px-4 py-14 text-center sm:px-6 lg:px-8">
             <SectionKicker center tone="invert" />
             <h1 className="mt-4 text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Which OZEV Grant Guide Do You Need?
+              Get an Instant OZEV Grant Quote
             </h1>
             <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">
-              Tell us which situation matches you, and we&apos;ll walk you
-              through eligibility, your quote, and the exact application
-              steps — with nothing charged until OZEV approves.
+              Select the grant you&apos;re interested in, and we&apos;ll walk
+              you through eligibility, calculate your instant itemised quote,
+              and guide you through the exact application steps — with nothing
+              charged until OZEV approves.
             </p>
           </div>
         </div>
@@ -73,7 +74,7 @@ export default function OzevGrantGuideSelectorPage() {
                         </h2>
                         <p className="mt-1.5 text-sm text-muted-foreground">{path.copy}</p>
                         <span className="mt-auto flex items-center gap-1.5 pt-4 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
-                          Start this guide
+                          Get a quote
                           <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                         </span>
                       </CardContent>

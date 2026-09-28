@@ -10,6 +10,7 @@ import {
   dbToDetail,
 } from "@/lib/catalog/queries";
 import { adminRoute } from "@/lib/catalog/types";
+import { groupByVariant } from "@/lib/catalog/variant-grouping";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
 import {
   installationProcessMarkdown,
@@ -85,13 +86,16 @@ export default async function ProductDetailPage({
   const siblings = product.variantGroup
     ? catalog.filter((p) => p.variantGroup === product.variantGroup)
     : [product];
-  const similar = catalog
-    .filter(
-      (p) =>
-        p.id !== product.id &&
-        (!product.variantGroup || p.variantGroup !== product.variantGroup)
-    )
-    .slice(0, 3);
+  const similarCandidates = catalog.filter(
+    (p) =>
+      p.id !== product.id &&
+      (!product.variantGroup || p.variantGroup !== product.variantGroup)
+  );
+  const similar = groupByVariant(
+    similarCandidates,
+    (p) => p.connectionType,
+    (p) => p.cableLength,
+  ).slice(0, 3);
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -255,8 +259,8 @@ export default async function ProductDetailPage({
                 Similar Products
               </h2>
               <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-                {similar.map((p) => (
-                  <ProductCard key={p.id} variants={[p]} />
+                {similar.map((group) => (
+                  <ProductCard key={group.key} variants={group.variants} />
                 ))}
               </div>
             </div>

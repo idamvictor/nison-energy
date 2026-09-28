@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, ChevronDown, Heart, Zap } from "lucide-react";
 
@@ -11,8 +12,6 @@ import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/currency";
-
-const OZEV_GRANT_GUIDE_URL = "https://nison-energy.vercel.app/ozev-grant-guide";
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -241,10 +240,8 @@ export function PurchasePanel({
         {wishlisted ? "Saved to wishlist" : "Add to wishlist"}
       </button>
 
-      <a
-        href={OZEV_GRANT_GUIDE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href="/ozev-grant-guide"
         className="group flex items-center justify-between gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5 transition-colors hover:bg-primary/10"
       >
         <div className="flex items-center gap-3">
@@ -260,7 +257,7 @@ export function PurchasePanel({
             </p>
           </div>
         </div>
-      </a>
+      </Link>
     </div>
   );
 }

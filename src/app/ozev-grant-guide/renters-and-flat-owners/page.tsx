@@ -535,15 +535,15 @@ export default function RentersFlatOwnersGuidePage() {
                     </ul>
 
                     <a
-                      href="/documents/landlord-consent-form.pdf"
-                      download
+                      href="/documents/landlord-consent-form.docx"
+                      download="Landlord Consent Form - EV Chargepoint.docx"
                       className="mt-4 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />
                       <span className="flex-1 font-medium">
                         Landlord / freeholder permission letter template
                       </span>
-                      <span className="text-xs text-muted-foreground">PDF</span>
+                      <span className="text-xs text-muted-foreground">Word</span>
                     </a>
 
                     <p className="mt-4 text-sm text-foreground/80">
@@ -552,8 +552,8 @@ export default function RentersFlatOwnersGuidePage() {
                       exactly what to expect before you start.
                     </p>
                     <a
-                      href="/documents/ozev-grant-application-guide.pdf"
-                      download
+                      href="/documents/ozev-grant-application-guide-single-household.pdf"
+                      download="OZEV Grant Application Guide - Single Household.pdf"
                       className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />
@@ -688,7 +688,7 @@ export default function RentersFlatOwnersGuidePage() {
                   Tell us about your property, vehicle and parking so we can confirm
                   eligibility and get your quote moving. Contacting your local highways
                   authority for cross-pavement consent is your responsibility as the
-                  applicant — each authority has its own rules.
+                  applicant — each local highways authority has its own rules.
                 </p>
                 <OnStreetIntakeForm />
               </Reveal>

@@ -56,11 +56,50 @@ function CheckboxRow({
   );
 }
 
+function RadioGroup({
+  label,
+  name,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  options: { label: string; value: string }[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <fieldset className="flex flex-col gap-2 sm:col-span-2">
+      <legend className="mb-2 text-sm font-medium text-foreground">{label}</legend>
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {options.map((option) => (
+          <label key={option.value} className="flex items-center gap-2 text-sm text-foreground/80">
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => onChange(option.value)}
+              className="size-4 accent-primary"
+            />
+            {option.label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 export function OnStreetIntakeForm() {
   const formRef = useRef<HTMLFormElement>(null);
-  const [tenure, setTenure] = useState("Own");
+  // Tenure and vehicle ownership start unanswered — the customer must choose.
+  const [tenure, setTenure] = useState("");
+  const [contactTime, setContactTime] = useState("none");
+  const [thirdPartyNeeded, setThirdPartyNeeded] = useState("");
   const [permissionStatus, setPermissionStatus] = useState("na");
-  const [vehicleOwnership, setVehicleOwnership] = useState("Registered owner (new or used)");
+  const [vehicleOwnership, setVehicleOwnership] = useState("");
+  const [planningNeeded, setPlanningNeeded] = useState("");
   const [lhaStatus, setLhaStatus] = useState("Not yet contacted");
   const [confirmNoOffStreet, setConfirmNoOffStreet] = useState(false);
   const [notMoving, setNotMoving] = useState(false);
@@ -75,10 +114,22 @@ export function OnStreetIntakeForm() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    // Base UI selects aren't native form controls, so `required` can't enforce these.
+    if (!tenure) {
+      setError("Please tell us whether you own or rent the property.");
+      return;
+    }
+    if (!vehicleOwnership) {
+      setError("Please tell us how the vehicle is held.");
+      return;
+    }
     const data = new FormData(e.currentTarget);
     data.set("tenure", tenure);
+    data.set("contactTime", contactTime);
+    data.set("thirdPartyNeeded", thirdPartyNeeded);
     data.set("permissionStatus", permissionStatus);
     data.set("vehicleOwnership", vehicleOwnership);
+    data.set("planningNeeded", planningNeeded);
     data.set("lhaStatus", lhaStatus);
 
     startTransition(async () => {
@@ -143,11 +194,26 @@ export function OnStreetIntakeForm() {
           <Field label="Do you own or rent this property?">
             <Select value={tenure} onValueChange={(v) => v && setTenure(v)}>
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue placeholder="Select…" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Own">Own</SelectItem>
                 <SelectItem value="Rent">Rent</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Best time to contact you">
+            <Select value={contactTime} onValueChange={(v) => v && setContactTime(v)}>
+              <SelectTrigger className="w-full">
+                <SelectValue>
+                  {(v: string) => (v === "none" ? "No preference" : v)}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No preference</SelectItem>
+                <SelectItem value="Morning">Morning</SelectItem>
+                <SelectItem value="Afternoon">Afternoon</SelectItem>
+                <SelectItem value="Evening">Evening</SelectItem>
               </SelectContent>
             </Select>
           </Field>
@@ -163,6 +229,16 @@ export function OnStreetIntakeForm() {
           agent or private road owner.
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <RadioGroup
+            label="Does anyone else need to give permission for the works?"
+            name="thirdPartyNeeded"
+            value={thirdPartyNeeded}
+            onChange={setThirdPartyNeeded}
+            options={[
+              { label: "Yes", value: "yes" },
+              { label: "No", value: "no" },
+            ]}
+          />
           <Field label="Name of landlord / freeholder / agent">
             <Input name="landlordName" placeholder="Optional" />
           </Field>
@@ -220,7 +296,7 @@ export function OnStreetIntakeForm() {
           <Field label="How is the vehicle held?">
             <Select value={vehicleOwnership} onValueChange={(v) => v && setVehicleOwnership(v)}>
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue placeholder="Select…" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Registered owner (new or used)">
@@ -272,6 +348,25 @@ export function OnStreetIntakeForm() {
           <Field label="LHA consent reference (if issued)">
             <Input name="lhaReference" placeholder="Optional" />
           </Field>
+          <RadioGroup
+            label="Do you know if planning permission is also required?"
+            name="planningNeeded"
+            value={planningNeeded}
+            onChange={setPlanningNeeded}
+            options={[
+              { label: "Yes", value: "yes" },
+              { label: "No", value: "no" },
+              { label: "Not sure", value: "unsure" },
+            ]}
+          />
+        </div>
+        <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3.5 py-3 text-xs text-foreground/80">
+          <span className="font-semibold text-accent">!</span>
+          <p>
+            Contact your LHA as early as possible — some councils have lengthy processing times
+            or don&apos;t yet permit cross-pavement solutions, and this can affect your
+            installation timeline.
+          </p>
         </div>
       </div>
 

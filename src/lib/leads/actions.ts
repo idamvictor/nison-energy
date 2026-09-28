@@ -87,6 +87,13 @@ export async function submitOnStreetParkingIntake(
     return { ok: false, error: "Too many attempts — please try again in a few minutes." };
   }
 
+  if (!field(formData, "tenure")) {
+    return { ok: false, error: "Please tell us whether you own or rent the property." };
+  }
+  if (!field(formData, "vehicleOwnership")) {
+    return { ok: false, error: "Please tell us how the vehicle is held." };
+  }
+
   const landlordName = field(formData, "landlordName");
   const landlordContact = field(formData, "landlordContact");
   const permissionLabel: Record<string, string> = {
@@ -96,9 +103,17 @@ export async function submitOnStreetParkingIntake(
     na: "Not applicable",
   };
 
+  const yesNo: Record<string, string> = { yes: "Yes", no: "No", unsure: "Not sure" };
+  const contactTime = field(formData, "contactTime");
+  // Explicit answer when given; otherwise infer from whether a landlord was named.
+  const thirdPartyNeeded =
+    yesNo[field(formData, "thirdPartyNeeded")] ??
+    (landlordName || landlordContact ? "Yes" : "Not stated");
+
   const notes = [
     `Tenure: ${field(formData, "tenure") || "—"}`,
-    `Third-party permission needed: ${landlordName || landlordContact ? "Yes" : "Not stated"}`,
+    `Best time to contact: ${contactTime && contactTime !== "none" ? contactTime : "No preference"}`,
+    `Third-party permission needed: ${thirdPartyNeeded}`,
     landlordName && `Landlord/freeholder/agent: ${landlordName}`,
     landlordContact && `Their contact details: ${landlordContact}`,
     `Written permission status: ${permissionLabel[field(formData, "permissionStatus")] ?? "Not applicable"}`,
@@ -110,6 +125,7 @@ export async function submitOnStreetParkingIntake(
     `Local highways authority: ${field(formData, "lhaName") || "—"}`,
     `LHA consent status: ${field(formData, "lhaStatus") || "—"}`,
     field(formData, "lhaReference") && `LHA consent reference: ${field(formData, "lhaReference")}`,
+    `Planning permission required: ${yesNo[field(formData, "planningNeeded")] ?? "Not stated"}`,
     field(formData, "notes") && `Additional notes: ${field(formData, "notes")}`,
   ]
     .filter(Boolean)

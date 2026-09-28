@@ -21,6 +21,7 @@ export type LandlordQuoteDocInput = {
   chargepoints: number;
   sockets: number;
   chargerModel: string;
+  /** Price of ONE chargepoint unit (ex VAT) — multiplied by `chargepoints`. */
   chargerCost: number;
   labourCost: number;
   works: WorkItem[];
@@ -48,8 +49,8 @@ function bulletLine(text: string, isLast = false): string {
  * a Blob (`new Blob(["﻿", html], { type: "application/msword" })`).
  */
 export function generateLandlordQuoteDoc(input: LandlordQuoteDocInput): string {
-  const chargerTotal = input.chargerCost;
-  const chargerUnitPrice = input.chargepoints > 0 ? chargerTotal / input.chargepoints : chargerTotal;
+  const chargerUnitPrice = input.chargerCost;
+  const chargerTotal = input.chargerCost * input.chargepoints;
   const labourTotal = input.labourCost;
   const worksTotal = input.works.reduce((sum, w) => sum + w.cost, 0);
   const subtotal = chargerTotal + labourTotal + worksTotal;

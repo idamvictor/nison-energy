@@ -139,7 +139,9 @@ export default function ResidentialLandlordsGuidePage() {
   const chargerCostNum = parseFloat(chargerCost) || 0;
   const labourCostNum = parseFloat(labourCost) || 0;
   const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
-  const previewSubtotal = chargerCostNum + labourCostNum + worksCostNum;
+  // The chargepoint cost is entered per unit — multiply by the number of chargepoints.
+  const chargerTotal = chargerCostNum * chargepointsNum;
+  const previewSubtotal = chargerTotal + labourCostNum + worksCostNum;
   const previewVat = previewSubtotal * 0.2;
   const previewTotal = previewSubtotal + previewVat;
   const previewGrantCap = 500 * socketsNum;
@@ -472,13 +474,13 @@ export default function ResidentialLandlordsGuidePage() {
                           </Select>
                         </Field>
                         <Field
-                          label="EV chargepoint cost — total for this order (£, ex VAT)"
-                          hint="The total you're paying for the chargepoint hardware, whatever the socket count."
+                          label="EV chargepoint cost — per chargepoint (£, ex VAT)"
+                          hint="The price of one chargepoint unit — we'll multiply by the number of chargepoints for you."
                         >
                           <Input
                             type="text"
                             inputMode="decimal"
-                            placeholder="e.g. 850"
+                            placeholder="e.g. 800"
                             value={chargerCost}
                             onChange={(e) => setChargerCost(e.target.value)}
                           />
@@ -642,7 +644,7 @@ export default function ResidentialLandlordsGuidePage() {
                     </p>
                     <a
                       href="/documents/ozev-application-guide-residential-landlords.pdf"
-                      download
+                      download="OZEV Grant Application Guide - Residential Landlords.pdf"
                       className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />

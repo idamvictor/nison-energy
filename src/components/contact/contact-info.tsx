@@ -18,9 +18,9 @@ export function ContactInfo() {
       <div className="flex flex-col gap-4 rounded-2xl border border-border p-6">
         <a
           href="tel:07525567054"
-          className="flex items-center gap-3 transition-colors hover:text-primary"
+          className="flex items-center gap-3 transition-colors hover:text-primary-ink"
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary-ink">
             <Phone className="size-4" />
           </span>
           <div>
@@ -33,9 +33,9 @@ export function ContactInfo() {
 
         <a
           href="mailto:info@ocunioenergy.com"
-          className="flex items-center gap-3 transition-colors hover:text-primary"
+          className="flex items-center gap-3 transition-colors hover:text-primary-ink"
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary-ink">
             <Mail className="size-4" />
           </span>
           <div>
@@ -47,7 +47,7 @@ export function ContactInfo() {
         </a>
 
         <div className="flex items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary-ink">
             <Clock className="size-4" />
           </span>
           <div>
@@ -68,7 +68,7 @@ export function ContactInfo() {
             <a
               key={i}
               href="#"
-              className="flex size-9 items-center justify-center rounded-full bg-secondary text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+              className="flex size-9 items-center justify-center rounded-full bg-secondary text-primary-ink transition-colors hover:bg-accent hover:text-accent-foreground"
             >
               <Icon className="size-4" />
             </a>

@@ -69,7 +69,7 @@ export function AccessoryProductCard({
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full shadow-sm ring-1 transition-colors",
                   compareSelected
-                    ? "bg-primary text-primary-foreground ring-primary"
+                    ? "bg-foreground text-background ring-primary/50 ring-2"
                     : "bg-white/95 text-foreground/60 ring-border hover:bg-white"
                 )}
               >
@@ -115,11 +115,11 @@ export function AccessoryProductCard({
           variant="outline"
           size="lg"
           nativeButton={false}
-          className="w-full justify-between border-primary/25 text-primary hover:bg-primary/5"
+          className="w-full justify-between"
           render={<Link href={href} />}
         >
           View Details
-          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-accent" />
         </Button>
       </CardFooter>
     </Card>

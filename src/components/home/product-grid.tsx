@@ -50,7 +50,7 @@ export async function ProductGrid({
                 size="lg"
                 variant="outline"
                 nativeButton={false}
-                className="gap-2 border-primary/25 text-primary hover:bg-primary/5"
+                className="gap-2"
                 render={<Link href={viewAllHref} />}
               >
                 View all residential chargers
@@ -71,7 +71,7 @@ export async function ProductGrid({
                 </p>
               </div>
               <Button
-                className="shrink-0 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                className="shrink-0 gap-2"
                 nativeButton={false}
                 render={<Link href="/contact-us" />}
               >

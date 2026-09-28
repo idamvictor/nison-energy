@@ -63,15 +63,16 @@ export default function OzevGrantsPage() {
               priority
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-primary via-primary/85 to-primary/70" />
+            <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/85 to-ink/55" />
+            <div aria-hidden className="absolute -top-32 left-1/2 size-[560px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]" />
           </div>
-          <div className="relative mx-auto max-w-7xl px-4 py-20 text-center text-primary-foreground sm:px-6 lg:px-8">
+          <div className="relative mx-auto max-w-7xl px-4 py-20 text-center text-white sm:px-6 lg:px-8">
             <Reveal>
-              <SectionKicker center tone="invert" />
+              <SectionKicker center />
               <h1 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-[-0.02em] sm:text-5xl">
                 Which OZEV Grant Could Save You Up to 75%?
               </h1>
-              <p className="mx-auto mt-4 max-w-3xl text-primary-foreground/80">
+              <p className="mx-auto mt-4 max-w-3xl text-white/75">
                 You&apos;ll learn more about OZEV grant scheme — for renters,
                 flat owners, residential landlords, workplaces, on-street
                 parking households, and state-funded education settings.
@@ -93,7 +94,7 @@ export default function OzevGrantsPage() {
                     <p className="font-heading text-base font-semibold">
                       {stat.label}
                     </p>
-                    <p className="mt-1.5 text-sm text-primary-foreground/70">
+                    <p className="mt-1.5 text-sm text-white/65">
                       {stat.sub}
                     </p>
                   </div>

@@ -76,7 +76,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
       className={cn(
         "rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all",
         active
-          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-4px_rgba(4,180,225,0.5)]"
+          ? "border-foreground bg-foreground text-background ring-3 ring-primary/35"
           : "border-foreground/25 bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
       )}
     >
@@ -169,7 +169,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
 
           <Reveal>
             <h2 className="mt-12 mb-5 font-heading text-lg font-semibold text-foreground">
-              <span className="mr-2 text-primary">01</span>
+              <span className="mr-2 text-accent">01</span>
               Check Your Eligibility
             </h2>
             <Card className={cardClass}>
@@ -206,7 +206,8 @@ export default function WorkplaceChargingSchemeGuidePage() {
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <Button
-                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        variant="cta"
+                        className="gap-1.5"
                         nativeButton={false}
                         render={<Link href="/checkout" />}
                       >
@@ -228,7 +229,8 @@ export default function WorkplaceChargingSchemeGuidePage() {
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <Button
-                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        variant="cta"
+                        className="gap-1.5"
                         nativeButton={false}
                         render={<Link href="/checkout" />}
                       >
@@ -256,7 +258,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
             <div ref={guideRef} className="mt-14 scroll-mt-24">
               <Reveal>
                 <h2 className="mb-5 font-heading text-lg font-semibold text-foreground">
-                  <span className="mr-2 text-primary">02</span>
+                  <span className="mr-2 text-accent">02</span>
                   Your Step-by-Step Guide
                 </h2>
               </Reveal>
@@ -266,7 +268,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                 <Card className={cn("mb-5", cardClass)}>
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[0_0_0_4px] shadow-accent/15">
                         1
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">
@@ -466,10 +468,10 @@ export default function WorkplaceChargingSchemeGuidePage() {
                             <span className="text-foreground">£{previewTotal.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between py-1.5">
-                            <span className="text-primary">
+                            <span className="text-primary-ink">
                               Less: OZEV voucher ({socketsNum} socket{socketsNum === 1 ? "" : "s"}, up to £500/socket, max £20,000)
                             </span>
-                            <span className="text-primary">− £{previewGrant.toFixed(2)}</span>
+                            <span className="text-primary-ink">− £{previewGrant.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between py-1.5 font-semibold">
                             <span className="text-foreground">Net payable</span>
@@ -481,7 +483,8 @@ export default function WorkplaceChargingSchemeGuidePage() {
                       <Button
                         type="submit"
                         disabled={submitting}
-                        className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        variant="cta"
+                        className="w-fit gap-1.5"
                       >
                         {submitting ? "Submitting…" : "Generate My Quote →"}
                       </Button>
@@ -522,7 +525,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                 <Card className={cn("mb-5", cardClass)}>
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[0_0_0_4px] shadow-accent/15">
                         2
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">
@@ -541,7 +544,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                         "Confirmation of dedicated off-street parking, clearly associated with your premises and designated for staff or fleet use",
                       ].map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
-                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                           {item}
                         </li>
                       ))}
@@ -574,7 +577,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                     <a
                       href="/documents/ozev-application-guide-workplace.pdf"
                       download="OZEV Grant Application Guide - Workplace Charging Scheme.pdf"
-                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary-ink transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />
                       <span className="flex-1 font-medium">OZEV Application Guide</span>
@@ -588,7 +591,8 @@ export default function WorkplaceChargingSchemeGuidePage() {
                     </p>
 
                     <Button
-                      className="mt-4 gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                      variant="cta"
+                      className="mt-4 gap-1.5"
                       nativeButton={false}
                       render={
                         <a
@@ -610,7 +614,7 @@ export default function WorkplaceChargingSchemeGuidePage() {
                 <Card className={cn("mb-5", cardClass)}>
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[0_0_0_4px] shadow-accent/15">
                         3
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">

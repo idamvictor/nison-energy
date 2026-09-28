@@ -22,7 +22,7 @@ export function FreeDeliveryBadge({ warranty }: { warranty?: string }) {
         Free Delivery
       </span>
       {warranty && (
-        <span className={cn(badgeClass, "bg-primary/10 text-primary ring-primary/25")}>
+        <span className={cn(badgeClass, "bg-primary/10 text-primary-ink ring-primary/25")}>
           <span className="flex size-6 items-center justify-center rounded-full bg-primary/15">
             <ShieldCheck className="size-3.5" />
           </span>

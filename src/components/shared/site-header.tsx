@@ -151,7 +151,7 @@ export function SiteHeader() {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="hidden rounded-full bg-primary text-primary-foreground hover:bg-primary/90 sm:inline-flex"
+                    className="hidden rounded-full sm:inline-flex"
                     aria-label="My account"
                   />
                 }
@@ -183,7 +183,8 @@ export function SiteHeader() {
             </DropdownMenu>
           ) : (
             <Button
-              className="hidden gap-1.5 bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 sm:inline-flex"
+              variant="cta"
+              className="hidden gap-1.5 sm:inline-flex"
               size="lg"
               nativeButton={false}
               render={<Link href="/sign-in" />}
@@ -258,7 +259,7 @@ export function SiteHeader() {
                   </>
                 ) : (
                   <Button
-                    className="bg-accent text-accent-foreground hover:bg-accent/90"
+                    variant="cta"
                     nativeButton={false}
                     render={<Link href="/sign-in" />}
                   >

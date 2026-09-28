@@ -41,19 +41,22 @@ export default async function WorkplaceChargingPage() {
           <CommercialCatalog products={products} />
         </Suspense>
 
-        <section className="bg-primary text-primary-foreground">
+        <section className="relative isolate overflow-hidden bg-ink text-white">
+          <div aria-hidden className="absolute -top-40 left-1/2 -z-10 size-[520px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]" />
+          <div aria-hidden className="absolute -bottom-40 -right-20 -z-10 size-[380px] rounded-full bg-accent/15 blur-[110px]" />
           <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
             <Reveal>
               <h2 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
                 Ready To Charge Your Fleet?
               </h2>
-              <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">
+              <p className="mx-auto mt-3 max-w-xl text-white/70">
                 Tell us about your site and we&apos;ll come back with a free,
                 no-obligation quote.
               </p>
               <Button
                 size="lg"
-                className="mt-8 h-12 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
+                variant="cta"
+                className="mt-8 h-12 px-6 text-base"
                 nativeButton={false}
                 render={<Link href="/contact-us" />}
               >

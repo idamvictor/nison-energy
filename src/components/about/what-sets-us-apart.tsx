@@ -24,10 +24,12 @@ const points = [
 
 export function WhatSetsUsApart() {
   return (
-    <section className="bg-primary text-primary-foreground">
+    <section className="relative isolate overflow-hidden bg-ink text-white">
+      <div aria-hidden className="absolute -top-40 -left-32 -z-10 size-[520px] rounded-full bg-primary/20 blur-[120px]" />
+      <div aria-hidden className="absolute -right-24 -bottom-48 -z-10 size-[420px] rounded-full bg-accent/15 blur-[120px]" />
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionKicker tone="invert" />
+          <SectionKicker />
           <h2 className="mt-4 text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
             What Sets Us Apart
           </h2>
@@ -37,12 +39,12 @@ export function WhatSetsUsApart() {
           {points.map((point, index) => (
             <Reveal key={point.title} delay={index * 90}>
               <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-white/15">
+                <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-[0_0_0_4px] shadow-accent/20">
                   <Check className="size-3.5" />
                 </span>
                 <div>
                   <p className="font-heading font-semibold">{point.title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-primary-foreground/75">
+                  <p className="mt-1 text-sm leading-relaxed text-white/70">
                     {point.copy}
                   </p>
                 </div>

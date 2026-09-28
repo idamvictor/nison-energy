@@ -84,7 +84,7 @@ export default async function GrantSchemePage({
                     Closed to new applications
                   </Badge>
                 )}
-                <p className="text-sm font-medium tracking-wide text-primary uppercase">
+                <p className="text-sm font-medium tracking-wide text-primary-ink uppercase">
                   {scheme.audience}
                 </p>
                 <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
@@ -130,7 +130,7 @@ export default async function GrantSchemePage({
                       key={detail}
                       className="flex items-start gap-2 text-sm text-foreground/80"
                     >
-                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                       {detail}
                     </li>
                   ))}
@@ -185,7 +185,7 @@ export default async function GrantSchemePage({
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {scheme.requirements.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
-                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                       {item}
                     </li>
                   ))}
@@ -196,13 +196,13 @@ export default async function GrantSchemePage({
             {scheme.documentation && (
               <Reveal>
                 <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
-                  <FileText className="size-4.5 text-primary" />
+                  <FileText className="size-4.5 text-primary-ink" />
                   Documentation you&apos;ll need
                 </h2>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {scheme.documentation.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
-                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                       {item}
                     </li>
                   ))}
@@ -213,13 +213,13 @@ export default async function GrantSchemePage({
             {scheme.applicationSteps && (
               <Reveal>
                 <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
-                  <ListChecks className="size-4.5 text-primary" />
+                  <ListChecks className="size-4.5 text-primary-ink" />
                   How to apply
                 </h2>
                 <ol className="mt-5 flex flex-col gap-5">
                   {scheme.applicationSteps.map((step, index) => (
                     <li key={step} className="flex gap-4">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-semibold text-primary">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-semibold text-primary-ink">
                         {index + 1}
                       </span>
                       <p className="text-sm text-foreground/80">{step}</p>
@@ -240,7 +240,7 @@ export default async function GrantSchemePage({
                     href={resource.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-primary hover:underline"
+                    className="flex items-center gap-2 text-sm text-primary-ink hover:underline"
                   >
                     <ExternalLink className="size-3.5 shrink-0" />
                     {resource.label}
@@ -253,7 +253,8 @@ export default async function GrantSchemePage({
               <div className="flex flex-wrap gap-3 border-t border-foreground/15 pt-8">
                 <Button
                   size="lg"
-                  className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                  variant="cta"
+                  className="gap-2"
                   nativeButton={false}
                   render={<a href={scheme.moreInfoHref} target="_blank" rel="noopener noreferrer" />}
                 >
@@ -262,7 +263,8 @@ export default async function GrantSchemePage({
                 </Button>
                 <Button
                   size="lg"
-                  className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                  variant="cta"
+                  className="gap-2"
                   nativeButton={false}
                   render={<Link href="/ozev-grant-guide" />}
                 >

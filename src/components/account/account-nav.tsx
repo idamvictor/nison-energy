@@ -34,7 +34,7 @@ export function AccountNav({ unreadCount = 0 }: { unreadCount?: number }) {
               className={cn(
                 "flex shrink-0 items-center gap-2.5 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors",
                 active
-                  ? "border-primary bg-primary/10 text-primary"
+                  ? "border-primary bg-primary/10 text-primary-ink"
                   : "border-transparent text-foreground/70 hover:bg-muted hover:text-foreground"
               )}
             >

@@ -234,7 +234,8 @@ export function Hero() {
               <Button
                 size="lg"
                 nativeButton={false}
-                className="hero-cta h-12 gap-2 bg-accent px-6 text-base text-accent-foreground hover:bg-accent/90"
+                variant="cta"
+                className="hero-cta h-12 gap-2 px-6 text-base"
                 render={<Link href={slide.href} />}
               >
                 {slide.cta}

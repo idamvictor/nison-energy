@@ -186,7 +186,7 @@ export default function CheckoutPage() {
               className="group mt-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-5 py-4 transition-colors hover:bg-primary/10"
             >
               <div className="flex items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
                   <Zap className="size-4.5" />
                 </span>
                 <div>
@@ -198,7 +198,7 @@ export default function CheckoutPage() {
                   </p>
                 </div>
               </div>
-              <ArrowRight className="size-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="size-4 shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5" />
             </Link>
           )}
 
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
                 Thanks — we&apos;ve got your order
               </p>
               <p className="text-sm text-muted-foreground">Your order reference</p>
-              <p className="font-heading text-2xl font-semibold text-primary">
+              <p className="font-heading text-2xl font-semibold text-primary-ink">
                 {reference}
               </p>
               <p className="max-w-sm text-sm text-muted-foreground">
@@ -225,7 +225,7 @@ export default function CheckoutPage() {
             </div>
           ) : lines.length === 0 ? (
             <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
-              <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
                 <ShoppingCart className="size-5" />
               </span>
               <p className="font-heading text-lg font-semibold text-foreground">
@@ -274,7 +274,7 @@ export default function CheckoutPage() {
                   <CardContent className="flex flex-col gap-3">
                     <StepHeading number={1} title="Survey" />
                     <div className="flex items-start gap-3 rounded-lg bg-secondary px-4 py-3">
-                      <Video className="mt-0.5 size-4.5 shrink-0 text-primary" />
+                      <Video className="mt-0.5 size-4.5 shrink-0 text-primary-ink" />
                       <div>
                         <div className="flex items-center justify-between gap-2">
                           <p className="text-sm font-medium text-foreground">
@@ -302,7 +302,7 @@ export default function CheckoutPage() {
                             key={extra.id}
                             className="flex items-start gap-3 rounded-lg border border-border px-4 py-3"
                           >
-                            <extra.icon className="mt-0.5 size-4 shrink-0 text-primary" />
+                            <extra.icon className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                             <div className="flex-1">
                               <div className="flex items-center justify-between gap-2">
                                 <p className="text-sm font-medium text-foreground">
@@ -402,13 +402,9 @@ export default function CheckoutPage() {
                   <Button
                     type="submit"
                     size="lg"
-                    variant={hasQuoteOnlyItems ? "default" : "outline"}
+                    variant={hasQuoteOnlyItems ? "cta" : "outline"}
                     disabled={pending || payPending}
-                    className={
-                      hasQuoteOnlyItems
-                        ? "w-fit bg-accent text-accent-foreground hover:bg-accent/90"
-                        : "w-fit"
-                    }
+                    className="w-fit"
                   >
                     {pending ? "Placing order…" : "Place Order"}
                   </Button>
@@ -417,7 +413,8 @@ export default function CheckoutPage() {
                       type="button"
                       size="lg"
                       disabled={pending || payPending}
-                      className="w-fit bg-accent text-accent-foreground hover:bg-accent/90"
+                      variant="cta"
+                      className="w-fit"
                       onClick={handlePayOnline}
                     >
                       {payPending ? "Starting checkout…" : "Pay online now"}
@@ -463,7 +460,7 @@ export default function CheckoutPage() {
                     {selectedExtras.map((extra) => (
                       <div key={extra.id} className="flex items-center gap-3">
                         <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-secondary ring-1 ring-border">
-                          <extra.icon className="size-4.5 text-primary" />
+                          <extra.icon className="size-4.5 text-primary-ink" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">
@@ -503,7 +500,7 @@ export default function CheckoutPage() {
 function StepHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
         {number}
       </span>
       <h2 className="font-heading text-sm font-semibold tracking-wide text-foreground uppercase">

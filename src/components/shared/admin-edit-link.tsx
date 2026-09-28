@@ -19,7 +19,7 @@ export function AdminEditLink({ href }: { href: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
+      className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary-ink"
     >
       <Pencil className="size-3.5" />
       Edit

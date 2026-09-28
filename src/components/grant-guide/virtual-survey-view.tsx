@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { PageHero } from "@/components/shared/page-hero";
 import { OpenQuoteEmbed } from "@/components/shared/openquote-embed";
 
 const OPENQUOTE_URL = "https://app.openquote.net/company/ocunioenergy?category=EV";
@@ -11,17 +12,11 @@ export function VirtualSurveyView() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <div className="bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Start Your Virtual Survey
-            </h1>
-            <p className="mt-3 text-primary-foreground/75">
-              Confirm your charger, any additional work required, and the
-              grant-adjusted price — through our OpenQuote system.
-            </p>
-          </div>
-        </div>
+        <PageHero
+          eyebrow="Virtual survey"
+          title="Start Your Virtual Survey"
+          subtitle="Confirm your charger, any additional work required, and the grant-adjusted price — through our OpenQuote system."
+        />
 
         <section className="bg-background">
           <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">

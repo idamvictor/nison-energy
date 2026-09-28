@@ -25,10 +25,12 @@ export function SearchPageInput({ initialQuery }: { initialQuery: string }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search chargers, accessories, brands, specs…"
-          className="pl-9"
+          className="h-11 bg-white pl-9 text-foreground"
         />
       </div>
-      <Button type="submit">Search</Button>
+      <Button type="submit" variant="cta" className="h-11 px-5">
+        Search
+      </Button>
     </form>
   );
 }

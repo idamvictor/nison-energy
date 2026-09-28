@@ -110,7 +110,6 @@ export function CompareDialog({
                     size="sm"
                     variant="outline"
                     nativeButton={false}
-                    className="border-primary/25 text-primary hover:bg-primary/5"
                     render={<Link href={`/home-charging/${product.id}`} />}
                   >
                     View

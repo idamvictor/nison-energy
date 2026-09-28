@@ -5,6 +5,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { ContactForm } from "@/components/contact/contact-form";
 import { ContactInfo } from "@/components/contact/contact-info";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { PageHero } from "@/components/shared/page-hero";
 
 export const metadata: Metadata = {
   title: "Contact Us | Ocunio Energy",
@@ -18,17 +19,12 @@ export default function ContactUsPage() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <div className="bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Have a Question?
-            </h1>
-            <p className="mt-3 max-w-lg text-primary-foreground/75">
-              We&apos;re here to help with chargers, installs, and grant
-              eligibility.
-            </p>
-          </div>
-        </div>
+        <PageHero
+          align="left"
+          eyebrow="Get in touch"
+          title="Have a Question?"
+          subtitle="We're here to help with chargers, installs, and grant eligibility."
+        />
 
         <section className="bg-background">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

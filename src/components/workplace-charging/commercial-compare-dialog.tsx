@@ -109,7 +109,6 @@ export function CommercialCompareDialog({
                     size="sm"
                     variant="outline"
                     nativeButton={false}
-                    className="border-primary/25 text-primary hover:bg-primary/5"
                     render={<Link href={`/workplace-charging/${product.id}`} />}
                   >
                     View

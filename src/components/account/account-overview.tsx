@@ -74,7 +74,7 @@ export function AccountOverview({
                     {counts[tile.href]}
                   </p>
                 </div>
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-ink">
                   <tile.icon className="size-4.5" />
                 </span>
               </CardContent>

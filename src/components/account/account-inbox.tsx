@@ -98,7 +98,7 @@ export function AccountInbox({
       <div className="flex flex-col gap-3">
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border px-6 py-16 text-center">
-            <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
+            <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary-ink">
               <InboxIcon className="size-5" />
             </span>
             <p className="font-heading text-lg font-semibold text-foreground">
@@ -124,7 +124,7 @@ export function AccountInbox({
                 className="cursor-pointer transition-colors hover:bg-secondary/60"
               >
                 <CardContent className="flex items-start gap-3">
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-ink">
                     <Icon className="size-4.5" />
                   </span>
                   <div className="flex-1">

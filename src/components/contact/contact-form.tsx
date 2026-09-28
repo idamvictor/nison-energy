@@ -193,7 +193,8 @@ export function ContactForm() {
         type="submit"
         size="lg"
         disabled={pending}
-        className="h-12 w-full bg-accent text-base text-accent-foreground hover:bg-accent/90 sm:w-auto"
+        variant="cta"
+        className="h-12 w-full text-base sm:w-auto"
       >
         {pending ? "Sending…" : "Send"}
       </Button>

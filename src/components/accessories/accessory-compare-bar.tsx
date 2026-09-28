@@ -75,7 +75,7 @@ export function AccessoryCompareBar({
               size="sm"
               disabled={selected.length < 2}
               onClick={onCompare}
-              className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+              className="gap-1.5"
             >
               <Scale className="size-3.5" />
               Compare

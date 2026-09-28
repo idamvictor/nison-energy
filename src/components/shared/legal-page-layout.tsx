@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { PageHero } from "@/components/shared/page-hero";
 import { HelpSection } from "@/components/shared/help-section";
 import { BlogMarkdown } from "@/components/blog/blog-markdown";
 import { LegalToc } from "@/components/shared/legal-toc";
@@ -23,14 +24,7 @@ export function LegalPageLayout({
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <div className="bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              {title}
-            </h1>
-            <p className="mt-3 max-w-xl text-primary-foreground/75">{subtitle}</p>
-          </div>
-        </div>
+        <PageHero align="left" eyebrow="Legal" title={title} subtitle={subtitle} />
 
         <section className="bg-background">
           <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">

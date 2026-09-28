@@ -40,7 +40,7 @@ export default function CartPage() {
 
           {lines.length === 0 ? (
             <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
-              <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
                 <ShoppingCart className="size-5" />
               </span>
               <p className="font-heading text-lg font-semibold text-foreground">
@@ -76,7 +76,7 @@ export default function CartPage() {
                           <div>
                             <Link
                               href={line.href}
-                              className="font-medium text-foreground hover:text-primary hover:underline"
+                              className="font-medium text-foreground hover:text-primary-ink hover:underline"
                             >
                               {line.name}
                             </Link>
@@ -134,7 +134,8 @@ export default function CartPage() {
                   )}
                   <Button
                     size="lg"
-                    className="w-full gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                    variant="cta"
+                    className="w-full gap-1.5"
                     nativeButton={false}
                     render={<Link href="/checkout" />}
                   >

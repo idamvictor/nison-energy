@@ -6,6 +6,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { AccessoriesCatalog } from "@/components/accessories/accessories-catalog";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { PageHero } from "@/components/shared/page-hero";
 import { getAccessoryCatalog } from "@/lib/catalog/queries";
 
 export const revalidate = 3600;
@@ -23,17 +24,12 @@ export default async function AccessoriesPage() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <div className="bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Accessories
-            </h1>
-            <p className="mt-3 max-w-lg text-primary-foreground/75">
-              TÜV-certified Type 2 charging cables — coiled or straight,
-              discreet grey or hi-vis lime green, single-phase or three-phase.
-            </p>
-          </div>
-        </div>
+        <PageHero
+          align="left"
+          eyebrow="Cables & accessories"
+          title="Accessories"
+          subtitle="TÜV-certified Type 2 charging cables — coiled or straight, discreet grey or hi-vis lime green, single-phase or three-phase."
+        />
         <Suspense fallback={null}>
           <AccessoriesCatalog products={products} />
         </Suspense>

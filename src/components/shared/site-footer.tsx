@@ -120,7 +120,7 @@ export function SiteFooter() {
                     required
                   />
                 </div>
-                <Button className="shrink-0 bg-accent text-accent-foreground hover:bg-accent/90">
+                <Button variant="cta" className="shrink-0">
                   Subscribe
                 </Button>
               </form>

@@ -101,8 +101,8 @@ export function ProductGallery({
                   className={cn(
                     "absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full ring-2 ring-background transition-colors",
                     image === thumbnailImage
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-white text-muted-foreground hover:text-primary"
+                      ? "bg-foreground text-background"
+                      : "bg-white text-muted-foreground hover:text-primary-ink"
                   )}
                 >
                   <Star

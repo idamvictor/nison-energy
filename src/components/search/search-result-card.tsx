@@ -62,11 +62,11 @@ export function SearchResultCard({ result }: { result: SearchResult }) {
           variant="outline"
           size="lg"
           nativeButton={false}
-          className="w-full justify-between border-primary/25 text-primary hover:bg-primary/5"
+          className="w-full justify-between"
           render={<Link href={href} />}
         >
           View Details
-          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-accent" />
         </Button>
       </CardFooter>
     </Card>

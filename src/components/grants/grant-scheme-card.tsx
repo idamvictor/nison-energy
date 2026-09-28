@@ -33,7 +33,7 @@ export function GrantSchemeCard({
               opacity: 0.75,
             }}
           />
-          <span className="absolute bottom-3 left-4 flex size-10 items-center justify-center rounded-full bg-white text-primary shadow-sm ring-4 ring-white/60">
+          <span className="absolute bottom-3 left-4 flex size-10 items-center justify-center rounded-full bg-white text-primary-ink shadow-sm ring-4 ring-white/60">
             <Icon className="size-5" />
           </span>
           {scheme.status === "closed" && (
@@ -52,7 +52,7 @@ export function GrantSchemeCard({
           </h3>
 
           <div className="mt-auto border-t border-foreground/15 pt-3.5">
-            <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors group-hover:text-primary">
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors group-hover:text-accent">
               View eligibility
               <ArrowRight className="size-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
             </span>

@@ -20,7 +20,7 @@ export function LegalToc({ sections }: { sections: LegalSection[] }) {
             key={section.id}
             href={`#${section.id}`}
             onClick={(e) => handleClick(e, section.id)}
-            className="py-1 text-sm text-foreground/70 transition-colors hover:text-primary"
+            className="py-1 text-sm text-foreground/70 transition-colors hover:text-primary-ink"
           >
             {section.label}
           </a>

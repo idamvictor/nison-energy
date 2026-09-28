@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { PageHero } from "@/components/shared/page-hero";
 import { SearchPageInput } from "@/components/search/search-page-input";
 import { SearchResultCard } from "@/components/search/search-result-card";
 import { searchProducts } from "@/lib/search/queries";
@@ -26,14 +27,11 @@ export default async function SearchPage({
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <div className="bg-primary text-primary-foreground">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-14 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-              Search
-            </h1>
+        <PageHero align="left" eyebrow="Find a product" title="Search">
+          <div className="mt-6">
             <SearchPageInput initialQuery={query} />
           </div>
-        </div>
+        </PageHero>
 
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           {!query ? (
@@ -47,15 +45,15 @@ export default async function SearchPage({
               </p>
               <p className="max-w-sm text-sm text-muted-foreground">
                 Try a different word, or browse{" "}
-                <Link href="/home-charging" className="text-primary hover:underline">
+                <Link href="/home-charging" className="text-primary-ink hover:underline">
                   Home Charging
                 </Link>
                 ,{" "}
-                <Link href="/workplace-charging" className="text-primary hover:underline">
+                <Link href="/workplace-charging" className="text-primary-ink hover:underline">
                   Workplace Charging
                 </Link>{" "}
                 or{" "}
-                <Link href="/accessories" className="text-primary hover:underline">
+                <Link href="/accessories" className="text-primary-ink hover:underline">
                   Accessories
                 </Link>
                 .

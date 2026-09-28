@@ -41,7 +41,7 @@ export function CartSheet() {
 
         {lines.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 text-center">
-            <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
               <ShoppingCart className="size-5" />
             </span>
             <p className="font-heading text-base font-semibold text-foreground">
@@ -75,7 +75,7 @@ export function CartSheet() {
                         <Link
                           href={line.href}
                           onClick={closeCart}
-                          className="text-sm font-medium text-foreground hover:text-primary hover:underline"
+                          className="text-sm font-medium text-foreground hover:text-primary-ink hover:underline"
                         >
                           {line.name}
                         </Link>
@@ -127,7 +127,8 @@ export function CartSheet() {
               )}
               <Button
                 size="lg"
-                className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                variant="cta"
+                className="w-full"
                 nativeButton={false}
                 render={<Link href="/checkout" />}
                 onClick={closeCart}

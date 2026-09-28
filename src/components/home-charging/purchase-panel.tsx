@@ -159,7 +159,7 @@ export function PurchasePanel({
                   className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
                   Standard installation (+{formatCurrency(installFee)})
-                  {installation === "standard" && <Check className="size-4 text-primary" />}
+                  {installation === "standard" && <Check className="size-4 text-primary-ink" />}
                 </button>
                 <button
                   type="button"
@@ -170,7 +170,7 @@ export function PurchasePanel({
                   className="flex w-full items-center justify-between border-t border-border px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
                   No installation (device only)
-                  {installation === "none" && <Check className="size-4 text-primary" />}
+                  {installation === "none" && <Check className="size-4 text-primary-ink" />}
                 </button>
               </div>
             )}
@@ -194,7 +194,8 @@ export function PurchasePanel({
       <Button
         size="lg"
         disabled={installation === null}
-        className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
+        variant="cta"
+        className="h-12 w-full gap-1.5 text-base"
         onClick={() => {
           if (installation === null) return;
           addItem(
@@ -245,7 +246,7 @@ export function PurchasePanel({
         className="group flex items-center justify-between gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5 transition-colors hover:bg-primary/10"
       >
         <div className="flex items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
             <Zap className="size-4.5" />
           </span>
           <div>

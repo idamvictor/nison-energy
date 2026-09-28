@@ -421,7 +421,8 @@ export function OnStreetIntakeForm() {
       <Button
         type="submit"
         disabled={pending}
-        className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+        variant="cta"
+        className="w-fit gap-1.5"
       >
         {pending ? "Submitting…" : "Submit details"}
       </Button>

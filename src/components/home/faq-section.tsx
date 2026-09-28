@@ -38,7 +38,7 @@ export function FaqSection({
           {categories.map((category, catIndex) => (
             <Reveal key={category.category} delay={catIndex * 60}>
               <div>
-                <h3 className="font-heading text-lg font-semibold text-primary">
+                <h3 className="font-heading text-lg font-semibold text-primary-ink">
                   {category.category}
                 </h3>
                 <Accordion className="mt-1">
@@ -56,7 +56,7 @@ export function FaqSection({
                         {item.link && (
                           <Link
                             href={item.link.href}
-                            className="inline-flex w-fit items-center gap-1 font-medium text-primary hover:underline"
+                            className="inline-flex w-fit items-center gap-1 font-medium text-primary-ink hover:underline"
                           >
                             {item.link.label}
                             <ArrowRight className="size-3.5" />
@@ -76,7 +76,7 @@ export function FaqSection({
             <div className="mt-8 flex justify-center">
               <Link
                 href={viewAllHref}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-ink hover:underline"
               >
                 View all FAQs
                 <ArrowRight className="size-3.5" />

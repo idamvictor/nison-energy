@@ -152,7 +152,7 @@ export function SiteSearch() {
               <button
                 type="button"
                 onClick={goToResults}
-                className="flex items-center justify-between rounded-lg p-2 text-sm font-medium text-primary hover:bg-muted"
+                className="flex items-center justify-between rounded-lg p-2 text-sm font-medium text-primary-ink hover:bg-muted"
               >
                 See all results for &ldquo;{value.trim()}&rdquo;
                 <ArrowRight className="size-4" />

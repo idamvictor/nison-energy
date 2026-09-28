@@ -83,7 +83,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
       className={cn(
         "rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all",
         active
-          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-4px_rgba(4,180,225,0.5)]"
+          ? "border-foreground bg-foreground text-background ring-3 ring-primary/35"
           : "border-foreground/25 bg-card text-foreground/80 shadow-xs hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-sm"
       )}
     >
@@ -161,7 +161,7 @@ export default function RentersFlatOwnersGuidePage() {
 
           <Reveal>
             <h2 className="mt-12 mb-5 font-heading text-lg font-semibold text-foreground">
-              <span className="mr-2 text-primary">01</span>
+              <span className="mr-2 text-accent">01</span>
               Check Your Eligibility
             </h2>
             <Card className="border border-foreground/18 shadow-md">
@@ -198,7 +198,8 @@ export default function RentersFlatOwnersGuidePage() {
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <Button
-                        className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        variant="cta"
+                        className="gap-1.5"
                         nativeButton={false}
                         render={<Link href="/checkout" />}
                       >
@@ -253,7 +254,7 @@ export default function RentersFlatOwnersGuidePage() {
             <div ref={guideRef} className="mt-14 scroll-mt-24">
               <Reveal>
                 <div className="flex items-start gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5 text-sm">
-                  <Zap className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <Zap className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                   <p className="text-foreground/80">
                     <strong className="text-foreground">No payment is due today.</strong>{" "}
                     Your Fully Managed package (charger, installation, and
@@ -265,7 +266,7 @@ export default function RentersFlatOwnersGuidePage() {
 
               <Reveal>
                 <h2 className="mt-12 mb-5 font-heading text-lg font-semibold text-foreground">
-                  <span className="mr-2 text-primary">02</span>
+                  <span className="mr-2 text-accent">02</span>
                   Your Step-by-Step Guide
                 </h2>
               </Reveal>
@@ -275,7 +276,7 @@ export default function RentersFlatOwnersGuidePage() {
                 <Card className="mb-5 border border-foreground/18 shadow-md">
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[0_0_0_4px] shadow-accent/15">
                         1
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">
@@ -436,8 +437,8 @@ export default function RentersFlatOwnersGuidePage() {
                             <span className="text-foreground">£{previewTotal.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between py-1.5">
-                            <span className="text-primary">Less: OZEV grant (75% of total, capped at £500)</span>
-                            <span className="text-primary">− £{previewGrant.toFixed(2)}</span>
+                            <span className="text-primary-ink">Less: OZEV grant (75% of total, capped at £500)</span>
+                            <span className="text-primary-ink">− £{previewGrant.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between py-1.5 font-semibold">
                             <span className="text-foreground">Net payable</span>
@@ -449,7 +450,8 @@ export default function RentersFlatOwnersGuidePage() {
                       <Button
                         type="submit"
                         disabled={submitting}
-                        className="w-fit gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                        variant="cta"
+                        className="w-fit gap-1.5"
                       >
                         {submitting ? "Generating…" : "Generate My Quote →"}
                       </Button>
@@ -492,7 +494,7 @@ export default function RentersFlatOwnersGuidePage() {
                 <Card className="mb-5 border border-foreground/18 shadow-md">
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[0_0_0_4px] shadow-accent/15">
                         2
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">
@@ -507,7 +509,7 @@ export default function RentersFlatOwnersGuidePage() {
                     <ul className="mt-2 flex flex-col gap-1.5">
                       {scheme.documentation?.map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
-                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                           {item}
                         </li>
                       ))}
@@ -518,17 +520,17 @@ export default function RentersFlatOwnersGuidePage() {
                     </p>
                     <ul className="mt-2 flex flex-col gap-1.5">
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         Normal turnaround: pre-approval within 10 working
                         days, but due to demand, pre-approval can take
                         longer than 10 working days
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         Our advice — apply sooner rather than later
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         Scheme rules mean we would not book your
                         installation until your grant has been approved
                       </li>
@@ -537,7 +539,7 @@ export default function RentersFlatOwnersGuidePage() {
                     <a
                       href="/documents/landlord-consent-form.docx"
                       download="Landlord Consent Form - EV Chargepoint.docx"
-                      className="mt-4 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                      className="mt-4 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary-ink transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />
                       <span className="flex-1 font-medium">
@@ -554,7 +556,7 @@ export default function RentersFlatOwnersGuidePage() {
                     <a
                       href="/documents/ozev-grant-application-guide-single-household.pdf"
                       download="OZEV Grant Application Guide - Single Household.pdf"
-                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary transition-colors hover:border-primary/40 hover:bg-primary/5"
+                      className="mt-2 flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border px-3.5 py-3 text-left text-sm text-primary-ink transition-colors hover:border-primary/40 hover:bg-primary/5"
                     >
                       <Download className="size-4 shrink-0" />
                       <span className="flex-1 font-medium">OZEV Application Guide</span>
@@ -567,7 +569,7 @@ export default function RentersFlatOwnersGuidePage() {
                     </p>
                     <ul className="mt-2 flex flex-col gap-1.5">
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         <span>
                           <strong className="text-foreground">Section 1 — Basic Applicant Details:</strong>{" "}
                           sign in or create a Find a Grant account, then
@@ -576,7 +578,7 @@ export default function RentersFlatOwnersGuidePage() {
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         <span>
                           <strong className="text-foreground">Section 2 — Property &amp; Tenancy Status:</strong>{" "}
                           confirm whether you&apos;re a tenant or flat
@@ -586,7 +588,7 @@ export default function RentersFlatOwnersGuidePage() {
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         <span>
                           <strong className="text-foreground">Section 3 — Installer Assignment:</strong>{" "}
                           enter Ocunio&apos;s details — business name Nison
@@ -596,7 +598,7 @@ export default function RentersFlatOwnersGuidePage() {
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         <span>
                           <strong className="text-foreground">Section 4 — Evidence Upload:</strong>{" "}
                           the documents listed above
@@ -605,7 +607,8 @@ export default function RentersFlatOwnersGuidePage() {
                     </ul>
 
                     <Button
-                      className="mt-4 gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                      variant="cta"
+                      className="mt-4 gap-1.5"
                       nativeButton={false}
                       render={
                         <a
@@ -626,7 +629,7 @@ export default function RentersFlatOwnersGuidePage() {
                 <Card className="mb-5 border border-foreground/18 shadow-md">
                   <CardContent>
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[0_0_0_4px] shadow-accent/15">
                         3
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">
@@ -639,13 +642,13 @@ export default function RentersFlatOwnersGuidePage() {
                     </p>
                     <ul className="flex flex-col gap-2">
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <Video className="mt-0.5 size-4 shrink-0 text-primary" />
+                        <Video className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                         <span>
                           We send you a link to start the home survey
                           through our{" "}
                           <Link
                             href="/virtual-survey"
-                            className="font-medium text-primary underline underline-offset-2"
+                            className="font-medium text-primary-ink underline underline-offset-2"
                           >
                             OpenQuote system
                           </Link>
@@ -654,13 +657,13 @@ export default function RentersFlatOwnersGuidePage() {
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <FileCheck2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                        <FileCheck2 className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                         We&apos;ll then send you an invoice for a deposit of
                         at least 50% of the total — or full payment, if
                         required — to secure your installation slot
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
-                        <FileCheck2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                        <FileCheck2 className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                         The remaining balance is due and must clear before
                         our engineer arrives on site
                       </li>
@@ -681,7 +684,7 @@ export default function RentersFlatOwnersGuidePage() {
             <div className="mt-14 scroll-mt-24">
               <Reveal>
                 <h2 className="mt-2 mb-5 font-heading text-lg font-semibold text-foreground">
-                  <span className="mr-2 text-primary">↳</span>
+                  <span className="mr-2 text-accent">↳</span>
                   On-Street Parking Grant — Customer Intake
                 </h2>
                 <p className="mb-5 text-sm text-muted-foreground">

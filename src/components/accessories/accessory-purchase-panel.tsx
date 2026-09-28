@@ -129,7 +129,8 @@ export function AccessoryPurchasePanel({
 
       <Button
         size="lg"
-        className="h-12 w-full gap-1.5 bg-accent text-base text-accent-foreground hover:bg-accent/90"
+        variant="cta"
+        className="h-12 w-full gap-1.5 text-base"
         onClick={() => {
           addItem(
             {

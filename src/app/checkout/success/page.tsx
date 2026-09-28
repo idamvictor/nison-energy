@@ -37,7 +37,7 @@ export default async function CheckoutSuccessPage({
             {order && (
               <>
                 <p className="text-sm text-muted-foreground">Your order reference</p>
-                <p className="font-heading text-2xl font-semibold text-primary">
+                <p className="font-heading text-2xl font-semibold text-primary-ink">
                   {order.reference}
                 </p>
               </>

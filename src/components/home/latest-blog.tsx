@@ -38,7 +38,7 @@ export async function LatestBlog({ limit = 3 }: { limit?: number }) {
               size="lg"
               variant="outline"
               nativeButton={false}
-              className="gap-2 border-primary/25 text-primary hover:bg-primary/5"
+              className="gap-2"
               render={<Link href="/blog" />}
             >
               Visit the blog

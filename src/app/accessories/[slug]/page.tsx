@@ -189,7 +189,7 @@ export default async function AccessoryDetailPage({
                         key={feature}
                         className="flex items-start gap-2 text-sm text-foreground/80"
                       >
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                         {feature}
                       </li>
                     ))}
@@ -230,7 +230,8 @@ export default async function AccessoryDetailPage({
               <div className="mt-2 flex flex-wrap gap-3">
                 <Button
                   size="lg"
-                  className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
+                  variant="cta"
+                  className="gap-1.5"
                   nativeButton={false}
                   render={<Link href="/contact-us" />}
                 >

@@ -346,7 +346,7 @@ export function ProductForm({
               type="button"
               variant="outline"
               size="sm"
-              className="w-fit border-primary/25 text-primary hover:bg-primary/5"
+              className="w-fit"
               onClick={() =>
                 setGallery((prev) => [...prev, { id: crypto.randomUUID(), url: "" }])
               }
@@ -666,7 +666,7 @@ export function ProductForm({
               type="button"
               variant="outline"
               size="sm"
-              className="w-fit border-primary/25 text-primary hover:bg-primary/5"
+              className="w-fit"
               onClick={() =>
                 setSpecs((prev) => [...prev, { label: "", value: "" }])
               }

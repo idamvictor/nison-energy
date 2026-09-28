@@ -10,7 +10,7 @@ export function BrandLogo({
   const logo = brandLogos[brand];
   if (!logo) {
     return (
-      <p className="text-sm font-medium tracking-wide text-primary uppercase">
+      <p className="text-sm font-medium tracking-wide text-primary-ink uppercase">
         {brand}
       </p>
     );

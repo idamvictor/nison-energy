@@ -38,7 +38,7 @@ export function AccountOrders({ orders }: { orders: OrderWithItems[] }) {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
-        <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
           <ShoppingBag className="size-5" />
         </span>
         <p className="font-heading text-lg font-semibold text-foreground">

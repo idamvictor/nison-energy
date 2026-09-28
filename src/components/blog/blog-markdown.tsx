@@ -59,11 +59,11 @@ const components: Components = {
       <li
         className={
           ordered
-            ? "list-decimal text-[0.95rem] leading-relaxed text-foreground/80 marker:font-medium marker:text-primary"
+            ? "list-decimal text-[0.95rem] leading-relaxed text-foreground/80 marker:font-medium marker:text-accent"
             : "flex items-start gap-2 text-[0.95rem] leading-relaxed text-foreground/80"
         }
       >
-        {!ordered && <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-primary" />}
+        {!ordered && <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" />}
         <span>{children}</span>
       </li>
     );
@@ -72,7 +72,7 @@ const components: Components = {
     if (!href) return <>{children}</>;
     const internal = href.startsWith("/");
     return internal ? (
-      <Link href={href} className="font-medium text-primary underline underline-offset-2">
+      <Link href={href} className="font-medium text-primary-ink underline underline-offset-2">
         {children}
       </Link>
     ) : (
@@ -80,7 +80,7 @@ const components: Components = {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="font-medium text-primary underline underline-offset-2"
+        className="font-medium text-primary-ink underline underline-offset-2"
       >
         {children}
       </a>

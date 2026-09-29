@@ -263,4 +263,4 @@ We may update this notice from time to time; the "Last updated" date above refle
 
 ## 11. Contact Us
 
-For any questions about this notice, or to exercise your privacy rights, contact our team at [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or 07525 567054.`;
+For any questions about this notice, or to exercise your privacy rights, contact our team at [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or [message us on WhatsApp](https://wa.me/443306330252).`;

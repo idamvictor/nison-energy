@@ -8,7 +8,9 @@ export const COMPANY = {
   companyNumber: "16371062",
   ozevInstallerNumber: "13528",
   email: "info@ocunioenergy.com",
-  phone: "07525 567054",
+  // No phone number is shown anywhere — customers reach us on WhatsApp.
+  // Digits only, international format (0330 633 0252 → 44 330 633 0252).
+  whatsapp: "443306330252",
   registeredOffice:
     "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom",
 } as const;

@@ -80,7 +80,7 @@ export function generateWorkplaceQuoteDoc(input: WorkplaceQuoteDocInput): string
     '<body style="font-family:Calibri,Arial,sans-serif; color:#262626; font-size:11px;">' +
     '<h2 style="color:#1F3864; margin-bottom:2px; font-size:17px;">Nison Limited</h2>' +
     '<p style="color:#595959; font-size:10px; margin:0 0 6px;">Nison Limited &mdash; OZEV-Approved Installer, No. 13528 &middot; VAT No. GB495472057 &middot; Company Reg. No. 16371062<br>' +
-    "info@ocunioenergy.com &middot; 07525 567054</p>" +
+    "info@ocunioenergy.com &middot; www.ocunioenergy.com</p>" +
     '<h1 style="color:#1F3864; border-bottom:2px solid #2E75B6; padding-bottom:4px; margin-bottom:6px; font-size:16px; white-space:nowrap;">Workplace Charging Scheme &mdash; Itemised Quote</h1>' +
     '<p style="font-size:10px; margin:0 0 8px;"><b>Quote/Invoice No.:</b> ' +
     input.reference +
@@ -95,7 +95,8 @@ export function generateWorkplaceQuoteDoc(input: WorkplaceQuoteDocInput): string
     "<b>OZEV Installer Number:</b> 13528<br>" +
     "<b>Company Registration No.:</b> 16371062<br>" +
     "<b>VAT No.:</b> GB495472057<br>" +
-    "<b>Installer Contact:</b> info@ocunioenergy.com &middot; 07525 567054</p>" +
+    "<b>Installer Contact:</b> info@ocunioenergy.com<br>" +
+    "<b>Website:</b> www.ocunioenergy.com</p>" +
     "</td>" +
     '<td style="width:50%; vertical-align:top; padding-left:12px;">' +
     '<h3 style="color:#1F3864; margin-bottom:3px; font-size:12px;">Client Details</h3>' +

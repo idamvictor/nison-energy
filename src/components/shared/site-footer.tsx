@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { CreditCard, Mail, Phone } from "lucide-react";
+import { CreditCard, Mail } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   FacebookIcon,
   InstagramIcon,
+  WhatsAppIcon,
   LinkedinIcon,
 } from "@/components/shared/social-icons";
 
@@ -63,13 +65,15 @@ export function SiteFooter() {
               Energy.
             </p>
             <a
-              href="tel:07525567054"
+              href={whatsappUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-4 flex w-fit items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
             >
-              <span className="flex size-7 items-center justify-center rounded-full bg-white/10">
-                <Phone className="size-3.5" />
+              <span className="flex size-7 items-center justify-center rounded-full bg-[#25D366] text-white">
+                <WhatsAppIcon className="size-3.5" />
               </span>
-              07525 567054
+              Chat on WhatsApp
             </a>
             <div className="mt-5 flex items-center gap-3">
               {[FacebookIcon, InstagramIcon, LinkedinIcon].map((Icon, i) => (

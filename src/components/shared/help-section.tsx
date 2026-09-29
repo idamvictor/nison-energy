@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { Phone, PhoneCall } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/reveal";
+import { WhatsAppIcon } from "@/components/shared/social-icons";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 export function HelpSection() {
   return (
@@ -38,12 +40,12 @@ export function HelpSection() {
                 variant="cta"
                 className="h-auto justify-start gap-3 px-5 py-3.5"
                 nativeButton={false}
-                render={<a href="tel:07525567054" />}
+                render={<a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" />}
               >
-                <Phone className="size-5" />
+                <WhatsAppIcon className="size-5" />
                 <span className="flex flex-col items-start leading-tight">
-                  <span className="text-xs font-normal text-accent-foreground/85">Call our team</span>
-                  <span className="font-heading font-semibold">07525 567054</span>
+                  <span className="text-xs font-normal text-accent-foreground/85">Quick replies</span>
+                  <span className="font-heading font-semibold">Chat on WhatsApp</span>
                 </span>
               </Button>
 
@@ -54,8 +56,8 @@ export function HelpSection() {
                 nativeButton={false}
                 render={<Link href="/contact-us" />}
               >
-                <PhoneCall className="size-5" />
-                Request a callback
+                <MessageSquareText className="size-5" />
+                Send us a message
               </Button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { COMPANY } from "@/lib/company";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/site";
 import { formatCurrency } from "@/lib/currency";
 
@@ -40,7 +41,7 @@ function emailLayout(opts: {
           </table>
         </td></tr>
         <tr><td style="padding:18px 28px;border-top:1px solid #e7e5e4;font-size:12px;line-height:1.6;color:#78716c">
-          ${COMPANY.legalName} trading as ${COMPANY.tradingName} · ${COMPANY.email} · ${COMPANY.phone}<br>
+          ${COMPANY.legalName} trading as ${COMPANY.tradingName} · ${COMPANY.email} · <a href="${whatsappUrl()}" style="color:inherit">WhatsApp us</a><br>
           ${esc(COMPANY.registeredOffice)}
         </td></tr>
       </table>
@@ -125,7 +126,7 @@ export function customerEnquiryAck(lead: LeadEmailInput): EmailContent {
            <strong>${esc(lead.reasonForEnquiry)}</strong> enquiry for
            <strong>${esc(lead.areaOfEnquiry)}</strong>.`,
         ),
-        row(`If it's urgent, call us on ${COMPANY.phone}.`),
+        row(`If it's urgent, <a href="${whatsappUrl()}" style="color:#16a34a;font-weight:600">message us on WhatsApp</a>.`),
       ].join(""),
     }),
   };

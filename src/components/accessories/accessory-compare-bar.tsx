@@ -1,11 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import { Scale, X } from "lucide-react";
 
 import type { AccessoryProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useCompareBarOffset } from "@/lib/compare-bar-offset";
 
 export function AccessoryCompareBar({
   products,
@@ -25,8 +27,12 @@ export function AccessoryCompareBar({
     .map((id) => byId.get(id))
     .filter((p): p is AccessoryProduct => Boolean(p));
 
+  const barRef = useRef<HTMLDivElement>(null);
+  useCompareBarOffset(barRef, selected.length > 0);
+
   return (
     <div
+      ref={barRef}
       className={cn(
         "fixed inset-x-0 bottom-0 z-50 transition-transform duration-300 ease-out",
         selected.length > 0 ? "translate-y-0" : "translate-y-full"

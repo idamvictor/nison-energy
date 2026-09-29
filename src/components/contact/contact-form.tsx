@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth/client";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { submitEnquiry } from "@/lib/leads/actions";
 import type { EnquiryFormState } from "@/lib/leads/types";
 
@@ -58,7 +59,16 @@ export function ContactForm() {
         </p>
         <p className="max-w-sm text-sm text-muted-foreground">
           A member of the team will be in touch shortly. If it&apos;s
-          urgent, call us on 07525 567054.
+          urgent,{" "}
+          <a
+            href={whatsappUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary-ink underline underline-offset-2"
+          >
+            message us on WhatsApp
+          </a>
+          .
         </p>
       </div>
     );

@@ -242,3 +242,15 @@
     transform: scaleX(1);
   }
 }
+
+/* Floating WhatsApp button — a soft ring that expands and fades. */
+@keyframes whatsapp-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}

@@ -1,8 +1,11 @@
-import { Clock, Mail, Phone } from "lucide-react";
+import { Clock, Mail } from "lucide-react";
+
+import { whatsappUrl } from "@/lib/whatsapp";
 
 import {
   FacebookIcon,
   InstagramIcon,
+  WhatsAppIcon,
   LinkedinIcon,
 } from "@/components/shared/social-icons";
 
@@ -17,17 +20,17 @@ export function ContactInfo() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-border p-6">
         <a
-          href="tel:07525567054"
+          href={whatsappUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-3 transition-colors hover:text-primary-ink"
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary-ink">
-            <Phone className="size-4" />
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#25D366]/15 text-[#128C4B]">
+            <WhatsAppIcon className="size-4.5" />
           </span>
           <div>
-            <p className="text-xs text-muted-foreground">Call us</p>
-            <p className="text-sm font-medium text-foreground">
-              07525 567054
-            </p>
+            <p className="text-xs text-muted-foreground">WhatsApp us</p>
+            <p className="text-sm font-medium text-foreground">Chat with our team</p>
           </div>
         </a>
 

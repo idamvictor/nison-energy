@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteLoader } from "@/components/shared/site-loader";
 import { AppHydration } from "@/components/shared/app-hydration";
 import { CartSheet } from "@/components/shared/cart-sheet";
+import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteLoader />
         <AppHydration />
         <CartSheet />
+        <WhatsAppButton />
         {children}
       </body>
     </html>

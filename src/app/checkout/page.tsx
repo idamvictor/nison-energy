@@ -35,7 +35,7 @@ import {
   type AddressSuggestion,
 } from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
-import { COMPANY } from "@/lib/company";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { placeOrder, createCheckoutSession } from "@/lib/orders/actions";
 import type { OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
@@ -216,8 +216,16 @@ export default function CheckoutPage() {
               </p>
               <p className="max-w-sm text-sm text-muted-foreground">
                 A member of the team will be in touch to confirm payment and
-                book your installation. If it&apos;s urgent, call us on{" "}
-                {COMPANY.phone}.
+                book your installation. If it&apos;s urgent,{" "}
+                <a
+                  href={whatsappUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary-ink underline underline-offset-2"
+                >
+                  message us on WhatsApp
+                </a>
+                .
               </p>
               <Button nativeButton={false} render={<Link href="/" />}>
                 Back to home

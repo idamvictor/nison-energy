@@ -7,7 +7,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { ClearCartOnMount } from "@/components/checkout/clear-cart-on-mount";
-import { COMPANY } from "@/lib/company";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { getOrderByCheckoutSession } from "@/lib/orders/queries";
 
 export const metadata: Metadata = { title: "Payment received | Ocunio Energy" };
@@ -44,8 +44,16 @@ export default async function CheckoutSuccessPage({
             )}
             <p className="max-w-sm text-sm text-muted-foreground">
               A confirmation email is on its way, along with your receipt from Stripe. A member
-              of the team will be in touch to book your installation. If it&apos;s urgent, call
-              us on {COMPANY.phone}.
+              of the team will be in touch to book your installation. If it&apos;s urgent,{" "}
+              <a
+                href={whatsappUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-primary-ink underline underline-offset-2"
+              >
+                message us on WhatsApp
+              </a>
+              .
             </p>
             <Button nativeButton={false} render={<Link href="/" />}>
               Back to home

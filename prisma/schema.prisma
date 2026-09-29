@@ -162,7 +162,7 @@ model Product {
   features    String[] @default([])
   specs       Json?
   warranty    String?
-  datasheet   String? // /api/media/datasheets/<uuid>.pdf
+  datasheets  String[] @default([]) // /api/media/datasheets/<uuid>/<name>.pdf, shown in this order
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

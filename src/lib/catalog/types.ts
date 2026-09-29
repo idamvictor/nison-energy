@@ -122,7 +122,8 @@ export type ProductDetail = {
   features: string[];
   specs: Spec[];
   warranty: string;
-  datasheet?: string;
+  /** Datasheet PDF URLs, in display order (empty = no Datasheet tab). */
+  datasheets: string[];
 };
 
 // ─── Admin write shapes ────────────────────────────────────────────────────
@@ -156,7 +157,7 @@ export type ProductInput = {
   features: string[];
   specs: Spec[];
   warranty: string | null;
-  datasheet: string | null;
+  datasheets: string[];
 };
 
 export type WriteResult =

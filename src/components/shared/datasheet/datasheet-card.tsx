@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Download, Eye, MoreVertical, RefreshCw, Trash2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Download,
+  Eye,
+  MoreVertical,
+  RefreshCw,
+  Trash2,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -48,11 +57,16 @@ export function DatasheetCard({
   url,
   onReplace,
   onRemove,
+  onMoveLeft,
+  onMoveRight,
 }: {
   url: string;
   /** Admin-only actions — omit on the storefront. */
   onReplace?: () => void;
   onRemove?: () => void;
+  /** Admin reordering — omit at the ends of the list. */
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [pageCount, setPageCount] = useState<number | null>(null);
@@ -96,6 +110,18 @@ export function DatasheetCard({
                 <Download />
                 Download
               </DropdownMenuItem>
+              {onMoveLeft && (
+                <DropdownMenuItem onClick={onMoveLeft}>
+                  <ArrowLeft />
+                  Move left
+                </DropdownMenuItem>
+              )}
+              {onMoveRight && (
+                <DropdownMenuItem onClick={onMoveRight}>
+                  <ArrowRight />
+                  Move right
+                </DropdownMenuItem>
+              )}
               {onReplace && (
                 <DropdownMenuItem onClick={onReplace}>
                   <RefreshCw />

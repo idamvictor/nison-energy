@@ -84,7 +84,7 @@ export default async function AccessoryDetailPage({
   const product = dbToAccessory(row);
   const detail = dbToDetail(row);
   // Pull the datasheet into memory now so the viewer finds it cached on first click.
-  warmDatasheet(detail.datasheet);
+  for (const url of detail.datasheets) warmDatasheet(url);
 
   const catalog = await getAccessoryCatalog();
   const siblings = catalog.filter(
@@ -167,8 +167,15 @@ export default async function AccessoryDetailPage({
               <TabsTrigger value="installation">Installation</TabsTrigger>
               <TabsTrigger value="delivery">Delivery Information</TabsTrigger>
               <TabsTrigger value="returns">Returns</TabsTrigger>
-              {detail.datasheet && (
-                <TabsTrigger value="datasheet">Datasheet</TabsTrigger>
+              {detail.datasheets.length > 0 && (
+                <TabsTrigger value="datasheet">
+                  {detail.datasheets.length === 1 ? "Datasheet" : "Datasheets"}
+                  {detail.datasheets.length > 1 && (
+                    <span className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-foreground">
+                      {detail.datasheets.length}
+                    </span>
+                  )}
+                </TabsTrigger>
               )}
             </TabsList>
 
@@ -256,9 +263,9 @@ export default async function AccessoryDetailPage({
               <BlogMarkdown content={returnsPolicyMarkdown} />
             </TabsContent>
 
-            {detail.datasheet && (
+            {detail.datasheets.length > 0 && (
               <TabsContent value="datasheet" className="py-6">
-                <ProductDatasheet url={detail.datasheet} />
+                <ProductDatasheet urls={detail.datasheets} />
               </TabsContent>
             )}
           </Tabs>

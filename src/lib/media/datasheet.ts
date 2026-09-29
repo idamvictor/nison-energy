@@ -3,6 +3,9 @@
 
 export const DATASHEET_URL_PREFIX = "/api/media/datasheets/";
 
+/** Most datasheets one product can have. */
+export const MAX_DATASHEETS = 10;
+
 const UUID_PDF_RE = /^[0-9a-f-]{36}\.pdf$/i;
 
 /** Slugified, length-capped version of an uploaded file's name (no extension). */

@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/select";
 import { ProductGallery } from "@/components/shared/product-gallery";
 import { ImageUploadField } from "@/components/shared/image-upload-field";
-import { DatasheetUploadField } from "@/components/admin/catalog/datasheet-upload-field";
+import { DatasheetsField } from "@/components/admin/catalog/datasheet-upload-field";
 import { cn } from "@/lib/utils";
 import {
   accessoryPhases,
@@ -162,7 +162,7 @@ export function ProductForm({
     return s.length > 0 ? s : [{ label: "", value: "" }];
   });
   const [warranty, setWarranty] = useState(row?.warranty ?? "");
-  const [datasheet, setDatasheet] = useState<string | null>(row?.datasheet ?? null);
+  const [datasheets, setDatasheets] = useState<string[]>(row?.datasheets ?? []);
 
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -204,7 +204,7 @@ export function ProductForm({
       features: fromLines(features),
       specs: specs.filter((s) => s.label.trim() && s.value.trim()),
       warranty: warranty.trim() || null,
-      datasheet,
+      datasheets,
     };
   }
 
@@ -680,10 +680,10 @@ export function ProductForm({
 
       <Card>
         <CardHeader>
-          <CardTitle>Datasheet</CardTitle>
+          <CardTitle>Datasheets</CardTitle>
         </CardHeader>
         <CardContent>
-          <DatasheetUploadField value={datasheet} onChange={setDatasheet} />
+          <DatasheetsField value={datasheets} onChange={setDatasheets} />
         </CardContent>
       </Card>
 

@@ -42,9 +42,21 @@ export function CommercialPurchasePanel({
   // One entry per distinct colour — siblings include every colour ×
   // connection-type combination in this variantGroup, so dedupe for the
   // Colour dropdown.
-  const colourOptions = colourSiblings.filter(
-    (p, i) => colourSiblings.findIndex((q) => q.colour === p.colour) === i,
-  );
+  // When colours ALSO come in several cable lengths (within this connection
+  // type), the shop lists each colour as its own product — lock this page to
+  // its own colour and let only the length change.
+  const hasLengthVariation =
+    new Set(
+      colourSiblings
+        .filter((p) => p.connectionType === product.connectionType)
+        .map((p) => p.cableLength)
+        .filter(Boolean),
+    ).size > 1;
+  const colourOptions = hasLengthVariation
+    ? [product]
+    : colourSiblings.filter(
+        (p, i) => colourSiblings.findIndex((q) => q.colour === p.colour) === i,
+      );
   // Lengths available for the current colour + connection type, shortest
   // first — mirrors the residential purchase panel exactly. Most commercial
   // products have no recorded length at all (the Cable length field is then
@@ -82,6 +94,9 @@ export function CommercialPurchasePanel({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Colour
+          {colourOptions.length <= 1 ? (
+            <div className={cn(selectClass, "flex items-center font-normal")}>{product.colour}</div>
+          ) : (
           <select
             value={product.colour}
             onChange={(e) => {
@@ -104,6 +119,7 @@ export function CommercialPurchasePanel({
               </option>
             ))}
           </select>
+          )}
         </label>
 
         {lengthSiblings.length > 0 && (

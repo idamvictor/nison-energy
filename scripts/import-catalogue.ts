@@ -332,6 +332,8 @@ const BRAND_PREFIXES: [string, string][] = [
   ["waev-charge", "waEV-charge"],
   ["zev", "ZEV"],
   ["wottz", "Wottz"],
+  // Before plain "tesla": the Matt:e accessory is filtered as its own brand.
+  ["tesla matt:e", "Tesla Matt:e"],
   ["tesla", "Tesla"],
 ];
 

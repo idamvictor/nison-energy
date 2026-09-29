@@ -47,11 +47,17 @@ export function PurchasePanel({
   const sameConnectionSiblings = colourSiblings.filter(
     (p) => p.connectionType === product.connectionType,
   );
-  // One entry per distinct colour — siblings include every colour × length
-  // combination in this variantGroup, so dedupe for the Colour dropdown.
-  const colourOptions = sameConnectionSiblings.filter(
-    (p, i) => sameConnectionSiblings.findIndex((q) => q.colour === p.colour) === i,
-  );
+  // When colours ALSO come in several cable lengths, the shop lists each colour
+  // as its own product (same rule as groupByVariant) — so this page is locked
+  // to its own colour and only the length is choosable. Otherwise one entry
+  // per distinct colour.
+  const hasLengthVariation =
+    new Set(sameConnectionSiblings.map((p) => p.cableLength).filter(Boolean)).size > 1;
+  const colourOptions = hasLengthVariation
+    ? [product]
+    : sameConnectionSiblings.filter(
+        (p, i) => sameConnectionSiblings.findIndex((q) => q.colour === p.colour) === i,
+      );
   // Lengths available for the currently selected colour, shortest first —
   // each length is now its own real, correctly-priced product row.
   const lengthSiblings = sameConnectionSiblings
@@ -90,6 +96,9 @@ export function PurchasePanel({
           )}
         >
           Colour
+          {colourOptions.length <= 1 ? (
+            <div className={cn(selectClass, "flex items-center font-normal")}>{product.colour}</div>
+          ) : (
           <select
             value={product.colour}
             onChange={(e) => {
@@ -106,6 +115,7 @@ export function PurchasePanel({
               </option>
             ))}
           </select>
+          )}
         </label>
 
         {hasLengths && (

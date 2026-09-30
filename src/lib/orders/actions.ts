@@ -19,6 +19,7 @@ import {
   type CreateCheckoutSessionResult,
   type OrderActionResult,
   type OrderStatus,
+  type OrderWithItems,
   type PlaceOrderPayload,
   type PlaceOrderResult,
 } from "@/lib/orders/types";
@@ -82,9 +83,19 @@ export async function createCheckoutSession(
   const { order } = draft;
 
   try {
+    const customer = await upsertStripeCustomer(order);
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      customer_email: order.email,
+      // The Customer carries the checkout form's name + addresses, so Stripe's
+      // payment page opens with the delivery address filled in as shipping
+      // and "Billing info is same as shipping" ticked. Hosted Checkout can't
+      // pre-fill a *different* billing address — those customers untick the
+      // box and enter it (it's also saved on the order and the Customer).
+      customer,
+      billing_address_collection: "required",
+      shipping_address_collection: { allowed_countries: ["GB"] },
+      // Anything the customer corrects on Stripe's page is saved back.
+      customer_update: { address: "auto", shipping: "auto", name: "auto" },
       line_items: order.items.map((item) => ({
         price_data: {
           currency: "gbp",
@@ -111,9 +122,50 @@ export async function createCheckoutSession(
     await prisma.order.delete({ where: { id: order.id } }).catch(() => {});
     return {
       ok: false,
-      errors: { lines: "Could not start checkout. Try again, or use “Place Order”." },
+      errors: {
+        lines: "Could not start payment. Please try again, or message us on WhatsApp and we'll help.",
+      },
     };
   }
+}
+
+/**
+ * Finds (by email) or creates the Stripe Customer for this order and sets its
+ * name, phone, billing address and shipping (= delivery & installation)
+ * address from the checkout form. Returns the Customer id.
+ */
+async function upsertStripeCustomer(order: OrderWithItems): Promise<string> {
+  const name = `${order.firstName} ${order.lastName}`.trim();
+  const delivery = {
+    line1: order.address,
+    city: order.city ?? undefined,
+    postal_code: order.postcode,
+    country: "GB",
+  };
+  const billing = order.billingSameAsDelivery
+    ? delivery
+    : {
+        line1: order.billingAddress ?? order.address,
+        city: order.billingCity ?? undefined,
+        postal_code: order.billingPostcode ?? order.postcode,
+        country: "GB",
+      };
+  const details = {
+    name,
+    email: order.email,
+    phone: order.phone,
+    address: billing,
+    shipping: { name, phone: order.phone, address: delivery },
+    metadata: { lastOrderReference: order.reference },
+  };
+
+  const existing = await stripe.customers.list({ email: order.email, limit: 1 });
+  if (existing.data[0]) {
+    await stripe.customers.update(existing.data[0].id, details);
+    return existing.data[0].id;
+  }
+  const created = await stripe.customers.create(details);
+  return created.id;
 }
 
 // ─── Admin ─────────────────────────────────────────────────────────────────

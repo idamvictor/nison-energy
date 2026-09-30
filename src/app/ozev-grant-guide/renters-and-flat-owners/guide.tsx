@@ -23,10 +23,11 @@ import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
 import { ChargerPicker } from "@/components/grant-guide/charger-picker";
 import type { ChargerGuideProps, ChargerSelection } from "@/lib/grant-guide/types";
-import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
+import { DraftRestoredNotice, SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
+import { useGuideDraft } from "@/components/grant-guide/use-guide-draft";
 import { OnStreetIntakeForm } from "@/components/grant-guide/on-street-intake-form";
 import { getGrantScheme } from "@/lib/content/grant-schemes";
-import { generateRentersQuoteDoc } from "@/lib/pdf/renters-quote";
+import { generateRentersQuotePdf } from "@/lib/pdf/renters-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
@@ -92,6 +93,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
+type GuideDraftState = { answers: Answers; chargerSel: ChargerSelection | null; works: WorkRow[] };
+
 export default function RentersFlatOwnersGuide({
   chargers,
   defaultCategory,
@@ -106,6 +109,15 @@ export default function RentersFlatOwnersGuide({
   const [showSignIn, setShowSignIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Survives the sign-in detour — see use-guide-draft.ts.
+  const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
+    key: "renters",
+    onRestore: (saved) => {
+      setAnswers(saved.answers);
+      setChargerSel(saved.chargerSel);
+      setWorks(saved.works);
+    },
+  });
 
   const guideRef = useRef<HTMLDivElement>(null);
 
@@ -292,7 +304,8 @@ export default function RentersFlatOwnersGuide({
                     </p>
 
                     <form
-                      className="mt-4 flex flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
+                      ref={draftFormRef}
+                      className="mt-4 flex scroll-mt-28 flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
                       onSubmit={async (e) => {
                         e.preventDefault();
                         if (!selectedCharger) {
@@ -303,6 +316,7 @@ export default function RentersFlatOwnersGuide({
                           return;
                         }
                         if (!session) {
+                          saveDraft({ answers, chargerSel, works });
                           setShowSignIn(true);
                           return;
                         }
@@ -330,9 +344,8 @@ export default function RentersFlatOwnersGuide({
                             works: workItems,
                           };
 
-                          const html = generateRentersQuoteDoc(input);
-                          const fileName = `OZEV-Quote-${fullName.replace(/\s+/g, "-")}.doc`;
-                          const blob = new Blob(["﻿", html], { type: "application/msword" });
+                          const blob = await generateRentersQuotePdf(input);
+                          const fileName = `OZEV-Quote-${fullName.replace(/\s+/g, "-")}.pdf`;
 
                           const body = new FormData();
                           body.append("scheme", "Renters");
@@ -358,6 +371,7 @@ export default function RentersFlatOwnersGuide({
                           URL.revokeObjectURL(url);
 
                           setQuoteResult({ netPayable: previewNet, grant: previewGrant });
+                          clearDraft();
                         } finally {
                           setSubmitting(false);
                         }
@@ -372,6 +386,8 @@ export default function RentersFlatOwnersGuide({
                         aria-hidden
                         className="absolute -left-[9999px] h-0 w-0 opacity-0"
                       />
+
+                      {draftRestored && <DraftRestoredNotice />}
 
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <Field label="Full name">
@@ -476,8 +492,8 @@ export default function RentersFlatOwnersGuide({
                         <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80">
                           <Check className="mt-0.5 size-4 shrink-0 text-success" />
                           <p>
-                            Your pre-filled quote has downloaded as a Word
-                            document, and it&apos;s saved to your account —
+                            Your pre-filled quote has downloaded as a PDF,
+                            and it&apos;s saved to your account —
                             find it anytime under Account → Quotes. Net
                             payable: £{quoteResult.netPayable.toFixed(2)}{" "}
                             (after a £{quoteResult.grant.toFixed(2)} grant

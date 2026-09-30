@@ -179,7 +179,7 @@ All content on this site — including text, graphics, logos, and software — i
 
 ## 4. Purchases and Payment
 
-All prices are shown in British pounds sterling and, unless stated otherwise, include VAT. Payments are processed securely through Stripe; we do not store your full card details ourselves. We reserve the right to refuse or cancel an order, for example where a product is listed at an incorrect price or is out of stock.
+All prices are shown in British pounds sterling and, unless stated otherwise, include VAT. Payments are processed securely through Stripe; we do not store your full card details ourselves. We reserve the right to refuse or cancel an order, for example where a product is listed at an incorrect price or is out of stock. Orders are governed by our [Terms and Conditions of Sale](/terms-of-sale), which you agree to at checkout.
 
 ## 5. Delivery and Returns
 
@@ -216,6 +216,176 @@ We may update these terms from time to time; the "Last updated" date above will 
 ## 13. Contact Us
 
 Questions about these terms can be sent to [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or via our [contact page](/contact-us).`;
+
+// Terms and Conditions of Sale — the contract terms customers agree to at
+// checkout (tick box on /checkout, page at /terms-of-sale). A standard UK
+// consumer template for supplying and installing EV chargepoints; the date is
+// fixed (not rendered at request time) so it only changes when the terms do.
+// Have a solicitor review before relying on it.
+export const TERMS_OF_SALE_UPDATED = "30 September 2026";
+
+export const termsOfSaleMarkdown = `**Last updated:** ${TERMS_OF_SALE_UPDATED}
+
+These Terms and Conditions of Sale ("Terms") apply to every order for EV chargepoints, accessories and installation services that you place with us through this website, by email or on WhatsApp. Please read them carefully before you order — at checkout you'll be asked to tick a box confirming that you agree to them. They sit alongside our general [Terms and Conditions](/terms-and-conditions) for using the website and our [Privacy Policy](/privacy-policy).
+
+Nothing in these Terms affects your statutory rights as a consumer, including under the Consumer Rights Act 2015 and the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013.
+
+## 1. About Us
+
+We are **Nison Limited**, trading as **Ocunio Energy**, a company registered in England and Wales under company number 16371062, with our registered office at 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom. Our VAT number is GB495472057 and we are an OZEV-approved installer (installer number 13528).
+
+You can contact us by email at [info@ocunioenergy.com](mailto:info@ocunioenergy.com), on [WhatsApp](https://wa.me/443306330252), or through our [contact form](/contact-us). If we need to contact you, we'll use the email address, phone number or postal address you gave us with your order.
+
+## 2. Definitions
+
+- **"Goods"** means the chargepoints, cables, accessories and other products we supply.
+- **"Installation"** means the survey, installation, testing, commissioning and app set-up services we provide.
+- **"Order"** means your order for Goods and/or Installation.
+- **"Contract"** means the legally binding agreement between you and us for your Order, made up of these Terms and your Order Confirmation.
+- **"Order Confirmation"** means the email we send confirming that we have accepted your Order.
+- **"Property"** means the delivery and installation address you give us.
+- **"You"** means the person placing the Order. If you are buying in the course of a business, see section 14.
+
+## 3. Your Order and Our Contract
+
+3.1 Placing an Order is an offer to buy. Our acceptance takes place when we email you an Order Confirmation, and the Contract is formed at that point.
+
+3.2 We may decline an Order — for example, if Goods are unavailable, if we can't install at your Property, or if there's an obvious error in a price or description. If we decline after you have paid, we'll refund you in full.
+
+3.3 Please check your Order carefully before submitting it, including the delivery and installation address, charger model, cable length and extras. Tell us as soon as possible if anything is wrong.
+
+3.4 If you'd like to change your Order after it's been accepted, contact us. We'll tell you whether the change is possible and about any change to the price or timing before we make it.
+
+## 4. Prices and Payment
+
+4.1 Prices are in pounds sterling and include VAT at the current rate, unless we clearly state they are shown excluding VAT. If the VAT rate changes between your Order and delivery or installation, we'll adjust the VAT you pay (unless you've already paid in full before the change takes effect).
+
+4.2 Our Standard Installation Package covers the work described on the product page. Any additional works identified by your survey (for example extra cable runs, groundworks, trenching, or a consumer unit upgrade) will be quoted to you in writing and **carried out only with your agreement**.
+
+4.3 When you choose **Proceed to Payment**, you pay securely online by card through our payment provider, Stripe. We never see or store your full card details. The billing and delivery addresses you enter at checkout are passed to Stripe to complete your payment.
+
+4.4 Some items are shown as "Quote" because their price depends on your site or specification. For these, placing an Order asks us to confirm the price: we'll contact you, and no Contract for those items exists until you've accepted our quote and we've confirmed payment arrangements.
+
+4.5 If we discover an obvious pricing error after you order, we'll contact you to ask whether you want to continue at the correct price or cancel for a full refund.
+
+## 5. OZEV Grants
+
+5.1 Where you tell us you're applying for a grant from the Office for Zero Emission Vehicles (OZEV), you are responsible for checking your eligibility and for submitting your application through the GOV.UK Find a Grant service. We'll provide a dated, itemised quote for your application and can review your documents on request.
+
+5.2 We won't book grant-funded installation work until your grant application has been pre-approved. The grant amount is deducted from the price you pay, as shown on your quote.
+
+5.3 If your grant application is refused, or you choose not to proceed with it, you may cancel the installation before work begins and we'll refund any amount you've paid for it, or you may go ahead and pay the full, non-grant price.
+
+5.4 If a grant is later withdrawn or reclaimed because information you supplied was inaccurate or incomplete, you will be responsible for paying the amount of the grant to us.
+
+## 6. Survey and Installation
+
+6.1 Every installation starts with a survey — usually our free virtual self-survey (photos and a short questionnaire). We use it to confirm that your Property is suitable for a standard installation and to agree your installation date. A physical site survey can be arranged on request and will be quoted separately.
+
+6.2 If the survey shows your Property isn't suitable, or needs additional works you don't want to go ahead with, either of us may cancel the Installation and we'll refund anything you've paid for it.
+
+6.3 Our engineers are qualified electricians and carry out all work in line with the current IET Wiring Regulations (BS 7671) and the IET Code of Practice for EV Charging Equipment Installation. On completion we'll test and commission your chargepoint, set up the app and provide your electrical certification.
+
+6.4 We'll try to keep to your agreed installation date. If we need to rearrange, we'll tell you as soon as possible and offer the next available date.
+
+## 7. Your Responsibilities Before Installation
+
+To help your installation go smoothly, you agree to:
+
+- give our engineers safe access to the Property, the parking area, the electricity meter and consumer unit on the agreed date;
+- make sure you have any permissions needed — for example from your landlord, freeholder or management company, or from your local council for on-street or cross-pavement solutions;
+- tell us about anything that could affect the work, such as asbestos, hidden pipes or cables, or restrictions on the Property; and
+- have a working mains electricity supply, and an internet connection if you'd like your charger connected to its app.
+
+If we can't carry out the installation on the agreed date because of something within your control, we may charge you a reasonable fee for the wasted visit, which we'll tell you about in advance where possible.
+
+## 8. Delivery, Risk and Ownership
+
+8.1 **Your charger will arrive before your scheduled installation date.** Goods are normally dispatched within 1–3 working days and delivered to the address you give at checkout. Full details are on our [Delivery Information](/delivery-information) page.
+
+8.2 Please keep the charger safe and unopened until your engineer arrives, and check the delivery for visible damage or missing items. Let us know about any problems within 48 hours so we can help put them right — this doesn't affect your statutory rights.
+
+8.3 Responsibility for the Goods (risk) passes to you when they are delivered to you or to someone you've nominated. Ownership of the Goods passes to you once we've received payment in full.
+
+8.4 If delivery is delayed by an event outside our control, we'll contact you as soon as possible with a revised date (see section 13).
+
+## 9. Your Right to Cancel
+
+9.1 **Goods only (no installation).** You have 14 days from the day you (or someone you nominate) receive the Goods to cancel the Contract, without giving a reason.
+
+9.2 **Installation.** You have 14 days from the day the Contract is formed to cancel the Installation, without giving a reason. If you ask us to start installation within this 14-day period and then cancel, you'll pay a proportionate amount for the work carried out up to the time you tell us. Once the installation has been fully completed at your request, you lose the right to cancel it.
+
+9.3 **Goods that have been installed.** Once a chargepoint has been hard-wired to your electrical supply it may not be possible to return it in its original condition. If you cancel after installation, we may reduce your refund to reflect any reduction in the value of the Goods, and we'll charge for the reasonable cost of removal.
+
+9.4 To cancel, email us at [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or message us on WhatsApp with your order reference. You may use the model cancellation form in Schedule 3 to the Consumer Contracts Regulations 2013, but you don't have to.
+
+## 10. Returns and Refunds
+
+10.1 If you cancel Goods, please return them to us within 14 days of telling us, unused and complete, with their original packaging, accessories and documentation where possible. Unless the Goods are faulty or not as described, you pay the cost of returning them.
+
+10.2 We'll refund you within 14 days of receiving the returned Goods (or evidence that you've sent them back), or within 14 days of you telling us you're cancelling an Installation that hasn't started. Refunds are made to your original payment method.
+
+10.3 We may reduce your refund to reflect any reduction in the value of the Goods caused by handling them more than was necessary to check them.
+
+10.4 The Returns tab on each product page gives more practical detail on returning Goods. Where it differs from these Terms, whichever gives you the greater rights applies.
+
+## 11. Warranty and Faulty Goods
+
+11.1 Every chargepoint comes with the manufacturer's warranty (at least 12 months — the length for each model is shown on its product page). Our installation work is backed by our **5-year workmanship guarantee**.
+
+11.2 Under the Consumer Rights Act 2015, Goods must be as described, fit for purpose and of satisfactory quality, and our services must be carried out with reasonable care and skill. If they're not, you're entitled to a repair, replacement, re-performance of the service or, in some cases, a refund.
+
+11.3 If you think something is faulty, please contact us before anyone else attempts a repair, removal or relocation, so we can help and so the manufacturer's warranty isn't affected.
+
+11.4 The warranty and guarantee don't cover damage caused by misuse, accidents, severe weather, power surges, normal wear and tear, or work carried out by anyone other than us or our approved engineers.
+
+## 12. Our Liability to You
+
+12.1 If we fail to comply with these Terms, we are responsible for loss or damage you suffer that is a foreseeable result of our breach or our failure to use reasonable care and skill. We are not responsible for loss that was not foreseeable when the Contract was made.
+
+12.2 We don't exclude or limit our liability for death or personal injury caused by our negligence, for fraud or fraudulent misrepresentation, or for breach of your statutory rights as a consumer.
+
+12.3 If we damage your Property while carrying out the Installation, we'll make good the damage or pay you for it. We aren't responsible for the cost of repairing pre-existing faults or defects we discover during the work, which we'll tell you about.
+
+12.4 We supply Goods and Installation for domestic and private use. If you use them for commercial purposes, we have no liability to you for loss of profit, loss of business, business interruption or loss of business opportunity.
+
+## 13. Events Outside Our Control
+
+We are not responsible for delays or failure to perform caused by events outside our reasonable control, such as extreme weather, supplier or courier failures, network-operator (DNO) delays, or industrial action. If this happens, we'll contact you as soon as possible and take steps to minimise the delay. If the delay is likely to be substantial, you may cancel and receive a refund for anything you've paid for but not received.
+
+## 14. Business Customers
+
+If you are buying in the course of a business (including landlords and workplaces), the consumer cancellation rights in section 9 do not apply. Our total liability to you arising out of or in connection with the Contract is limited to the price paid for your Order, and we will not be liable for any indirect or consequential loss, or loss of profit, revenue or business. Nothing in this section limits liability that cannot be limited by law.
+
+## 15. Complaints and Disputes
+
+We want you to be happy with your order. If you're not, please email [info@ocunioenergy.com](mailto:info@ocunioenergy.com) with your order reference and tell us what went wrong. We'll acknowledge your complaint within 5 working days and aim to resolve it within 28 days. If we can't resolve a dispute between us, you may use an alternative dispute resolution service, or take the matter to court.
+
+## 16. Your Personal Data
+
+We use the personal information you give us to process your Order, arrange delivery and installation, support your grant application and keep in touch about your Order, in line with our [Privacy Policy](/privacy-policy).
+
+## 17. General
+
+17.1 We may transfer our rights and obligations under the Contract to another organisation; we'll tell you if this happens and it won't affect your rights. You may only transfer your rights to someone else with our written agreement.
+
+17.2 The Contract is between you and us. No other person has any right to enforce any of its terms.
+
+17.3 Each section of these Terms operates separately. If a court decides that any part is unlawful, the remaining parts will stay in full force.
+
+17.4 If we don't insist immediately that you do anything you are required to do under these Terms, or delay in taking steps against you, that doesn't mean you don't have to do those things.
+
+## 18. Governing Law
+
+These Terms are governed by the law of England and Wales, and you can bring legal proceedings in the courts of England and Wales. If you live in Scotland or Northern Ireland, you can also bring proceedings in your local courts.
+
+## 19. Changes to These Terms
+
+We may update these Terms from time to time, for example to reflect changes in the law or in how we work. The version that applies to your Order is the one shown on our website when you placed it. The "Last updated" date at the top shows when these Terms last changed.
+
+## 20. Contact Us
+
+Questions about these Terms or your Order? Email [info@ocunioenergy.com](mailto:info@ocunioenergy.com), message us on [WhatsApp](https://wa.me/443306330252), or use our [contact form](/contact-us).`;
 
 export const privacyPolicyMarkdown = `**Last updated:** ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
 

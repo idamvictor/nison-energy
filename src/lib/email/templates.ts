@@ -85,6 +85,7 @@ export type OrderEmailInput = {
   lastName: string;
   email: string;
   address: string;
+  city?: string | null;
   postcode: string;
   subtotal: number;
   status: string;
@@ -92,6 +93,10 @@ export type OrderEmailInput = {
 };
 
 export type EmailContent = { subject: string; html: string };
+
+function fullAddress(order: Pick<OrderEmailInput, "address" | "city" | "postcode">): string {
+  return [order.address, order.city, order.postcode].filter(Boolean).join(", ");
+}
 
 // ─── Lead ────────────────────────────────────────────────────────────────
 
@@ -170,9 +175,7 @@ export function customerOrderConfirmation(
           `<strong>Subtotal (ex VAT): ${formatCurrency(order.subtotal)}</strong>`,
         ),
         row(
-          `<strong>Installation address</strong><br>${esc(order.address)}, ${esc(
-            order.postcode,
-          )}`,
+          `<strong>Delivery &amp; installation address</strong><br>${esc(fullAddress(order))}`,
         ),
         opts?.paid
           ? row(
@@ -199,7 +202,7 @@ export function staffOrderAlert(order: OrderEmailInput): EmailContent {
         row(`<strong>Contact</strong><br>${esc(order.email)}`),
         row(itemsTable(order.items)),
         row(`<strong>Subtotal (ex VAT): ${formatCurrency(order.subtotal)}</strong>`),
-        row(`<strong>Address</strong><br>${esc(order.address)}, ${esc(order.postcode)}`),
+        row(`<strong>Delivery &amp; installation address</strong><br>${esc(fullAddress(order))}`),
       ].join(""),
       cta: { label: "Open in admin", href: `${SITE_URL}/admin/orders/${order.id}` },
     }),

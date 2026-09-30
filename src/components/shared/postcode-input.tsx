@@ -18,12 +18,24 @@ export function PostcodeInput({
   name = "postcode",
   required,
   className,
+  value: controlledValue,
+  onValueChange,
+  autoComplete = "postal-code",
 }: {
   name?: string;
   required?: boolean;
   className?: string;
+  /** Optional controlled value (e.g. filled in from an address lookup). */
+  value?: string;
+  onValueChange?: (value: string) => void;
+  autoComplete?: string;
 }) {
-  const [value, setValue] = useState("");
+  const [innerValue, setInnerValue] = useState("");
+  const value = controlledValue ?? innerValue;
+  const setValue = (next: string) => {
+    if (controlledValue === undefined) setInnerValue(next);
+    onValueChange?.(next);
+  };
   const [status, setStatus] = useState<Status>("idle");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -55,6 +67,7 @@ export function PostcodeInput({
         name={name}
         required={required}
         placeholder="Postcode"
+        autoComplete={autoComplete}
         value={value}
         onChange={(e) => setValue(e.target.value.toUpperCase())}
         className={cn("pr-9", className)}

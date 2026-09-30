@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart/store";
 import { useUnreadCount } from "@/lib/notifications/use-unread-count";
 import { authClient } from "@/lib/auth/client";
+import { signInHref } from "@/lib/auth/redirect";
 import {
   Sheet,
   SheetContent,
@@ -72,6 +73,17 @@ export function SiteHeader() {
   );
   const openCart = useCart((s) => s.openCart);
   const { data: session } = authClient.useSession();
+
+  // "Get Started" returns the customer to this page after sign-in / sign-up.
+  // The query + hash are read at click time (reading them during render would
+  // need useSearchParams, which opts every page out of static rendering).
+  const signInLink = signInHref(pathname);
+  function goToSignIn(event: React.MouseEvent<HTMLAnchorElement>) {
+    const { search, hash } = window.location;
+    if ((!search && !hash) || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    router.push(signInHref(pathname + search + hash));
+  }
   const isSignedIn = !!session;
   const displayName = session?.user.name?.trim() || session?.user.email || "";
   const initials = initialsOf(session?.user.name, session?.user.email);
@@ -187,7 +199,7 @@ export function SiteHeader() {
               className="hidden gap-1.5 sm:inline-flex"
               size="lg"
               nativeButton={false}
-              render={<Link href="/sign-in" />}
+              render={<Link href={signInLink} onClick={goToSignIn} />}
             >
               Get Started
               <ArrowRight className="size-4" />
@@ -261,7 +273,7 @@ export function SiteHeader() {
                   <Button
                     variant="cta"
                     nativeButton={false}
-                    render={<Link href="/sign-in" />}
+                    render={<Link href={signInLink} onClick={goToSignIn} />}
                   >
                     Get Started
                   </Button>

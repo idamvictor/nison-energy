@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, LinkIcon, LockKeyhole } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
+import { withRedirect } from "@/lib/auth/redirect";
 import { Button } from "@/components/ui/button";
 import {
   AuthHeading,
@@ -19,6 +20,7 @@ export function ResetPasswordForm() {
   const params = useSearchParams();
   const token = params.get("token");
   const linkError = params.get("error");
+  const returnTo = params.get("redirect");
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -45,7 +47,7 @@ export function ResetPasswordForm() {
       setPending(false);
       return;
     }
-    router.push("/sign-in?reset=1");
+    router.push(withRedirect("/sign-in?reset=1", returnTo));
   }
 
   if (invalid) {
@@ -59,13 +61,13 @@ export function ResetPasswordForm() {
         <Button
           size="lg"
           nativeButton={false}
-          render={<Link href="/forgot-password" />}
+          render={<Link href={withRedirect("/forgot-password", returnTo)} />}
           className="h-11 w-full rounded-xl bg-foreground text-sm font-semibold text-background hover:bg-foreground/85"
         >
           Request a new link
         </Button>
         <Link
-          href="/sign-in"
+          href={withRedirect("/sign-in", returnTo)}
           className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />

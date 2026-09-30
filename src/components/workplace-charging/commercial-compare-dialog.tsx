@@ -71,18 +71,24 @@ export function CommercialCompareDialog({
                   >
                     <X className="size-3.5" />
                   </button>
-                  <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-border">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      sizes="64px"
-                      className="object-contain p-1.5"
-                    />
-                  </div>
-                  <p className="text-xs leading-snug font-semibold text-foreground">
-                    {product.name}
-                  </p>
+                  <Link
+                    href={`/workplace-charging/${product.id}`}
+                    onClick={() => onOpenChange(false)}
+                    className="group flex flex-col items-center gap-2 rounded-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+                  >
+                    <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-border transition-shadow group-hover:ring-primary/50">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        sizes="64px"
+                        className="object-contain p-1.5"
+                      />
+                    </div>
+                    <p className="text-xs leading-snug font-semibold text-foreground group-hover:text-primary-ink group-hover:underline">
+                      {product.name}
+                    </p>
+                  </Link>
                 </div>
               ))}
 

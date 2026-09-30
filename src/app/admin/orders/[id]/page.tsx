@@ -199,14 +199,45 @@ export default async function OrderDetailPage({
               <Phone className="size-4 text-muted-foreground" />
               {order.phone}
             </a>
-            <p className="flex items-start gap-2 text-foreground">
+            <div className="flex items-start gap-2 text-foreground">
               <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-              <span>
-                {order.address}
-                <br />
-                {order.postcode}
-              </span>
-            </p>
+              <div>
+                <p className="text-xs text-muted-foreground">Delivery &amp; installation</p>
+                <p>
+                  {order.address}
+                  {order.city && (
+                    <>
+                      <br />
+                      {order.city}
+                    </>
+                  )}
+                  <br />
+                  {order.postcode}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">Billing</p>
+                {order.billingSameAsDelivery ? (
+                  <p>Same as delivery address</p>
+                ) : (
+                  <p>
+                    {order.billingAddress}
+                    {order.billingCity && (
+                      <>
+                        <br />
+                        {order.billingCity}
+                      </>
+                    )}
+                    <br />
+                    {order.billingPostcode}
+                  </p>
+                )}
+              </div>
+            </div>
+            {order.termsAcceptedAt && (
+              <p className="text-xs text-muted-foreground">
+                Terms of Sale accepted{" "}
+                {formatDateTime(order.termsAcceptedAt)}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

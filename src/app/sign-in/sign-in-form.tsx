@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
+import { safeRedirect, withRedirect } from "@/lib/auth/redirect";
 import { Button } from "@/components/ui/button";
 import {
   AuthHeading,
@@ -17,20 +18,13 @@ import {
 } from "@/components/auth/auth-fields";
 import { cn } from "@/lib/utils";
 
-function safeRedirect(target: string | null): string {
-  // Only allow same-origin relative paths.
-  if (target && target.startsWith("/") && !target.startsWith("//")) {
-    return target;
-  }
-  return "/account";
-}
-
 type Mode = "sign-in" | "sign-up";
 
 export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = safeRedirect(searchParams.get("redirect"));
+  const redirectParam = searchParams.get("redirect");
+  const redirectTo = safeRedirect(redirectParam);
   const justReset = searchParams.get("reset") === "1";
 
   const [mode, setMode] = useState<Mode>("sign-in");
@@ -175,7 +169,7 @@ export function SignInForm() {
             aside={
               !isSignUp && (
                 <Link
-                  href="/forgot-password"
+                  href={withRedirect("/forgot-password", redirectParam)}
                   className="text-sm font-normal text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                 >
                   Forgot password?

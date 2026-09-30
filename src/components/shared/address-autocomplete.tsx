@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 
 export type AddressSuggestion = {
   label: string;
+  /** "House number + road" — what goes in an "Address line 1" field. */
+  line1?: string;
   road?: string;
   city?: string;
   postcode?: string;
@@ -15,6 +17,8 @@ export type AddressSuggestion = {
 type NominatimResult = {
   display_name: string;
   address?: {
+    house_number?: string;
+    house_name?: string;
     road?: string;
     city?: string;
     town?: string;
@@ -30,10 +34,14 @@ type NominatimResult = {
 export function AddressAutocomplete({
   name = "addressLine1",
   required,
+  placeholder = "Start typing your address",
+  autoComplete = "off",
   onSelect,
 }: {
   name?: string;
   required?: boolean;
+  placeholder?: string;
+  autoComplete?: string;
   onSelect?: (suggestion: AddressSuggestion) => void;
 }) {
   const [value, setValue] = useState("");
@@ -68,6 +76,10 @@ export function AddressAutocomplete({
           setSuggestions(
             data.map((r) => ({
               label: r.display_name,
+              line1:
+                [r.address?.house_number ?? r.address?.house_name, r.address?.road]
+                  .filter(Boolean)
+                  .join(" ") || undefined,
               road: r.address?.road,
               city: r.address?.city ?? r.address?.town ?? r.address?.village,
               postcode: r.address?.postcode,
@@ -102,11 +114,11 @@ export function AddressAutocomplete({
       <Input
         name={name}
         required={required}
-        placeholder="Start typing your address"
+        placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onFocus={() => suggestions.length > 0 && setOpen(true)}
-        autoComplete="off"
+        autoComplete={autoComplete}
         className="pr-9"
       />
       <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2">
@@ -124,7 +136,7 @@ export function AddressAutocomplete({
               key={index}
               type="button"
               onClick={() => {
-                setValue(suggestion.road ?? suggestion.label);
+                setValue(suggestion.line1 ?? suggestion.label.split(",")[0]);
                 setOpen(false);
                 onSelect?.(suggestion);
               }}

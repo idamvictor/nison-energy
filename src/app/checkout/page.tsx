@@ -92,17 +92,21 @@ export default function CheckoutPage() {
   const [pending, startTransition] = useTransition();
   const [payPending, startPayTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  // Town + postcode are controlled so picking an address suggestion can fill them.
+  const [city, setCity] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [billingSame, setBillingSame] = useState(true);
+  const [billingCity, setBillingCity] = useState("");
+  const [billingPostcode, setBillingPostcode] = useState("");
 
   function handleAddressSelect(suggestion: AddressSuggestion) {
-    if (!suggestion.postcode) return;
-    const form = formRef.current;
-    const field = form?.elements.namedItem("postcode");
-    if (field instanceof HTMLInputElement) {
-      field.value = suggestion.postcode;
-      // PostcodeInput is controlled — dispatch a real input event so its
-      // React state (and validation) picks up the programmatic change.
-      field.dispatchEvent(new Event("input", { bubbles: true }));
-    }
+    if (suggestion.city) setCity(suggestion.city);
+    if (suggestion.postcode) setPostcode(suggestion.postcode.toUpperCase());
+  }
+
+  function handleBillingAddressSelect(suggestion: AddressSuggestion) {
+    if (suggestion.city) setBillingCity(suggestion.city);
+    if (suggestion.postcode) setBillingPostcode(suggestion.postcode.toUpperCase());
   }
 
   const lines = items
@@ -149,13 +153,19 @@ export default function CheckoutPage() {
       email: String(fd.get("email") ?? ""),
       phone: String(fd.get("phone") ?? ""),
       address: String(fd.get("address") ?? ""),
-      postcode: String(fd.get("postcode") ?? ""),
+      city,
+      postcode,
+      billingSameAsDelivery: billingSame,
+      billingAddress: billingSame ? undefined : String(fd.get("billingAddress") ?? ""),
+      billingCity: billingSame ? undefined : billingCity,
+      billingPostcode: billingSame ? undefined : billingPostcode,
+      acceptedTerms: fd.get("acceptedTerms") === "on",
       honeypot: String(fd.get("company_website") ?? ""),
       lines: orderLines,
     };
   }
 
-  function handlePayOnline() {
+  function handleProceedToPayment() {
     const form = formRef.current;
     if (!form || !form.reportValidity()) return;
     const payload = buildPayload(new FormData(form));
@@ -250,6 +260,10 @@ export default function CheckoutPage() {
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
+                  if (!hasQuoteOnlyItems) {
+                    handleProceedToPayment();
+                    return;
+                  }
                   const payload = buildPayload(new FormData(e.currentTarget));
                   setError(null);
 
@@ -371,61 +385,138 @@ export default function CheckoutPage() {
 
                 <Card>
                   <CardContent className="flex flex-col gap-4">
-                    <StepHeading number={3} title="Installation address" />
+                    <StepHeading number={3} title="Delivery and Installation Address" />
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="First name">
-                        <Input name="firstName" required placeholder="First name" />
+                        <Input name="firstName" required autoComplete="given-name" placeholder="First name" />
                       </Field>
                       <Field label="Last name">
-                        <Input name="lastName" required placeholder="Last name" />
+                        <Input name="lastName" required autoComplete="family-name" placeholder="Last name" />
                       </Field>
                       <Field label="Email">
-                        <Input name="email" required type="email" placeholder="Email" />
+                        <Input name="email" required type="email" autoComplete="email" placeholder="Email" />
                       </Field>
                       <Field label="Phone number">
-                        <Input name="phone" required type="tel" placeholder="Phone number" />
+                        <Input name="phone" required type="tel" autoComplete="tel" placeholder="Phone number" />
                       </Field>
-                      <Field label="Installation address" className="sm:col-span-2">
+                      <Field label="Address line 1" className="sm:col-span-2">
                         <AddressAutocomplete
                           name="address"
                           required
+                          autoComplete="address-line1"
+                          placeholder="Start typing your house number and street"
                           onSelect={handleAddressSelect}
                         />
                       </Field>
+                      <Field label="Town / City">
+                        <Input
+                          name="city"
+                          required
+                          autoComplete="address-level2"
+                          placeholder="Town or city"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                        />
+                      </Field>
                       <Field label="Postcode">
-                        <PostcodeInput required />
+                        <PostcodeInput required value={postcode} onValueChange={setPostcode} />
                       </Field>
                     </div>
+
+                    <label className="flex cursor-pointer items-start gap-2.5 rounded-lg bg-secondary px-3.5 py-3 text-sm text-foreground">
+                      <input
+                        type="checkbox"
+                        checked={billingSame}
+                        onChange={(e) => setBillingSame(e.target.checked)}
+                        className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary-ink"
+                      />
+                      My billing address is the same as my delivery and
+                      installation address
+                    </label>
+
+                    {!billingSame && (
+                      <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
+                        <p className="text-sm font-semibold text-foreground">Billing address</p>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <Field label="Address line 1" className="sm:col-span-2">
+                            <AddressAutocomplete
+                              name="billingAddress"
+                              required
+                              autoComplete="billing address-line1"
+                              placeholder="Start typing your billing address"
+                              onSelect={handleBillingAddressSelect}
+                            />
+                          </Field>
+                          <Field label="Town / City">
+                            <Input
+                              name="billingCity"
+                              required
+                              autoComplete="billing address-level2"
+                              placeholder="Town or city"
+                              value={billingCity}
+                              onChange={(e) => setBillingCity(e.target.value)}
+                            />
+                          </Field>
+                          <Field label="Postcode">
+                            <PostcodeInput
+                              name="billingPostcode"
+                              required
+                              autoComplete="billing postal-code"
+                              value={billingPostcode}
+                              onValueChange={setBillingPostcode}
+                            />
+                          </Field>
+                        </div>
+                      </div>
+                    )}
+
                     <p className="text-xs text-muted-foreground">
                       {hasQuoteOnlyItems
                         ? "No payment is taken online — this places your order for review, and we’ll be in touch to confirm payment and schedule installation."
-                        : "Pay online now with card, or place your order for review and we’ll be in touch to confirm payment and schedule installation."}
+                        : "Your charger will arrive before your scheduled installation date."}
                     </p>
                   </CardContent>
                 </Card>
 
+                <label className="flex cursor-pointer items-start gap-2.5 text-sm text-foreground">
+                  <input
+                    type="checkbox"
+                    name="acceptedTerms"
+                    required
+                    className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary-ink"
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <Link
+                      href="/terms-of-sale"
+                      target="_blank"
+                      className="font-medium text-primary-ink underline underline-offset-2 hover:text-foreground"
+                    >
+                      Terms and Conditions of Sale
+                    </Link>
+                    .
+                  </span>
+                </label>
+
                 {error && <p className="text-sm text-destructive">{error}</p>}
 
                 <div className="flex flex-wrap gap-3">
-                  <Button
-                    type="submit"
-                    size="lg"
-                    variant={hasQuoteOnlyItems ? "cta" : "outline"}
-                    disabled={pending || payPending}
-                    className="w-fit"
-                  >
-                    {pending ? "Placing order…" : "Place Order"}
-                  </Button>
-                  {!hasQuoteOnlyItems && (
+                  {hasQuoteOnlyItems ? (
+                    // Quote-only items have no price, so they can't be paid
+                    // online — the order goes to the team for review instead.
+                    <Button type="submit" size="lg" variant="cta" disabled={pending} className="w-fit">
+                      {pending ? "Placing order…" : "Place Order"}
+                    </Button>
+                  ) : (
                     <Button
-                      type="button"
+                      type="submit"
                       size="lg"
-                      disabled={pending || payPending}
                       variant="cta"
-                      className="w-fit"
-                      onClick={handlePayOnline}
+                      disabled={payPending}
+                      className="w-fit gap-1.5"
                     >
-                      {payPending ? "Starting checkout…" : "Pay online now"}
+                      {payPending ? "Opening secure payment…" : "Proceed to Payment"}
+                      {!payPending && <ArrowRight className="size-4" />}
                     </Button>
                   )}
                 </div>

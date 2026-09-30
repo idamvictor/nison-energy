@@ -5,11 +5,12 @@ import { getSessionCookie } from "better-auth/cookies";
 // expired session. The real checks are `requireAdmin()` / `requireUser()` in the
 // admin + account layouts and the leads route handler (src/lib/auth-dal.ts).
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
   if (!getSessionCookie(request)) {
     const signInUrl = new URL("/sign-in", request.url);
-    signInUrl.searchParams.set("redirect", pathname);
+    // Keep the query too, so deep links return exactly where they pointed.
+    signInUrl.searchParams.set("redirect", pathname + search);
     return NextResponse.redirect(signInUrl);
   }
 

@@ -35,6 +35,7 @@ const productLinks = [
 
 const legalLinks = [
   { label: "Terms & Conditions", href: "/terms-and-conditions" },
+  { label: "Terms of Sale", href: "/terms-of-sale" },
   { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 

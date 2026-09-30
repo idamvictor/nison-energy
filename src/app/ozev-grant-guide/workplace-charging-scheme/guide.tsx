@@ -22,8 +22,9 @@ import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
 import { ChargerPicker } from "@/components/grant-guide/charger-picker";
 import type { ChargerGuideProps, ChargerSelection } from "@/lib/grant-guide/types";
-import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
-import { generateWorkplaceQuoteDoc } from "@/lib/pdf/workplace-quote";
+import { DraftRestoredNotice, SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
+import { useGuideDraft } from "@/components/grant-guide/use-guide-draft";
+import { generateWorkplaceQuotePdf } from "@/lib/pdf/workplace-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
@@ -87,6 +88,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const cardClass = "border border-foreground/18 shadow-md";
 
+type GuideDraftState = { answers: Answers; chargerSel: ChargerSelection | null; chargepoints: string; sockets: string; labourCost: string; works: WorkRow[] };
+
 export default function WorkplaceChargingSchemeGuide({
   chargers,
   defaultCategory,
@@ -104,6 +107,18 @@ export default function WorkplaceChargingSchemeGuide({
   const [showSignIn, setShowSignIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Survives the sign-in detour — see use-guide-draft.ts.
+  const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
+    key: "workplace",
+    onRestore: (saved) => {
+      setAnswers(saved.answers);
+      setChargerSel(saved.chargerSel);
+      setChargepoints(saved.chargepoints);
+      setSockets(saved.sockets);
+      setLabourCost(saved.labourCost);
+      setWorks(saved.works);
+    },
+  });
 
   const guideRef = useRef<HTMLDivElement>(null);
 
@@ -287,7 +302,8 @@ export default function WorkplaceChargingSchemeGuide({
                     </p>
 
                     <form
-                      className="mt-4 flex flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
+                      ref={draftFormRef}
+                      className="mt-4 flex scroll-mt-28 flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
                       onSubmit={async (e) => {
                         e.preventDefault();
                         if (!selectedCharger) {
@@ -298,6 +314,7 @@ export default function WorkplaceChargingSchemeGuide({
                           return;
                         }
                         if (!session) {
+                          saveDraft({ answers, chargerSel, chargepoints, sockets, labourCost, works });
                           setShowSignIn(true);
                           return;
                         }
@@ -332,9 +349,8 @@ export default function WorkplaceChargingSchemeGuide({
                             works: workItems,
                           };
 
-                          const html = generateWorkplaceQuoteDoc(input);
-                          const fileName = `OZEV-WCS-Quote-${(businessName || contactName).replace(/\s+/g, "-")}.doc`;
-                          const blob = new Blob(["﻿", html], { type: "application/msword" });
+                          const blob = await generateWorkplaceQuotePdf(input);
+                          const fileName = `OZEV-WCS-Quote-${(businessName || contactName).replace(/\s+/g, "-")}.pdf`;
 
                           const body = new FormData();
                           body.append("scheme", "WorkplaceChargingScheme");
@@ -353,6 +369,7 @@ export default function WorkplaceChargingSchemeGuide({
 
                           // Needs admin review before it can be downloaded.
                           setSubmitted(true);
+                          clearDraft();
                         } finally {
                           setSubmitting(false);
                         }
@@ -367,6 +384,8 @@ export default function WorkplaceChargingSchemeGuide({
                         aria-hidden
                         className="absolute -left-[9999px] h-0 w-0 opacity-0"
                       />
+
+                      {draftRestored && <DraftRestoredNotice />}
 
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <Field label="Contact name">

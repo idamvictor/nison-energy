@@ -14,11 +14,10 @@ export const runtime = "nodejs";
 // Handles file bytes — never statically cache this route.
 export const dynamic = "force-dynamic";
 
-// Renters generates a Word-compatible .doc; landlord/workplace generate a
-// real PDF. Anything else is rejected.
+// All three guides generate a PDF (src/lib/pdf/*-quote.ts). Older quotes
+// saved as Word .doc files are still served by /api/quotes/[id].
 const ALLOWED_QUOTE_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
-  "application/msword": "doc",
 };
 
 export async function POST(request: Request) {

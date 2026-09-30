@@ -2,13 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, KeyRound, MailCheck } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
+import { withRedirect } from "@/lib/auth/redirect";
 import { Button } from "@/components/ui/button";
 import { AuthHeading, SubmitButton, TextField } from "@/components/auth/auth-fields";
 
 export function ForgotPasswordForm() {
+  // Where the customer was before signing in — carried through the reset email.
+  const returnTo = useSearchParams().get("redirect");
+  const signInLink = withRedirect("/sign-in", returnTo);
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -20,7 +25,7 @@ export function ForgotPasswordForm() {
     // probe which emails have accounts.
     await authClient.requestPasswordReset({
       email,
-      redirectTo: "/reset-password",
+      redirectTo: withRedirect("/reset-password", returnTo),
     });
     setPending(false);
     setSent(true);
@@ -44,7 +49,7 @@ export function ForgotPasswordForm() {
           variant="outline"
           size="lg"
           nativeButton={false}
-          render={<Link href="/sign-in" />}
+          render={<Link href={signInLink} />}
           className="h-11 w-full gap-2 rounded-xl bg-card text-sm font-medium shadow-xs"
         >
           <ArrowLeft className="size-4" />
@@ -78,7 +83,7 @@ export function ForgotPasswordForm() {
         </div>
       </form>
       <Link
-        href="/sign-in"
+        href={signInLink}
         className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />

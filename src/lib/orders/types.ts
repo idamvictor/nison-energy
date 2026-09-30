@@ -49,8 +49,14 @@ export type OrderRecord = {
   email: string;
   phone: string;
   address: string;
+  city: string | null;
   postcode: string;
   notes: string | null;
+  billingSameAsDelivery: boolean;
+  billingAddress: string | null;
+  billingCity: string | null;
+  billingPostcode: string | null;
+  termsAcceptedAt: Date | null;
   subtotal: number;
   paymentStatus: PaymentStatus;
   stripeCheckoutSessionId: string | null;
@@ -71,8 +77,17 @@ export type PlaceOrderPayload = {
   lastName: string;
   email: string;
   phone: string;
+  /** Delivery & installation address. */
   address: string;
+  city: string;
   postcode: string;
+  /** When false, the billing* fields are required. */
+  billingSameAsDelivery: boolean;
+  billingAddress?: string;
+  billingCity?: string;
+  billingPostcode?: string;
+  /** The Terms and Conditions of Sale tick box — re-checked on the server. */
+  acceptedTerms: boolean;
   notes?: string;
   lines: OrderLineInput[];
   /** Honeypot — bots fill hidden fields; humans never see this input. */

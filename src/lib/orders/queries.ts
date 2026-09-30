@@ -103,7 +103,13 @@ export type CreateOrderInput = {
   email?: unknown;
   phone?: unknown;
   address?: unknown;
+  city?: unknown;
   postcode?: unknown;
+  billingSameAsDelivery?: unknown;
+  billingAddress?: unknown;
+  billingCity?: unknown;
+  billingPostcode?: unknown;
+  acceptedTerms?: unknown;
   notes?: unknown;
   lines?: OrderLineInput[];
 };
@@ -132,7 +138,13 @@ type ValidatedOrderInput = {
   email: string;
   phone: string;
   address: string;
+  city: string;
   postcode: string;
+  billingSameAsDelivery: boolean;
+  billingAddress: string | null;
+  billingCity: string | null;
+  billingPostcode: string | null;
+  termsAcceptedAt: Date;
   notes: string | null;
   lines: OrderLineInput[];
   subtotal: number;
@@ -147,7 +159,13 @@ async function validateOrderInput(
   const email = str(input.email);
   const phone = str(input.phone);
   const address = str(input.address);
+  const city = str(input.city);
   const postcode = str(input.postcode);
+  // Anything but an explicit `false` means "same as delivery".
+  const billingSameAsDelivery = input.billingSameAsDelivery !== false;
+  const billingAddress = str(input.billingAddress);
+  const billingCity = str(input.billingCity);
+  const billingPostcode = str(input.billingPostcode);
 
   const errors: Record<string, string> = {};
   if (!firstName) errors.firstName = "Enter your first name.";
@@ -155,8 +173,17 @@ async function validateOrderInput(
   if (!email) errors.email = "Enter your email.";
   else if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
   if (!phone) errors.phone = "Enter a phone number.";
-  if (!address) errors.address = "Enter the installation address.";
+  if (!address) errors.address = "Enter the delivery and installation address.";
+  if (!city) errors.city = "Enter the town or city.";
   if (!postcode) errors.postcode = "Enter the postcode.";
+  if (!billingSameAsDelivery) {
+    if (!billingAddress) errors.billingAddress = "Enter the billing address.";
+    if (!billingCity) errors.billingCity = "Enter the billing town or city.";
+    if (!billingPostcode) errors.billingPostcode = "Enter the billing postcode.";
+  }
+  if (input.acceptedTerms !== true) {
+    errors.acceptedTerms = "Please tick to agree to the Terms and Conditions of Sale.";
+  }
 
   const lines = Array.isArray(input.lines) ? input.lines : [];
   if (lines.length === 0) errors.lines = "Your cart is empty.";
@@ -181,7 +208,13 @@ async function validateOrderInput(
       email,
       phone,
       address,
+      city,
       postcode,
+      billingSameAsDelivery,
+      billingAddress: billingSameAsDelivery ? null : billingAddress,
+      billingCity: billingSameAsDelivery ? null : billingCity,
+      billingPostcode: billingSameAsDelivery ? null : billingPostcode,
+      termsAcceptedAt: new Date(),
       notes: str(input.notes) || null,
       lines,
       subtotal,
@@ -205,7 +238,13 @@ async function insertOrder(
           email: data.email,
           phone: data.phone,
           address: data.address,
+          city: data.city,
           postcode: data.postcode,
+          billingSameAsDelivery: data.billingSameAsDelivery,
+          billingAddress: data.billingAddress,
+          billingCity: data.billingCity,
+          billingPostcode: data.billingPostcode,
+          termsAcceptedAt: data.termsAcceptedAt,
           notes: data.notes,
           subtotal: data.subtotal,
           userId: data.userId,

@@ -26,7 +26,7 @@ export function SearchResultCard({ result }: { result: SearchResult }) {
 
   return (
     <Card className="group relative h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">
-      <Link href={href} className="absolute inset-0 z-0" aria-label={result.name}>
+      <Link href={href} className="absolute inset-0 z-[5]" aria-label={result.name}>
         <span className="sr-only">View {result.name}</span>
       </Link>
       <CardHeader className="p-0">

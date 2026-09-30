@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth/session";
+import { safeRedirect } from "@/lib/auth/redirect";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SignInForm } from "./sign-in-form";
 
@@ -19,7 +20,7 @@ export default async function SignInPage({
   const user = await getCurrentUser();
   if (user) {
     const { redirect: target } = await searchParams;
-    redirect(target?.startsWith("/") && !target.startsWith("//") ? target : "/account");
+    redirect(safeRedirect(target));
   }
 
   return (

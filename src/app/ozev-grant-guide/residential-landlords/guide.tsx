@@ -30,8 +30,9 @@ import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
 import { ChargerPicker } from "@/components/grant-guide/charger-picker";
 import type { ChargerGuideProps, ChargerSelection } from "@/lib/grant-guide/types";
-import { SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
-import { generateLandlordQuoteDoc } from "@/lib/pdf/landlord-quote";
+import { DraftRestoredNotice, SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
+import { useGuideDraft } from "@/components/grant-guide/use-guide-draft";
+import { generateLandlordQuotePdf } from "@/lib/pdf/landlord-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
@@ -93,6 +94,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const cardClass = "border border-foreground/18 shadow-md";
 
+type GuideDraftState = { answers: Answers; chargerSel: ChargerSelection | null; installType: string; chargepoints: string; sockets: string; labourCost: string; works: WorkRow[] };
+
 export default function ResidentialLandlordsGuide({
   chargers,
   defaultCategory,
@@ -111,6 +114,19 @@ export default function ResidentialLandlordsGuide({
   const [showSignIn, setShowSignIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Survives the sign-in detour — see use-guide-draft.ts.
+  const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
+    key: "landlords",
+    onRestore: (saved) => {
+      setAnswers(saved.answers);
+      setChargerSel(saved.chargerSel);
+      setInstallType(saved.installType);
+      setChargepoints(saved.chargepoints);
+      setSockets(saved.sockets);
+      setLabourCost(saved.labourCost);
+      setWorks(saved.works);
+    },
+  });
 
   const guideRef = useRef<HTMLDivElement>(null);
 
@@ -338,7 +354,8 @@ export default function ResidentialLandlordsGuide({
                     </p>
 
                     <form
-                      className="mt-4 flex flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
+                      ref={draftFormRef}
+                      className="mt-4 flex scroll-mt-28 flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
                       onSubmit={async (e) => {
                         e.preventDefault();
                         if (!selectedCharger) {
@@ -349,6 +366,7 @@ export default function ResidentialLandlordsGuide({
                           return;
                         }
                         if (!session) {
+                          saveDraft({ answers, chargerSel, installType, chargepoints, sockets, labourCost, works });
                           setShowSignIn(true);
                           return;
                         }
@@ -384,9 +402,8 @@ export default function ResidentialLandlordsGuide({
                             works: workItems,
                           };
 
-                          const html = generateLandlordQuoteDoc(input);
-                          const fileName = `OZEV-Landlord-Quote-${(businessName || contactName).replace(/\s+/g, "-")}.doc`;
-                          const blob = new Blob(["﻿", html], { type: "application/msword" });
+                          const blob = await generateLandlordQuotePdf(input);
+                          const fileName = `OZEV-Landlord-Quote-${(businessName || contactName).replace(/\s+/g, "-")}.pdf`;
 
                           const body = new FormData();
                           body.append("scheme", "ResidentialLandlords");
@@ -405,6 +422,7 @@ export default function ResidentialLandlordsGuide({
 
                           // Needs admin review before it can be downloaded.
                           setSubmitted(true);
+                          clearDraft();
                         } finally {
                           setSubmitting(false);
                         }
@@ -419,6 +437,8 @@ export default function ResidentialLandlordsGuide({
                         aria-hidden
                         className="absolute -left-[9999px] h-0 w-0 opacity-0"
                       />
+
+                      {draftRestored && <DraftRestoredNotice />}
 
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <Field label="Contact name">

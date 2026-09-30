@@ -67,9 +67,19 @@ model Order {
   lastName  String
   email     String
   phone     String
-  address   String
+  address   String // delivery & installation address, line 1
+  city      String?
   postcode  String
   notes     String?
+
+  // Billing address — only stored when it differs from the delivery address.
+  billingSameAsDelivery Boolean @default(true)
+  billingAddress        String?
+  billingCity           String?
+  billingPostcode       String?
+
+  /// When the customer ticked "I agree to the Terms and Conditions of Sale".
+  termsAcceptedAt DateTime?
 
   subtotal Decimal @db.Decimal(10, 2) // GBP, penny-precise — matches what was actually charged
 

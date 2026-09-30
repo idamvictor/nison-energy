@@ -1,45 +1,24 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { FileUp, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { FileUp, LibraryBig, Loader2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { DatasheetLibraryDialog } from "@/components/admin/catalog/datasheet-library-dialog";
 import {
   DATASHEET_CARD_HEIGHT,
   DATASHEET_CARD_WIDTH,
   DatasheetCard,
 } from "@/components/shared/datasheet/datasheet-card";
-import { MAX_DATASHEETS } from "@/lib/media/datasheet";
+import { MAX_DATASHEETS, MAX_DATASHEET_BYTES, formatFileSize } from "@/lib/media/datasheet";
+import { uploadDatasheetFile } from "@/lib/media/datasheet-upload-client";
 import { cn } from "@/lib/utils";
-
-// Mirrors MAX_DATASHEET_BYTES in src/lib/media/queries.ts (server enforces it too).
-const MAX_BYTES = 5 * 1024 * 1024;
-
-/** Uploads one PDF (plus its page-1 preview image). Returns its URL or an error. */
-async function uploadPdf(file: File): Promise<{ url: string } | { error: string }> {
-  if (file.type !== "application/pdf") return { error: "only PDF files can be uploaded" };
-  if (file.size > MAX_BYTES) return { error: "must be 5MB or smaller" };
-  try {
-    const body = new FormData();
-    body.append("file", file);
-    // Page-1 preview image so the card shows instantly — rendered here with
-    // pdf.js (loaded on demand). Upload the PDF anyway if this fails.
-    const { renderPdfPreview } = await import("@/components/shared/datasheet/pdf-pages");
-    const preview = await renderPdfPreview(file);
-    if (preview) body.append("preview", preview, "preview");
-    const res = await fetch("/api/media/datasheet", { method: "POST", body });
-    const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-    if (!res.ok || !json.url) return { error: json.error ?? "upload failed, try again" };
-    return { url: json.url };
-  } catch {
-    return { error: "upload failed — check your connection and try again" };
-  }
-}
 
 /**
  * A product's datasheets as a gallery of Drive-style cards plus an "Add
- * datasheet" tile. Plain PDF uploads (no media library); several files can be
- * picked or dropped at once and upload one after another. Order here is the
- * order on the product page.
+ * datasheet" tile and the shared PDF library. PDFs are stored once and linked
+ * by URL — removing one here only unlinks it from this product (it stays in
+ * the library for other products). Order here is the order on the product page.
  */
 export function DatasheetsField({
   value,
@@ -51,10 +30,35 @@ export function DatasheetsField({
   const addInputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const replaceIndex = useRef<number | null>(null);
-  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
-  const [replacing, setReplacing] = useState<number | null>(null);
+  const [progress, setProgress] = useState<{ file: number; total: number; percent: number } | null>(
+    null,
+  );
+  const [replacing, setReplacing] = useState<{ index: number; percent: number } | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  // Original file names by URL (the URL itself only has a web-safe slug).
+  const [names, setNames] = useState<Record<string, string>>({});
+  const nameFor = (url: string, fileName: string) =>
+    setNames((prev) => (prev[url] ? prev : { ...prev, [url]: fileName }));
+
+  useEffect(() => {
+    // Load the stored names for this product's datasheets once.
+    let cancelled = false;
+    fetch("/api/media/datasheet/library", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json: { items?: { url: string; fileName: string }[] } | null) => {
+        if (cancelled || !json?.items) return;
+        setNames((prev) => ({
+          ...Object.fromEntries(json.items!.map((i) => [i.url, i.fileName])),
+          ...prev,
+        }));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const room = MAX_DATASHEETS - value.length;
   const busy = progress !== null || replacing !== null;
@@ -70,27 +74,39 @@ export function DatasheetsField({
     }
     // Accumulate locally so each finished upload appears straight away.
     let current = [...value];
-    setProgress({ done: 0, total: files.length });
     for (const [i, file] of files.entries()) {
-      const result = await uploadPdf(file);
+      setProgress({ file: i + 1, total: files.length, percent: 0 });
+      const result = await uploadDatasheetFile(file, (f) =>
+        setProgress({ file: i + 1, total: files.length, percent: Math.round(f * 100) }),
+      );
       if ("url" in result) {
-        current = [...current, result.url];
-        onChange(current);
+        nameFor(result.url, file.name);
+        // An identical PDF already stored comes back as the same URL — no duplicate.
+        if (!current.includes(result.url)) {
+          current = [...current, result.url];
+          onChange(current);
+        }
       } else {
         problems.push(`${file.name} — ${result.error}.`);
       }
-      setProgress({ done: i + 1, total: files.length });
     }
     setProgress(null);
     setErrors(problems);
   }
 
   async function replaceAt(index: number, file: File) {
-    setReplacing(index);
-    const result = await uploadPdf(file);
+    setReplacing({ index, percent: 0 });
+    const result = await uploadDatasheetFile(file, (f) =>
+      setReplacing({ index, percent: Math.round(f * 100) }),
+    );
     setReplacing(null);
     if ("url" in result) {
-      onChange(value.map((url, i) => (i === index ? result.url : url)));
+      nameFor(result.url, file.name);
+      onChange(
+        value
+          .map((url, i) => (i === index ? result.url : url))
+          .filter((url, i, all) => all.indexOf(url) === i),
+      );
       setErrors([]);
     } else {
       setErrors([`${file.name} — ${result.error}.`]);
@@ -130,14 +146,33 @@ export function DatasheetsField({
         }}
       />
 
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {value.length
+            ? `${value.length} of ${MAX_DATASHEETS} datasheets`
+            : "No datasheets yet — upload PDFs or pick existing ones from the library."}
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={busy || room === 0}
+          onClick={() => setLibraryOpen(true)}
+        >
+          <LibraryBig />
+          Choose from library
+        </Button>
+      </div>
+
       <div className="flex flex-wrap gap-4">
         {value.map((url, index) =>
-          replacing === index ? (
-            <UploadingTile key={url} label="Replacing…" />
+          replacing?.index === index ? (
+            <UploadingTile key={url} label="Replacing…" percent={replacing.percent} />
           ) : (
             <DatasheetCard
               key={url}
               url={url}
+              name={names[url]}
               onMoveLeft={index > 0 ? () => move(index, -1) : undefined}
               onMoveRight={index < value.length - 1 ? () => move(index, 1) : undefined}
               onReplace={() => {
@@ -152,8 +187,15 @@ export function DatasheetsField({
           ),
         )}
 
-        {progress && progress.done < progress.total && (
-          <UploadingTile label={`Uploading ${progress.done + 1} of ${progress.total}…`} />
+        {progress && (
+          <UploadingTile
+            label={
+              progress.total > 1
+                ? `Uploading ${progress.file} of ${progress.total}`
+                : "Uploading…"
+            }
+            percent={progress.percent}
+          />
         )}
 
         {room > 0 && !progress && (
@@ -205,18 +247,31 @@ export function DatasheetsField({
         </ul>
       )}
       <p className="text-xs text-muted-foreground">
-        PDF only, max 5MB each · up to {MAX_DATASHEETS} · shown in this order in the product&apos;s
-        Datasheet tab. Save the product to apply changes.
+        PDF only, max {formatFileSize(MAX_DATASHEET_BYTES)} each · up to {MAX_DATASHEETS} · shown in
+        this order in the product&apos;s Datasheet tab. The same PDF is only ever stored once —
+        removing it here just unlinks it from this product. Save the product to apply changes.
       </p>
+
+      <DatasheetLibraryDialog
+        open={libraryOpen}
+        onOpenChange={setLibraryOpen}
+        attached={value}
+        room={room}
+        onAdd={(items) => {
+          for (const item of items) if (item.fileName) nameFor(item.url, item.fileName);
+          const urls = items.map((i) => i.url).filter((u) => !value.includes(u));
+          onChange([...value, ...urls].slice(0, MAX_DATASHEETS));
+        }}
+      />
     </div>
   );
 }
 
-function UploadingTile({ label }: { label: string }) {
+function UploadingTile({ label, percent }: { label: string; percent: number }) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border bg-muted/40 text-center",
+        "flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border bg-muted/40 px-6 text-center",
         DATASHEET_CARD_WIDTH,
         DATASHEET_CARD_HEIGHT,
       )}
@@ -224,7 +279,15 @@ function UploadingTile({ label }: { label: string }) {
       <span className="flex size-12 items-center justify-center rounded-full bg-card text-muted-foreground shadow-xs ring-1 ring-border">
         <Loader2 className="size-5 animate-spin" />
       </span>
-      <span className="text-sm font-medium text-foreground">{label}</span>
+      <span className="text-sm font-medium text-foreground">
+        {label} · {percent}%
+      </span>
+      <span className="h-1.5 w-full overflow-hidden rounded-full bg-border">
+        <span
+          className="block h-full rounded-full bg-foreground transition-[width] duration-300"
+          style={{ width: `${percent}%` }}
+        />
+      </span>
     </div>
   );
 }

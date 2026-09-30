@@ -4,7 +4,7 @@
 // next/dynamic with `ssr: false` (see datasheet-card.tsx) so pdf.js never
 // runs on the server and is only downloaded when a datasheet is on screen.
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { FileText, RotateCw } from "lucide-react";
 
@@ -19,6 +19,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 // react-pdf v11 suspends by default, which turns a failed fetch into a thrown
 // error that crashes the tree. Opt out so failures land in `onLoadError`.
 const SUSPENSE = false;
+
+// Large PDFs load on demand in 256KB byte ranges (the media route supports
+// Range requests), so a 17MB manual shows page 1 without downloading it all.
+// Module-level so the object is stable — react-pdf reloads when it changes.
+// disableStream: fetch only the ranges page rendering needs, instead of also
+// streaming the whole file alongside them (they compete for bandwidth).
+const PDF_OPTIONS = { rangeChunkSize: 256 * 1024, disableAutoFetch: true, disableStream: true };
 // Automatic retries before showing the failure state.
 const AUTO_RETRIES = 2;
 
@@ -108,6 +115,7 @@ export function PdfFirstPage({ url, width }: { url: string; width: number }) {
     <Document
       key={src}
       file={src}
+      options={PDF_OPTIONS}
       suspense={SUSPENSE}
       onLoadError={onLoadError}
       loading={<Skeleton className="size-full rounded-none" />}
@@ -123,95 +131,5 @@ export function PdfFirstPage({ url, width }: { url: string; width: number }) {
         loading={<Skeleton className="size-full rounded-none" />}
       />
     </Document>
-  );
-}
-
-/** Every page, sized to the container's width — the preview dialog body. */
-export function PdfAllPages({
-  url,
-  onPageCount,
-}: {
-  url: string;
-  onPageCount?: (count: number) => void;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  const [numPages, setNumPages] = useState(0);
-  const { src, failed, onLoadError, retry } = useRetryingSource(url);
-  // Download progress, tagged with the source it belongs to so a retry starts from 0.
-  const [progress, setProgress] = useState<{ src: string; percent: number } | null>(null);
-  const percent = progress?.src === src ? progress.percent : null;
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setWidth(Math.min(Math.floor(entry.contentRect.width), 900));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const pageSkeleton = (
-    <Skeleton className="mx-auto aspect-[1/1.414] w-full max-w-225 bg-white/10" />
-  );
-  const loadingState = (
-    <div className="relative mx-auto w-full max-w-225">
-      {pageSkeleton}
-      <div className="absolute inset-x-0 top-24 flex flex-col items-center gap-3 text-sm text-white/70">
-        <p>Loading datasheet…{percent !== null && ` ${percent}%`}</p>
-        <div className="h-1 w-48 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full bg-white/60 transition-[width] duration-300"
-            style={{ width: `${percent ?? 5}%` }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div ref={containerRef} className="w-full">
-      {failed ? (
-        <div className="h-64 text-white/70">
-          <Unavailable onRetry={retry} />
-        </div>
-      ) : (
-        <Document
-          key={src}
-          file={src}
-          suspense={SUSPENSE}
-          onLoadSuccess={({ numPages }) => {
-            setNumPages(numPages);
-            onPageCount?.(numPages);
-          }}
-          onLoadError={onLoadError}
-          onLoadProgress={({ loaded, total }) => {
-            if (total > 0) {
-              setProgress({ src, percent: Math.min(99, Math.round((loaded / total) * 100)) });
-            }
-          }}
-          loading={loadingState}
-          error={loadingState}
-          className="flex flex-col items-center gap-4"
-        >
-          {width > 0 &&
-            Array.from({ length: numPages }, (_, i) => (
-              <Page
-                key={i}
-                pageNumber={i + 1}
-                width={width}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                suspense={SUSPENSE}
-                className="overflow-hidden rounded-sm bg-white shadow-lg"
-                loading={
-                  <div className="aspect-[1/1.414] bg-white" style={{ width }} />
-                }
-              />
-            ))}
-        </Document>
-      )}
-    </div>
   );
 }

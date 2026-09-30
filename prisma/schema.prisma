@@ -352,4 +352,22 @@ model DatasheetFile {
   contentType String
   bytes       Bytes
   createdAt   DateTime @default(now())
+  /// PDFs only: content hash — the same PDF is stored once and shared by URL.
+  sha256      String?  @unique
+  /// PDFs only: original upload name, shown in the admin PDF library.
+  fileName    String?
+  /// Byte length (set for every row; lets range requests skip reading the bytes).
+  size        Int?
+}
+
+/// Staging for chunked datasheet uploads (Vercel caps a request at ~4.5MB,
+/// so large PDFs arrive in <=4MB parts and are assembled on "complete").
+model DatasheetUploadPart {
+  uploadId  String
+  index     Int
+  bytes     Bytes
+  createdAt DateTime @default(now())
+
+  @@id([uploadId, index])
+  @@index([createdAt])
 }

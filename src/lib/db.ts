@@ -34,12 +34,17 @@ function createPool() {
   return pool;
 }
 
+/**
+ * The single pg pool Prisma runs on. Exposed for the rare hot path where
+ * Prisma's raw-query result mapping is too slow — e.g. reading 1MB bytea
+ * slices for datasheet range requests (~200ms via pg vs ~4s via $queryRaw).
+ */
+export function pgPool(): Pool {
+  return (globalForPrisma.pgPool ??= createPool());
+}
+
 function createPrismaClient() {
-  const pool = globalForPrisma.pgPool ?? createPool();
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.pgPool = pool;
-  }
-  return new PrismaClient({ adapter: new PrismaPg(pool) });
+  return new PrismaClient({ adapter: new PrismaPg(pgPool()) });
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

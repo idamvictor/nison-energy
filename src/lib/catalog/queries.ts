@@ -5,7 +5,7 @@ import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
-import { DATASHEET_URL_PREFIX, deleteDatasheet } from "@/lib/media/queries";
+import { DATASHEET_URL_PREFIX } from "@/lib/media/queries";
 import { MAX_DATASHEETS } from "@/lib/media/datasheet";
 import type { Product as ProductRow } from "@/generated/prisma/client";
 import type {
@@ -320,26 +320,18 @@ export async function updateProduct(
     }
   }
 
-  const previous = await prisma.product.findUnique({
-    where: { id },
-    select: { datasheets: true },
-  });
-  const data = toData(input);
+  // Datasheets are shared by URL across products, so removing one here only
+  // unlinks it — the file stays in the PDF library (deleted from there only).
   await prisma.product.update({
     where: { id },
-    data: { id: nextId, ...data },
+    data: { id: nextId, ...toData(input) },
   });
-  // Removed or replaced — drop those files so storage doesn't fill up.
-  const kept = new Set(data.datasheets);
-  for (const url of previous?.datasheets ?? []) {
-    if (!kept.has(url)) await deleteDatasheet(url);
-  }
   return { ok: true, id: nextId };
 }
 
 export async function deleteProduct(id: string): Promise<WriteResult> {
   await requireAdmin();
-  const removed = await prisma.product.delete({ where: { id } });
-  for (const url of removed.datasheets) await deleteDatasheet(url);
+  // Its datasheets stay in the PDF library (they may be shared with other products).
+  await prisma.product.delete({ where: { id } });
   return { ok: true, id };
 }

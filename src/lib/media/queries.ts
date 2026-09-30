@@ -1,6 +1,6 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { cache } from "react";
 
 import {
@@ -11,12 +11,15 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
-import { prisma } from "@/lib/db";
+import { pgPool, prisma } from "@/lib/db";
 import {
   DATASHEET_PREVIEW_TYPES,
   DATASHEET_URL_PREFIX,
   MAX_DATASHEET_PREVIEW_BYTES,
+  MAX_DATASHEET_BYTES,
+  datasheetFileName,
   datasheetPreviewKey,
+  formatFileSize,
   datasheetPreviewUrl,
   datasheetSafeName,
 } from "@/lib/media/datasheet";
@@ -100,8 +103,6 @@ export async function uploadImage(file: File): Promise<
   return { ok: true, image: { key, url: `/api/media/${key}` } };
 }
 
-export const MAX_DATASHEET_BYTES = 5 * 1024 * 1024; // 5MB
-
 type UploadResult = { ok: true; url: string } | { ok: false; error: string };
 
 /**
@@ -109,54 +110,104 @@ type UploadResult = { ok: true; url: string } | { ok: false; error: string };
  * plus its optional page-1 preview image (rendered in the admin's browser —
  * see renderPdfPreview) at `datasheets/<uuid>/preview`. Both live in the
  * DatasheetFile table and are served publicly through /api/media.
+ *
+ * PDFs are de-duplicated by SHA-256: uploading a PDF that's already stored
+ * returns the existing URL, so one file can be shared by many products.
  */
-export async function uploadDatasheet(
-  file: File,
-  preview: File | null,
+export async function storeDatasheet(
+  bytes: Uint8Array<ArrayBuffer>,
+  fileName: string,
+  preview: { bytes: Uint8Array<ArrayBuffer>; contentType: string } | null,
 ): Promise<UploadResult> {
-  if (file.type !== "application/pdf") {
-    return { ok: false, error: "Unsupported file type. Upload a PDF." };
+  if (bytes.byteLength > MAX_DATASHEET_BYTES) {
+    return { ok: false, error: `PDF is too large (max ${formatFileSize(MAX_DATASHEET_BYTES)}).` };
   }
-  if (file.size > MAX_DATASHEET_BYTES) {
-    return { ok: false, error: "PDF is too large (max 5MB)." };
-  }
-
-  const bytes = new Uint8Array(await file.arrayBuffer());
   // Check the "%PDF-" magic bytes so a renamed non-PDF can't slip through.
   if (!startsWith(bytes, PDF_MAGIC)) {
     return { ok: false, error: "That file isn't a valid PDF." };
   }
 
-  // The preview is a nice-to-have: skip (rather than fail the upload) if it's
-  // missing or doesn't look like the WebP/PNG we asked the browser for.
+  // The preview is a nice-to-have: skip it (rather than fail the upload) if it
+  // doesn't look like the WebP/PNG we asked the browser for.
   let previewObject: CachedObject | null = null;
   if (
     preview &&
-    DATASHEET_PREVIEW_TYPES.includes(preview.type) &&
-    preview.size <= MAX_DATASHEET_PREVIEW_BYTES
+    DATASHEET_PREVIEW_TYPES.includes(preview.contentType) &&
+    preview.bytes.byteLength <= MAX_DATASHEET_PREVIEW_BYTES &&
+    (isWebp(preview.bytes) || startsWith(preview.bytes, PNG_MAGIC))
   ) {
-    const candidate = new Uint8Array(await preview.arrayBuffer());
-    if (isWebp(candidate) || startsWith(candidate, PNG_MAGIC)) {
-      previewObject = { bytes: candidate, contentType: preview.type };
+    previewObject = preview;
+  }
+
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const existing = await prisma.datasheetFile.findUnique({
+    where: { sha256 },
+    select: { key: true },
+  });
+  if (existing) {
+    // Same PDF already stored — share it. Backfill its preview if it had none.
+    const previewKey = datasheetPreviewKey(existing.key);
+    if (previewObject && datasheetPreviewUrl(`/api/media/${existing.key}`)) {
+      await prisma.datasheetFile.upsert({
+        where: { key: previewKey },
+        create: {
+          key: previewKey,
+          contentType: previewObject.contentType,
+          bytes: previewObject.bytes,
+          size: previewObject.bytes.byteLength,
+        },
+        update: {},
+      });
     }
+    return { ok: true, url: `/api/media/${existing.key}` };
   }
 
   // Keep the original name in the key so the UI (and downloads) can show it.
-  const key = `datasheets/${randomUUID()}/${datasheetSafeName(file.name)}.pdf`;
-  const pdfObject: CachedObject = { bytes, contentType: "application/pdf" };
+  const key = `datasheets/${randomUUID()}/${datasheetSafeName(fileName)}.pdf`;
   const previewKey = datasheetPreviewKey(key);
   await prisma.datasheetFile.createMany({
     data: [
-      { key, contentType: pdfObject.contentType, bytes },
+      {
+        key,
+        contentType: "application/pdf",
+        bytes,
+        sha256,
+        fileName: fileName.slice(0, 200),
+        size: bytes.byteLength,
+      },
       ...(previewObject
-        ? [{ key: previewKey, contentType: previewObject.contentType, bytes: previewObject.bytes }]
+        ? [
+            {
+              key: previewKey,
+              contentType: previewObject.contentType,
+              bytes: previewObject.bytes,
+              size: previewObject.bytes.byteLength,
+            },
+          ]
         : []),
     ],
   });
   // Warm the (process-wide) cache so the card/preview right after upload is instant.
-  rememberDatasheet(key, pdfObject);
+  if (bytes.byteLength <= DATASHEET_WHOLE_FILE_MAX) {
+    rememberDatasheet(key, { bytes, contentType: "application/pdf" });
+  }
   if (previewObject) rememberDatasheet(previewKey, previewObject);
   return { ok: true, url: `/api/media/${key}` };
+}
+
+/** Single-request upload (small files) — the chunked routes are used for large ones. */
+export async function uploadDatasheet(file: File, preview: File | null): Promise<UploadResult> {
+  if (file.type !== "application/pdf") {
+    return { ok: false, error: "Unsupported file type. Upload a PDF." };
+  }
+  if (file.size > MAX_DATASHEET_BYTES) {
+    return { ok: false, error: `PDF is too large (max ${formatFileSize(MAX_DATASHEET_BYTES)}).` };
+  }
+  return storeDatasheet(
+    new Uint8Array(await file.arrayBuffer()),
+    file.name,
+    preview ? { bytes: new Uint8Array(await preview.arrayBuffer()), contentType: preview.type } : null,
+  );
 }
 
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2d]; // "%PDF-"
@@ -256,12 +307,15 @@ export async function getDatasheetObject(key: string): Promise<CachedObject | nu
 export function warmDatasheet(url: string | null | undefined): void {
   if (!url?.startsWith(DATASHEET_URL_PREFIX)) return;
   const key = url.slice("/api/media/".length);
-  const keys = datasheetPreviewUrl(url) ? [key, datasheetPreviewKey(key)] : [key];
-  for (const k of keys) {
-    getDatasheetObject(k).catch((error) =>
-      console.error("Failed to warm datasheet cache", error),
-    );
-  }
+  const warm = (k: string) =>
+    getDatasheetObject(k).catch((error) => console.error("Failed to warm datasheet cache", error));
+  if (datasheetPreviewUrl(url)) warm(datasheetPreviewKey(key));
+  // Whole-file warm only for small PDFs — large ones are served in ranges.
+  getDatasheetMeta(key)
+    .then((meta) => {
+      if (!meta || meta.size <= DATASHEET_WHOLE_FILE_MAX) warm(key);
+    })
+    .catch((error) => console.error("Failed to warm datasheet cache", error));
 }
 
 /**
@@ -281,6 +335,190 @@ export async function deleteDatasheet(url: string | null | undefined): Promise<v
     // Orphaned bytes are harmless — never fail the product save over this.
     console.error("Failed to delete old datasheet", error);
   }
+}
+
+// ─── Large datasheets: ranges, streaming, chunked uploads, library ─────────
+
+/**
+ * Files at or below this size are read and cached whole; larger ones are only
+ * ever read in byte ranges (keeps memory flat and every response under
+ * Vercel's ~4.5MB function limit).
+ */
+export const DATASHEET_WHOLE_FILE_MAX = 2 * 1024 * 1024;
+
+type DatasheetMeta = { size: number; contentType: string; fileName: string | null };
+const globalForMeta = globalThis as unknown as { datasheetMeta?: Map<string, DatasheetMeta> };
+const datasheetMeta = (globalForMeta.datasheetMeta ??= new Map());
+
+/** Size + type of a stored datasheet object, without reading its bytes. Null if missing. */
+export async function getDatasheetMeta(key: string): Promise<DatasheetMeta | null> {
+  const cached = datasheetMeta.get(key);
+  // Entries cached before `fileName` was tracked lack the field — refetch those.
+  if (cached && "fileName" in cached) return cached;
+  const rows = await prisma.$queryRaw<
+    { size: number | null; contentType: string; fileName: string | null }[]
+  >`
+    SELECT COALESCE("size", octet_length("bytes")) AS "size", "contentType", "fileName"
+    FROM "DatasheetFile" WHERE "key" = ${key}`;
+  const row = rows[0];
+  if (!row || row.size == null) return null;
+  const meta = { size: Number(row.size), contentType: row.contentType, fileName: row.fileName };
+  datasheetMeta.set(key, meta);
+  return meta;
+}
+
+/**
+ * Original upload names for datasheet URLs (e.g. "MyEnergi EV Charger User
+ * Manual.pdf") — shown on cards and used for downloads instead of the
+ * web-safe slug in the URL. URLs without a stored name are omitted.
+ */
+export async function getDatasheetNames(urls: string[]): Promise<Record<string, string>> {
+  const keys = urls.filter((u) => u.startsWith(DATASHEET_URL_PREFIX)).map((u) => u.slice("/api/media/".length));
+  if (keys.length === 0) return {};
+  const rows = await prisma.datasheetFile.findMany({
+    where: { key: { in: keys } },
+    select: { key: true, fileName: true },
+  });
+  return Object.fromEntries(
+    rows.filter((r) => r.fileName).map((r) => [`/api/media/${r.key}`, r.fileName as string]),
+  );
+}
+
+/** Bytes [start, end] (inclusive) of a stored datasheet, read straight from Postgres. */
+export async function getDatasheetRange(
+  key: string,
+  start: number,
+  end: number,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const cached = datasheetCache.entries.get(key);
+  if (cached) return cached.bytes.slice(start, end + 1);
+  // Plain pg, not prisma.$queryRaw: Prisma's raw result mapping turns a 1MB
+  // bytea slice into a ~4s request; the driver returns it as a Buffer in ~200ms.
+  const { rows } = await pgPool().query<{ chunk: Buffer }>(
+    `SELECT substring("bytes" FROM $1::int FOR $2::int) AS "chunk" FROM "DatasheetFile" WHERE "key" = $3`,
+    [start + 1, end - start + 1, key],
+  );
+  const chunk = rows[0]?.chunk;
+  if (!chunk) return new Uint8Array();
+  // Copy into a plain ArrayBuffer-backed array (Buffers may share a pooled buffer).
+  const out = new Uint8Array(chunk.byteLength);
+  out.set(chunk);
+  return out;
+}
+
+/** Streams a stored datasheet in `sliceSize` pieces (for full downloads of large files). */
+export function streamDatasheet(key: string, size: number, sliceSize = 1024 * 1024): ReadableStream<Uint8Array> {
+  let offset = 0;
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      if (offset >= size) {
+        controller.close();
+        return;
+      }
+      const end = Math.min(offset + sliceSize, size) - 1;
+      const chunk = await getDatasheetRange(key, offset, end);
+      offset = end + 1;
+      controller.enqueue(chunk);
+    },
+  });
+}
+
+/** Stores one part of a chunked upload. */
+export async function putDatasheetUploadPart(
+  uploadId: string,
+  index: number,
+  bytes: Uint8Array<ArrayBuffer>,
+): Promise<void> {
+  await prisma.datasheetUploadPart.upsert({
+    where: { uploadId_index: { uploadId, index } },
+    create: { uploadId, index, bytes },
+    update: { bytes, createdAt: new Date() },
+  });
+}
+
+/** Assembles a chunked upload's parts in order, stores the PDF, and clears the parts. */
+export async function completeDatasheetUpload(
+  uploadId: string,
+  fileName: string,
+  preview: { bytes: Uint8Array<ArrayBuffer>; contentType: string } | null,
+): Promise<UploadResult> {
+  const parts = await prisma.datasheetUploadPart.findMany({
+    where: { uploadId },
+    orderBy: { index: "asc" },
+  });
+  if (parts.length === 0) return { ok: false, error: "Upload not found — please try again." };
+  if (parts.some((p, i) => p.index !== i)) {
+    return { ok: false, error: "Upload is incomplete — please try again." };
+  }
+  const total = parts.reduce((n, p) => n + p.bytes.byteLength, 0);
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const part of parts) {
+    bytes.set(part.bytes, offset);
+    offset += part.bytes.byteLength;
+  }
+  try {
+    return await storeDatasheet(bytes, fileName, preview);
+  } finally {
+    await prisma.datasheetUploadPart.deleteMany({ where: { uploadId } });
+  }
+}
+
+/** Drops parts of uploads abandoned more than a day ago. */
+export async function pruneDatasheetUploadParts(): Promise<void> {
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  await prisma.datasheetUploadPart.deleteMany({ where: { createdAt: { lt: cutoff } } });
+}
+
+export type DatasheetLibraryItem = {
+  url: string;
+  fileName: string;
+  size: number | null;
+  createdAt: string;
+  usedBy: { id: string; name: string }[];
+};
+
+/** Every stored datasheet PDF, newest first, with the products that use it. */
+export async function listDatasheetLibrary(): Promise<DatasheetLibraryItem[]> {
+  const [files, products] = await Promise.all([
+    prisma.datasheetFile.findMany({
+      where: { key: { startsWith: "datasheets/", endsWith: ".pdf" } },
+      select: { key: true, fileName: true, size: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.product.findMany({
+      where: { NOT: { datasheets: { isEmpty: true } } },
+      select: { id: true, name: true, datasheets: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+  return files.map((f) => {
+    const url = `/api/media/${f.key}`;
+    return {
+      url,
+      fileName: f.fileName ?? datasheetFileName(url),
+      size: f.size,
+      createdAt: f.createdAt.toISOString(),
+      usedBy: products
+        .filter((p) => p.datasheets.includes(url))
+        .map((p) => ({ id: p.id, name: p.name })),
+    };
+  });
+}
+
+/** Deletes a datasheet from the library — refused while any product still uses it. */
+export async function deleteDatasheetIfUnused(url: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!url.startsWith(DATASHEET_URL_PREFIX)) return { ok: false, error: "Not a datasheet." };
+  const inUse = await prisma.product.count({ where: { datasheets: { has: url } } });
+  if (inUse > 0) {
+    return {
+      ok: false,
+      error: `Still used by ${inUse} product${inUse === 1 ? "" : "s"} — remove it from them first.`,
+    };
+  }
+  await deleteDatasheet(url);
+  datasheetMeta.delete(url.slice("/api/media/".length));
+  return { ok: true };
 }
 
 type ObjectStream = {

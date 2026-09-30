@@ -6,6 +6,23 @@ export const DATASHEET_URL_PREFIX = "/api/media/datasheets/";
 /** Most datasheets one product can have. */
 export const MAX_DATASHEETS = 10;
 
+/** Largest datasheet PDF accepted (client and server). */
+export const MAX_DATASHEET_BYTES = 20 * 1024 * 1024;
+/**
+ * Upload part size. Vercel caps a function request/response at ~4.5MB, so
+ * large PDFs are uploaded — and served — in slices no bigger than this.
+ */
+export const DATASHEET_CHUNK_BYTES = 4 * 1024 * 1024;
+/** Most parts one upload can have (20MB / 4MB). */
+export const MAX_DATASHEET_PARTS = Math.ceil(MAX_DATASHEET_BYTES / DATASHEET_CHUNK_BYTES);
+
+/** Human-readable file size, e.g. "684 KB", "17.6 MB". */
+export function formatFileSize(bytes: number | null | undefined): string {
+  if (!bytes) return "";
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 const UUID_PDF_RE = /^[0-9a-f-]{36}\.pdf$/i;
 
 /** Slugified, length-capped version of an uploaded file's name (no extension). */

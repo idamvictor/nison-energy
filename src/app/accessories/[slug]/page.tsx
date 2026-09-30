@@ -9,7 +9,7 @@ import {
   dbToAccessory,
   dbToDetail,
 } from "@/lib/catalog/queries";
-import { warmDatasheet } from "@/lib/media/queries";
+import { getDatasheetNames, warmDatasheet } from "@/lib/media/queries";
 import { adminRoute } from "@/lib/catalog/types";
 import { groupByVariant } from "@/lib/catalog/variant-grouping";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
@@ -85,6 +85,7 @@ export default async function AccessoryDetailPage({
   const detail = dbToDetail(row);
   // Pull the datasheet into memory now so the viewer finds it cached on first click.
   for (const url of detail.datasheets) warmDatasheet(url);
+  const datasheetNames = await getDatasheetNames(detail.datasheets);
 
   const catalog = await getAccessoryCatalog();
   const siblings = catalog.filter(
@@ -265,7 +266,7 @@ export default async function AccessoryDetailPage({
 
             {detail.datasheets.length > 0 && (
               <TabsContent value="datasheet" className="py-6">
-                <ProductDatasheet urls={detail.datasheets} />
+                <ProductDatasheet urls={detail.datasheets} names={datasheetNames} />
               </TabsContent>
             )}
           </Tabs>

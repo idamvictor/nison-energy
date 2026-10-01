@@ -31,11 +31,11 @@ export function SignInRequiredDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sign in to generate your quote</DialogTitle>
+          <DialogTitle>Create an account or sign-in to continue</DialogTitle>
           <DialogDescription>
-            Your quote is saved to your account so you can find it again any
-            time — sign in (or create an account) to continue. Your answers
-            and details are kept, so you&apos;ll pick up right where you left off.
+            Once you create an account, your quotes will be automatically
+            saved to your account. Depending on the nature of your account,
+            your quote will be reviewed and approved before download.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

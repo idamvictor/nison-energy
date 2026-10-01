@@ -184,36 +184,14 @@ export default function CheckoutPage() {
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
       <TrustBar />
-      <main className="flex-1">
+      <main className="flex-1 bg-secondary/40">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
             Checkout
           </h1>
 
-          {!submitted && (
-            <Link
-              href="/ozev-grant-guide"
-              className="group mt-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-5 py-4 transition-colors hover:bg-primary/10"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
-                  <Zap className="size-4.5" />
-                </span>
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    Did you know you could get up to £500 off with an OZEV grant?
-                  </p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    Check Your OZEV Grant Eligibility — £0 Today!
-                  </p>
-                </div>
-              </div>
-              <ArrowRight className="size-4 shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          )}
-
           {submitted ? (
-            <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-border bg-secondary px-6 py-16 text-center">
+            <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-foreground/15 bg-card px-6 py-16 text-center shadow-md">
               <span className="flex size-12 items-center justify-center rounded-full bg-success/15">
                 <CheckCircle2 className="size-6 text-success" />
               </span>
@@ -242,7 +220,7 @@ export default function CheckoutPage() {
               </Button>
             </div>
           ) : lines.length === 0 ? (
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/20 bg-card py-20 text-center">
               <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
                 <ShoppingCart className="size-5" />
               </span>
@@ -292,10 +270,10 @@ export default function CheckoutPage() {
                   className="absolute -left-[9999px] h-0 w-0 opacity-0"
                 />
 
-                <Card>
+                <Card className="border border-foreground/18 shadow-md">
                   <CardContent className="flex flex-col gap-3">
                     <StepHeading number={1} title="Survey" />
-                    <div className="flex items-start gap-3 rounded-lg bg-secondary px-4 py-3">
+                    <div className="flex items-start gap-3 rounded-lg bg-secondary px-4 py-3 ring-1 ring-foreground/10">
                       <Video className="mt-0.5 size-4.5 shrink-0 text-primary-ink" />
                       <div>
                         <div className="flex items-center justify-between gap-2">
@@ -313,7 +291,7 @@ export default function CheckoutPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border border-foreground/18 shadow-md">
                   <CardContent className="flex flex-col gap-3">
                     <StepHeading number={2} title="Extras" />
 
@@ -322,7 +300,7 @@ export default function CheckoutPage() {
                         {selectedExtras.map((extra) => (
                           <div
                             key={extra.id}
-                            className="flex items-start gap-3 rounded-lg border border-border px-4 py-3"
+                            className="flex items-start gap-3 rounded-lg border border-foreground/15 px-4 py-3"
                           >
                             <extra.icon className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                             <div className="flex-1">
@@ -383,7 +361,7 @@ export default function CheckoutPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border border-foreground/18 shadow-md">
                   <CardContent className="flex flex-col gap-4">
                     <StepHeading number={3} title="Delivery and Installation Address" />
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -423,7 +401,7 @@ export default function CheckoutPage() {
                       </Field>
                     </div>
 
-                    <label className="flex cursor-pointer items-start gap-2.5 rounded-lg bg-secondary px-3.5 py-3 text-sm text-foreground">
+                    <label className="flex cursor-pointer items-start gap-2.5 rounded-lg bg-secondary px-3.5 py-3 text-sm text-foreground ring-1 ring-foreground/10">
                       <input
                         type="checkbox"
                         checked={billingSame}
@@ -435,7 +413,7 @@ export default function CheckoutPage() {
                     </label>
 
                     {!billingSame && (
-                      <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 rounded-lg border border-foreground/15 p-4">
                         <p className="text-sm font-semibold text-foreground">Billing address</p>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <Field label="Address line 1" className="sm:col-span-2">
@@ -522,7 +500,7 @@ export default function CheckoutPage() {
                 </div>
               </form>
 
-              <Card className="h-fit">
+              <Card className="h-fit border border-foreground/18 shadow-md">
                 <CardContent className="flex flex-col gap-4">
                   <h2 className="font-heading text-lg font-semibold text-foreground">
                     Order Summary

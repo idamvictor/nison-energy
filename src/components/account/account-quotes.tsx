@@ -61,7 +61,7 @@ export function AccountQuotes({ quotes }: { quotes: QuoteDocumentView[] }) {
           Quotes
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Quotes generated from the OZEV guides — download once approved.
+          Download the quote documents showing approved. Approved means reviewed and ready for download.
         </p>
       </div>
 

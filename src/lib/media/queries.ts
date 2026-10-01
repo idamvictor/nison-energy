@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { cache } from "react";
 
 import {
@@ -305,6 +306,9 @@ export async function getDatasheetObject(key: string): Promise<CachedObject | nu
  * product page renders, so the viewer usually finds it cached on first click.
  */
 export function warmDatasheet(url: string | null | undefined): void {
+  // At build time the cache dies with the build worker, and the PDF reads
+  // starve the prerender queries of pool connections (connect timeouts).
+  if (process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) return;
   if (!url?.startsWith(DATASHEET_URL_PREFIX)) return;
   const key = url.slice("/api/media/".length);
   const warm = (k: string) =>

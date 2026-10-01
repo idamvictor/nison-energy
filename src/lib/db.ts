@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { Pool } from "pg";
 
 import { PrismaClient } from "@/generated/prisma/client";
@@ -25,7 +26,10 @@ function createPool() {
     // with "Connection terminated unexpectedly").
     keepAlive: true,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 10_000,
+    // Also bounds the wait for a free pool slot. At build time each worker
+    // prerenders many pages through these 5 connections, so let them queue.
+    connectionTimeoutMillis:
+      process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD ? 120_000 : 10_000,
     max: 5,
   });
   // An idle client dropped by the server emits here; swallow it so it doesn't

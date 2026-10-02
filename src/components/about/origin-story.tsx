@@ -4,7 +4,7 @@ import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 
 const QUOTE_IMG =
-  "https://ocunioenergy.com/wp-content/uploads/2025/05/pexels-kindelmedia-9800036-scaled.webp";
+  "/media/wp/2025/05/pexels-kindelmedia-9800036-scaled.webp";
 
 export function OriginStory() {
   return (

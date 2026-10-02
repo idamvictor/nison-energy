@@ -4,8 +4,8 @@ import type { Prisma } from "../src/generated/prisma/client";
 // `Product` table by prisma/seed.ts. `sortOrder` follows array order; the first
 // three of each category are `featured` (matches the old home-page `.slice(0,3)`).
 
-const IMG = "https://ocunioenergy.com/wp-content/uploads";
-const ACC_IMG = "https://ocunioenergy.com/wp-content/uploads/2025/05";
+const IMG = "/media/wp";
+const ACC_IMG = "/media/wp/2025/05";
 const accImages = {
   greyCoiled: `${ACC_IMG}/ZEV_Grey-Coil-min-scaled.png`,
   greyStraight: `${ACC_IMG}/ZEV_Grey_Straight-2-min-scaled.png`,

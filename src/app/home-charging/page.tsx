@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "Browse our full range of OZEV-approved home EV chargers, professionally installed by certified engineers.",
 };
 
-const IMG = "https://ocunioenergy.com/wp-content/uploads";
+const IMG = "/media/wp";
 
 export default async function HomeChargingPage() {
   const products = await getResidentialCatalog();

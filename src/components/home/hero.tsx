@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(useGSAP);
 
-const IMG = "https://ocunioenergy.com/wp-content/uploads";
+const IMG = "/media/wp";
 
 type Slide = {
   tag?: string;

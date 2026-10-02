@@ -251,16 +251,18 @@ export default async function GrantSchemePage({
 
             <Reveal>
               <div className="flex flex-wrap gap-3 border-t border-foreground/15 pt-8">
-                <Button
-                  size="lg"
-                  variant="cta"
-                  className="gap-2"
-                  nativeButton={false}
-                  render={<a href={scheme.moreInfoHref} target="_blank" rel="noopener noreferrer" />}
-                >
-                  More Information
-                  <ExternalLink className="size-4" />
-                </Button>
+                {scheme.moreInfoHref && (
+                  <Button
+                    size="lg"
+                    variant="cta"
+                    className="gap-2"
+                    nativeButton={false}
+                    render={<Link href={scheme.moreInfoHref} />}
+                  >
+                    More Information
+                    <ArrowRight className="size-4" />
+                  </Button>
+                )}
                 <Button
                   size="lg"
                   variant="cta"

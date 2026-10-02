@@ -57,7 +57,7 @@ export default function OzevGrantsPage() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0">
             <Image
-              src="https://ocunioenergy.com/wp-content/uploads/2025/05/Home-Charging-Image.jpg"
+              src="/media/wp/2025/05/Home-Charging-Image.jpg"
               alt=""
               fill
               priority

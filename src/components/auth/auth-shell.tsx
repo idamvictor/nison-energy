@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, BadgeCheck, PoundSterling, Truck } from "lucide-react";
 
 const PANEL_IMAGE =
-  "https://ocunioenergy.com/wp-content/uploads/2025/05/side-view-man-charging-his-car-min-scaled.webp";
+  "/media/wp/2025/05/side-view-man-charging-his-car-min-scaled.webp";
 
 const facts = [
   { icon: PoundSterling, label: "OZEV grant support" },

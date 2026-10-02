@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "Commercial EV charger installation for offices, depots and car parks, backed by the OZEV Workplace Charging Scheme.",
 };
 
-const IMG = "https://ocunioenergy.com/wp-content/uploads";
+const IMG = "/media/wp";
 
 export default async function WorkplaceChargingPage() {
   const products = await getCommercialCatalog();

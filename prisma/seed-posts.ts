@@ -24,7 +24,7 @@ const seedPosts: SeedPost[] = [
     title: "Work From Home? You Could Claim £500 towards an EV Charger",
     excerpt:
       "The Workplace Charging Scheme is usually pitched at offices and fleet yards — but if your home is your registered place of business, you can often claim too.",
-    coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/06/image-3.jpeg",
+    coverImage: "/media/wp/2026/06/image-3.jpeg",
     author: "Ocunio Energy",
     publishedAt: "2026-06-09",
     tags: ["Workplace Charging Scheme", "OZEV Grants", "Home Business"],
@@ -83,7 +83,7 @@ Not sure if your home setup qualifies? That's the most common question we get fr
     title: "OZEV EV Charger Grants Have Just Got Bigger",
     excerpt:
       "From 1 April 2026 the grant rate jumped to £500 per socket across both the Workplace Charging Scheme and the Residential Landlord Chargepoint Grant — here's what that means in practice.",
-    coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/06/image-1.jpeg",
+    coverImage: "/media/wp/2026/06/image-1.jpeg",
     author: "Ocunio Energy",
     publishedAt: "2026-06-09",
     tags: ["OZEV Grants", "Workplace Charging Scheme", "Landlords"],
@@ -215,7 +215,7 @@ Add EV charging to your portfolio or workplace. [Book a free site survey](/conta
     title: "Why EV Charging Adds Value to Your Property — and How to Make It Pay",
     excerpt:
       "Rightmove and Zoopla are both tracking a surge in demand for EV charging. Here's what it does to your property's value, and how a networked charger can pay for itself.",
-    coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/06/id-1.jpg",
+    coverImage: "/media/wp/2026/06/id-1.jpg",
     author: "Ocunio Energy",
     publishedAt: "2026-06-09",
     tags: ["Property", "Landlords", "EV Charging"],
@@ -267,7 +267,7 @@ Ready to add charging — and make it work for you? [Book a free, no-obligation 
     title: "The 2026 EV Explosion & Your Energy Independence",
     excerpt:
       "25% of global car sales are now electric. Here's what's happening right now across charging speeds, home energy freedom, infrastructure and the 2025/26 grants.",
-    coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/04/i3nnin.jpg",
+    coverImage: "/media/wp/2026/04/i3nnin.jpg",
     author: "Ocunio Energy",
     publishedAt: "2026-04-21",
     tags: ["EV Industry", "Home Charging", "OZEV Grants"],
@@ -313,7 +313,7 @@ Whether you're a homeowner looking for energy independence or a business scaling
     title: "OZEV EV Charge Point Grants: Key Changes for 2026/27",
     excerpt:
       "Five grant schemes have been extended until 31 March 2027 with new, higher rates, while three grants close permanently at the end of March 2026. Here's what's changing.",
-    coverImage: "https://ocunioenergy.com/wp-content/uploads/2025/06/Picture89.jpg",
+    coverImage: "/media/wp/2025/06/Picture89.jpg",
     author: "Ocunio Energy",
     publishedAt: "2026-03-30",
     tags: ["OZEV Grants", "Policy Update"],
@@ -375,7 +375,7 @@ If you have questions or need support navigating the new requirements, it's wort
     title: "Guide to Electric Car Charging and Ownership",
     excerpt:
       "From home charging tariffs and cable types to connector standards, battery health and today's OZEV grant rates — a complete walkthrough of EV ownership.",
-    coverImage: "https://ocunioenergy.com/wp-content/uploads/2026/03/image-2.jpeg",
+    coverImage: "/media/wp/2026/03/image-2.jpeg",
     author: "Ocunio Energy",
     publishedAt: "2026-03-10",
     tags: ["EV Ownership", "Home Charging", "OZEV Grants"],
@@ -492,7 +492,7 @@ At Ocunio Energy, our electricians are OZEV-approved, so we can take away the ha
     excerpt:
       "A £650 million Electric Car Grant offers discounts of up to £3,750 on eligible electric vehicles priced at or under £37,000 — here's who qualifies and what it means alongside home charging.",
     coverImage:
-      "https://ocunioenergy.com/wp-content/uploads/2025/07/UK-Electric-Car-Grant-2025_blog-image.webp",
+      "/media/wp/2025/07/UK-Electric-Car-Grant-2025_blog-image.webp",
     author: "Ocunio Energy",
     publishedAt: "2025-07-30",
     tags: ["EV Grants", "Buying an EV"],
@@ -573,7 +573,7 @@ Ready to explore your electric future? [Contact Ocunio Energy](/contact-us) toda
     excerpt:
       "Your cable is just as crucial as your charger. Here's why we recommend ZEV's Type 2 charging cables for home, workplace and public charging.",
     coverImage:
-      "https://ocunioenergy.com/wp-content/uploads/2025/07/Zev-Cable-2025-05-04-at-15.38.53.jpeg.jpg",
+      "/media/wp/2025/07/Zev-Cable-2025-05-04-at-15.38.53.jpeg.jpg",
     author: "Ocunio Energy",
     publishedAt: "2025-07-12",
     tags: [

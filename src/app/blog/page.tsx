@@ -31,7 +31,7 @@ export default async function BlogPage() {
         <CategoryHero
           title="The Ocunio Energy Blog"
           subtitle="EV charging news, OZEV grant updates, and buying guides — written by our team."
-          image="https://ocunioenergy.com/wp-content/uploads/2026/06/image-3.jpeg"
+          image="/media/wp/2026/06/image-3.jpeg"
         />
         <BlogList posts={posts} />
         <HelpSection />

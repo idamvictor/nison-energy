@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 
-const IMG = "https://ocunioenergy.com/wp-content/uploads/2025/05";
+const IMG = "/media/wp/2025/05";
 
 const logos = [
   { src: `${IMG}/wallbox.png`, alt: "Wallbox" },

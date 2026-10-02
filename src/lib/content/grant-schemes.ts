@@ -1,4 +1,4 @@
-const IMG = "https://ocunioenergy.com/wp-content/uploads/2025/05";
+const IMG = "/media/wp/2025/05";
 
 export type GrantStatus = "open" | "closed";
 
@@ -17,7 +17,8 @@ export type GrantScheme = {
   requirements?: string[];
   documentation?: string[];
   applicationSteps?: string[];
-  moreInfoHref: string;
+  /** In-site guide for this scheme, when one exists. */
+  moreInfoHref?: string;
   resources: { label: string; href: string }[];
 };
 
@@ -78,8 +79,7 @@ export const grantSchemes: GrantScheme[] = [
       "Vehicle evidence: your V5C logbook, lease agreement, or registration number if you already have the car — or your vehicle order form plus a photo of your off-street parking space if it's on order",
       "Some landlords, especially councils or housing associations, require you to submit a business case as part of your permission — we support you with the information and supporting documents needed for this",
     ],
-    moreInfoHref:
-      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-renters-and-flat-owners/",
+    moreInfoHref: "/ozev-grant-guide/renters-and-flat-owners",
     resources: [
       {
         label: "Apply via Find a Grant",
@@ -108,8 +108,7 @@ export const grantSchemes: GrantScheme[] = [
       "Have a company registration or VAT number (individuals, RTM/RMC companies, freeholders, management companies, social housing providers, and public sector landlords all qualify)",
       "Not be installing the chargepoint because it's a mandatory requirement (e.g. a new-build planning condition)",
     ],
-    moreInfoHref:
-      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-residential-landlords/",
+    moreInfoHref: "/ozev-grant-guide/residential-landlords",
     resources: govResources,
   },
   {
@@ -138,8 +137,7 @@ export const grantSchemes: GrantScheme[] = [
       "Share the voucher with your installer and complete installation within 180 days (don't install before the voucher is issued)",
       "Your installer claims the grant on your behalf and deducts it from your invoice",
     ],
-    moreInfoHref:
-      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-businesses-charities-and-public-sector/",
+    moreInfoHref: "/ozev-grant-guide/workplace-charging-scheme",
     resources: [
       {
         label: "Apply for a workplace voucher",
@@ -173,8 +171,6 @@ export const grantSchemes: GrantScheme[] = [
       "Have previously claimed this grant or the Renters and Flat Owners grant at this address",
       "Are moving or planning to move",
     ],
-    moreInfoHref:
-      "https://ocunioenergy.com/ozev-grants/electric-vehicle-chargepoint-grant-for-households-with-on-street-parking/",
     resources: [
       {
         label: "Apply via Find a Grant",
@@ -216,8 +212,6 @@ export const grantSchemes: GrantScheme[] = [
       "Your installer completes the work within the 180-day voucher validity period",
       "Your installer submits the claim, including photographs, a cost breakdown, and a site plan, and deducts the grant from your invoice",
     ],
-    moreInfoHref:
-      "https://ocunioenergy.com/ozev-grants/workplace-charging-scheme-for-state-funded-education-institutions/",
     resources: [
       {
         label: "Apply on GOV.UK",

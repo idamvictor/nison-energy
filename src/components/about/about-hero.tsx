@@ -8,7 +8,7 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(useGSAP);
 
 const IMG =
-  "https://ocunioenergy.com/wp-content/uploads/2025/05/pexels-andersen-ev-1587213396-27355833-scaled.jpg";
+  "/media/wp/2025/05/pexels-andersen-ev-1587213396-27355833-scaled.jpg";
 
 const headline = "Your One-Stop EV Charging Solution";
 

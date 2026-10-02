@@ -6,7 +6,7 @@ import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { cn } from "@/lib/utils";
 
-const IMG = "https://ocunioenergy.com/wp-content/uploads";
+const IMG = "/media/wp";
 
 const categories = [
   {

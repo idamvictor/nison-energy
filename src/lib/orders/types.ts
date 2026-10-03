@@ -99,7 +99,7 @@ export type PlaceOrderResult =
   | { ok: false; errors: Record<string, string> };
 
 export type CreateCheckoutSessionResult =
-  | { ok: true; url: string }
+  | { ok: true; clientSecret: string; orderId: string }
   | { ok: false; errors: Record<string, string> };
 
 export type OrderActionResult = { ok: true } | { ok: false; error: string };

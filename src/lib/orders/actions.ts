@@ -86,16 +86,13 @@ export async function createCheckoutSession(
     const customer = await upsertStripeCustomer(order);
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      // The Customer carries the checkout form's name + addresses, so Stripe's
-      // payment page opens with the delivery address filled in as shipping
-      // and "Billing info is same as shipping" ticked. Hosted Checkout can't
-      // pre-fill a *different* billing address — those customers untick the
-      // box and enter it (it's also saved on the order and the Customer).
+      // Payment is taken on our own /checkout page with the Payment Element
+      // (no redirect to Stripe). The delivery and billing addresses come from
+      // our form — they're on the Order and the Customer, and the billing
+      // address is passed to Stripe when the customer confirms.
+      ui_mode: "elements",
       customer,
       billing_address_collection: "required",
-      shipping_address_collection: { allowed_countries: ["GB"] },
-      // Anything the customer corrects on Stripe's page is saved back.
-      customer_update: { address: "auto", shipping: "auto", name: "auto" },
       line_items: order.items.map((item) => ({
         price_data: {
           currency: "gbp",
@@ -105,19 +102,18 @@ export async function createCheckoutSession(
         quantity: item.quantity,
       })),
       invoice_creation: { enabled: true },
-      success_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/checkout`,
+      return_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       metadata: { orderId: order.id },
     });
 
-    if (!session.url) throw new Error("Stripe did not return a Checkout URL.");
+    if (!session.client_secret) throw new Error("Stripe did not return a client secret.");
 
     await prisma.order.update({
       where: { id: order.id },
       data: { stripeCheckoutSessionId: session.id },
     });
 
-    return { ok: true, url: session.url };
+    return { ok: true, clientSecret: session.client_secret, orderId: order.id };
   } catch {
     await prisma.order.delete({ where: { id: order.id } }).catch(() => {});
     return {
@@ -127,6 +123,31 @@ export async function createCheckoutSession(
       },
     };
   }
+}
+
+/**
+ * The customer went back to edit their details after the payment form opened:
+ * expire that Checkout Session and drop its draft order, so editing never
+ * leaves phantom Unpaid orders behind. Only an Unpaid order with an open
+ * session qualifies — anything already paid (or mid-payment) is left alone.
+ */
+export async function cancelCheckoutDraft(orderId: string): Promise<void> {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { paymentStatus: true, stripeCheckoutSessionId: true },
+  });
+  if (!order || order.paymentStatus !== "Unpaid" || !order.stripeCheckoutSessionId) return;
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(order.stripeCheckoutSessionId);
+    if (session.status !== "open") return;
+    await stripe.checkout.sessions.expire(session.id);
+  } catch {
+    return; // couldn't confirm it's safe to delete — the 24h expiry webhook cleans up instead
+  }
+
+  await prisma.order.deleteMany({ where: { id: orderId, paymentStatus: "Unpaid" } });
+  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 }
 
 /**

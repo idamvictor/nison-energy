@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -31,7 +31,8 @@ import {
 } from "@/components/shared/address-autocomplete";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { placeOrder, createCheckoutSession } from "@/lib/orders/actions";
+import { placeOrder, createCheckoutSession, cancelCheckoutDraft } from "@/lib/orders/actions";
+import { StripePayment, type StripePaymentProps } from "@/components/checkout/stripe-payment";
 import type { OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
 
@@ -54,12 +55,23 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
   const [pending, startTransition] = useTransition();
   const [payPending, startPayTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  // The submit buttons stay disabled until every required field (and the
+  // terms box) passes the browser's own validation.
+  const [formValid, setFormValid] = useState(false);
+  const checkForm = () => setFormValid(formRef.current?.checkValidity() ?? false);
+  // Also re-check after state-driven changes (address suggestions filling
+  // town/postcode, the billing toggle) that don't fire an input event.
+  useEffect(checkForm);
   // Town + postcode are controlled so picking an address suggestion can fill them.
   const [city, setCity] = useState("");
   const [postcode, setPostcode] = useState("");
   const [billingSame, setBillingSame] = useState(true);
   const [billingCity, setBillingCity] = useState("");
   const [billingPostcode, setBillingPostcode] = useState("");
+  // Set once "Continue to payment" has created the draft order + Checkout
+  // Session; the form above locks and the Stripe payment step appears.
+  const [payment, setPayment] = useState<(StripePaymentProps & { orderId: string }) | null>(null);
+  const [editing, startEditTransition] = useTransition();
 
   function handleAddressSelect(suggestion: AddressSuggestion) {
     if (suggestion.city) setCity(suggestion.city);
@@ -138,7 +150,36 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
         setError(Object.values(result.errors)[0] ?? "Could not start checkout.");
         return;
       }
-      window.location.href = result.url;
+      const billingSameAsDelivery = payload.billingSameAsDelivery !== false;
+      setPayment({
+        clientSecret: result.clientSecret,
+        orderId: result.orderId,
+        billingAddress: {
+          name: `${payload.firstName} ${payload.lastName}`.trim(),
+          address: {
+            country: "GB",
+            // The "Use my delivery address as my billing address" box decides
+            // which address Stripe records as billing.
+            line1: (billingSameAsDelivery ? payload.address : payload.billingAddress)?.trim(),
+            line2: "",
+            city: (billingSameAsDelivery ? payload.city : payload.billingCity)?.trim(),
+            postal_code: (billingSameAsDelivery ? payload.postcode : payload.billingPostcode)?.trim(),
+            // UK addresses have no state, but the Payment Element rejects
+            // confirm() unless it's non-empty (null/"" count as missing) — the
+            // town is the closest UK equivalent (county/post town).
+            state: (billingSameAsDelivery ? payload.city : payload.billingCity)?.trim(),
+          },
+        },
+      });
+    });
+  }
+
+  function handleEditDetails() {
+    if (!payment) return;
+    const { orderId } = payment;
+    startEditTransition(async () => {
+      await cancelCheckoutDraft(orderId);
+      setPayment(null);
     });
   }
 
@@ -197,6 +238,8 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
             <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
               <form
                 ref={formRef}
+                onInput={checkForm}
+                onChange={checkForm}
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -231,6 +274,9 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                   aria-hidden
                   className="absolute -left-[9999px] h-0 w-0 opacity-0"
                 />
+
+                {/* Locked while the payment step is open — "Edit details" unlocks it. */}
+                <fieldset disabled={!!payment} className="contents">
 
                 <Card className="border border-foreground/18 shadow-md">
                   <CardContent className="flex flex-col gap-3">
@@ -377,8 +423,7 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                         onChange={(e) => setBillingSame(e.target.checked)}
                         className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary-ink"
                       />
-                      My billing address is the same as my delivery and
-                      installation address
+                      Use my delivery address as my billing address
                     </label>
 
                     {!billingSame && (
@@ -444,14 +489,36 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                     .
                   </span>
                 </label>
+                </fieldset>
 
                 {error && <p className="text-sm text-destructive">{error}</p>}
 
+                {payment ? (
+                  <Card className="border border-foreground/18 shadow-md">
+                    <CardContent className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <StepHeading number={4} title="Payment" />
+                        <button
+                          type="button"
+                          onClick={handleEditDetails}
+                          disabled={editing}
+                          className="text-sm font-medium text-primary-ink underline underline-offset-2 hover:text-foreground disabled:opacity-50"
+                        >
+                          {editing ? "Unlocking…" : "Edit details"}
+                        </button>
+                      </div>
+                      <StripePayment
+                        clientSecret={payment.clientSecret}
+                        billingAddress={payment.billingAddress}
+                      />
+                    </CardContent>
+                  </Card>
+                ) : (
                 <div className="flex flex-wrap gap-3">
                   {hasQuoteOnlyItems ? (
                     // Quote-only items have no price, so they can't be paid
                     // online — the order goes to the team for review instead.
-                    <Button type="submit" size="lg" variant="cta" disabled={pending} className="w-fit">
+                    <Button type="submit" size="lg" variant="cta" disabled={pending || !formValid} className="w-fit">
                       {pending ? "Placing order…" : "Place Order"}
                     </Button>
                   ) : (
@@ -459,17 +526,20 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                       type="submit"
                       size="lg"
                       variant="cta"
-                      disabled={payPending}
+                      disabled={payPending || !formValid}
                       className="w-fit gap-1.5"
                     >
-                      {payPending ? "Opening secure payment…" : "Proceed to Payment"}
+                      {payPending ? "Preparing secure payment…" : "Continue to payment"}
                       {!payPending && <ArrowRight className="size-4" />}
                     </Button>
                   )}
                 </div>
+                )}
               </form>
 
-              <Card className="h-fit border border-foreground/18 shadow-md">
+              {/* Pinned below the sticky site header on desktop while the form scrolls;
+                  scrolls internally only if the summary itself outgrows the screen. */}
+              <Card className="h-fit border border-foreground/18 shadow-md lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
                 <CardContent className="flex flex-col gap-4">
                   <h2 className="font-heading text-lg font-semibold text-foreground">
                     Order Summary

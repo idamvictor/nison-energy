@@ -24,7 +24,7 @@ export async function ProductGrid({
 
   return (
     <section id="chargers" className="bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <SectionKicker center />
@@ -35,7 +35,7 @@ export async function ProductGrid({
           </div>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product, index) => (
             <Reveal key={product.id} delay={(index % 3) * 75}>
               <ProductCard variants={[product]} />
@@ -45,7 +45,7 @@ export async function ProductGrid({
 
         {viewAllHref ? (
           <Reveal>
-            <div className="mt-12 flex justify-center">
+            <div className="mt-8 flex justify-center">
               <Button
                 size="lg"
                 variant="outline"
@@ -60,7 +60,7 @@ export async function ProductGrid({
           </Reveal>
         ) : (
           <Reveal>
-            <div className="mt-14 flex flex-col items-center gap-4 rounded-2xl border border-primary/15 bg-secondary px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+            <div className="mt-10 flex flex-col items-center gap-4 rounded-2xl border border-primary/15 bg-secondary px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
               <div>
                 <p className="font-heading text-lg font-semibold text-foreground">
                   Can&apos;t find what you&apos;re looking for?

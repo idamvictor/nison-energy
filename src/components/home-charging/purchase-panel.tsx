@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, Heart, Zap } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Heart, Zap } from "lucide-react";
 
 import type { Product } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -71,11 +71,11 @@ export function PurchasePanel({
     installation === "standard"
       ? `Standard installation (+${formatCurrency(installFee)})`
       : installation === "none"
-        ? "No installation (device only)"
+        ? "No installation (charger only)"
         : "Select";
 
   return (
-    <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
+    <div className="flex flex-col gap-5 rounded-2xl border-2 border-foreground/10 bg-card p-6 shadow-[0_12px_40px_-16px_rgb(0_0_0/0.25)]">
       <div>
         <p className="text-3xl font-semibold text-foreground">
           {formatCurrency(total)}
@@ -179,7 +179,7 @@ export function PurchasePanel({
                   }}
                   className="flex w-full items-center justify-between border-t border-border px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
-                  No installation (device only)
+                  No installation (charger only)
                   {installation === "none" && <Check className="size-4 text-primary-ink" />}
                 </button>
               </div>
@@ -253,21 +253,22 @@ export function PurchasePanel({
 
       <Link
         href="/ozev-grant-guide"
-        className="group flex items-center justify-between gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3.5 transition-colors hover:bg-primary/10"
+        className="group flex items-center justify-between gap-3 rounded-xl border-2 border-primary bg-primary/10 px-4 py-3.5 transition-colors hover:bg-primary/15"
       >
         <div className="flex items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-white">
             <Zap className="size-4.5" />
           </span>
           <div>
-            <p className="text-sm font-medium text-foreground">
+            <p className="text-[15px] font-semibold text-foreground">
               Pay £0 today. Get up to £500 funded by the UK government.
             </p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-0.5 text-xs text-foreground/75">
               No payment due until grant is approved.
             </p>
           </div>
         </div>
+        <ArrowRight className="size-4 shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5" />
       </Link>
     </div>
   );

@@ -11,6 +11,7 @@ export function PageHero({
   title,
   subtitle,
   align = "center",
+  size = "default",
   children,
   className,
 }: {
@@ -18,6 +19,8 @@ export function PageHero({
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   align?: "center" | "left";
+  /** `compact` halves the vertical padding for pages where the content should start sooner. */
+  size?: "default" | "compact";
   /** Extra content under the subtitle (e.g. a CTA). */
   children?: React.ReactNode;
   className?: string;
@@ -35,7 +38,8 @@ export function PageHero({
       />
       <div
         className={cn(
-          "mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8",
+          "mx-auto max-w-3xl px-4 sm:px-6 lg:px-8",
+          size === "compact" ? "py-8 sm:py-10" : "py-16 sm:py-20",
           centered ? "text-center" : "max-w-7xl",
         )}
       >
@@ -50,7 +54,12 @@ export function PageHero({
             {eyebrow}
           </p>
         )}
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.02em] text-balance sm:text-4xl">
+        <h1
+          className={cn(
+            "mt-3 font-semibold tracking-[-0.02em] text-balance",
+            size === "compact" ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl",
+          )}
+        >
           {title}
         </h1>
         {subtitle && (

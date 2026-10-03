@@ -21,7 +21,7 @@ export function TrustedInstallers() {
 
   return (
     <section className="bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <Reveal>
           <SectionKicker center />
           <h2 className="mt-4 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">

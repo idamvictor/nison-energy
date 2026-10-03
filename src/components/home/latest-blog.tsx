@@ -14,7 +14,7 @@ export async function LatestBlog({ limit = 3 }: { limit?: number }) {
 
   return (
     <section className="bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <SectionKicker center />
@@ -24,7 +24,7 @@ export async function LatestBlog({ limit = 3 }: { limit?: number }) {
           </div>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {latest.map((post, index) => (
             <Reveal key={post.slug} delay={(index % 3) * 75}>
               <BlogCard post={post} />
@@ -33,7 +33,7 @@ export async function LatestBlog({ limit = 3 }: { limit?: number }) {
         </div>
 
         <Reveal>
-          <div className="mt-12 flex justify-center">
+          <div className="mt-8 flex justify-center">
             <Button
               size="lg"
               variant="outline"

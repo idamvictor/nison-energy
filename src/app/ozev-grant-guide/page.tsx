@@ -4,10 +4,7 @@ import {
   ArrowRight,
   BadgeCheck,
   Building2,
-  Download,
-  FileText,
   Home,
-  ListChecks,
   ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -45,34 +42,17 @@ const paths: { title: string; copy: string; href: string; icon: LucideIcon }[] =
   },
 ];
 
-const steps: { title: string; copy: string; icon: LucideIcon; extra?: React.ReactNode }[] = [
+const steps: { title: string; copy: string }[] = [
   {
     title: "Choose your grant",
-    icon: ListChecks,
     copy: "Pick the scheme that fits your situation — for households, private landlords, or public and private sector organisations.",
   },
   {
     title: "Get your quote",
-    icon: FileText,
-    copy: "Use our quote generator to create the compliant quote you'll need for your application — worth up to £500 per socket.",
-    extra: (
-      <p className="mt-4 rounded-xl bg-secondary px-3.5 py-3 text-sm text-foreground/80 ring-1 ring-foreground/10">
-        Renting? You&apos;ll also need your landlord&apos;s permission —{" "}
-        <a
-          href="/documents/landlord-consent-form.docx"
-          download="Landlord Consent Form - EV Chargepoint.docx"
-          className="inline-flex items-center gap-1 font-semibold text-primary-ink underline underline-offset-2 hover:text-foreground"
-        >
-          <Download aria-hidden className="size-3.5" />
-          download our template
-        </a>
-        .
-      </p>
-    ),
+    copy: "Use our quote generator to create the compliant quote you'll need for your application — worth up to £500 per socket. Renting? You'll also need your landlord's permission.",
   },
   {
     title: "Apply & get approved",
-    icon: BadgeCheck,
     copy: "Submit your application on the government portal and, if approved, you'll receive an authorisation code for your grant.",
   },
 ];
@@ -87,34 +67,31 @@ export default function OzevGrantGuideSelectorPage() {
           eyebrow="Applying for an OZEV grant"
           title="How it works"
           subtitle="Three simple steps from choosing your grant to getting your charger installed."
+          size="compact"
         />
 
         <section className="bg-linear-to-b from-secondary/70 to-background">
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
             <div className="relative">
               {/* Connector behind the step numbers (desktop only). */}
               <div
                 aria-hidden
-                className="absolute top-7 right-[16.66%] left-[16.66%] hidden h-0.5 bg-linear-to-r from-primary via-primary/60 to-accent md:block"
+                className="absolute top-5.5 right-[16.66%] left-[16.66%] hidden h-0.5 bg-linear-to-r from-primary via-primary/60 to-accent md:block"
               />
-              <ol className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
+              <ol className="relative grid grid-cols-1 gap-5 md:grid-cols-3">
                 {steps.map((step, index) => (
                   <li key={step.title} className="flex">
                     <Reveal delay={index * 110} className="flex w-full flex-col items-center">
-                      <span className="relative z-10 flex size-14 items-center justify-center rounded-2xl bg-ink font-heading text-xl font-semibold text-white shadow-lg ring-4 ring-background">
+                      <span className="relative z-10 flex size-11 items-center justify-center rounded-2xl bg-ink font-heading text-lg font-semibold text-white shadow-lg ring-4 ring-background">
                         {index + 1}
                       </span>
-                      <div className="mt-5 flex w-full flex-1 flex-col items-center rounded-2xl border border-foreground/15 bg-card px-6 pt-6 pb-7 text-center shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
-                        <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
-                          <step.icon aria-hidden className="size-5" />
-                        </span>
-                        <h2 className="mt-4 font-heading text-lg font-semibold text-foreground">
+                      <div className="mt-3 flex w-full flex-1 flex-col items-center rounded-2xl border border-foreground/15 bg-card px-6 pt-5 pb-5 text-center shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+                        <h2 className="font-heading text-lg font-semibold text-foreground">
                           {step.title}
                         </h2>
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                           {step.copy}
                         </p>
-                        {step.extra}
                       </div>
                     </Reveal>
                   </li>
@@ -123,11 +100,11 @@ export default function OzevGrantGuideSelectorPage() {
             </div>
 
             <Reveal delay={200}>
-              <div className="mx-auto mt-12 flex max-w-3xl items-center gap-4 rounded-2xl border border-primary/30 bg-card px-5 py-5 shadow-md sm:px-6">
+              <div className="mt-6 flex w-full items-center gap-4 rounded-2xl border border-primary/30 bg-card px-5 py-4 shadow-md sm:px-6">
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-success/12 text-success">
                   <BadgeCheck aria-hidden className="size-5.5" />
                 </span>
-                <p className="font-semibold text-balance text-foreground sm:text-lg">
+                <p className="font-semibold text-foreground sm:text-base">
                   Once your grant has been approved, we&apos;ll send you a link to make
                   your purchase using your approved grant amount.
                 </p>
@@ -137,20 +114,20 @@ export default function OzevGrantGuideSelectorPage() {
         </section>
 
         <section className="bg-background">
-          <div className="mx-auto max-w-6xl px-4 pt-4 pb-20 sm:px-6 lg:px-8">
-            <h2 className="flex items-center justify-center gap-3 text-center text-3xl font-semibold tracking-[-0.02em] text-foreground">
+          <div className="mx-auto max-w-6xl px-4 pt-2 pb-14 sm:px-6 lg:px-8">
+            <h2 className="flex items-center justify-center gap-3 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
               <span aria-hidden className="h-0.5 w-8 rounded-full bg-accent" />
               Choose your grant
               <span aria-hidden className="h-0.5 w-8 rounded-full bg-accent" />
             </h2>
-            <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
               {paths.map((path, index) => (
                 <Reveal key={path.href} delay={index * 90} className="h-full">
                   <Link
                     href={path.href}
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-foreground/15 bg-card shadow-md transition-all duration-200 hover:-translate-y-1 hover:border-primary/45 hover:shadow-xl focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
                   >
-                    <div className="relative isolate flex h-24 items-end overflow-hidden bg-ink px-6 pb-4">
+                    <div className="relative isolate flex h-20 items-end overflow-hidden bg-ink px-6 pb-4">
                       <div
                         aria-hidden
                         className="absolute -top-14 -right-8 -z-10 size-40 rounded-full bg-primary/30 blur-3xl transition-opacity duration-300 group-hover:opacity-70"

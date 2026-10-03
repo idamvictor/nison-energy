@@ -46,7 +46,7 @@ const categories = [
 export function CategoryCards() {
   return (
     <section className="bg-secondary">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
         <Reveal>
           <SectionKicker />
           <h2 className="mt-4 text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">

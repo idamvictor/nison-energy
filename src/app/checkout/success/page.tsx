@@ -7,8 +7,10 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { ClearCartOnMount } from "@/components/checkout/clear-cart-on-mount";
+import { SurveyNextStep } from "@/components/checkout/survey-next-step";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { getOrderByCheckoutSession } from "@/lib/orders/queries";
+import { includesInstallation } from "@/lib/orders/installation";
 
 export const metadata: Metadata = { title: "Payment received | Ocunio Energy" };
 
@@ -19,6 +21,7 @@ export default async function CheckoutSuccessPage({
 }) {
   const { session_id: sessionId } = await searchParams;
   const order = sessionId ? await getOrderByCheckoutSession(sessionId) : null;
+  const needsSurvey = order ? includesInstallation(order.items) : false;
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -44,7 +47,8 @@ export default async function CheckoutSuccessPage({
             )}
             <p className="max-w-sm text-sm text-muted-foreground">
               A confirmation email is on its way, along with your receipt from Stripe. A member
-              of the team will be in touch to book your installation. If it&apos;s urgent,{" "}
+              of the team will be in touch to book your installation
+              {needsSurvey && " once your survey below is in"}. If it&apos;s urgent,{" "}
               <a
                 href={whatsappUrl()}
                 target="_blank"
@@ -59,6 +63,7 @@ export default async function CheckoutSuccessPage({
               Back to home
             </Button>
           </div>
+          {needsSurvey && <SurveyNextStep />}
         </div>
       </main>
       <SiteFooter />

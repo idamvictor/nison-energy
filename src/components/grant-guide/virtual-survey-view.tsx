@@ -3,8 +3,7 @@ import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { PageHero } from "@/components/shared/page-hero";
 import { OpenQuoteEmbed } from "@/components/shared/openquote-embed";
-
-const OPENQUOTE_URL = "https://app.openquote.net/company/ocunioenergy?category=EV";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
 export function VirtualSurveyView() {
   return (
@@ -20,7 +19,7 @@ export function VirtualSurveyView() {
 
         <section className="bg-background">
           <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-            <OpenQuoteEmbed src={OPENQUOTE_URL} />
+            <OpenQuoteEmbed src={OPENQUOTE_SURVEY_URL} />
           </div>
         </section>
       </main>

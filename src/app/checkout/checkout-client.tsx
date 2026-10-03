@@ -33,6 +33,8 @@ import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { placeOrder, createCheckoutSession, cancelCheckoutDraft } from "@/lib/orders/actions";
 import { StripePayment, type StripePaymentProps } from "@/components/checkout/stripe-payment";
+import { SurveyNextStep } from "@/components/checkout/survey-next-step";
+import { includesInstallation } from "@/lib/orders/installation";
 import type { OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
 
@@ -49,6 +51,8 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
   const clear = useCart((s) => s.clear);
   const [submitted, setSubmitted] = useState(false);
   const [reference, setReference] = useState("");
+  // Captured before the cart is cleared: installation orders get the survey next.
+  const [needsSurvey, setNeedsSurvey] = useState(false);
   const [extraIds, setExtraIds] = useState<string[]>([]);
   const [pendingExtra, setPendingExtra] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -222,7 +226,11 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                 Back to home
               </Button>
             </div>
-          ) : lines.length === 0 ? (
+          ) : null}
+
+          {submitted && needsSurvey && <SurveyNextStep />}
+
+          {submitted ? null : lines.length === 0 ? (
             <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/20 bg-card py-20 text-center">
               <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
                 <ShoppingCart className="size-5" />
@@ -260,6 +268,7 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                       return;
                     }
                     setReference(result.reference);
+                    setNeedsSurvey(includesInstallation(lines));
                     setSubmitted(true);
                     clear();
                   });

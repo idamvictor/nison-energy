@@ -34,7 +34,18 @@ export type StripePaymentProps = {
   clientSecret: string;
   /** Sent with the payment — the delivery address, or the separate billing one. */
   billingAddress: StripeCheckoutContact;
+  /** The phone from the delivery details, so Stripe doesn't ask for it again. */
+  phone: string;
 };
+
+/** UK numbers as Stripe expects them (E.164): "07700 900123" → "+447700900123". */
+function toE164(phone: string): string {
+  const digits = phone.replace(/[^\d+]/g, "");
+  if (digits.startsWith("+")) return digits;
+  if (digits.startsWith("44")) return `+${digits}`;
+  if (digits.startsWith("0")) return `+44${digits.slice(1)}`;
+  return digits;
+}
 
 /**
  * Stripe's Payment Element on our own checkout page (Checkout Session with
@@ -52,14 +63,23 @@ export function StripePayment(props: StripePaymentProps) {
   return (
     <CheckoutElementsProvider
       stripe={stripePromise}
-      options={{ clientSecret: props.clientSecret, elementsOptions: { appearance } }}
+      options={{
+        clientSecret: props.clientSecret,
+        elementsOptions: { appearance },
+        // Seed the session with what the customer already typed above, so
+        // Stripe's own sections (e.g. Link's "save my information") start
+        // filled in instead of asking for the phone number again.
+        // (The billing address is set at Pay time via updateBillingAddress —
+        // seeding it here too makes Stripe reject confirm().)
+        defaultValues: { phoneNumber: toE164(props.phone) },
+      }}
     >
       <PaymentForm {...props} />
     </CheckoutElementsProvider>
   );
 }
 
-function PaymentForm({ billingAddress }: StripePaymentProps) {
+function PaymentForm({ billingAddress, phone }: StripePaymentProps) {
   const state = useCheckoutElements();
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,14 +98,16 @@ function PaymentForm({ billingAddress }: StripePaymentProps) {
     setConfirming(true);
     // The session requires a full billing address, and Stripe only accepts one
     // from our own form via updateBillingAddress() — passing it to confirm()
-    // isn't enough. Email and phone already come from the session's Customer
-    // (upsertStripeCustomer), so confirm() itself takes no billing details.
+    // isn't enough. The phone is handed over the same way (the session has
+    // phone collection on), and the email comes from the session's Customer —
+    // so confirm() itself takes no billing details.
     const addressResult = await state.checkout.updateBillingAddress(billingAddress);
     if (addressResult.type === "error") {
       setError(addressResult.error.message);
       setConfirming(false);
       return;
     }
+    await state.checkout.updatePhoneNumber(toE164(phone));
     const result = await state.checkout.confirm();
     // On success the browser is already redirecting to /checkout/success.
     if (result.type === "error") {
@@ -99,16 +121,18 @@ function PaymentForm({ billingAddress }: StripePaymentProps) {
       <PaymentElement
         options={{
           layout: "tabs",
-          // Our form already has the name, email and billing address — Stripe
-          // refuses to confirm if the Payment Element could collect them a
-          // second time. Only the parts we actually send are "never": phone,
-          // line2 and state stay "auto" (UK cards never ask for them), because
-          // a "never" field with no value — or every field "never" — is
-          // rejected by Stripe at confirm.
+          // No Link "save my information" box under the card form: it can't
+          // take the phone from our form and asked for it again.
+          wallets: { link: "never" },
+          // Our form already has the name, email, phone and billing address —
+          // Stripe refuses to confirm if the Payment Element could collect them
+          // a second time. line2 and state stay "auto" (UK cards never ask for
+          // them) because a "never" field with no value is rejected at confirm.
           fields: {
             billingDetails: {
               name: "never",
               email: "never",
+              phone: "never",
               address: {
                 country: "never",
                 postalCode: "never",

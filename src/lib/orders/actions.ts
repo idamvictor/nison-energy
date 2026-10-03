@@ -93,6 +93,9 @@ export async function createCheckoutSession(
       ui_mode: "elements",
       customer,
       billing_address_collection: "required",
+      // Lets the page hand Stripe the phone from our delivery details
+      // (updatePhoneNumber) instead of the Payment Element asking again.
+      phone_number_collection: { enabled: true },
       line_items: order.items.map((item) => ({
         price_data: {
           currency: "gbp",

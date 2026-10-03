@@ -19,8 +19,8 @@ const CYAN = "#0280a3";
 const ORANGE = "#f2861f";
 const MUTED = "#5b6b72";
 
-// Mail clients fetch the logo from the public site, so a dev SITE_URL
-// (localhost) would show a broken image — always use a public origin.
+// Logo and every link point at the public site: a dev SITE_URL (localhost)
+// would break the image, and localhost links are a strong spam signal.
 const PUBLIC_ORIGIN = SITE_URL.startsWith("http://localhost") ? "https://ocunioenergy.com" : SITE_URL;
 
 function emailLayout(opts: {
@@ -128,7 +128,7 @@ function fullAddress(order: Pick<OrderEmailInput, "address" | "city" | "postcode
 export function staffLeadAlert(lead: LeadEmailInput): EmailContent {
   const name = `${lead.firstName} ${lead.lastName}`.trim();
   return {
-    subject: `New enquiry — ${name} (${lead.areaOfEnquiry})`,
+    subject: `Enquiry from ${name} about ${lead.areaOfEnquiry}`,
     html: emailLayout({
       heading: `New enquiry from ${esc(name)}`,
       bodyHtml: [
@@ -140,7 +140,7 @@ export function staffLeadAlert(lead: LeadEmailInput): EmailContent {
           ? row(`<strong>Message</strong><br>${esc(lead.additionalInformation)}`)
           : "",
       ].join(""),
-      cta: { label: "Open in admin", href: `${SITE_URL}/admin/leads/${lead.id}` },
+      cta: { label: "Open in admin", href: `${PUBLIC_ORIGIN}/admin/leads/${lead.id}` },
     }),
   };
 }
@@ -185,7 +185,7 @@ export function customerEnquiryStatusUpdate(
         row(`Your enquiry about <strong>${esc(lead.areaOfEnquiry)}</strong> is now <strong>${esc(status)}</strong>.`),
         row(LEAD_STATUS_LINE[status] ?? "There's an update on your enquiry."),
       ].join(""),
-      cta: { label: "View your messages", href: `${SITE_URL}/account/inbox` },
+      cta: { label: "View your messages", href: `${PUBLIC_ORIGIN}/account/inbox` },
     }),
   };
 }
@@ -219,7 +219,7 @@ function surveyCallout(): string {
     `<strong style="color:${INK}">Next step: complete your virtual survey</strong><br>
      It takes about 5 minutes — a few photos and questions about where your charger is going.
      Our team reviews it before booking your installation.<br>
-     ${link(`${SITE_URL}/virtual-survey`, "Start your survey →")}`,
+     ${link(`${PUBLIC_ORIGIN}/virtual-survey`, "Start your survey →")}`,
   );
 }
 
@@ -254,14 +254,14 @@ export function customerOrderConfirmation(
             ),
         needsSurvey ? surveyCallout() : "",
       ].join(""),
-      cta: { label: "View your orders", href: `${SITE_URL}/account/orders` },
+      cta: { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` },
     }),
   };
 }
 
 export function staffOrderAlert(order: OrderEmailInput): EmailContent {
   return {
-    subject: `New order ${order.reference} — ${formatCurrency(order.subtotal)}`,
+    subject: `Order ${order.reference} placed by ${order.firstName} ${order.lastName}`,
     html: emailLayout({
       heading: `New order from ${esc(order.firstName)} ${esc(order.lastName)}`,
       bodyHtml: [
@@ -276,7 +276,7 @@ export function staffOrderAlert(order: OrderEmailInput): EmailContent {
           ? row("Includes installation — the customer has been asked to complete the virtual survey.")
           : "",
       ].join(""),
-      cta: { label: "Open in admin", href: `${SITE_URL}/admin/orders/${order.id}` },
+      cta: { label: "Open in admin", href: `${PUBLIC_ORIGIN}/admin/orders/${order.id}` },
     }),
   };
 }
@@ -299,7 +299,7 @@ export function customerOrderStatusUpdate(order: OrderEmailInput): EmailContent 
         row(itemsTable(order.items)),
         totalLine(order),
       ].join(""),
-      cta: { label: "View your orders", href: `${SITE_URL}/account/orders` },
+      cta: { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` },
     }),
   };
 }
@@ -319,14 +319,14 @@ export function customerPaymentFailed(order: OrderEmailInput): EmailContent {
            same or a different card — or get in touch and we'll help.`,
         ),
       ].join(""),
-      cta: { label: "Try again", href: `${SITE_URL}/checkout` },
+      cta: { label: "Try again", href: `${PUBLIC_ORIGIN}/checkout` },
     }),
   };
 }
 
 export function staffPaymentFailed(order: OrderEmailInput): EmailContent {
   return {
-    subject: `Payment failed — order ${order.reference} (${formatCurrency(order.subtotal)})`,
+    subject: `Payment failed on order ${order.reference}`,
     html: emailLayout({
       heading: `Payment failed for ${esc(order.firstName)} ${esc(order.lastName)}`,
       bodyHtml: [
@@ -340,7 +340,7 @@ export function staffPaymentFailed(order: OrderEmailInput): EmailContent {
         row(itemsTable(order.items)),
         totalLine(order),
       ].join(""),
-      cta: { label: "Open in admin", href: `${SITE_URL}/admin/orders/${order.id}` },
+      cta: { label: "Open in admin", href: `${PUBLIC_ORIGIN}/admin/orders/${order.id}` },
     }),
   };
 }
@@ -365,7 +365,7 @@ export function quoteApprovedEmail(quote: QuoteEmailInput): EmailContent {
            can download it now.`,
         ),
       ].join(""),
-      cta: { label: "Download your quote", href: `${SITE_URL}/account/quotes` },
+      cta: { label: "Download your quote", href: `${PUBLIC_ORIGIN}/account/quotes` },
     }),
   };
 }
@@ -384,7 +384,7 @@ export function quoteRejectedEmail(quote: QuoteEmailInput): EmailContent {
           ? row(`<strong>Reason:</strong> ${esc(quote.rejectionReason)}`)
           : "",
       ].join(""),
-      cta: { label: "View details", href: `${SITE_URL}/account/quotes` },
+      cta: { label: "View details", href: `${PUBLIC_ORIGIN}/account/quotes` },
     }),
   };
 }
@@ -405,7 +405,7 @@ export function customerQuoteSubmitted(
           "Our team checks every grant quote before it can be used in your application. We'll email you as soon as it's approved, or if anything needs changing.",
         ),
       ].join(""),
-      cta: { label: "View your quotes", href: `${SITE_URL}/account/quotes` },
+      cta: { label: "View your quotes", href: `${PUBLIC_ORIGIN}/account/quotes` },
     }),
   };
 }
@@ -424,7 +424,7 @@ export function staffQuoteSubmitted(
           `<strong>Customer</strong><br>${esc(quote.customerName || "—")} · ${esc(quote.customerEmail)}`,
         ),
       ].join(""),
-      cta: { label: "Review in admin", href: `${SITE_URL}/admin/quotes` },
+      cta: { label: "Review in admin", href: `${PUBLIC_ORIGIN}/admin/quotes` },
     }),
   };
 }
@@ -464,7 +464,7 @@ export function passwordChangedEmail(input: { name: string }): EmailContent {
            straight away and ${link(whatsappUrl(), "let us know on WhatsApp")}.`,
         ),
       ].join(""),
-      cta: { label: "Reset password", href: `${SITE_URL}/forgot-password` },
+      cta: { label: "Reset password", href: `${PUBLIC_ORIGIN}/forgot-password` },
     }),
   };
 }
@@ -480,11 +480,11 @@ export function welcomeEmail(input: { name: string }): EmailContent {
            track orders, download grant quotes and keep your saved chargers.`,
         ),
         row(
-          `Thinking about an OZEV grant? ${link(`${SITE_URL}/ozev-grant-guide`, "See how it works")} —
+          `Thinking about an OZEV grant? ${link(`${PUBLIC_ORIGIN}/ozev-grant-guide`, "See how it works")} —
            you could get up to £500 off your charger installation.`,
         ),
       ].join(""),
-      cta: { label: "Go to your account", href: `${SITE_URL}/account` },
+      cta: { label: "Go to your account", href: `${PUBLIC_ORIGIN}/account` },
     }),
   };
 }

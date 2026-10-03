@@ -36,15 +36,19 @@ export function AddressAutocomplete({
   required,
   placeholder = "Start typing your address",
   autoComplete = "off",
+  defaultValue = "",
   onSelect,
 }: {
   name?: string;
   required?: boolean;
   placeholder?: string;
   autoComplete?: string;
+  /** Prefill (e.g. from the signed-in account) — no lookup runs until the user edits it. */
+  defaultValue?: string;
   onSelect?: (suggestion: AddressSuggestion) => void;
 }) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultValue);
+  const edited = useRef(false);
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -54,6 +58,7 @@ export function AddressAutocomplete({
   useEffect(() => {
     const trimmed = value.trim();
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!edited.current) return;
 
     if (trimmed.length < 4) {
       setSuggestions([]);
@@ -116,7 +121,10 @@ export function AddressAutocomplete({
         required={required}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          edited.current = true;
+          setValue(e.target.value);
+        }}
         onFocus={() => suggestions.length > 0 && setOpen(true)}
         autoComplete={autoComplete}
         className="pr-9"

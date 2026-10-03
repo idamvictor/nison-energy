@@ -46,7 +46,23 @@ export type CheckoutExtra = {
   image: string;
 };
 
-export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
+/** Contact fields prefilled from the signed-in account (all still editable). */
+export type CheckoutDefaults = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  postcode: string;
+};
+
+export function CheckoutClient({
+  extras,
+  defaults,
+}: {
+  extras: CheckoutExtra[];
+  defaults?: CheckoutDefaults;
+}) {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
   const [submitted, setSubmitted] = useState(false);
@@ -68,7 +84,7 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
   useEffect(checkForm);
   // Town + postcode are controlled so picking an address suggestion can fill them.
   const [city, setCity] = useState("");
-  const [postcode, setPostcode] = useState("");
+  const [postcode, setPostcode] = useState(defaults?.postcode ?? "");
   const [billingSame, setBillingSame] = useState(true);
   const [billingCity, setBillingCity] = useState("");
   const [billingPostcode, setBillingPostcode] = useState("");
@@ -158,6 +174,7 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
       setPayment({
         clientSecret: result.clientSecret,
         orderId: result.orderId,
+        phone: payload.phone,
         billingAddress: {
           name: `${payload.firstName} ${payload.lastName}`.trim(),
           address: {
@@ -390,20 +407,21 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                     <StepHeading number={3} title="Delivery and Installation Address" />
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="First name">
-                        <Input name="firstName" required autoComplete="given-name" placeholder="First name" />
+                        <Input name="firstName" defaultValue={defaults?.firstName} required autoComplete="given-name" placeholder="First name" />
                       </Field>
                       <Field label="Last name">
-                        <Input name="lastName" required autoComplete="family-name" placeholder="Last name" />
+                        <Input name="lastName" defaultValue={defaults?.lastName} required autoComplete="family-name" placeholder="Last name" />
                       </Field>
                       <Field label="Email">
-                        <Input name="email" required type="email" autoComplete="email" placeholder="Email" />
+                        <Input name="email" defaultValue={defaults?.email} required type="email" autoComplete="email" placeholder="Email" />
                       </Field>
                       <Field label="Phone number">
-                        <Input name="phone" required type="tel" autoComplete="tel" placeholder="Phone number" />
+                        <Input name="phone" defaultValue={defaults?.phone} required type="tel" autoComplete="tel" placeholder="Phone number" />
                       </Field>
                       <Field label="Address line 1" className="sm:col-span-2">
                         <AddressAutocomplete
                           name="address"
+                          defaultValue={defaults?.address}
                           required
                           autoComplete="address-line1"
                           placeholder="Start typing your house number and street"
@@ -519,6 +537,7 @@ export function CheckoutClient({ extras }: { extras: CheckoutExtra[] }) {
                       <StripePayment
                         clientSecret={payment.clientSecret}
                         billingAddress={payment.billingAddress}
+                        phone={payment.phone}
                       />
                     </CardContent>
                   </Card>

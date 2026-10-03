@@ -1,6 +1,10 @@
 import "server-only";
 
+import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
+
+import { COMPANY } from "@/lib/company";
+import { htmlToText } from "@/lib/email/text";
 
 const apiKey = process.env.RESEND_API_KEY;
 const from = process.env.RESEND_FROM ?? "Ocunio Energy <noreply@ocunioenergy.com>";
@@ -40,7 +44,13 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
       to: message.to,
       subject: message.subject,
       html: message.html,
-      ...(message.replyTo ? { replyTo: message.replyTo } : {}),
+      // Multipart (HTML + plain text) is treated as less spammy than HTML-only.
+      text: htmlToText(message.html),
+      // noreply@ can't take replies — send them to the real inbox unless the
+      // caller set one (staff alerts reply straight to the customer).
+      replyTo: message.replyTo ?? COMPANY.email,
+      // Unique per send so Gmail doesn't thread/collapse repeated alerts.
+      headers: { "X-Entity-Ref-ID": randomUUID() },
     });
     if (error) console.error("[email] send failed:", error);
   } catch (err) {

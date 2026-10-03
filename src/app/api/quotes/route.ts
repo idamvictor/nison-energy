@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { revalidateTag } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { uploadDocument } from "@/lib/media/queries";
 import { checkRateLimit } from "@/lib/rate-limit/check";
-import { quoteSchemes, type QuoteScheme } from "@/lib/quotes/types";
+import { quoteSchemeLabels, quoteSchemes, type QuoteScheme } from "@/lib/quotes/types";
+import { sendEmail } from "@/lib/email/client";
+import { getStaffEmails } from "@/lib/email/recipients";
+import { customerQuoteSubmitted, staffQuoteSubmitted } from "@/lib/email/templates";
 import type { Prisma } from "@/generated/prisma/client";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 
@@ -101,6 +104,34 @@ export async function POST(request: Request) {
     },
   });
   revalidateTag(CACHE_TAGS.quotes, { expire: 0 });
+
+  // Landlord / workplace quotes wait for admin sign-off: tell staff there's one
+  // to review and let the customer know it's in. (Renters quotes are approved
+  // instantly and downloaded on the spot, so they need no email.)
+  if (quote.status === "Pending") {
+    const schemeLabel = quoteSchemeLabels[quote.scheme as QuoteScheme];
+    after(async () => {
+      const staff = await getStaffEmails();
+      await sendEmail({
+        to: staff,
+        replyTo: user.email,
+        ...staffQuoteSubmitted({
+          reference: quote.reference,
+          schemeLabel,
+          customerName: user.name,
+          customerEmail: user.email,
+        }),
+      });
+      await sendEmail({
+        to: user.email,
+        ...customerQuoteSubmitted({
+          reference: quote.reference,
+          schemeLabel,
+          firstName: user.name.split(" ")[0] ?? "",
+        }),
+      });
+    });
+  }
 
   return NextResponse.json(
     { ok: true, id: quote.id, status: quote.status },

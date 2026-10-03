@@ -2,6 +2,7 @@ import { COMPANY } from "@/lib/company";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/site";
 import { formatCurrency } from "@/lib/currency";
+import { includesInstallation } from "@/lib/orders/installation";
 
 function esc(value: string): string {
   return value
@@ -12,37 +13,48 @@ function esc(value: string): string {
 
 // ─── Shared shell ─────────────────────────────────────────────────────────
 
+// Brand colours (mirror globals.css): ink, cyan text, orange CTA.
+const INK = "#0b1418";
+const CYAN = "#0280a3";
+const ORANGE = "#f2861f";
+const MUTED = "#5b6b72";
+
+// Mail clients fetch the logo from the public site, so a dev SITE_URL
+// (localhost) would show a broken image — always use a public origin.
+const PUBLIC_ORIGIN = SITE_URL.startsWith("http://localhost") ? "https://ocunioenergy.com" : SITE_URL;
+
 function emailLayout(opts: {
   heading: string;
   bodyHtml: string;
   cta?: { label: string; href: string };
 }): string {
   const cta = opts.cta
-    ? `<tr><td style="padding:8px 0 4px">
-         <a href="${opts.cta.href}" style="display:inline-block;background:#16a34a;color:#ffffff;
-            text-decoration:none;font-weight:600;font-size:14px;padding:11px 20px;border-radius:8px">
+    ? `<tr><td style="padding:14px 0 4px">
+         <a href="${opts.cta.href}" style="display:inline-block;background:${ORANGE};color:#ffffff;
+            text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px">
            ${esc(opts.cta.label)}</a>
        </td></tr>`
     : "";
 
   return `<!doctype html>
-<html><body style="margin:0;background:#f5f5f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c1917">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f4;padding:24px 12px">
+<html><body style="margin:0;background:#f1f6f8;font-family:Arial,Helvetica,sans-serif;color:${INK}">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f6f8;padding:24px 12px">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e7e5e4">
-        <tr><td style="padding:20px 28px;border-bottom:1px solid #e7e5e4">
-          <span style="font-size:16px;font-weight:700;color:#16a34a">${COMPANY.tradingName}</span>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #dbe5e9">
+        <tr><td style="padding:18px 28px;border-bottom:3px solid ${CYAN}">
+          <img src="${PUBLIC_ORIGIN}/ocunio-energy-logo.png" alt="${COMPANY.tradingName}" height="36" style="display:block;height:36px;width:auto;border:0">
         </td></tr>
         <tr><td style="padding:28px">
-          <h1 style="margin:0 0 14px;font-size:19px;line-height:1.3;color:#1c1917">${esc(opts.heading)}</h1>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.6;color:#44403c">
+          <h1 style="margin:0 0 14px;font-size:20px;line-height:1.3;color:${INK}">${esc(opts.heading)}</h1>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.6;color:#33434a">
             ${opts.bodyHtml}
             ${cta}
           </table>
         </td></tr>
-        <tr><td style="padding:18px 28px;border-top:1px solid #e7e5e4;font-size:12px;line-height:1.6;color:#78716c">
-          ${COMPANY.legalName} trading as ${COMPANY.tradingName} · ${COMPANY.email} · <a href="${whatsappUrl()}" style="color:inherit">WhatsApp us</a><br>
-          ${esc(COMPANY.registeredOffice)}
+        <tr><td style="padding:18px 28px;background:#f7fafb;border-top:1px solid #dbe5e9;font-size:12px;line-height:1.6;color:${MUTED}">
+          Questions? Email <a href="mailto:${COMPANY.email}" style="color:${CYAN}">${COMPANY.email}</a> or
+          <a href="${whatsappUrl()}" style="color:${CYAN}">message us on WhatsApp</a>.<br>
+          ${COMPANY.legalName} trading as ${COMPANY.tradingName} · ${esc(COMPANY.registeredOffice)}
         </td></tr>
       </table>
     </td></tr>
@@ -52,6 +64,17 @@ function emailLayout(opts: {
 
 function row(html: string): string {
   return `<tr><td style="padding:4px 0">${html}</td></tr>`;
+}
+
+function link(href: string, label: string): string {
+  return `<a href="${href}" style="color:${CYAN};font-weight:600">${esc(label)}</a>`;
+}
+
+/** Highlighted "next step" panel inside an email body. */
+function callout(html: string): string {
+  return row(
+    `<div style="margin:8px 0;padding:14px 16px;border:2px solid ${CYAN};border-radius:10px;background:#eef8fb">${html}</div>`,
+  );
 }
 
 function money(amount: number | null): string {
@@ -76,6 +99,7 @@ export type OrderItemEmailInput = {
   name: string;
   quantity: number;
   unitPrice: number | null;
+  options?: unknown;
 };
 
 export type OrderEmailInput = {
@@ -84,6 +108,7 @@ export type OrderEmailInput = {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   address: string;
   city?: string | null;
   postcode: string;
@@ -131,8 +156,36 @@ export function customerEnquiryAck(lead: LeadEmailInput): EmailContent {
            <strong>${esc(lead.reasonForEnquiry)}</strong> enquiry for
            <strong>${esc(lead.areaOfEnquiry)}</strong>.`,
         ),
-        row(`If it's urgent, <a href="${whatsappUrl()}" style="color:#16a34a;font-weight:600">message us on WhatsApp</a>.`),
+        row(`If it's urgent, ${link(whatsappUrl(), "message us on WhatsApp")}.`),
       ].join(""),
+    }),
+  };
+}
+
+const LEAD_STATUS_LINE: Record<string, string> = {
+  Contacted: "We've picked up your enquiry and a member of the team is in touch with you.",
+  Quoted: "We've prepared a quote for you — keep an eye on your inbox and messages.",
+  Won: "Great news — we're going ahead. We'll guide you through the next steps, including any OZEV grant paperwork.",
+};
+
+/** Customer-facing statuses only — "New" is the initial state and "Lost" isn't emailed. */
+export function isEmailableLeadStatus(status: string): boolean {
+  return status in LEAD_STATUS_LINE;
+}
+
+export function customerEnquiryStatusUpdate(
+  lead: Pick<LeadEmailInput, "firstName" | "areaOfEnquiry">,
+  status: string,
+): EmailContent {
+  return {
+    subject: `An update on your ${lead.areaOfEnquiry} enquiry`,
+    html: emailLayout({
+      heading: `Hi ${esc(lead.firstName)}, there's an update on your enquiry`,
+      bodyHtml: [
+        row(`Your enquiry about <strong>${esc(lead.areaOfEnquiry)}</strong> is now <strong>${esc(status)}</strong>.`),
+        row(LEAD_STATUS_LINE[status] ?? "There's an update on your enquiry."),
+      ].join(""),
+      cta: { label: "View your messages", href: `${SITE_URL}/account/inbox` },
     }),
   };
 }
@@ -144,22 +197,37 @@ function itemsTable(items: OrderItemEmailInput[]): string {
     .map(
       (i) =>
         `<tr>
-           <td style="padding:6px 0;border-bottom:1px solid #f0efee">${esc(i.name)}${
+           <td style="padding:6px 0;border-bottom:1px solid #e6eef1">${esc(i.name)}${
              i.quantity > 1 ? ` &times;${i.quantity}` : ""
            }</td>
-           <td align="right" style="padding:6px 0;border-bottom:1px solid #f0efee;white-space:nowrap">${money(
-             i.unitPrice,
+           <td align="right" style="padding:6px 0;border-bottom:1px solid #e6eef1;white-space:nowrap">${money(
+             i.unitPrice == null ? null : i.unitPrice * i.quantity,
            )}</td>
          </tr>`,
     )
     .join("");
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#44403c;margin:4px 0">${rows}</table>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a;margin:4px 0">${rows}</table>`;
+}
+
+// Product prices are stored inc VAT, so the order subtotal is the VAT-inclusive total.
+function totalLine(order: OrderEmailInput): string {
+  return row(`<strong>Total (inc VAT): ${formatCurrency(order.subtotal)}</strong>`);
+}
+
+function surveyCallout(): string {
+  return callout(
+    `<strong style="color:${INK}">Next step: complete your virtual survey</strong><br>
+     It takes about 5 minutes — a few photos and questions about where your charger is going.
+     Our team reviews it before booking your installation.<br>
+     ${link(`${SITE_URL}/virtual-survey`, "Start your survey →")}`,
+  );
 }
 
 export function customerOrderConfirmation(
   order: OrderEmailInput,
   opts?: { paid?: boolean },
 ): EmailContent {
+  const needsSurvey = includesInstallation(order.items);
   return {
     subject: opts?.paid
       ? `Payment received — order ${order.reference}`
@@ -169,23 +237,22 @@ export function customerOrderConfirmation(
         ? `Thanks, ${esc(order.firstName)} — payment received`
         : `Thanks, ${esc(order.firstName)} — we've got your order`,
       bodyHtml: [
-        row(`Your reference is <strong>${esc(order.reference)}</strong>.`),
+        row(`Your order reference is <strong>${esc(order.reference)}</strong>.`),
         row(itemsTable(order.items)),
-        row(
-          `<strong>Subtotal (ex VAT): ${formatCurrency(order.subtotal)}</strong>`,
-        ),
+        totalLine(order),
         row(
           `<strong>Delivery &amp; installation address</strong><br>${esc(fullAddress(order))}`,
         ),
         opts?.paid
           ? row(
-              `Your payment has gone through and a receipt/invoice is on its way from Stripe.
-               A member of the team will be in touch to book your installation.`,
+              `Your payment has gone through. A member of the team will be in touch to
+               ${needsSurvey ? "book your installation once your survey is in" : "arrange delivery"}.`,
             )
           : row(
               `No payment is taken online — a member of the team will be in touch to confirm
-               payment and book your installation.`,
+               payment${needsSurvey ? " and book your installation" : " and arrange delivery"}.`,
             ),
+        needsSurvey ? surveyCallout() : "",
       ].join(""),
       cta: { label: "View your orders", href: `${SITE_URL}/account/orders` },
     }),
@@ -199,10 +266,15 @@ export function staffOrderAlert(order: OrderEmailInput): EmailContent {
       heading: `New order from ${esc(order.firstName)} ${esc(order.lastName)}`,
       bodyHtml: [
         row(`<strong>Reference</strong><br>${esc(order.reference)}`),
-        row(`<strong>Contact</strong><br>${esc(order.email)}`),
+        row(
+          `<strong>Contact</strong><br>${esc(order.email)}${order.phone ? ` · ${esc(order.phone)}` : ""}`,
+        ),
         row(itemsTable(order.items)),
-        row(`<strong>Subtotal (ex VAT): ${formatCurrency(order.subtotal)}</strong>`),
+        totalLine(order),
         row(`<strong>Delivery &amp; installation address</strong><br>${esc(fullAddress(order))}`),
+        includesInstallation(order.items)
+          ? row("Includes installation — the customer has been asked to complete the virtual survey.")
+          : "",
       ].join(""),
       cta: { label: "Open in admin", href: `${SITE_URL}/admin/orders/${order.id}` },
     }),
@@ -211,9 +283,9 @@ export function staffOrderAlert(order: OrderEmailInput): EmailContent {
 
 const STATUS_LINE: Record<string, string> = {
   Confirmed: "We've confirmed your order and payment. Installation scheduling is next.",
-  Scheduled: "Your installation has been scheduled — check your inbox for the date.",
+  Scheduled: "Your installation is being scheduled — we'll be in touch to confirm the date with you.",
   Installed: "Your charger has been installed. Welcome to easier charging!",
-  Cancelled: "Your order has been cancelled. Contact us if this is unexpected.",
+  Cancelled: "Your order has been cancelled. If this is unexpected, please get in touch.",
 };
 
 export function customerOrderStatusUpdate(order: OrderEmailInput): EmailContent {
@@ -222,10 +294,53 @@ export function customerOrderStatusUpdate(order: OrderEmailInput): EmailContent 
     html: emailLayout({
       heading: `Your order is now ${esc(order.status)}`,
       bodyHtml: [
-        row(`Reference <strong>${esc(order.reference)}</strong>.`),
+        row(`Order reference <strong>${esc(order.reference)}</strong>.`),
         row(STATUS_LINE[order.status] ?? "There's an update on your order."),
+        row(itemsTable(order.items)),
+        totalLine(order),
       ].join(""),
       cta: { label: "View your orders", href: `${SITE_URL}/account/orders` },
+    }),
+  };
+}
+
+export function customerPaymentFailed(order: OrderEmailInput): EmailContent {
+  return {
+    subject: `Your payment for order ${order.reference} didn't go through`,
+    html: emailLayout({
+      heading: `Hi ${esc(order.firstName)}, your payment didn't go through`,
+      bodyHtml: [
+        row(
+          `We couldn't take payment for your order <strong>${esc(order.reference)}</strong>
+           (${formatCurrency(order.subtotal)}). No money has been taken.`,
+        ),
+        row(
+          `This is usually a declined card or a cancelled bank check. You can try again with the
+           same or a different card — or get in touch and we'll help.`,
+        ),
+      ].join(""),
+      cta: { label: "Try again", href: `${SITE_URL}/checkout` },
+    }),
+  };
+}
+
+export function staffPaymentFailed(order: OrderEmailInput): EmailContent {
+  return {
+    subject: `Payment failed — order ${order.reference} (${formatCurrency(order.subtotal)})`,
+    html: emailLayout({
+      heading: `Payment failed for ${esc(order.firstName)} ${esc(order.lastName)}`,
+      bodyHtml: [
+        row(
+          `The online payment for order <strong>${esc(order.reference)}</strong> failed. The
+           customer has been emailed a retry link — you may want to follow up.`,
+        ),
+        row(
+          `<strong>Contact</strong><br>${esc(order.email)}${order.phone ? ` · ${esc(order.phone)}` : ""}`,
+        ),
+        row(itemsTable(order.items)),
+        totalLine(order),
+      ].join(""),
+      cta: { label: "Open in admin", href: `${SITE_URL}/admin/orders/${order.id}` },
     }),
   };
 }
@@ -274,6 +389,46 @@ export function quoteRejectedEmail(quote: QuoteEmailInput): EmailContent {
   };
 }
 
+export function customerQuoteSubmitted(
+  quote: QuoteEmailInput & { firstName: string },
+): EmailContent {
+  return {
+    subject: `We've received your ${quote.schemeLabel} quote`,
+    html: emailLayout({
+      heading: `Thanks, ${esc(quote.firstName || "there")} — your quote is with us`,
+      bodyHtml: [
+        row(
+          `Your <strong>${esc(quote.schemeLabel)}</strong> quote (reference
+           <strong>${esc(quote.reference)}</strong>) has been submitted for review.`,
+        ),
+        row(
+          "Our team checks every grant quote before it can be used in your application. We'll email you as soon as it's approved, or if anything needs changing.",
+        ),
+      ].join(""),
+      cta: { label: "View your quotes", href: `${SITE_URL}/account/quotes` },
+    }),
+  };
+}
+
+export function staffQuoteSubmitted(
+  quote: QuoteEmailInput & { customerName: string; customerEmail: string },
+): EmailContent {
+  return {
+    subject: `Quote awaiting review — ${quote.schemeLabel} (${quote.reference})`,
+    html: emailLayout({
+      heading: "A grant quote is waiting for review",
+      bodyHtml: [
+        row(`<strong>Scheme</strong><br>${esc(quote.schemeLabel)}`),
+        row(`<strong>Reference</strong><br>${esc(quote.reference)}`),
+        row(
+          `<strong>Customer</strong><br>${esc(quote.customerName || "—")} · ${esc(quote.customerEmail)}`,
+        ),
+      ].join(""),
+      cta: { label: "Review in admin", href: `${SITE_URL}/admin/quotes` },
+    }),
+  };
+}
+
 // ─── Auth ────────────────────────────────────────────────────────────────
 
 export function passwordResetEmail(input: {
@@ -292,6 +447,44 @@ export function passwordResetEmail(input: {
         ),
       ].join(""),
       cta: { label: "Set a new password", href: input.url },
+    }),
+  };
+}
+
+export function passwordChangedEmail(input: { name: string }): EmailContent {
+  return {
+    subject: `Your ${COMPANY.tradingName} password was changed`,
+    html: emailLayout({
+      heading: "Your password was changed",
+      bodyHtml: [
+        row(`Hi ${esc(input.name || "there")},`),
+        row("The password for your account was just changed."),
+        row(
+          `If this was you, there's nothing else to do. If it wasn't, reset your password
+           straight away and ${link(whatsappUrl(), "let us know on WhatsApp")}.`,
+        ),
+      ].join(""),
+      cta: { label: "Reset password", href: `${SITE_URL}/forgot-password` },
+    }),
+  };
+}
+
+export function welcomeEmail(input: { name: string }): EmailContent {
+  return {
+    subject: `Welcome to ${COMPANY.tradingName}`,
+    html: emailLayout({
+      heading: `Welcome, ${esc(input.name || "there")}!`,
+      bodyHtml: [
+        row(
+          `Thanks for creating your ${COMPANY.tradingName} account. From your account you can
+           track orders, download grant quotes and keep your saved chargers.`,
+        ),
+        row(
+          `Thinking about an OZEV grant? ${link(`${SITE_URL}/ozev-grant-guide`, "See how it works")} —
+           you could get up to £500 off your charger installation.`,
+        ),
+      ].join(""),
+      cta: { label: "Go to your account", href: `${SITE_URL}/account` },
     }),
   };
 }

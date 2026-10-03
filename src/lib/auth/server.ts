@@ -5,7 +5,7 @@ import { admin } from "better-auth/plugins";
 
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/client";
-import { passwordResetEmail } from "@/lib/email/templates";
+import { passwordChangedEmail, passwordResetEmail, welcomeEmail } from "@/lib/email/templates";
 
 // Extra profile fields stored on the Better Auth `user` row. Kept in sync with
 // the `User` model in prisma/schema.prisma and inferred on the client in
@@ -40,6 +40,21 @@ export const auth = betterAuth({
         to: user.email,
         ...passwordResetEmail({ name: user.name, url }),
       });
+    },
+    // Security notice once the reset completes — the only way a password
+    // changes in this app.
+    onPasswordReset: async ({ user }) => {
+      await sendEmail({ to: user.email, ...passwordChangedEmail({ name: user.name }) });
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        // Every new account (email/password or Google) gets a welcome email.
+        after: async (user) => {
+          await sendEmail({ to: user.email, ...welcomeEmail({ name: user.name }) });
+        },
+      },
     },
   },
   socialProviders: {

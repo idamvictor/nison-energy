@@ -8,7 +8,12 @@ import { stripe } from "@/lib/stripe/client";
 import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { getStaffEmails } from "@/lib/email/recipients";
-import { customerOrderConfirmation, staffOrderAlert } from "@/lib/email/templates";
+import {
+  customerOrderConfirmation,
+  customerPaymentFailed,
+  staffOrderAlert,
+  staffPaymentFailed,
+} from "@/lib/email/templates";
 import { toOrderRecord } from "@/lib/orders/queries";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 
@@ -117,14 +122,27 @@ async function markOrderPaid(session: Stripe.Checkout.Session) {
   });
 }
 
+// Fires for delayed payment methods that fail after the customer left the page
+// (a declined card is shown inline on /checkout and never reaches here).
 async function markOrderFailed(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.orderId;
   if (!orderId) return;
-  await prisma.order.updateMany({
+  const { count } = await prisma.order.updateMany({
     where: { id: orderId, paymentStatus: "Unpaid" },
     data: { paymentStatus: "Failed" },
   });
   revalidateTag(CACHE_TAGS.orders, { expire: 0 });
+  if (count === 0) return; // duplicate delivery, or the order was already settled
+
+  const rawOrder = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
+  if (!rawOrder) return;
+  const order = toOrderRecord(rawOrder);
+
+  after(async () => {
+    await sendEmail({ to: order.email, ...customerPaymentFailed(order) });
+    const staff = await getStaffEmails();
+    await sendEmail({ to: staff, replyTo: order.email, ...staffPaymentFailed(order) });
+  });
 }
 
 // A Checkout Session expires 24h after creation if the customer never pays.

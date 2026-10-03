@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/session";
@@ -9,6 +10,8 @@ import { createNotification } from "@/lib/notifications/queries";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getClientIp } from "@/lib/rate-limit/ip";
 import { CACHE_TAGS } from "@/lib/cache/tags";
+import { sendEmail } from "@/lib/email/client";
+import { customerEnquiryStatusUpdate, isEmailableLeadStatus } from "@/lib/email/templates";
 import {
   grantStatuses,
   installationStages,
@@ -178,6 +181,12 @@ export async function updateLeadStatus(
       title: `Your enquiry is now ${status}`,
       body: `Enquiry about ${lead.areaOfEnquiry}.`,
       href: "/account/inbox",
+    });
+  }
+  // Customer-facing statuses only (Contacted / Quoted / Won) — "Lost" stays internal.
+  if (isEmailableLeadStatus(status)) {
+    after(async () => {
+      await sendEmail({ to: lead.email, ...customerEnquiryStatusUpdate(lead, status) });
     });
   }
   revalidateLead(id);

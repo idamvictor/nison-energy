@@ -99,6 +99,9 @@ export type PlaceOrderResult =
   | { ok: true; reference: string }
   | { ok: false; errors: Record<string, string> };
 
+/** Which Stripe session a checkout category needs (see startCheckout). */
+export type CheckoutKind = "wallet" | "card";
+
 /** Server-priced totals for the checkout summary (GBP inc VAT). */
 export type CheckoutTotals = { subtotal: number; deliveryFee: number; total: number };
 

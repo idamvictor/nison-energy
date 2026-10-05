@@ -41,7 +41,7 @@ export function CustomerStep({ signedInEmail }: { signedInEmail: string | null }
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div className="flex flex-col gap-2">
       <div className="rounded-lg border-2 border-primary bg-primary/5 px-4 py-3">
         <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <span className="flex size-4 items-center justify-center rounded-full border-2 border-primary-ink">
@@ -49,14 +49,17 @@ export function CustomerStep({ signedInEmail }: { signedInEmail: string | null }
           </span>
           Checkout as guest
         </p>
-        <p className="mt-0.5 pl-6 text-xs text-muted-foreground">Quick and easy — no account needed.</p>
+        <p className="mt-0.5 pl-6 text-xs text-muted-foreground">Quick and easy — no account required.</p>
       </div>
       <Link
         href={withRedirect("/sign-in", "/checkout")}
         className="rounded-lg border border-foreground/15 px-4 py-3 transition-colors hover:border-primary/50 hover:bg-secondary"
       >
-        <p className="text-sm font-semibold text-foreground">Sign in</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
+        <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <span className="size-4 rounded-full border-2 border-foreground/30" />
+          Sign in
+        </p>
+        <p className="mt-0.5 pl-6 text-xs text-muted-foreground">
           Have an account? Your details fill in automatically.
         </p>
       </Link>

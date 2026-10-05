@@ -27,6 +27,7 @@ import {
   type OrderLineInput,
   type SaveCheckoutDetailsResult,
   type StartCheckoutResult,
+  type CheckoutKind,
 } from "@/lib/orders/types";
 
 // ─── Checkout ──────────────────────────────────────────────────────────────
@@ -79,6 +80,8 @@ export async function placeOrder(
 export async function startCheckout(
   lines: OrderLineInput[],
   previousDraftId?: string,
+  /** "wallet" = express + pay later (Dashboard-driven methods); "card" = card only. */
+  kind: CheckoutKind = "wallet",
 ): Promise<StartCheckoutResult> {
   const ip = await getClientIp();
   const allowed = await checkRateLimit(`checkout-start:${ip}`, { limit: 40, windowMs: 10 * 60_000 });
@@ -110,6 +113,9 @@ export async function startCheckout(
       // Element). No payment_method_types: Stripe shows whatever is switched
       // on in the Dashboard, so newly enabled methods appear automatically.
       ui_mode: "elements",
+      // The Card category is card-only by definition; the wallet session
+      // stays Dashboard-driven so newly enabled wallets appear automatically.
+      ...(kind === "card" ? { payment_method_types: ["card" as const] } : {}),
       line_items: cart.lines.map((line) => ({
         price_data: {
           currency: "gbp",

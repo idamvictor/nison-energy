@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import type { StripeCheckoutContact } from "@stripe/stripe-js";
 import {
@@ -34,9 +34,9 @@ const appearance = {
 export const stripeConfigured = stripePromise != null;
 
 /**
- * Wraps the checkout in one Stripe Checkout Session (`ui_mode: "elements"`),
- * so the express wallet bar at the top and the card form at the bottom share
- * it. Re-keyed by the caller whenever the session is recreated.
+ * One Stripe Checkout Session (`ui_mode: "elements"`) shared by every Stripe
+ * element inside it (card fields + Place Order, wallet buttons). Re-keyed by
+ * the caller whenever the session is recreated.
  */
 export function StripeCheckoutProvider({
   clientSecret,
@@ -74,45 +74,80 @@ export function toStripeContact(name: string, line1: string, city: string, postc
   };
 }
 
+// ─── One-tap buttons (Express Checkout Element) ────────────────────────────
+
+type ExpressMethods = {
+  applePay: "always" | "auto" | "never";
+  googlePay: "always" | "auto" | "never";
+  paypal: "auto" | "never";
+  amazonPay: "auto" | "never";
+  klarna: "auto" | "never";
+  link: "auto" | "never";
+};
+
+const NONE: ExpressMethods = {
+  applePay: "never",
+  googlePay: "never",
+  paypal: "never",
+  amazonPay: "never",
+  klarna: "never",
+  link: "never",
+};
+
+/** Customer-step shortcut: every wallet. "always" so Apple/Google Pay show on more browsers. */
+export const ALL_WALLETS: ExpressMethods = { ...NONE, applePay: "always", googlePay: "always", paypal: "auto", amazonPay: "auto" };
+/** Review step, one wallet each — the button the customer chose at the Payment step. */
+export const APPLE_GOOGLE: ExpressMethods = { ...NONE, applePay: "always", googlePay: "always" };
+export const PAYPAL_ONLY: ExpressMethods = { ...NONE, paypal: "auto" };
+export const AMAZON_ONLY: ExpressMethods = { ...NONE, amazonPay: "auto" };
+
 /**
- * Apple Pay / Google Pay / PayPal buttons. The wallet supplies the name,
- * email, phone and delivery address, so the customer needn't fill the form.
- * Nothing is hard-coded to show: Stripe offers whatever is switched on in the
- * Dashboard; only the methods we keep as tabs below are turned off here.
+ * One-tap payment buttons. The provider supplies name, email, phone and
+ * address, so no form is needed. Stripe only renders a button over HTTPS on a
+ * registered domain when the method works on this device, so `onAvailability`
+ * reports what actually rendered (a button row is ~48px; an empty frame ~8px).
+ * `locked` puts a click-catching overlay over the buttons (e.g. terms unticked).
  */
 export function ExpressCheckout({
-  termsAccepted,
-  onNeedTerms,
+  methods,
+  onAvailability,
+  locked = false,
+  onLockedClick,
 }: {
-  termsAccepted: boolean;
-  onNeedTerms: () => void;
+  methods: ExpressMethods;
+  onAvailability?: (available: boolean) => void;
+  locked?: boolean;
+  onLockedClick?: () => void;
 }) {
   const state = useCheckoutElements();
-  const [available, setAvailable] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const areaRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onAvailability?.((areaRef.current?.offsetHeight ?? 0) >= 24);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [onAvailability]);
 
   if (state.type !== "success") return null;
   const { checkout } = state;
 
   return (
-    <div className={available ? "flex flex-col gap-3" : "hidden"}>
-      {/* Checkout-session express buttons have no click hook, so until the
-          Terms of Sale are ticked an overlay catches the click and nudges
-          instead of letting the wallet open. */}
+    <div className="flex flex-col gap-2">
       <div className="relative">
-        <div className={termsAccepted ? undefined : "pointer-events-none opacity-50"}>
+        <div ref={areaRef} className={locked ? "pointer-events-none opacity-50" : undefined}>
           <ExpressCheckoutElement
             options={{
-              paymentMethods: { klarna: "never", amazonPay: "never", link: "never" },
+              paymentMethods: methods,
               buttonHeight: 48,
               buttonTheme: undefined,
               buttonType: undefined,
-              layout: { maxColumns: 3, overflow: "never" },
-              paymentMethodOrder: ["apple_pay", "google_pay", "paypal"],
+              layout: { maxColumns: 2, overflow: "never" },
+              paymentMethodOrder: ["apple_pay", "google_pay", "paypal", "amazon_pay"],
             }}
-            onReady={(event) =>
-              setAvailable(Object.values(event.availablePaymentMethods ?? {}).some(Boolean))
-            }
+            onReady={(event) => {
+              if (!Object.values(event.availablePaymentMethods ?? {}).some(Boolean)) onAvailability?.(false);
+            }}
             onConfirm={async (event) => {
               setError(null);
               const result = await checkout.confirm({ expressCheckoutConfirmEvent: event });
@@ -120,22 +155,53 @@ export function ExpressCheckout({
             }}
           />
         </div>
-        {!termsAccepted && (
+        {locked && (
           <button
             type="button"
-            onClick={onNeedTerms}
-            aria-label="Agree to the Terms of Sale to use express checkout"
+            onClick={onLockedClick}
+            aria-label="Agree to the Terms of Sale first"
             className="absolute inset-0 cursor-pointer"
           />
         )}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />
-        or pay with your details below
-        <span className="h-px flex-1 bg-border" />
-      </div>
     </div>
+  );
+}
+
+// ─── Card ──────────────────────────────────────────────────────────────────
+
+/** Card number / expiry / CVC only (the card session is card-only). */
+export function CardFields({ onComplete }: { onComplete: (complete: boolean) => void }) {
+  const state = useCheckoutElements();
+  if (state.type === "error") return <p className="text-sm text-destructive">{state.error.message}</p>;
+  if (state.type !== "success") return <p className="text-sm text-muted-foreground">Loading secure card form…</p>;
+  return (
+    <PaymentElement
+      options={{
+        layout: "tabs",
+        wallets: { applePay: "never", googlePay: "never", link: "never" },
+        // Our form supplies name, email, phone and billing address — Stripe
+        // refuses to confirm if the Payment Element could collect them again.
+        // line2 and state stay "auto" (a "never" field with no value is rejected).
+        fields: {
+          billingDetails: {
+            name: "never",
+            email: "never",
+            phone: "never",
+            address: {
+              country: "never",
+              postalCode: "never",
+              city: "never",
+              line1: "never",
+              line2: "auto",
+              state: "auto",
+            },
+          },
+        },
+      }}
+      onChange={(event) => onComplete(event.complete)}
+    />
   );
 }
 
@@ -147,11 +213,10 @@ export type PayDetails = {
 };
 
 /**
- * The card form (and Klarna / Amazon Pay / PayPal tabs) plus the Pay button.
- * `prepare` validates and saves our form, returning what to hand to Stripe —
- * or null to stop (it shows its own errors).
+ * "Place Order" for card payments. `prepare` validates and saves our form,
+ * returning what to hand to Stripe (or null to stop — it shows its own errors).
  */
-export function PaymentSection({
+export function CardPlaceOrder({
   canPay,
   prepare,
 }: {
@@ -161,12 +226,6 @@ export function PaymentSection({
   const state = useCheckoutElements();
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Stays false until the Payment Element reports every required field filled.
-  const [methodComplete, setMethodComplete] = useState(false);
-
-  if (state.type === "error") {
-    return <p className="text-sm text-destructive">{state.error.message}</p>;
-  }
   const ready = state.type === "success";
 
   async function pay() {
@@ -180,7 +239,7 @@ export function PaymentSection({
     const details = await prepare();
     if (!details) return setConfirming(false);
     const { checkout } = state;
-    // Hand Stripe what the customer typed above, so its form never asks again.
+    // Hand Stripe what the customer typed, so its form never asks again.
     const steps = [
       () => checkout.updateEmail(details.email),
       () => checkout.updatePhoneNumber(toE164(details.phone)),
@@ -199,52 +258,19 @@ export function PaymentSection({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <PaymentElement
-        options={{
-          layout: "tabs",
-          // No Link "save my information" box: it can't take our phone number.
-          wallets: { link: "never" },
-          // Our form supplies name, email, phone and billing address — Stripe
-          // refuses to confirm if the Payment Element could collect them again.
-          // line2 and state stay "auto" (a "never" field with no value is rejected).
-          fields: {
-            billingDetails: {
-              name: "never",
-              email: "never",
-              phone: "never",
-              address: {
-                country: "never",
-                postalCode: "never",
-                city: "never",
-                line1: "never",
-                line2: "auto",
-                state: "auto",
-              },
-            },
-          },
-        }}
-        onChange={(event) => setMethodComplete(event.complete)}
-      />
+    <div className="flex flex-col gap-2">
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button
         type="button"
         size="lg"
         variant="cta"
-        disabled={!ready || !methodComplete || !canPay || confirming}
+        disabled={!ready || !canPay || confirming}
         onClick={pay}
-        className="w-full gap-1.5 sm:w-fit"
+        className="h-12 w-full gap-1.5 text-base"
       >
         <Lock className="size-4" />
-        {confirming
-          ? "Processing payment…"
-          : ready
-            ? `Pay ${state.checkout.total.total.amount}`
-            : "Loading secure payment…"}
+        {confirming ? "Processing payment…" : ready ? `Place Order · ${state.checkout.total.total.amount}` : "Loading…"}
       </Button>
-      <p className="text-xs text-muted-foreground">
-        Payments are processed securely by Stripe. We never see or store your card details.
-      </p>
     </div>
   );
 }

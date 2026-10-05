@@ -113,6 +113,8 @@ export type OrderEmailInput = {
   city?: string | null;
   postcode: string;
   subtotal: number;
+  /** Delivery charge (GBP); 0 = free delivery. Absent on legacy orders. */
+  deliveryFee?: number;
   status: string;
   items: OrderItemEmailInput[];
 };
@@ -210,8 +212,16 @@ function itemsTable(items: OrderItemEmailInput[]): string {
 }
 
 // Product prices are stored inc VAT, so the order subtotal is the VAT-inclusive total.
+function orderTotal(order: OrderEmailInput): number {
+  return Math.round((order.subtotal + (order.deliveryFee ?? 0)) * 100) / 100;
+}
+
 function totalLine(order: OrderEmailInput): string {
-  return row(`<strong>Total (inc VAT): ${formatCurrency(order.subtotal)}</strong>`);
+  const fee = order.deliveryFee ?? 0;
+  return [
+    row(`Delivery: ${fee > 0 ? formatCurrency(fee) : "FREE"}`),
+    row(`<strong>Total (inc VAT): ${formatCurrency(orderTotal(order))}</strong>`),
+  ].join("");
 }
 
 function surveyCallout(): string {
@@ -312,7 +322,7 @@ export function customerPaymentFailed(order: OrderEmailInput): EmailContent {
       bodyHtml: [
         row(
           `We couldn't take payment for your order <strong>${esc(order.reference)}</strong>
-           (${formatCurrency(order.subtotal)}). No money has been taken.`,
+           (${formatCurrency(orderTotal(order))}). No money has been taken.`,
         ),
         row(
           `This is usually a declined card or a cancelled bank check. You can try again with the

@@ -8,6 +8,7 @@ import { ArrowRight, Check, ChevronDown, Heart, Zap } from "lucide-react";
 import type { CommercialProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
+import { InstallationPostcodeCheck } from "@/components/shared/installation-postcode-check";
 import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,9 @@ export function CommercialPurchasePanel({
   const router = useRouter();
   const [installation, setInstallation] = useState<"standard" | "none" | null>(null);
   const [installationOpen, setInstallationOpen] = useState(false);
+  // Confirmed by the postcode check — required before adding installation.
+  const [installPostcode, setInstallPostcode] = useState<string | null>(null);
+  const needsPostcode = installation === "standard" && !installPostcode;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
@@ -195,6 +199,12 @@ export function CommercialPurchasePanel({
             </p>
           )}
         </div>
+
+        {installation === "standard" && (
+          <div className="sm:col-span-2">
+            <InstallationPostcodeCheck onChange={setInstallPostcode} />
+          </div>
+        )}
       </div>
 
 
@@ -207,11 +217,11 @@ export function CommercialPurchasePanel({
 
       <Button
         size="lg"
-        disabled={installation === null}
+        disabled={installation === null || needsPostcode}
         variant="cta"
         className="h-12 w-full gap-1.5 text-base"
         onClick={() => {
-          if (installation === null) return;
+          if (installation === null || needsPostcode) return;
           addItem(
             {
               id: product.id,
@@ -222,7 +232,10 @@ export function CommercialPurchasePanel({
               price: unitPrice,
             },
             quantity,
-            { installation },
+            {
+              installation,
+              ...(installation === "standard" && installPostcode ? { postcode: installPostcode } : {}),
+            },
           );
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2000);

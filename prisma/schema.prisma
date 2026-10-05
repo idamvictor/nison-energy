@@ -81,7 +81,8 @@ model Order {
   /// When the customer ticked "I agree to the Terms and Conditions of Sale".
   termsAcceptedAt DateTime?
 
-  subtotal Decimal @db.Decimal(10, 2) // GBP, penny-precise — matches what was actually charged
+  subtotal    Decimal @db.Decimal(10, 2) // GBP inc VAT, items only (server-priced)
+  deliveryFee Decimal @default(0) @db.Decimal(10, 2) // GBP; £10 under £1,000, free from £1,000
 
   paymentStatus           PaymentStatus @default(Unpaid)
   stripeCheckoutSessionId String?       @unique
@@ -115,6 +116,23 @@ model OrderItem {
   options   Json? // { cableLength?, installation? }
 
   @@index([orderId])
+}
+
+/// Holds a server-priced cart for an open Stripe Checkout Session until the
+/// payment succeeds; the Order is created from it at fulfilment (webhook or
+/// success page) and the draft is deleted. Abandoned drafts are removed when
+/// the session expires.
+model CheckoutDraft {
+  id                      String   @id @default(cuid())
+  stripeCheckoutSessionId String?  @unique
+  userId                  String?
+  lines                   Json // PricedLine[] — see src/lib/orders/pricing.ts
+  subtotal                Decimal  @db.Decimal(10, 2)
+  deliveryFee             Decimal  @db.Decimal(10, 2)
+  details                 Json? // contact + addresses from our form (card path); null for express wallets
+  createdAt               DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 enum OrderStatus {

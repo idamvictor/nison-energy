@@ -129,6 +129,12 @@ export default async function OrderDetailPage({
                       <p className="text-muted-foreground">Subtotal</p>
                       <p className="text-foreground">{formatCurrency(order.subtotal)}</p>
                     </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground">Delivery</p>
+                      <p className="text-foreground">
+                        {order.deliveryFee > 0 ? formatCurrency(order.deliveryFee) : "Free"}
+                      </p>
+                    </div>
                     {order.taxAmount != null && (
                       <div className="flex items-center justify-between">
                         <p className="text-muted-foreground">Tax</p>
@@ -143,12 +149,20 @@ export default async function OrderDetailPage({
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground">Subtotal</p>
-                    <p className="font-heading text-lg font-semibold text-foreground">
-                      {formatCurrency(order.subtotal)}
-                    </p>
-                  </div>
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground">Delivery</p>
+                      <p className="text-foreground">
+                        {order.deliveryFee > 0 ? formatCurrency(order.deliveryFee) : "Free"}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground">Total</p>
+                      <p className="font-heading text-lg font-semibold text-foreground">
+                        {formatCurrency(order.subtotal + order.deliveryFee)}
+                      </p>
+                    </div>
+                  </>
                 )}
                 {order.stripePaymentIntentId && (
                   <a

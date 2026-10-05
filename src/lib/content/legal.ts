@@ -56,8 +56,8 @@ export const deliveryPolicyMarkdown = `We are committed to providing fast, relia
 
 | Order Value | Shipping Fee |
 |---|---|
-| Orders over £120 (ex. VAT) | FREE Standard UK Shipping |
-| Orders under £120 (ex. VAT) | £10 Standard Carriage Fee |
+| Orders of £1,000 or more (inc. VAT) | FREE Standard UK Delivery |
+| Orders under £1,000 (inc. VAT) | £10 Standard UK Delivery |
 
 **Special Services:** Need your order on a weekend? Saturday deliveries and expedited options can be arranged upon request.
 

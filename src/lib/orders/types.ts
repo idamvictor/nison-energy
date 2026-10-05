@@ -22,7 +22,7 @@ export type OrderLineInput = {
   name: string;
   unitPrice: number | null;
   quantity: number;
-  options?: { cableLength?: string; installation?: "standard" | "none" };
+  options?: { cableLength?: string; installation?: "standard" | "none"; postcode?: string };
 };
 
 export type OrderItemRecord = {
@@ -58,6 +58,7 @@ export type OrderRecord = {
   billingPostcode: string | null;
   termsAcceptedAt: Date | null;
   subtotal: number;
+  deliveryFee: number;
   paymentStatus: PaymentStatus;
   stripeCheckoutSessionId: string | null;
   stripePaymentIntentId: string | null;
@@ -98,8 +99,13 @@ export type PlaceOrderResult =
   | { ok: true; reference: string }
   | { ok: false; errors: Record<string, string> };
 
-export type CreateCheckoutSessionResult =
-  | { ok: true; clientSecret: string; orderId: string }
-  | { ok: false; errors: Record<string, string> };
+/** Server-priced totals for the checkout summary (GBP inc VAT). */
+export type CheckoutTotals = { subtotal: number; deliveryFee: number; total: number };
+
+export type StartCheckoutResult =
+  | ({ ok: true; clientSecret: string; draftId: string } & CheckoutTotals)
+  | { ok: false; error: string };
+
+export type SaveCheckoutDetailsResult = { ok: true } | { ok: false; errors: Record<string, string> };
 
 export type OrderActionResult = { ok: true } | { ok: false; error: string };

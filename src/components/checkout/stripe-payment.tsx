@@ -5,6 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import type { StripeCheckoutContact } from "@stripe/stripe-js";
 import {
   CheckoutElementsProvider,
+  ExpressCheckoutElement,
   PaymentElement,
   useCheckoutElements,
 } from "@stripe/react-stripe-js/checkout";
@@ -30,16 +31,33 @@ const appearance = {
   },
 };
 
-export type StripePaymentProps = {
+export const stripeConfigured = stripePromise != null;
+
+/**
+ * Wraps the checkout in one Stripe Checkout Session (`ui_mode: "elements"`),
+ * so the express wallet bar at the top and the card form at the bottom share
+ * it. Re-keyed by the caller whenever the session is recreated.
+ */
+export function StripeCheckoutProvider({
+  clientSecret,
+  children,
+}: {
   clientSecret: string;
-  /** Sent with the payment — the delivery address, or the separate billing one. */
-  billingAddress: StripeCheckoutContact;
-  /** The phone from the delivery details, so Stripe doesn't ask for it again. */
-  phone: string;
-};
+  children: React.ReactNode;
+}) {
+  if (!stripePromise) return <>{children}</>;
+  return (
+    <CheckoutElementsProvider
+      stripe={stripePromise}
+      options={{ clientSecret, elementsOptions: { appearance } }}
+    >
+      {children}
+    </CheckoutElementsProvider>
+  );
+}
 
 /** UK numbers as Stripe expects them (E.164): "07700 900123" → "+447700900123". */
-function toE164(phone: string): string {
+export function toE164(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, "");
   if (digits.startsWith("+")) return digits;
   if (digits.startsWith("44")) return `+${digits}`;
@@ -47,73 +65,137 @@ function toE164(phone: string): string {
   return digits;
 }
 
+/** A Stripe address contact. UK addresses have no state, but Stripe rejects an
+ *  empty one, so the town (closest UK equivalent) is used. */
+export function toStripeContact(name: string, line1: string, city: string, postcode: string): StripeCheckoutContact {
+  return {
+    name,
+    address: { country: "GB", line1: line1.trim(), line2: "", city: city.trim(), postal_code: postcode.trim(), state: city.trim() },
+  };
+}
+
 /**
- * Stripe's Payment Element on our own checkout page (Checkout Session with
- * `ui_mode: "elements"`). Confirming redirects to the session's return_url
- * (/checkout/success) once payment — including any 3-D Secure step — succeeds.
+ * Apple Pay / Google Pay / PayPal buttons. The wallet supplies the name,
+ * email, phone and delivery address, so the customer needn't fill the form.
+ * Nothing is hard-coded to show: Stripe offers whatever is switched on in the
+ * Dashboard; only the methods we keep as tabs below are turned off here.
  */
-export function StripePayment(props: StripePaymentProps) {
-  if (!stripePromise) {
-    return (
-      <p className="text-sm text-destructive">
-        Online payment isn&apos;t configured yet — please use WhatsApp to complete your order.
-      </p>
-    );
-  }
+export function ExpressCheckout({
+  termsAccepted,
+  onNeedTerms,
+}: {
+  termsAccepted: boolean;
+  onNeedTerms: () => void;
+}) {
+  const state = useCheckoutElements();
+  const [available, setAvailable] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (state.type !== "success") return null;
+  const { checkout } = state;
+
   return (
-    <CheckoutElementsProvider
-      stripe={stripePromise}
-      options={{
-        clientSecret: props.clientSecret,
-        elementsOptions: { appearance },
-        // Seed the session with what the customer already typed above, so
-        // Stripe's own sections (e.g. Link's "save my information") start
-        // filled in instead of asking for the phone number again.
-        // (The billing address is set at Pay time via updateBillingAddress —
-        // seeding it here too makes Stripe reject confirm().)
-        defaultValues: { phoneNumber: toE164(props.phone) },
-      }}
-    >
-      <PaymentForm {...props} />
-    </CheckoutElementsProvider>
+    <div className={available ? "flex flex-col gap-3" : "hidden"}>
+      {/* Checkout-session express buttons have no click hook, so until the
+          Terms of Sale are ticked an overlay catches the click and nudges
+          instead of letting the wallet open. */}
+      <div className="relative">
+        <div className={termsAccepted ? undefined : "pointer-events-none opacity-50"}>
+          <ExpressCheckoutElement
+            options={{
+              paymentMethods: { klarna: "never", amazonPay: "never", link: "never" },
+              buttonHeight: 48,
+              buttonTheme: undefined,
+              buttonType: undefined,
+              layout: { maxColumns: 3, overflow: "never" },
+              paymentMethodOrder: ["apple_pay", "google_pay", "paypal"],
+            }}
+            onReady={(event) =>
+              setAvailable(Object.values(event.availablePaymentMethods ?? {}).some(Boolean))
+            }
+            onConfirm={async (event) => {
+              setError(null);
+              const result = await checkout.confirm({ expressCheckoutConfirmEvent: event });
+              if (result.type === "error") setError(result.error.message);
+            }}
+          />
+        </div>
+        {!termsAccepted && (
+          <button
+            type="button"
+            onClick={onNeedTerms}
+            aria-label="Agree to the Terms of Sale to use express checkout"
+            className="absolute inset-0 cursor-pointer"
+          />
+        )}
+      </div>
+      {error && <p className="text-sm text-destructive">{error}</p>}
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        or pay with your details below
+        <span className="h-px flex-1 bg-border" />
+      </div>
+    </div>
   );
 }
 
-function PaymentForm({ billingAddress, phone }: StripePaymentProps) {
+export type PayDetails = {
+  email: string;
+  phone: string;
+  shipping: StripeCheckoutContact;
+  billing: StripeCheckoutContact;
+};
+
+/**
+ * The card form (and Klarna / Amazon Pay / PayPal tabs) plus the Pay button.
+ * `prepare` validates and saves our form, returning what to hand to Stripe —
+ * or null to stop (it shows its own errors).
+ */
+export function PaymentSection({
+  canPay,
+  prepare,
+}: {
+  canPay: boolean;
+  prepare: () => Promise<PayDetails | null>;
+}) {
   const state = useCheckoutElements();
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Stays false until the Payment Element reports every required card field filled.
-  const [cardComplete, setCardComplete] = useState(false);
+  // Stays false until the Payment Element reports every required field filled.
+  const [methodComplete, setMethodComplete] = useState(false);
 
   if (state.type === "error") {
     return <p className="text-sm text-destructive">{state.error.message}</p>;
   }
-
   const ready = state.type === "success";
 
   async function pay() {
     if (state.type !== "success") return;
     setError(null);
     setConfirming(true);
-    // The session requires a full billing address, and Stripe only accepts one
-    // from our own form via updateBillingAddress() — passing it to confirm()
-    // isn't enough. The phone is handed over the same way (the session has
-    // phone collection on), and the email comes from the session's Customer —
-    // so confirm() itself takes no billing details.
-    const addressResult = await state.checkout.updateBillingAddress(billingAddress);
-    if (addressResult.type === "error") {
-      setError(addressResult.error.message);
+    const fail = (message: string) => {
+      setError(message);
       setConfirming(false);
-      return;
+    };
+    const details = await prepare();
+    if (!details) return setConfirming(false);
+    const { checkout } = state;
+    // Hand Stripe what the customer typed above, so its form never asks again.
+    const steps = [
+      () => checkout.updateEmail(details.email),
+      () => checkout.updatePhoneNumber(toE164(details.phone)),
+      () => checkout.updateShippingAddress(details.shipping),
+      () => checkout.updateBillingAddress(details.billing),
+    ];
+    for (const step of steps) {
+      const result = await step();
+      if (result.type === "error") {
+        return fail((result.error as { message?: string } | undefined)?.message ?? "Please check your details.");
+      }
     }
-    await state.checkout.updatePhoneNumber(toE164(phone));
-    const result = await state.checkout.confirm();
+    const result = await checkout.confirm();
     // On success the browser is already redirecting to /checkout/success.
-    if (result.type === "error") {
-      setError(result.error.message);
-      setConfirming(false);
-    }
+    if (result.type === "error") fail(result.error.message);
   }
 
   return (
@@ -121,13 +203,11 @@ function PaymentForm({ billingAddress, phone }: StripePaymentProps) {
       <PaymentElement
         options={{
           layout: "tabs",
-          // No Link "save my information" box under the card form: it can't
-          // take the phone from our form and asked for it again.
+          // No Link "save my information" box: it can't take our phone number.
           wallets: { link: "never" },
-          // Our form already has the name, email, phone and billing address —
-          // Stripe refuses to confirm if the Payment Element could collect them
-          // a second time. line2 and state stay "auto" (UK cards never ask for
-          // them) because a "never" field with no value is rejected at confirm.
+          // Our form supplies name, email, phone and billing address — Stripe
+          // refuses to confirm if the Payment Element could collect them again.
+          // line2 and state stay "auto" (a "never" field with no value is rejected).
           fields: {
             billingDetails: {
               name: "never",
@@ -144,14 +224,14 @@ function PaymentForm({ billingAddress, phone }: StripePaymentProps) {
             },
           },
         }}
-        onChange={(event) => setCardComplete(event.complete)}
+        onChange={(event) => setMethodComplete(event.complete)}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button
         type="button"
         size="lg"
         variant="cta"
-        disabled={!ready || !cardComplete || confirming}
+        disabled={!ready || !methodComplete || !canPay || confirming}
         onClick={pay}
         className="w-full gap-1.5 sm:w-fit"
       >

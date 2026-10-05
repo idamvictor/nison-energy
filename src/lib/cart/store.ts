@@ -7,6 +7,8 @@ export type { CartCategory };
 export type CartItemOptions = {
   cableLength?: string;
   installation?: "standard" | "none";
+  /** Installation postcode, checked on the product page (installation orders). */
+  postcode?: string;
 };
 
 // The catalog now lives in Postgres, so the cart snapshots the fields it needs
@@ -55,6 +57,7 @@ export function formatCartOptions(options?: CartItemOptions) {
         : "No installation"
     );
   }
+  if (options.installation === "standard" && options.postcode) parts.push(options.postcode);
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 

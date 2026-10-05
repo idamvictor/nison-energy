@@ -8,7 +8,7 @@ const PANEL_IMAGE =
 const facts = [
   { icon: PoundSterling, label: "OZEV grant support" },
   { icon: BadgeCheck, label: "Certified installers" },
-  { icon: Truck, label: "Free delivery" },
+  { icon: Truck, label: "Free delivery over £1,000" },
 ];
 
 const SEGMENTS = 8;

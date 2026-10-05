@@ -97,7 +97,7 @@ export function AccountOrders({ orders }: { orders: OrderWithItems[] }) {
                 <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
                   <p className="text-muted-foreground">{statusHint[status]}</p>
                   <p className="font-heading font-semibold text-foreground">
-                    {formatCurrency(order.subtotal)}
+                    {formatCurrency(order.total ?? order.subtotal + order.deliveryFee)}
                   </p>
                 </div>
               </CardContent>

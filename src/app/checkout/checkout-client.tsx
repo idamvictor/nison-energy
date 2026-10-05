@@ -3,13 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CheckCircle2,
-  ShoppingCart,
-  Video,
-  X,
-} from "lucide-react";
+import { CheckCircle2, ShoppingCart, Truck, Video, X } from "lucide-react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -29,13 +23,22 @@ import {
   AddressAutocomplete,
   type AddressSuggestion,
 } from "@/components/shared/address-autocomplete";
+import { CustomerStep } from "@/components/checkout/customer-step";
+import {
+  ExpressCheckout,
+  PaymentSection,
+  StripeCheckoutProvider,
+  stripeConfigured,
+  toStripeContact,
+  type PayDetails,
+} from "@/components/checkout/stripe-payment";
+import { SurveyNextStep } from "@/components/checkout/survey-next-step";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { placeOrder, createCheckoutSession, cancelCheckoutDraft } from "@/lib/orders/actions";
-import { StripePayment, type StripePaymentProps } from "@/components/checkout/stripe-payment";
-import { SurveyNextStep } from "@/components/checkout/survey-next-step";
+import { placeOrder, saveCheckoutDetails, startCheckout } from "@/lib/orders/actions";
 import { includesInstallation } from "@/lib/orders/installation";
-import type { OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
+import { deliveryFeeFor, FREE_DELIVERY_THRESHOLD } from "@/lib/orders/delivery";
+import type { CheckoutTotals, OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
 
 /** A real catalogue accessory offered as a checkout add-on (see src/lib/orders/extras.ts). */
@@ -56,6 +59,8 @@ export type CheckoutDefaults = {
   postcode: string;
 };
 
+type Session = { clientSecret: string; draftId: string } & CheckoutTotals;
+
 export function CheckoutClient({
   extras,
   defaults,
@@ -73,25 +78,95 @@ export function CheckoutClient({
   const [pendingExtra, setPendingExtra] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [payPending, startPayTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  // The submit buttons stay disabled until every required field (and the
-  // terms box) passes the browser's own validation.
+  // Pay / Place Order stay disabled until every required field (and the terms
+  // box) passes the browser's own validation.
   const [formValid, setFormValid] = useState(false);
   const checkForm = () => setFormValid(formRef.current?.checkValidity() ?? false);
   // Also re-check after state-driven changes (address suggestions filling
   // town/postcode, the billing toggle) that don't fire an input event.
   useEffect(checkForm);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsNudge, setTermsNudge] = useState(false);
   // Town + postcode are controlled so picking an address suggestion can fill them.
   const [city, setCity] = useState("");
-  const [postcode, setPostcode] = useState(defaults?.postcode ?? "");
+  // Prefer the account postcode; otherwise the one checked on the product page.
+  const [postcode, setPostcode] = useState(
+    () => defaults?.postcode || items.find((i) => i.options?.postcode)?.options?.postcode || "",
+  );
   const [billingSame, setBillingSame] = useState(true);
   const [billingCity, setBillingCity] = useState("");
   const [billingPostcode, setBillingPostcode] = useState("");
-  // Set once "Continue to payment" has created the draft order + Checkout
-  // Session; the form above locks and the Stripe payment step appears.
-  const [payment, setPayment] = useState<(StripePaymentProps & { orderId: string }) | null>(null);
-  const [editing, startEditTransition] = useTransition();
+
+  const lines = items
+    .map((item) => resolveCartItem(item))
+    .filter((line): line is NonNullable<typeof line> => line !== null);
+  const selectedExtras = extras.filter((extra) => extraIds.includes(extra.id));
+  const remainingExtras = extras.filter((extra) => !extraIds.includes(extra.id));
+  const hasQuoteOnlyItems = lines.some((line) => line.price === null);
+  const hasInstallation = includesInstallation(lines);
+
+  // What goes to the server. Prices here are display-only — the server
+  // re-prices every line from the database (src/lib/orders/pricing.ts).
+  const orderLines: OrderLineInput[] = [
+      ...lines.map((line) => ({
+        productId: line.id,
+        category: line.category,
+        name: line.name,
+        unitPrice: line.price,
+        quantity: line.quantity,
+        options: line.options,
+      })),
+      ...selectedExtras.map((extra) => ({
+        productId: extra.id,
+        category: "extra" as const,
+        name: extra.name,
+        unitPrice: extra.price,
+        quantity: 1,
+      })),
+  ];
+  const orderLinesJson = JSON.stringify(orderLines);
+  const payable = lines.length > 0 && !hasQuoteOnlyItems && !submitted;
+
+  // ── Stripe session: opened as soon as the page loads (express wallets need
+  // it before any typing) and reopened whenever the cart or extras change.
+  const [session, setSession] = useState<Session | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const draftRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!payable) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const result = await startCheckout(JSON.parse(orderLinesJson), draftRef.current);
+      if (result.ok) draftRef.current = result.draftId;
+      if (cancelled) return;
+      if (result.ok) {
+        setSession(result);
+        setSessionError(null);
+      } else {
+        setSession(null);
+        setSessionError(result.error);
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [orderLinesJson, payable]);
+
+  // Server totals once the session is open; a same-rule estimate before that.
+  const estimateSubtotal =
+    Math.round(
+      (lines.reduce((sum, l) => sum + (l.price ?? 0) * l.quantity, 0) +
+        selectedExtras.reduce((sum, e) => sum + e.price, 0)) *
+        100,
+    ) / 100;
+  const totals: CheckoutTotals = session ?? {
+    subtotal: estimateSubtotal,
+    deliveryFee: deliveryFeeFor(estimateSubtotal),
+    total: estimateSubtotal + deliveryFeeFor(estimateSubtotal),
+  };
+  const toFreeDelivery = FREE_DELIVERY_THRESHOLD - totals.subtotal;
 
   function handleAddressSelect(suggestion: AddressSuggestion) {
     if (suggestion.city) setCity(suggestion.city);
@@ -103,44 +178,7 @@ export function CheckoutClient({
     if (suggestion.postcode) setBillingPostcode(suggestion.postcode.toUpperCase());
   }
 
-  const lines = items
-    .map((item) => resolveCartItem(item))
-    .filter((line): line is NonNullable<typeof line> => line !== null);
-
-  const selectedExtras = extras.filter((extra) =>
-    extraIds.includes(extra.id)
-  );
-  const remainingExtras = extras.filter(
-    (extra) => !extraIds.includes(extra.id)
-  );
-
-  const itemsSubtotal = lines.reduce(
-    (sum, line) => sum + (line.price ?? 0) * line.quantity,
-    0
-  );
-  const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
-  const subtotal = Math.round((itemsSubtotal + extrasTotal) * 100) / 100;
-  const hasQuoteOnlyItems = lines.some((line) => line.price === null);
-
   function buildPayload(fd: FormData): PlaceOrderPayload {
-    const orderLines: OrderLineInput[] = [
-      ...lines.map((line) => ({
-        productId: line.id,
-        category: line.category,
-        name: line.name,
-        unitPrice: line.price,
-        quantity: line.quantity,
-        options: line.options,
-      })),
-      ...selectedExtras.map((extra) => ({
-        productId: extra.id,
-        category: "accessories" as const,
-        name: extra.name,
-        unitPrice: extra.price,
-        quantity: 1,
-      })),
-    ];
-
     return {
       firstName: String(fd.get("firstName") ?? ""),
       lastName: String(fd.get("lastName") ?? ""),
@@ -159,50 +197,28 @@ export function CheckoutClient({
     };
   }
 
-  function handleProceedToPayment() {
+  /** Card path: validate + save our form on the draft, then hand it to Stripe. */
+  async function preparePayment(): Promise<PayDetails | null> {
     const form = formRef.current;
-    if (!form || !form.reportValidity()) return;
+    if (!form || !session || !form.reportValidity()) return null;
     const payload = buildPayload(new FormData(form));
     setError(null);
-    startPayTransition(async () => {
-      const result = await createCheckoutSession(payload);
-      if (!result.ok) {
-        setError(Object.values(result.errors)[0] ?? "Could not start checkout.");
-        return;
-      }
-      const billingSameAsDelivery = payload.billingSameAsDelivery !== false;
-      setPayment({
-        clientSecret: result.clientSecret,
-        orderId: result.orderId,
-        phone: payload.phone,
-        billingAddress: {
-          name: `${payload.firstName} ${payload.lastName}`.trim(),
-          address: {
-            country: "GB",
-            // The "Use my delivery address as my billing address" box decides
-            // which address Stripe records as billing.
-            line1: (billingSameAsDelivery ? payload.address : payload.billingAddress)?.trim(),
-            line2: "",
-            city: (billingSameAsDelivery ? payload.city : payload.billingCity)?.trim(),
-            postal_code: (billingSameAsDelivery ? payload.postcode : payload.billingPostcode)?.trim(),
-            // UK addresses have no state, but the Payment Element rejects
-            // confirm() unless it's non-empty (null/"" count as missing) — the
-            // town is the closest UK equivalent (county/post town).
-            state: (billingSameAsDelivery ? payload.city : payload.billingCity)?.trim(),
-          },
-        },
-      });
-    });
+    const saved = await saveCheckoutDetails(session.draftId, payload);
+    if (!saved.ok) {
+      setError(Object.values(saved.errors)[0] ?? "Please check your details.");
+      return null;
+    }
+    const name = `${payload.firstName} ${payload.lastName}`.trim();
+    const shipping = toStripeContact(name, payload.address, payload.city, payload.postcode);
+    const billing = payload.billingSameAsDelivery
+      ? shipping
+      : toStripeContact(name, payload.billingAddress ?? "", payload.billingCity ?? "", payload.billingPostcode ?? "");
+    return { email: payload.email, phone: payload.phone, shipping, billing };
   }
 
-  function handleEditDetails() {
-    if (!payment) return;
-    const { orderId } = payment;
-    startEditTransition(async () => {
-      await cancelCheckoutDraft(orderId);
-      setPayment(null);
-    });
-  }
+  const stepNumbers = { customer: 1, survey: 2, extras: 3, address: extras.length > 0 ? 4 : 3 };
+  const paymentStep = stepNumbers.address + 1;
+  const showStripe = payable && stripeConfigured;
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -223,12 +239,10 @@ export function CheckoutClient({
                 Thanks — we&apos;ve got your order
               </p>
               <p className="text-sm text-muted-foreground">Your order reference</p>
-              <p className="font-heading text-2xl font-semibold text-primary-ink">
-                {reference}
-              </p>
+              <p className="font-heading text-2xl font-semibold text-primary-ink">{reference}</p>
               <p className="max-w-sm text-sm text-muted-foreground">
-                A member of the team will be in touch to confirm payment and
-                book your installation. If it&apos;s urgent,{" "}
+                A member of the team will be in touch to confirm payment and book your
+                installation. If it&apos;s urgent,{" "}
                 <a
                   href={whatsappUrl()}
                   target="_blank"
@@ -252,9 +266,7 @@ export function CheckoutClient({
               <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
                 <ShoppingCart className="size-5" />
               </span>
-              <p className="font-heading text-lg font-semibold text-foreground">
-                Your cart is empty
-              </p>
+              <p className="font-heading text-lg font-semibold text-foreground">Your cart is empty</p>
               <Button nativeButton={false} render={<Link href="/home-charging" />}>
                 Browse residential chargers
               </Button>
@@ -268,20 +280,15 @@ export function CheckoutClient({
                 className="flex flex-col gap-6"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (!hasQuoteOnlyItems) {
-                    handleProceedToPayment();
-                    return;
-                  }
+                  // Only quote-only carts submit the form ("Place Order");
+                  // payable carts pay through the Stripe section below.
+                  if (!hasQuoteOnlyItems) return;
                   const payload = buildPayload(new FormData(e.currentTarget));
                   setError(null);
-
                   startTransition(async () => {
                     const result = await placeOrder(payload);
                     if (!result.ok) {
-                      setError(
-                        Object.values(result.errors)[0] ??
-                          "Could not place the order.",
-                      );
+                      setError(Object.values(result.errors)[0] ?? "Could not place the order.");
                       return;
                     }
                     setReference(result.reference);
@@ -301,24 +308,34 @@ export function CheckoutClient({
                   className="absolute -left-[9999px] h-0 w-0 opacity-0"
                 />
 
-                {/* Locked while the payment step is open — "Edit details" unlocks it. */}
-                <fieldset disabled={!!payment} className="contents">
+                <Card className="border border-foreground/18 shadow-md">
+                  <CardContent className="flex flex-col gap-4">
+                    <StepHeading number={stepNumbers.customer} title="Customer" />
+                    <CustomerStep signedInEmail={defaults?.email ?? null} />
+                    {showStripe && session && (
+                      <StripeCheckoutProvider key={`express-${session.clientSecret}`} clientSecret={session.clientSecret}>
+                        <ExpressCheckout
+                          termsAccepted={termsAccepted}
+                          onNeedTerms={() => setTermsNudge(true)}
+                        />
+                      </StripeCheckoutProvider>
+                    )}
+                  </CardContent>
+                </Card>
 
                 <Card className="border border-foreground/18 shadow-md">
                   <CardContent className="flex flex-col gap-3">
-                    <StepHeading number={1} title="Survey" />
+                    <StepHeading number={stepNumbers.survey} title="Survey" />
                     <div className="flex items-start gap-3 rounded-lg bg-secondary px-4 py-3 ring-1 ring-foreground/10">
                       <Video className="mt-0.5 size-4.5 shrink-0 text-primary-ink" />
                       <div>
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-medium text-foreground">
-                            Virtual self survey
-                          </p>
+                          <p className="text-sm font-medium text-foreground">Virtual self survey</p>
                           <p className="text-sm font-semibold text-success">Free</p>
                         </div>
                         <p className="mt-0.5 text-sm text-muted-foreground">
-                          Instant — photos and a short questionnaire, reviewed
-                          by our team before installation.
+                          Instant — photos and a short questionnaire, reviewed by our team before
+                          installation.
                         </p>
                       </div>
                     </div>
@@ -326,85 +343,65 @@ export function CheckoutClient({
                 </Card>
 
                 {extras.length > 0 && (
-                <Card className="border border-foreground/18 shadow-md">
-                  <CardContent className="flex flex-col gap-3">
-                    <StepHeading number={2} title="Extras" />
-
-                    {selectedExtras.length > 0 && (
-                      <div className="flex flex-col gap-2">
-                        {selectedExtras.map((extra) => (
-                          <div
-                            key={extra.id}
-                            className="flex items-center gap-3 rounded-lg border border-foreground/15 px-4 py-3"
-                          >
-                            <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-secondary ring-1 ring-border">
-                              <Image
-                                src={extra.image}
-                                alt=""
-                                fill
-                                sizes="40px"
-                                className="object-contain p-0.5"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between gap-2">
-                                <p className="text-sm font-medium text-foreground">
-                                  {extra.name}
-                                </p>
-                                <p className="text-sm font-semibold text-foreground">
-                                  {formatCurrency(extra.price)}
-                                </p>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setExtraIds((ids) =>
-                                  ids.filter((id) => id !== extra.id)
-                                )
-                              }
-                              aria-label={`Remove ${extra.name}`}
-                              className="text-muted-foreground transition-colors hover:text-destructive"
+                  <Card className="border border-foreground/18 shadow-md">
+                    <CardContent className="flex flex-col gap-3">
+                      <StepHeading number={stepNumbers.extras} title="Extras" />
+                      {selectedExtras.length > 0 && (
+                        <div className="flex flex-col gap-2">
+                          {selectedExtras.map((extra) => (
+                            <div
+                              key={extra.id}
+                              className="flex items-center gap-3 rounded-lg border border-foreground/15 px-4 py-3"
                             >
-                              <X className="size-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {remainingExtras.length > 0 ? (
-                      <Select
-                        value={pendingExtra}
-                        onValueChange={(value) => {
-                          if (!value) return;
-                          setExtraIds((ids) => [...ids, value]);
-                          setPendingExtra("");
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Add an extra…" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {remainingExtras.map((extra) => (
-                            <SelectItem key={extra.id} value={extra.id}>
-                              {extra.name} — {formatCurrency(extra.price)}
-                            </SelectItem>
+                              <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-secondary ring-1 ring-border">
+                                <Image src={extra.image} alt="" fill sizes="40px" className="object-contain p-0.5" />
+                              </div>
+                              <div className="flex flex-1 items-center justify-between gap-2">
+                                <p className="text-sm font-medium text-foreground">{extra.name}</p>
+                                <p className="text-sm font-semibold text-foreground">{formatCurrency(extra.price)}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setExtraIds((ids) => ids.filter((id) => id !== extra.id))}
+                                aria-label={`Remove ${extra.name}`}
+                                className="text-muted-foreground transition-colors hover:text-destructive"
+                              >
+                                <X className="size-4" />
+                              </button>
+                            </div>
                           ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        All available extras have been added.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                        </div>
+                      )}
+                      {remainingExtras.length > 0 ? (
+                        <Select
+                          value={pendingExtra}
+                          onValueChange={(value) => {
+                            if (!value) return;
+                            setExtraIds((ids) => [...ids, value]);
+                            setPendingExtra("");
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Add an extra…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {remainingExtras.map((extra) => (
+                              <SelectItem key={extra.id} value={extra.id}>
+                                {extra.name} — {formatCurrency(extra.price)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">All available extras have been added.</p>
+                      )}
+                    </CardContent>
+                  </Card>
                 )}
 
                 <Card className="border border-foreground/18 shadow-md">
                   <CardContent className="flex flex-col gap-4">
-                    <StepHeading number={3} title="Delivery and Installation Address" />
+                    <StepHeading number={stepNumbers.address} title="Your details & delivery address" />
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="First name">
                         <Input name="firstName" defaultValue={defaults?.firstName} required autoComplete="given-name" placeholder="First name" />
@@ -418,7 +415,7 @@ export function CheckoutClient({
                       <Field label="Phone number">
                         <Input name="phone" defaultValue={defaults?.phone} required type="tel" autoComplete="tel" placeholder="Phone number" />
                       </Field>
-                      <Field label="Address line 1" className="sm:col-span-2">
+                      <Field label={hasInstallation ? "Delivery & installation address" : "Delivery address"} className="sm:col-span-2">
                         <AddressAutocomplete
                           name="address"
                           defaultValue={defaults?.address}
@@ -438,7 +435,7 @@ export function CheckoutClient({
                           onChange={(e) => setCity(e.target.value)}
                         />
                       </Field>
-                      <Field label="Postcode">
+                      <Field label={hasInstallation ? "Installation postcode" : "Postcode"}>
                         <PostcodeInput required value={postcode} onValueChange={setPostcode} />
                       </Field>
                     </div>
@@ -492,16 +489,27 @@ export function CheckoutClient({
                     <p className="text-xs text-muted-foreground">
                       {hasQuoteOnlyItems
                         ? "No payment is taken online — this places your order for review, and we’ll be in touch to confirm payment and schedule installation."
-                        : "Your charger will arrive before your scheduled installation date."}
+                        : hasInstallation
+                          ? "Your charger will arrive before your scheduled installation date."
+                          : "Standard UK delivery in 1–3 working days."}
                     </p>
                   </CardContent>
                 </Card>
 
-                <label className="flex cursor-pointer items-start gap-2.5 text-sm text-foreground">
+                <label
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-lg text-sm text-foreground ${
+                    termsNudge && !termsAccepted ? "bg-destructive/5 p-3 ring-1 ring-destructive/40" : ""
+                  }`}
+                >
                   <input
                     type="checkbox"
                     name="acceptedTerms"
                     required
+                    checked={termsAccepted}
+                    onChange={(e) => {
+                      setTermsAccepted(e.target.checked);
+                      setTermsNudge(false);
+                    }}
                     className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary-ink"
                   />
                   <span>
@@ -514,54 +522,41 @@ export function CheckoutClient({
                       Terms and Conditions of Sale
                     </Link>
                     .
+                    {termsNudge && !termsAccepted && (
+                      <span className="mt-1 block text-destructive">
+                        Please tick to agree before paying with Apple Pay, Google Pay or PayPal.
+                      </span>
+                    )}
                   </span>
                 </label>
-                </fieldset>
 
                 {error && <p className="text-sm text-destructive">{error}</p>}
 
-                {payment ? (
+                {hasQuoteOnlyItems ? (
+                  // Quote-only items have no price, so they can't be paid
+                  // online — the order goes to the team for review instead.
+                  <Button type="submit" size="lg" variant="cta" disabled={pending || !formValid} className="w-fit">
+                    {pending ? "Placing order…" : "Place Order"}
+                  </Button>
+                ) : (
                   <Card className="border border-foreground/18 shadow-md">
                     <CardContent className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <StepHeading number={4} title="Payment" />
-                        <button
-                          type="button"
-                          onClick={handleEditDetails}
-                          disabled={editing}
-                          className="text-sm font-medium text-primary-ink underline underline-offset-2 hover:text-foreground disabled:opacity-50"
-                        >
-                          {editing ? "Unlocking…" : "Edit details"}
-                        </button>
-                      </div>
-                      <StripePayment
-                        clientSecret={payment.clientSecret}
-                        billingAddress={payment.billingAddress}
-                        phone={payment.phone}
-                      />
+                      <StepHeading number={paymentStep} title="Payment" />
+                      {sessionError ? (
+                        <p className="text-sm text-destructive">{sessionError}</p>
+                      ) : !stripeConfigured ? (
+                        <p className="text-sm text-destructive">
+                          Online payment isn&apos;t configured yet — please use WhatsApp to complete your order.
+                        </p>
+                      ) : session ? (
+                        <StripeCheckoutProvider key={`pay-${session.clientSecret}`} clientSecret={session.clientSecret}>
+                          <PaymentSection canPay={formValid} prepare={preparePayment} />
+                        </StripeCheckoutProvider>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Loading secure payment…</p>
+                      )}
                     </CardContent>
                   </Card>
-                ) : (
-                <div className="flex flex-wrap gap-3">
-                  {hasQuoteOnlyItems ? (
-                    // Quote-only items have no price, so they can't be paid
-                    // online — the order goes to the team for review instead.
-                    <Button type="submit" size="lg" variant="cta" disabled={pending || !formValid} className="w-fit">
-                      {pending ? "Placing order…" : "Place Order"}
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      size="lg"
-                      variant="cta"
-                      disabled={payPending || !formValid}
-                      className="w-fit gap-1.5"
-                    >
-                      {payPending ? "Preparing secure payment…" : "Continue to payment"}
-                      {!payPending && <ArrowRight className="size-4" />}
-                    </Button>
-                  )}
-                </div>
                 )}
               </form>
 
@@ -569,71 +564,69 @@ export function CheckoutClient({
                   scrolls internally only if the summary itself outgrows the screen. */}
               <Card className="h-fit border border-foreground/18 shadow-md lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
                 <CardContent className="flex flex-col gap-4">
-                  <h2 className="font-heading text-lg font-semibold text-foreground">
-                    Order Summary
-                  </h2>
+                  <h2 className="font-heading text-lg font-semibold text-foreground">Order Summary</h2>
                   <div className="flex flex-col gap-3">
                     {lines.map((line) => (
                       <div key={line.id} className="flex items-center gap-3">
                         <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
-                          <Image
-                            src={line.image}
-                            alt={line.name}
-                            fill
-                            sizes="48px"
-                            className="object-contain p-1"
-                          />
+                          <Image src={line.image} alt={line.name} fill sizes="48px" className="object-contain p-1" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">
-                            {line.name}
-                          </p>
+                          <p className="text-sm font-medium text-foreground">{line.name}</p>
                           <p className="text-xs text-muted-foreground">
                             Qty {line.quantity}
-                            {formatCartOptions(line.options) &&
-                              ` · ${formatCartOptions(line.options)}`}
+                            {formatCartOptions(line.options) && ` · ${formatCartOptions(line.options)}`}
                           </p>
                         </div>
                         <p className="text-sm font-semibold text-foreground">
-                          {line.price != null
-                            ? formatCurrency(line.price * line.quantity)
-                            : "Quote"}
+                          {line.price != null ? formatCurrency(line.price * line.quantity) : "Quote"}
                         </p>
                       </div>
                     ))}
                     {selectedExtras.map((extra) => (
                       <div key={extra.id} className="flex items-center gap-3">
                         <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
-                          <Image
-                            src={extra.image}
-                            alt={extra.name}
-                            fill
-                            sizes="48px"
-                            className="object-contain p-1"
-                          />
+                          <Image src={extra.image} alt={extra.name} fill sizes="48px" className="object-contain p-1" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">
-                            {extra.name}
-                          </p>
+                          <p className="text-sm font-medium text-foreground">{extra.name}</p>
                           <p className="text-xs text-muted-foreground">Qty 1</p>
                         </div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {formatCurrency(extra.price)}
-                        </p>
+                        <p className="text-sm font-semibold text-foreground">{formatCurrency(extra.price)}</p>
                       </div>
                     ))}
                   </div>
+                  <div className="flex flex-col gap-2 border-t border-border pt-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground">Subtotal</p>
+                      <p className="font-medium text-foreground">{formatCurrency(totals.subtotal)}</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="flex items-center gap-1.5 text-muted-foreground">
+                        <Truck className="size-3.5" /> Delivery
+                      </p>
+                      <p className="font-medium text-foreground">
+                        {totals.deliveryFee === 0 ? (
+                          <span className="font-semibold text-success">FREE</span>
+                        ) : (
+                          formatCurrency(totals.deliveryFee)
+                        )}
+                      </p>
+                    </div>
+                    {toFreeDelivery > 0 && (
+                      <p className="rounded-md bg-secondary px-2.5 py-1.5 text-xs text-foreground/80">
+                        Add {formatCurrency(toFreeDelivery)} more for <strong>free delivery</strong>.
+                      </p>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
-                    <p className="text-muted-foreground">Subtotal</p>
-                    <p className="font-heading text-lg font-semibold text-foreground">
-                      {formatCurrency(subtotal)}
-                    </p>
+                    <p className="font-medium text-foreground">Total (inc VAT)</p>
+                    <p className="font-heading text-lg font-semibold text-foreground">{formatCurrency(totals.total)}</p>
                   </div>
                   {hasQuoteOnlyItems && (
                     <p className="text-xs text-muted-foreground">
-                      Some items don&apos;t have a fixed price yet —
-                      we&apos;ll confirm the full total when we&apos;re in touch.
+                      Some items don&apos;t have a fixed price yet — we&apos;ll confirm the full total
+                      when we&apos;re in touch.
                     </p>
                   )}
                 </CardContent>
@@ -653,9 +646,7 @@ function StepHeading({ number, title }: { number: number; title: string }) {
       <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
         {number}
       </span>
-      <h2 className="font-heading text-sm font-semibold tracking-wide text-foreground uppercase">
-        {title}
-      </h2>
+      <h2 className="font-heading text-sm font-semibold tracking-wide text-foreground uppercase">{title}</h2>
     </div>
   );
 }
@@ -670,9 +661,7 @@ function Field({
   className?: string;
 }) {
   return (
-    <label
-      className={`flex flex-col gap-1.5 text-sm font-medium text-foreground ${className ?? ""}`}
-    >
+    <label className={`flex flex-col gap-1.5 text-sm font-medium text-foreground ${className ?? ""}`}>
       {label}
       {children}
     </label>

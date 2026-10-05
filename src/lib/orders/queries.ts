@@ -16,6 +16,7 @@ import {
 import type { OrderItemRecord, OrderLineInput, OrderWithItems } from "@/lib/orders/types";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { CACHE_TTL } from "@/lib/cache/config";
+import { priceCart, type PricedLine } from "@/lib/orders/pricing";
 
 export type {
   OrderStatus,
@@ -42,6 +43,7 @@ export function toOrderRecord(
   return {
     ...order,
     subtotal: Number(order.subtotal),
+    deliveryFee: Number(order.deliveryFee ?? 0),
     taxAmount: order.taxAmount == null ? null : Number(order.taxAmount),
     total: order.total == null ? null : Number(order.total),
     items: order.items.map((item) => ({
@@ -97,7 +99,8 @@ export const getPendingOrderCount = cache(
 
 // ─── Create ─────────────────────────────────────────────────────────────────
 
-export type CreateOrderInput = {
+/** Raw contact/address fields from the checkout form (validated server-side). */
+export type ContactInput = {
   firstName?: unknown;
   lastName?: unknown;
   email?: unknown;
@@ -111,16 +114,29 @@ export type CreateOrderInput = {
   billingPostcode?: unknown;
   acceptedTerms?: unknown;
   notes?: unknown;
-  lines?: OrderLineInput[];
 };
+
+export type CreateOrderInput = ContactInput & { lines?: OrderLineInput[] };
 
 export type CreateOrderResult =
   | { ok: true; reference: string }
   | { ok: false; errors: Record<string, string> };
 
-export type CreateDraftOrderResult =
-  | { ok: true; order: OrderWithItems }
-  | { ok: false; errors: Record<string, string> };
+/** Validated contact + delivery/billing details, as stored on an Order. */
+export type ContactDetails = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string | null;
+  postcode: string;
+  billingSameAsDelivery: boolean;
+  billingAddress: string | null;
+  billingCity: string | null;
+  billingPostcode: string | null;
+  notes: string | null;
+};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -132,40 +148,22 @@ function newReference(): string {
   return `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-type ValidatedOrderInput = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  postcode: string;
-  billingSameAsDelivery: boolean;
-  billingAddress: string | null;
-  billingCity: string | null;
-  billingPostcode: string | null;
-  termsAcceptedAt: Date;
-  notes: string | null;
-  lines: OrderLineInput[];
-  subtotal: number;
-  userId: string | null;
-};
-
-async function validateOrderInput(
-  input: CreateOrderInput,
-): Promise<{ ok: true; data: ValidatedOrderInput } | { ok: false; errors: Record<string, string> }> {
+/** Contact, address and terms checks shared by "Place Order" and the card checkout. */
+export function validateContactDetails(
+  input: ContactInput,
+): { ok: true; details: ContactDetails } | { ok: false; errors: Record<string, string> } {
   const firstName = str(input.firstName);
   const lastName = str(input.lastName);
   const email = str(input.email);
   const phone = str(input.phone);
   const address = str(input.address);
   const city = str(input.city);
-  const postcode = str(input.postcode);
+  const postcode = str(input.postcode).toUpperCase();
   // Anything but an explicit `false` means "same as delivery".
   const billingSameAsDelivery = input.billingSameAsDelivery !== false;
   const billingAddress = str(input.billingAddress);
   const billingCity = str(input.billingCity);
-  const billingPostcode = str(input.billingPostcode);
+  const billingPostcode = str(input.billingPostcode).toUpperCase();
 
   const errors: Record<string, string> = {};
   if (!firstName) errors.firstName = "Enter your first name.";
@@ -184,107 +182,123 @@ async function validateOrderInput(
   if (input.acceptedTerms !== true) {
     errors.acceptedTerms = "Please tick to agree to the Terms and Conditions of Sale.";
   }
-
-  const lines = Array.isArray(input.lines) ? input.lines : [];
-  if (lines.length === 0) errors.lines = "Your cart is empty.";
-
   if (Object.keys(errors).length > 0) return { ok: false, errors };
-
-  const subtotal =
-    Math.round(
-      lines.reduce(
-        (sum, line) => sum + (line.unitPrice ?? 0) * Math.max(1, line.quantity),
-        0,
-      ) * 100,
-    ) / 100;
-
-  const user = await getCurrentUser();
 
   return {
     ok: true,
-    data: {
+    details: {
       firstName,
       lastName,
       email,
       phone,
       address,
-      city,
+      city: city || null,
       postcode,
       billingSameAsDelivery,
       billingAddress: billingSameAsDelivery ? null : billingAddress,
       billingCity: billingSameAsDelivery ? null : billingCity,
       billingPostcode: billingSameAsDelivery ? null : billingPostcode,
-      termsAcceptedAt: new Date(),
       notes: str(input.notes) || null,
-      lines,
-      subtotal,
-      userId: user?.id ?? null,
     },
   };
 }
 
-async function insertOrder(
-  data: ValidatedOrderInput,
-  extra?: { paymentStatus?: "Unpaid" | "Paid" | "Failed" },
-): Promise<OrderWithItems> {
+export type NewOrder = {
+  details: ContactDetails;
+  lines: PricedLine[];
+  subtotal: number;
+  deliveryFee: number;
+  userId: string | null;
+  termsAcceptedAt: Date | null;
+  paymentStatus?: "Unpaid" | "Paid" | "Failed";
+  status?: "Pending" | "Confirmed";
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string | null;
+  taxAmount?: number | null;
+  total?: number | null;
+};
+
+/**
+ * Inserts an Order with a fresh unique reference (shared by every checkout
+ * path). Doesn't revalidate caches itself — it also runs while the success
+ * page renders, where revalidateTag isn't allowed; callers in actions and
+ * route handlers revalidate CACHE_TAGS.orders.
+ */
+export async function insertOrder(data: NewOrder): Promise<OrderWithItems> {
   for (let attempt = 0; attempt < 5; attempt++) {
     const reference = newReference();
     try {
       const order = await prisma.order.create({
         data: {
           reference,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          postcode: data.postcode,
-          billingSameAsDelivery: data.billingSameAsDelivery,
-          billingAddress: data.billingAddress,
-          billingCity: data.billingCity,
-          billingPostcode: data.billingPostcode,
+          ...data.details,
           termsAcceptedAt: data.termsAcceptedAt,
-          notes: data.notes,
           subtotal: data.subtotal,
+          deliveryFee: data.deliveryFee,
           userId: data.userId,
-          paymentStatus: extra?.paymentStatus,
+          paymentStatus: data.paymentStatus,
+          status: data.status,
+          stripeCheckoutSessionId: data.stripeCheckoutSessionId,
+          stripePaymentIntentId: data.stripePaymentIntentId,
+          taxAmount: data.taxAmount,
+          total: data.total,
           items: {
             create: data.lines.map((line) => ({
               productId: line.productId,
               category: line.category,
               name: line.name,
-              unitPrice: line.unitPrice ?? null,
-              quantity: Math.max(1, line.quantity),
+              unitPrice: line.unitPrice,
+              quantity: line.quantity,
               options: line.options ?? undefined,
             })),
           },
         },
         include: { items: true },
       });
-      revalidateTag(CACHE_TAGS.orders, { expire: 0 });
       return toOrderRecord(order);
     } catch (err) {
-      const code = (err as { code?: string })?.code;
-      if (code === "P2002") continue; // unique clash on reference — retry
+      const e = err as { code?: string; meta?: { target?: unknown } };
+      // Unique clash on the random reference — try another. A clash on the
+      // Stripe session id means the order already exists; let the caller see it.
+      if (e?.code === "P2002" && !String(e.meta?.target ?? "").includes("stripeCheckoutSessionId")) continue;
       throw err;
     }
   }
   throw new Error("Could not generate a unique order reference.");
 }
 
-export async function createOrder(
-  input: CreateOrderInput,
-): Promise<CreateOrderResult> {
-  const validated = await validateOrderInput(input);
-  if (!validated.ok) return validated;
+/**
+ * "Place Order" path — quote-only carts that can't be paid online. Prices are
+ * re-read from the database (priceCart), never taken from the browser.
+ */
+export async function createOrder(input: CreateOrderInput): Promise<CreateOrderResult> {
+  const contact = validateContactDetails(input);
+  const priced = await priceCart(input.lines ?? []);
+  if (!contact.ok || !priced.ok) {
+    return {
+      ok: false,
+      errors: {
+        ...(contact.ok ? {} : contact.errors),
+        ...(priced.ok ? {} : { lines: priced.error }),
+      },
+    };
+  }
+  const user = await getCurrentUser();
 
   let order: OrderWithItems;
   try {
-    order = await insertOrder(validated.data);
+    order = await insertOrder({
+      details: contact.details,
+      lines: priced.cart.lines,
+      subtotal: priced.cart.subtotal,
+      deliveryFee: priced.cart.deliveryFee,
+      userId: user?.id ?? null,
+      termsAcceptedAt: new Date(),
+    });
   } catch {
     return { ok: false, errors: { lines: "Could not place the order. Try again." } };
   }
+  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 
   await createNotification({
     userId: order.userId,
@@ -308,32 +322,4 @@ export async function createOrder(
   });
 
   return { ok: true, reference: order.reference };
-}
-
-/**
- * Creates an Order row for the "Pay online now" path — paymentStatus starts
- * Unpaid and no confirmation email/notification is sent yet. Those fire from
- * the Stripe webhook once payment is actually confirmed (see
- * src/app/api/webhooks/stripe/route.ts), never from this synchronous path,
- * since a customer can close the tab before paying.
- */
-export async function createDraftOrderForCheckout(
-  input: CreateOrderInput,
-): Promise<CreateDraftOrderResult> {
-  const validated = await validateOrderInput(input);
-  if (!validated.ok) return validated;
-
-  if (validated.data.lines.some((line) => line.unitPrice == null)) {
-    return {
-      ok: false,
-      errors: { lines: "Some items don't have a fixed price yet — use “Place Order” instead." },
-    };
-  }
-
-  try {
-    const order = await insertOrder(validated.data, { paymentStatus: "Unpaid" });
-    return { ok: true, order };
-  } catch {
-    return { ok: false, errors: { lines: "Could not start checkout. Try again." } };
-  }
 }

@@ -1,7 +1,7 @@
 import { CalendarClock, CreditCard, Truck, Wrench } from "lucide-react";
 
 const items = [
-  { icon: Truck, label: "Free nationwide delivery" },
+  { icon: Truck, label: "Free UK delivery over £1,000" },
   { icon: CreditCard, label: "Buy now, pay in 3" },
   { icon: Wrench, label: "Certified charger installation" },
   { icon: CalendarClock, label: "Next day delivery available" },

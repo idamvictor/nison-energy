@@ -4,8 +4,12 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth/session";
-import { createOrder, createDraftOrderForCheckout, toOrderRecord } from "@/lib/orders/queries";
+import { getCurrentUser, requireAdmin } from "@/lib/auth/session";
+import { createOrder, toOrderRecord, validateContactDetails } from "@/lib/orders/queries";
+import { priceCart, type PricedLine } from "@/lib/orders/pricing";
+import { DELIVERY_LABEL } from "@/lib/orders/delivery";
+import { checkUkPostcode } from "@/lib/postcode";
+import type { Prisma } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { customerOrderStatusUpdate } from "@/lib/email/templates";
@@ -16,12 +20,13 @@ import { getClientIp } from "@/lib/rate-limit/ip";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import {
   orderStatuses,
-  type CreateCheckoutSessionResult,
   type OrderActionResult,
   type OrderStatus,
-  type OrderWithItems,
   type PlaceOrderPayload,
   type PlaceOrderResult,
+  type OrderLineInput,
+  type SaveCheckoutDetailsResult,
+  type StartCheckoutResult,
 } from "@/lib/orders/types";
 
 // ─── Checkout ──────────────────────────────────────────────────────────────
@@ -64,132 +69,152 @@ export async function placeOrder(
 }
 
 /**
- * Draft-order-then-Checkout-Session flow for "Pay online now". The Order row
- * is created up front (paymentStatus: Unpaid) so we don't have to cram a
- * whole cart into Stripe metadata — the webhook (src/app/api/webhooks/stripe/
- * route.ts) looks it up by id and flips it to Paid once Stripe confirms
- * payment. If Stripe session creation fails, the draft order is deleted so we
- * don't leave an orphaned Unpaid row with no Checkout Session behind it.
+ * Opens a Stripe Checkout Session for the cart as soon as /checkout loads, so
+ * the express wallet buttons (Apple Pay / Google Pay / PayPal) work before the
+ * customer types anything. Prices come from the database (priceCart), never
+ * the browser. The cart is held in a CheckoutDraft; the Order itself is only
+ * created once Stripe confirms payment (src/lib/orders/fulfil.ts). Called
+ * again (with the previous draft id) whenever the cart or extras change.
  */
-export async function createCheckoutSession(
-  payload: PlaceOrderPayload,
-): Promise<CreateCheckoutSessionResult> {
-  const blocked = await checkoutGuard(payload);
-  if (blocked) return blocked;
+export async function startCheckout(
+  lines: OrderLineInput[],
+  previousDraftId?: string,
+): Promise<StartCheckoutResult> {
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`checkout-start:${ip}`, { limit: 40, windowMs: 10 * 60_000 });
+  if (!allowed) return { ok: false, error: "Too many attempts — please try again in a few minutes." };
 
-  const draft = await createDraftOrderForCheckout(payload);
-  if (!draft.ok) return draft;
+  if (previousDraftId) await discardDraft(previousDraftId);
 
-  const { order } = draft;
+  const priced = await priceCart(lines);
+  if (!priced.ok) return { ok: false, error: priced.error };
+  const { cart } = priced;
+  if (cart.hasQuoteOnly) {
+    return { ok: false, error: "Some items don't have a fixed price yet — use “Place Order” instead." };
+  }
+
+  const user = await getCurrentUser();
+  const draft = await prisma.checkoutDraft.create({
+    data: {
+      userId: user?.id ?? null,
+      lines: cart.lines as unknown as Prisma.InputJsonValue,
+      subtotal: cart.subtotal,
+      deliveryFee: cart.deliveryFee,
+    },
+  });
 
   try {
-    const customer = await upsertStripeCustomer(order);
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      // Payment is taken on our own /checkout page with the Payment Element
-      // (no redirect to Stripe). The delivery and billing addresses come from
-      // our form — they're on the Order and the Customer, and the billing
-      // address is passed to Stripe when the customer confirms.
+      // Payment happens on our own /checkout page (Express Checkout + Payment
+      // Element). No payment_method_types: Stripe shows whatever is switched
+      // on in the Dashboard, so newly enabled methods appear automatically.
       ui_mode: "elements",
-      customer,
-      billing_address_collection: "required",
-      // Lets the page hand Stripe the phone from our delivery details
-      // (updatePhoneNumber) instead of the Payment Element asking again.
-      phone_number_collection: { enabled: true },
-      line_items: order.items.map((item) => ({
+      line_items: cart.lines.map((line) => ({
         price_data: {
           currency: "gbp",
-          product_data: { name: item.name },
-          unit_amount: Math.round((item.unitPrice ?? 0) * 100),
+          product_data: { name: line.name },
+          unit_amount: Math.round((line.unitPrice ?? 0) * 100),
         },
-        quantity: item.quantity,
+        quantity: line.quantity,
       })),
+      // An inline rate (no Stripe objects) so test and live behave the same;
+      // wallets show it in their sheet too.
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            display_name: DELIVERY_LABEL,
+            type: "fixed_amount",
+            fixed_amount: { amount: Math.round(cart.deliveryFee * 100), currency: "gbp" },
+          },
+        },
+      ],
+      // Wallets (express) supply the delivery address; the card path hands
+      // over the address, email and phone from our form before confirming.
+      shipping_address_collection: { allowed_countries: ["GB"] },
+      billing_address_collection: "required",
+      phone_number_collection: { enabled: true },
+      customer_creation: "always",
       invoice_creation: { enabled: true },
       return_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      metadata: { orderId: order.id },
+      metadata: { draftId: draft.id },
     });
-
     if (!session.client_secret) throw new Error("Stripe did not return a client secret.");
 
-    await prisma.order.update({
-      where: { id: order.id },
+    await prisma.checkoutDraft.update({
+      where: { id: draft.id },
       data: { stripeCheckoutSessionId: session.id },
     });
 
-    return { ok: true, clientSecret: session.client_secret, orderId: order.id };
+    return {
+      ok: true,
+      clientSecret: session.client_secret,
+      draftId: draft.id,
+      subtotal: cart.subtotal,
+      deliveryFee: cart.deliveryFee,
+      total: cart.total,
+    };
   } catch {
-    await prisma.order.delete({ where: { id: order.id } }).catch(() => {});
+    await prisma.checkoutDraft.delete({ where: { id: draft.id } }).catch(() => {});
     return {
       ok: false,
-      errors: {
-        lines: "Could not start payment. Please try again, or message us on WhatsApp and we'll help.",
-      },
+      error: "Could not start payment. Please try again, or message us on WhatsApp and we'll help.",
     };
   }
 }
 
 /**
- * The customer went back to edit their details after the payment form opened:
- * expire that Checkout Session and drop its draft order, so editing never
- * leaves phantom Unpaid orders behind. Only an Unpaid order with an open
- * session qualifies — anything already paid (or mid-payment) is left alone.
+ * Card path: validates the checkout form and stores it on the draft just
+ * before the customer confirms, so the Order is created with exactly these
+ * details. (Express wallets skip this — their details come from Stripe.)
  */
-export async function cancelCheckoutDraft(orderId: string): Promise<void> {
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    select: { paymentStatus: true, stripeCheckoutSessionId: true },
-  });
-  if (!order || order.paymentStatus !== "Unpaid" || !order.stripeCheckoutSessionId) return;
+export async function saveCheckoutDetails(
+  draftId: string,
+  payload: PlaceOrderPayload,
+): Promise<SaveCheckoutDetailsResult> {
+  const blocked = await checkoutGuard(payload);
+  if (blocked) return blocked;
 
-  try {
-    const session = await stripe.checkout.sessions.retrieve(order.stripeCheckoutSessionId);
-    if (session.status !== "open") return;
-    await stripe.checkout.sessions.expire(session.id);
-  } catch {
-    return; // couldn't confirm it's safe to delete — the 24h expiry webhook cleans up instead
+  const contact = validateContactDetails(payload);
+  if (!contact.ok) return contact;
+
+  const draft = await prisma.checkoutDraft.findUnique({ where: { id: draftId } });
+  if (!draft) return { ok: false, errors: { lines: "Your checkout expired — please refresh the page." } };
+
+  // Installation orders need a real UK postcode for the installer.
+  const lines = draft.lines as unknown as PricedLine[];
+  if (lines.some((l) => l.options?.installation === "standard")) {
+    const check = await checkUkPostcode(contact.details.postcode);
+    if (!check.valid) return { ok: false, errors: { postcode: check.reason } };
+    contact.details.postcode = check.postcode;
   }
 
-  await prisma.order.deleteMany({ where: { id: orderId, paymentStatus: "Unpaid" } });
-  revalidateTag(CACHE_TAGS.orders, { expire: 0 });
+  await prisma.checkoutDraft.update({
+    where: { id: draftId },
+    data: {
+      details: {
+        ...contact.details,
+        termsAcceptedAt: new Date().toISOString(),
+      } as unknown as Prisma.InputJsonValue,
+    },
+  });
+  return { ok: true };
 }
 
-/**
- * Finds (by email) or creates the Stripe Customer for this order and sets its
- * name, phone, billing address and shipping (= delivery & installation)
- * address from the checkout form. Returns the Customer id.
- */
-async function upsertStripeCustomer(order: OrderWithItems): Promise<string> {
-  const name = `${order.firstName} ${order.lastName}`.trim();
-  const delivery = {
-    line1: order.address,
-    city: order.city ?? undefined,
-    postal_code: order.postcode,
-    country: "GB",
-  };
-  const billing = order.billingSameAsDelivery
-    ? delivery
-    : {
-        line1: order.billingAddress ?? order.address,
-        city: order.billingCity ?? undefined,
-        postal_code: order.billingPostcode ?? order.postcode,
-        country: "GB",
-      };
-  const details = {
-    name,
-    email: order.email,
-    phone: order.phone,
-    address: billing,
-    shipping: { name, phone: order.phone, address: delivery },
-    metadata: { lastOrderReference: order.reference },
-  };
-
-  const existing = await stripe.customers.list({ email: order.email, limit: 1 });
-  if (existing.data[0]) {
-    await stripe.customers.update(existing.data[0].id, details);
-    return existing.data[0].id;
+/** Expires a superseded session and drops its draft (cart changed, page left). */
+async function discardDraft(draftId: string): Promise<void> {
+  const draft = await prisma.checkoutDraft.findUnique({ where: { id: draftId } });
+  if (!draft) return;
+  if (draft.stripeCheckoutSessionId) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(draft.stripeCheckoutSessionId);
+      if (session.status !== "open") return; // completed/expired — fulfilment owns it
+      await stripe.checkout.sessions.expire(session.id);
+    } catch {
+      return;
+    }
   }
-  const created = await stripe.customers.create(details);
-  return created.id;
+  await prisma.checkoutDraft.delete({ where: { id: draftId } }).catch(() => {});
 }
 
 // ─── Admin ─────────────────────────────────────────────────────────────────

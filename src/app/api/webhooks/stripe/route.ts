@@ -15,6 +15,12 @@ import {
   staffPaymentFailed,
 } from "@/lib/email/templates";
 import { toOrderRecord } from "@/lib/orders/queries";
+import {
+  discardExpiredSession,
+  fulfilCheckoutSession,
+  markSessionFailed,
+  markSessionPaid,
+} from "@/lib/orders/fulfil";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 
 // Uses the raw request body for signature verification — never statically cache.
@@ -37,28 +43,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  const session = event.data.object as Stripe.Checkout.Session;
+  // Sessions from the previous checkout carried a pre-created `orderId`; new
+  // ones carry a `draftId` and the Order is created at fulfilment.
+  const legacy = Boolean(session.metadata?.orderId);
+
   switch (event.type) {
     case "checkout.session.completed":
-    case "checkout.session.async_payment_succeeded": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      if (session.payment_status !== "unpaid") {
-        await markOrderPaid(session);
+      if (legacy) {
+        if (session.payment_status !== "unpaid") await markOrderPaid(session);
+      } else {
+        await fulfilCheckoutSession(session.id);
       }
       break;
-    }
-    case "checkout.session.async_payment_failed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      await markOrderFailed(session);
+    case "checkout.session.async_payment_succeeded":
+      if (legacy) await markOrderPaid(session);
+      else await markSessionPaid(session);
       break;
-    }
-    case "checkout.session.expired": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      await deleteAbandonedOrder(session);
+    case "checkout.session.async_payment_failed":
+      if (legacy) await markOrderFailed(session);
+      else await markSessionFailed(session);
       break;
-    }
+    case "checkout.session.expired":
+      if (legacy) await deleteAbandonedOrder(session);
+      else await discardExpiredSession(session);
+      break;
     default:
       break;
   }
+  // Fulfilment can also happen on the success page (which can't revalidate
+  // during render), so the webhook always refreshes the orders cache.
+  if (!legacy) revalidateTag(CACHE_TAGS.orders, { expire: 0 });
 
   return NextResponse.json({ received: true });
 }

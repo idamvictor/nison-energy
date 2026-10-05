@@ -269,13 +269,110 @@ export function customerOrderConfirmation(
   };
 }
 
-export function staffOrderAlert(order: OrderEmailInput): EmailContent {
+/** Invoice figures for the paid-order email (built by src/lib/orders/invoice.ts). */
+export type InvoiceEmailInput = {
+  number: string;
+  date: Date;
+  paymentMethod: string;
+  billTo: string[];
+  deliverTo: string[];
+  net: number;
+  vat: number;
+  gross: number;
+};
+
+const VAT_NUMBER = "GB495472057";
+
+function invoiceDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/London",
+  }).format(date);
+}
+
+function amountRow(label: string, value: string, strong = false): string {
+  const weight = strong ? "font-weight:700;color:" + INK + ";font-size:15px" : "color:#33434a";
+  return `<tr>
+    <td style="padding:3px 0;${weight}">${label}</td>
+    <td align="right" style="padding:3px 0;white-space:nowrap;${weight}">${value}</td>
+  </tr>`;
+}
+
+/**
+ * Paid online order: a branded invoice / receipt. The same invoice is attached
+ * as a PDF (src/lib/pdf/order-invoice.ts).
+ */
+export function customerInvoiceEmail(order: OrderEmailInput, invoice: InvoiceEmailInput): EmailContent {
+  const needsSurvey = includesInstallation(order.items);
+  const fee = order.deliveryFee ?? 0;
+  const address = (lines: string[]) => lines.map(esc).join("<br>");
+  return {
+    subject: `Your invoice ${invoice.number} — order ${order.reference} (paid)`,
+    html: emailLayout({
+      heading: `Thanks, ${esc(order.firstName)} — payment received`,
+      bodyHtml: [
+        row(
+          `Your payment has gone through and your order is confirmed. Your invoice is below and attached
+           as a PDF for your records.`,
+        ),
+        callout(
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a">
+             <tr><td style="padding:2px 0"><strong style="color:${INK}">Invoice</strong></td>
+                 <td align="right" style="padding:2px 0">${esc(invoice.number)}</td></tr>
+             <tr><td style="padding:2px 0"><strong style="color:${INK}">Order</strong></td>
+                 <td align="right" style="padding:2px 0">${esc(order.reference)}</td></tr>
+             <tr><td style="padding:2px 0"><strong style="color:${INK}">Date</strong></td>
+                 <td align="right" style="padding:2px 0">${invoiceDate(invoice.date)}</td></tr>
+             <tr><td style="padding:2px 0"><strong style="color:${INK}">Paid by</strong></td>
+                 <td align="right" style="padding:2px 0">${esc(invoice.paymentMethod)}</td></tr>
+           </table>`,
+        ),
+        row(itemsTable(order.items)),
+        row(
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">
+             ${amountRow("Delivery", fee > 0 ? formatCurrency(fee) : "FREE")}
+             ${amountRow("Subtotal (ex VAT)", formatCurrency(invoice.net))}
+             ${amountRow("VAT @ 20%", formatCurrency(invoice.vat))}
+             ${amountRow("Total paid (inc VAT)", formatCurrency(invoice.gross), true)}
+           </table>`,
+        ),
+        row(
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a;margin-top:8px">
+             <tr>
+               <td valign="top" width="50%" style="padding:4px 8px 4px 0"><strong style="color:${INK}">Billing address</strong><br>${address(invoice.billTo)}</td>
+               <td valign="top" width="50%" style="padding:4px 0 4px 8px"><strong style="color:${INK}">${
+                 needsSurvey ? "Delivery &amp; installation" : "Delivery address"
+               }</strong><br>${address(invoice.deliverTo)}</td>
+             </tr>
+           </table>`,
+        ),
+        row(
+          `A member of the team will be in touch to
+           ${needsSurvey ? "book your installation once your survey is in" : "arrange delivery"}.`,
+        ),
+        needsSurvey ? surveyCallout() : "",
+        row(
+          `<span style="font-size:12px;color:${MUTED}">All prices include VAT at 20%.
+           ${COMPANY.legalName} · VAT no. ${VAT_NUMBER} · Company no. ${COMPANY.companyNumber}</span>`,
+        ),
+      ].join(""),
+      cta: { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` },
+    }),
+  };
+}
+
+export function staffOrderAlert(order: OrderEmailInput, opts?: { paymentMethod?: string }): EmailContent {
   return {
     subject: `Order ${order.reference} placed by ${order.firstName} ${order.lastName}`,
     html: emailLayout({
       heading: `New order from ${esc(order.firstName)} ${esc(order.lastName)}`,
       bodyHtml: [
         row(`<strong>Reference</strong><br>${esc(order.reference)}`),
+        opts?.paymentMethod
+          ? row(`<strong>Payment</strong><br>Paid online — ${esc(opts.paymentMethod)}`)
+          : row(`<strong>Payment</strong><br>Not paid online — confirm payment with the customer`),
         row(
           `<strong>Contact</strong><br>${esc(order.email)}${order.phone ? ` · ${esc(order.phone)}` : ""}`,
         ),

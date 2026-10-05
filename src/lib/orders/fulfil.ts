@@ -9,7 +9,7 @@ import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { getStaffEmails } from "@/lib/email/recipients";
 import {
-  customerOrderConfirmation,
+  customerInvoiceEmail,
   customerPaymentFailed,
   staffOrderAlert,
   staffPaymentFailed,
@@ -17,6 +17,8 @@ import {
 import { insertOrder, toOrderRecord, type ContactDetails } from "@/lib/orders/queries";
 import type { PricedLine } from "@/lib/orders/pricing";
 import type { OrderWithItems } from "@/lib/orders/types";
+import { invoiceFor, paymentMethodLabel } from "@/lib/orders/invoice";
+import { buildOrderInvoicePdf } from "@/lib/pdf/order-invoice";
 
 type DraftDetails = ContactDetails & { termsAcceptedAt?: string };
 
@@ -63,9 +65,31 @@ function sendPaidNotices(order: OrderWithItems) {
       title: `Payment received for order ${order.reference}`,
       href: "/account/orders",
     });
-    await sendEmail({ to: order.email, ...customerOrderConfirmation(order, { paid: true }) });
-    const staff = await getStaffEmails();
-    await sendEmail({ to: staff, replyTo: order.email, ...staffOrderAlert(order) });
+    await sendPaidOrderEmails(order);
+  });
+}
+
+/**
+ * Paid online order: the customer gets a branded invoice email with the PDF
+ * invoice attached; staff get the new-order alert (with how it was paid).
+ * A PDF failure never blocks the emails — the invoice is still in the body.
+ */
+export async function sendPaidOrderEmails(order: OrderWithItems): Promise<void> {
+  const invoice = invoiceFor(order, await paymentMethodLabel(order.stripePaymentIntentId));
+  let attachments: { filename: string; content: Buffer; contentType: string }[] | undefined;
+  try {
+    attachments = [
+      { filename: `${invoice.number}.pdf`, content: await buildOrderInvoicePdf(invoice), contentType: "application/pdf" },
+    ];
+  } catch (err) {
+    console.error("[invoice] PDF generation failed:", err);
+  }
+  await sendEmail({ to: order.email, ...customerInvoiceEmail(order, invoice), attachments });
+  const staff = await getStaffEmails();
+  await sendEmail({
+    to: staff,
+    replyTo: order.email,
+    ...staffOrderAlert(order, { paymentMethod: invoice.paymentMethod }),
   });
 }
 

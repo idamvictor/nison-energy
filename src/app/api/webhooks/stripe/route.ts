@@ -8,18 +8,14 @@ import { stripe } from "@/lib/stripe/client";
 import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
 import { getStaffEmails } from "@/lib/email/recipients";
-import {
-  customerOrderConfirmation,
-  customerPaymentFailed,
-  staffOrderAlert,
-  staffPaymentFailed,
-} from "@/lib/email/templates";
+import { customerPaymentFailed, staffPaymentFailed } from "@/lib/email/templates";
 import { toOrderRecord } from "@/lib/orders/queries";
 import {
   discardExpiredSession,
   fulfilCheckoutSession,
   markSessionFailed,
   markSessionPaid,
+  sendPaidOrderEmails,
 } from "@/lib/orders/fulfil";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 
@@ -123,18 +119,7 @@ async function markOrderPaid(session: Stripe.Checkout.Session) {
     href: "/account/orders",
   });
 
-  after(async () => {
-    await sendEmail({
-      to: order.email,
-      ...customerOrderConfirmation(order, { paid: true }),
-    });
-    const staff = await getStaffEmails();
-    await sendEmail({
-      to: staff,
-      replyTo: order.email,
-      ...staffOrderAlert(order),
-    });
-  });
+  after(() => sendPaidOrderEmails(order));
 }
 
 // Fires for delayed payment methods that fail after the customer left the page

@@ -21,6 +21,8 @@ export type EmailMessage = {
   subject: string;
   html: string;
   replyTo?: string;
+  /** Files to attach (e.g. the PDF invoice). */
+  attachments?: { filename: string; content: Buffer; contentType?: string }[];
 };
 
 /**
@@ -51,6 +53,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
       replyTo: message.replyTo ?? COMPANY.email,
       // Unique per send so Gmail doesn't thread/collapse repeated alerts.
       headers: { "X-Entity-Ref-ID": randomUUID() },
+      ...(message.attachments?.length ? { attachments: message.attachments } : {}),
     });
     if (error) console.error("[email] send failed:", error);
   } catch (err) {

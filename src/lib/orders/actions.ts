@@ -86,7 +86,7 @@ export async function startCheckout(
   opts?: { keepCart?: boolean },
 ): Promise<StartCheckoutResult> {
   const ip = await getClientIp();
-  const allowed = await checkRateLimit(`checkout-start:${ip}`, { limit: 40, windowMs: 10 * 60_000 });
+  const allowed = await checkRateLimit(`checkout-start:${ip}`, { limit: 150, windowMs: 10 * 60_000 });
   if (!allowed) return { ok: false, error: "Too many attempts — please try again in a few minutes." };
 
   if (previousDraftId) await discardDraft(previousDraftId);

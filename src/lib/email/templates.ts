@@ -117,6 +117,8 @@ export type OrderEmailInput = {
   deliveryFee?: number;
   status: string;
   items: OrderItemEmailInput[];
+  /** Set when the order belongs to an account (guests have none). */
+  userId?: string | null;
 };
 
 export type EmailContent = { subject: string; html: string };
@@ -224,6 +226,13 @@ function totalLine(order: OrderEmailInput): string {
   ].join("");
 }
 
+/** Signed-in customers can open their orders; guests have no account, so offer WhatsApp. */
+function ordersCta(order: OrderEmailInput): { label: string; href: string } {
+  return order.userId
+    ? { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` }
+    : { label: "Message us on WhatsApp", href: whatsappUrl() };
+}
+
 function surveyCallout(): string {
   return callout(
     `<strong style="color:${INK}">Next step: complete your virtual survey</strong><br>
@@ -264,7 +273,7 @@ export function customerOrderConfirmation(
             ),
         needsSurvey ? surveyCallout() : "",
       ].join(""),
-      cta: { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` },
+      cta: ordersCta(order),
     }),
   };
 }
@@ -358,7 +367,7 @@ export function customerInvoiceEmail(order: OrderEmailInput, invoice: InvoiceEma
            ${COMPANY.legalName} · VAT no. ${VAT_NUMBER} · Company no. ${COMPANY.companyNumber}</span>`,
         ),
       ].join(""),
-      cta: { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` },
+      cta: ordersCta(order),
     }),
   };
 }
@@ -406,7 +415,7 @@ export function customerOrderStatusUpdate(order: OrderEmailInput): EmailContent 
         row(itemsTable(order.items)),
         totalLine(order),
       ].join(""),
-      cta: { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` },
+      cta: ordersCta(order),
     }),
   };
 }

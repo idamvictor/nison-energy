@@ -16,6 +16,7 @@ import { PostcodeInput } from "@/components/shared/postcode-input";
 import { AddressLookup } from "@/components/shared/address-lookup";
 import { CustomerStep } from "@/components/checkout/customer-step";
 import { useCheckoutSession } from "@/components/checkout/use-checkout-session";
+import { useInView } from "@/components/checkout/use-in-view";
 import { ExpressWallets, WalletSkeleton } from "@/components/checkout/express-wallets";
 import { AmexLogo, MastercardLogo, VisaLogo } from "@/components/checkout/payment-logos";
 import {
@@ -86,8 +87,10 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const lines = items
     .map((item) => resolveCartItem(item))
     .filter((line): line is NonNullable<typeof line> => line !== null);
-  const selectedExtras = extras.filter((extra) => extraIds.includes(extra.id));
-  const remainingExtras = extras.filter((extra) => !extraIds.includes(extra.id));
+  // Extras already in the basket aren't offered (or kept) again as a second line.
+  const inBasket = new Set(lines.map((line) => line.id));
+  const selectedExtras = extras.filter((extra) => extraIds.includes(extra.id) && !inBasket.has(extra.id));
+  const remainingExtras = extras.filter((extra) => !extraIds.includes(extra.id) && !inBasket.has(extra.id));
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
   const hasInstallation = includesInstallation(lines);
 
@@ -119,8 +122,11 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   // ── Two Stripe sessions: the Express Checkout buttons at the top use the
   // wallet session (Dashboard-driven methods; the wallet supplies the details),
   // the Payment section uses a card-only session with our form's details.
+  // Sessions are reused from this browser while the basket is unchanged
+  // (cart → checkout, reloads); the card one only opens once Payment is near.
+  const [paymentRef, paymentInView] = useInView<HTMLDivElement>();
   const express = useCheckoutSession("wallet", orderLinesJson, payable);
-  const card = useCheckoutSession("card", orderLinesJson, payable);
+  const card = useCheckoutSession("card", orderLinesJson, payable && paymentInView);
   const session = card.session;
 
   // Server totals once the session is open; a same-rule estimate before that.
@@ -211,35 +217,37 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
 
   // Card fields + Place Order share the card-only session.
   const paymentArea = (
-    <Section
-      title="Payment"
-      aside={
-        <span className="flex items-center gap-1.5" aria-label="Visa, Mastercard and American Express accepted">
-          <VisaLogo className="h-8" />
-          <MastercardLogo className="h-5" />
-          <AmexLogo className="h-6" />
-        </span>
-      }
-    >
-      {paymentStatus ??
-        (session ? (
-          <CardFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
-        ) : (
-          <p className="text-sm text-muted-foreground">Loading secure card form…</p>
-        ))}
-      <div className="flex flex-col gap-3 border-t border-border pt-4">
-        {termsBox}
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        {!paymentStatus &&
+    <div ref={paymentRef}>
+      <Section
+        title="Payment"
+        aside={
+          <span className="flex items-center gap-1.5" aria-label="Visa, Mastercard and American Express accepted">
+            <VisaLogo className="h-8" />
+            <MastercardLogo className="h-5" />
+            <AmexLogo className="h-6" />
+          </span>
+        }
+      >
+        {paymentStatus ??
           (session ? (
-            <CardPlaceOrder canPay={termsAccepted && cardComplete} prepare={preparePayment} />
+            <CardFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
           ) : (
-            <Button type="button" size="lg" variant="cta" disabled className="h-12 w-full text-base">
-              Loading secure payment…
-            </Button>
+            <p className="text-sm text-muted-foreground">Loading secure card form…</p>
           ))}
-      </div>
-    </Section>
+        <div className="flex flex-col gap-3 border-t border-border pt-4">
+          {termsBox}
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          {!paymentStatus &&
+            (session ? (
+              <CardPlaceOrder canPay={termsAccepted && cardComplete} prepare={preparePayment} />
+            ) : (
+              <Button type="button" size="lg" variant="cta" disabled className="h-12 w-full text-base">
+                Loading secure payment…
+              </Button>
+            ))}
+        </div>
+      </Section>
+    </div>
   );
 
   return (
@@ -364,7 +372,10 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                   <CustomerStep signedInEmail={defaults?.email ?? null} />
                 </Section>
 
-                <Section title="Contact information" aside={<span className="text-xs text-muted-foreground">Saved on this device until you order</span>}>
+                <Section
+                  title="Contact information"
+                  aside={<span className="text-xs text-muted-foreground">Saved on this device until you order</span>}
+                >
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="First name">
                       <Input
@@ -477,7 +488,9 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                           autoComplete="billing address-line1"
                           value={form.billingAddress ?? ""}
                           onValueChange={(value) => setForm({ billingAddress: value })}
-                          onTown={(town) => !useCheckoutForm.getState().billingCityTyped && setForm({ billingCity: town })}
+                          onTown={(town) =>
+                            !useCheckoutForm.getState().billingCityTyped && setForm({ billingCity: town })
+                          }
                         />
                       </Field>
                     </div>

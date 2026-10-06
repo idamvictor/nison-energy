@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ExpressWallets, WalletButtonsWaiting, WalletSkeleton } from "@/components/checkout/express-wallets";
 import { StripeCheckoutProvider, stripeConfigured } from "@/components/checkout/stripe-payment";
 import { useCheckoutSession } from "@/components/checkout/use-checkout-session";
+import { useInView } from "@/components/checkout/use-in-view";
 import type { OrderLineInput } from "@/lib/orders/types";
 
 /**
@@ -28,13 +29,15 @@ export function ExpressCheckoutBox({
   keepCart?: boolean;
 }) {
   const payable = lines.length > 0 && lines.every((line) => line.unitPrice != null);
-  const enabled = payable && stripeConfigured && !disabledReason;
+  // No Stripe call until the buttons are about to be seen.
+  const [boxRef, inView] = useInView<HTMLDivElement>();
+  const enabled = payable && stripeConfigured && !disabledReason && inView;
   const { session, error } = useCheckoutSession("wallet", JSON.stringify(lines), enabled, { keepCart });
 
   if (!payable || !stripeConfigured) return null;
 
   return (
-    <div className="flex flex-col gap-2.5">
+    <div ref={boxRef} className="flex flex-col gap-2.5">
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <span className="h-px flex-1 bg-border" />
         {label}
@@ -53,7 +56,11 @@ export function ExpressCheckoutBox({
       )}
       <p className="text-center text-xs text-muted-foreground">
         By paying you agree to our{" "}
-        <Link href="/terms-of-sale" target="_blank" className="font-medium text-primary-ink underline underline-offset-2">
+        <Link
+          href="/terms-of-sale"
+          target="_blank"
+          className="font-medium text-primary-ink underline underline-offset-2"
+        >
           Terms and Conditions of Sale
         </Link>
         .

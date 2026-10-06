@@ -32,7 +32,7 @@ export default async function CheckoutSuccessPage({
   return (
     <div className="flex min-h-full flex-1 flex-col">
       {/* A product-page "buy now" paid for just that item — leave the basket. */}
-      {keepCart !== "1" && <ClearCartOnMount />}
+      <ClearCartOnMount keepCart={keepCart === "1"} />
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">

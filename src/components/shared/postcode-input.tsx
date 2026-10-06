@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Loader2, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -36,30 +36,37 @@ export function PostcodeInput({
     if (controlledValue === undefined) setInnerValue(next);
     onValueChange?.(next);
   };
-  const [status, setStatus] = useState<Status>("idle");
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Result of the last check, keyed by the value it was for — the status is
+  // derived from it, so a stale answer never shows against a newer value.
+  const [checked, setChecked] = useState<{ value: string; valid: boolean | null } | null>(null);
+  const trimmed = value.trim();
+  const status: Status =
+    trimmed.length < 5
+      ? "idle"
+      : checked?.value !== trimmed
+        ? "checking"
+        : checked.valid == null
+          ? "idle"
+          : checked.valid
+            ? "valid"
+            : "invalid";
 
   useEffect(() => {
-    const trimmed = value.trim();
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    if (trimmed.length < 5) {
-      setStatus("idle");
-      return;
-    }
-
-    setStatus("checking");
-    debounceRef.current = setTimeout(() => {
-      fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(trimmed)}/validate`)
+    if (trimmed.length < 5) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(trimmed)}/validate`, { signal: controller.signal })
         .then((res) => res.json())
-        .then((data) => setStatus(data.result ? "valid" : "invalid"))
-        .catch(() => setStatus("idle"));
-    }, 500);
-
+        .then((data) => setChecked({ value: trimmed, valid: Boolean(data.result) }))
+        .catch((err) => {
+          if ((err as Error).name !== "AbortError") setChecked({ value: trimmed, valid: null });
+        });
+    }, 400);
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+      clearTimeout(timer);
+      controller.abort();
     };
-  }, [value]);
+  }, [trimmed]);
 
   return (
     <div className="relative">

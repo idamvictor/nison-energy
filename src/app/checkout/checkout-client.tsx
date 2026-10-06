@@ -19,10 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PostcodeInput } from "@/components/shared/postcode-input";
-import {
-  AddressAutocomplete,
-  type AddressSuggestion,
-} from "@/components/shared/address-autocomplete";
+import { AddressLookup } from "@/components/shared/address-lookup";
 import { CustomerStep } from "@/components/checkout/customer-step";
 import { CheckoutProgress, StepPanel } from "@/components/checkout/checkout-steps";
 import {
@@ -228,15 +225,9 @@ export function CheckoutClient({
   const toFreeDelivery = FREE_DELIVERY_THRESHOLD - totals.subtotal;
   const deliveryPrice = totals.deliveryFee === 0 ? "FREE" : formatCurrency(totals.deliveryFee);
 
-  function handleAddressSelect(suggestion: AddressSuggestion) {
-    if (suggestion.city) setCity(suggestion.city);
-    if (suggestion.postcode) setPostcode(suggestion.postcode.toUpperCase());
-  }
-
-  function handleBillingAddressSelect(suggestion: AddressSuggestion) {
-    if (suggestion.city) setBillingCity(suggestion.city);
-    if (suggestion.postcode) setBillingPostcode(suggestion.postcode.toUpperCase());
-  }
+  // The postcode lookup fills Town / City — unless the customer typed their own.
+  const cityTyped = useRef(false);
+  const billingCityTyped = useRef(false);
 
   function buildPayload(fd: FormData): PlaceOrderPayload {
     return {
@@ -646,14 +637,18 @@ export function CheckoutClient({
                         <Field label="Phone number">
                           <Input name="phone" defaultValue={defaults?.phone} required type="tel" autoComplete="tel" placeholder="Phone number" />
                         </Field>
+                        <Field label={hasInstallation ? "Installation postcode" : "Postcode"}>
+                          <PostcodeInput required value={postcode} onValueChange={setPostcode} />
+                        </Field>
+                        <div className="hidden sm:block" />
                         <Field label="Address line 1" className="sm:col-span-2">
-                          <AddressAutocomplete
+                          <AddressLookup
+                            postcode={postcode}
                             name="address"
                             defaultValue={defaults?.address}
                             required
                             autoComplete="address-line1"
-                            placeholder="Start typing your house number and street"
-                            onSelect={handleAddressSelect}
+                            onTown={(town) => !cityTyped.current && setCity(town)}
                           />
                         </Field>
                         <Field label="Town / City">
@@ -663,11 +658,11 @@ export function CheckoutClient({
                             autoComplete="address-level2"
                             placeholder="Town or city"
                             value={city}
-                            onChange={(e) => setCity(e.target.value)}
+                            onChange={(e) => {
+                              cityTyped.current = e.target.value.trim() !== "";
+                              setCity(e.target.value);
+                            }}
                           />
-                        </Field>
-                        <Field label={hasInstallation ? "Installation postcode" : "Postcode"}>
-                          <PostcodeInput required value={postcode} onValueChange={setPostcode} />
                         </Field>
                       </div>
 
@@ -685,13 +680,23 @@ export function CheckoutClient({
                         <div className="flex flex-col gap-4 rounded-lg border border-foreground/15 p-4">
                           <p className="text-sm font-semibold text-foreground">Billing address</p>
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <Field label="Postcode">
+                              <PostcodeInput
+                                name="billingPostcode"
+                                required
+                                autoComplete="billing postal-code"
+                                value={billingPostcode}
+                                onValueChange={setBillingPostcode}
+                              />
+                            </Field>
+                            <div className="hidden sm:block" />
                             <Field label="Address line 1" className="sm:col-span-2">
-                              <AddressAutocomplete
+                              <AddressLookup
+                                postcode={billingPostcode}
                                 name="billingAddress"
                                 required
                                 autoComplete="billing address-line1"
-                                placeholder="Start typing your billing address"
-                                onSelect={handleBillingAddressSelect}
+                                onTown={(town) => !billingCityTyped.current && setBillingCity(town)}
                               />
                             </Field>
                             <Field label="Town / City">
@@ -701,16 +706,10 @@ export function CheckoutClient({
                                 autoComplete="billing address-level2"
                                 placeholder="Town or city"
                                 value={billingCity}
-                                onChange={(e) => setBillingCity(e.target.value)}
-                              />
-                            </Field>
-                            <Field label="Postcode">
-                              <PostcodeInput
-                                name="billingPostcode"
-                                required
-                                autoComplete="billing postal-code"
-                                value={billingPostcode}
-                                onValueChange={setBillingPostcode}
+                                onChange={(e) => {
+                                  billingCityTyped.current = e.target.value.trim() !== "";
+                                  setBillingCity(e.target.value);
+                                }}
                               />
                             </Field>
                           </div>

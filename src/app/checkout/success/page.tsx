@@ -18,9 +18,9 @@ export const metadata: Metadata = { title: "Payment received | Ocunio Energy" };
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ session_id?: string }>;
+  searchParams: Promise<{ session_id?: string; keep_cart?: string }>;
 }) {
-  const { session_id: sessionId } = await searchParams;
+  const { session_id: sessionId, keep_cart: keepCart } = await searchParams;
   // Creates the Order now if the webhook hasn't yet (Stripe recommends
   // fulfilling from the landing page too); returns the existing one otherwise.
   const order = sessionId ? await fulfilCheckoutSession(sessionId) : null;
@@ -31,7 +31,8 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <ClearCartOnMount />
+      {/* A product-page "buy now" paid for just that item — leave the basket. */}
+      {keepCart !== "1" && <ClearCartOnMount />}
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">

@@ -8,6 +8,7 @@ import type { AccessoryProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { useCart } from "@/lib/cart/store";
+import { ExpressCheckoutBox } from "@/components/checkout/express-checkout-box";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/currency";
@@ -156,6 +157,20 @@ export function AccessoryPurchasePanel({
           "Add to Cart"
         )}
       </Button>
+
+      <ExpressCheckoutBox
+        label="Or buy now with"
+        keepCart
+        lines={[
+          {
+            productId: product.id,
+            category: "accessories",
+            name: product.name,
+            unitPrice: product.price,
+            quantity,
+          },
+        ]}
+      />
 
       <button
         type="button"

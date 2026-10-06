@@ -82,6 +82,8 @@ export async function startCheckout(
   previousDraftId?: string,
   /** "wallet" = express + pay later (Dashboard-driven methods); "card" = card only. */
   kind: CheckoutKind = "wallet",
+  /** keepCart: a product-page "buy now" — the success page leaves the basket alone. */
+  opts?: { keepCart?: boolean },
 ): Promise<StartCheckoutResult> {
   const ip = await getClientIp();
   const allowed = await checkRateLimit(`checkout-start:${ip}`, { limit: 40, windowMs: 10 * 60_000 });
@@ -142,7 +144,7 @@ export async function startCheckout(
       phone_number_collection: { enabled: true },
       customer_creation: "always",
       invoice_creation: { enabled: true },
-      return_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}${opts?.keepCart ? "&keep_cart=1" : ""}`,
       metadata: { draftId: draft.id },
     });
     if (!session.client_secret) throw new Error("Stripe did not return a client secret.");

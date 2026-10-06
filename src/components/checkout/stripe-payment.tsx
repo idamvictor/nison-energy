@@ -94,12 +94,16 @@ const NONE: ExpressMethods = {
   link: "never",
 };
 
-/** Customer-step shortcut: every wallet. "always" so Apple/Google Pay show on more browsers. */
-export const ALL_WALLETS: ExpressMethods = { ...NONE, applePay: "always", googlePay: "always", paypal: "auto", amazonPay: "auto" };
-/** Review step, one wallet each — the button the customer chose at the Payment step. */
-export const APPLE_GOOGLE: ExpressMethods = { ...NONE, applePay: "always", googlePay: "always" };
-export const PAYPAL_ONLY: ExpressMethods = { ...NONE, paypal: "auto" };
-export const AMAZON_ONLY: ExpressMethods = { ...NONE, amazonPay: "auto" };
+/**
+ * Express Checkout: Apple Pay and Google Pay ("always" so they show on more browsers).
+ * PayPal is "never" until PayPal is connected in Stripe (Settings → Payment methods);
+ * until then the row shows our PayPal stand-in. Switch it to "auto" once connected.
+ */
+export const ALL_WALLETS: ExpressMethods = { ...NONE, applePay: "always", googlePay: "always", paypal: "never" };
+
+/** Which wallets Stripe could actually show in this browser. */
+export type AvailableWallets = { applePay: boolean; googlePay: boolean; paypal: boolean };
+const NO_WALLETS: AvailableWallets = { applePay: false, googlePay: false, paypal: false };
 
 /**
  * One-tap payment buttons. The provider supplies name, email, phone and
@@ -113,8 +117,17 @@ export function ExpressCheckout({
   onAvailability,
   locked = false,
   onLockedClick,
+  maxColumns = 2,
+  buttonHeight = 48,
+  onWallets,
 }: {
+  /** Reports which wallets rendered (all false if Stripe never gets ready). */
+  onWallets?: (available: AvailableWallets) => void;
   methods: ExpressMethods;
+  /** Buttons per row before wrapping. */
+  maxColumns?: number;
+  /** Button height in px (Stripe allows 40–55). */
+  buttonHeight?: number;
   onAvailability?: (available: boolean) => void;
   locked?: boolean;
   onLockedClick?: () => void;
@@ -122,12 +135,14 @@ export function ExpressCheckout({
   const state = useCheckoutElements();
   const [error, setError] = useState<string | null>(null);
   const areaRef = useRef<HTMLDivElement>(null);
+  const reported = useRef(false);
   useEffect(() => {
     const timer = setTimeout(() => {
       onAvailability?.((areaRef.current?.offsetHeight ?? 0) >= 24);
+      if (!reported.current) onWallets?.(NO_WALLETS);
     }, 4000);
     return () => clearTimeout(timer);
-  }, [onAvailability]);
+  }, [onAvailability, onWallets]);
 
   if (state.type !== "success") return null;
   const { checkout } = state;
@@ -139,14 +154,21 @@ export function ExpressCheckout({
           <ExpressCheckoutElement
             options={{
               paymentMethods: methods,
-              buttonHeight: 48,
+              buttonHeight,
               buttonTheme: undefined,
               buttonType: undefined,
-              layout: { maxColumns: 2, overflow: "never" },
-              paymentMethodOrder: ["apple_pay", "google_pay", "paypal", "amazon_pay"],
+              layout: { maxColumns, overflow: "never" },
+              paymentMethodOrder: ["apple_pay", "google_pay", "paypal"],
             }}
             onReady={(event) => {
-              if (!Object.values(event.availablePaymentMethods ?? {}).some(Boolean)) onAvailability?.(false);
+              const a = event.availablePaymentMethods;
+              reported.current = true;
+              onWallets?.({
+                applePay: Boolean(a?.applePay),
+                googlePay: Boolean(a?.googlePay),
+                paypal: Boolean(a?.paypal),
+              });
+              if (!Object.values(a ?? {}).some(Boolean)) onAvailability?.(false);
             }}
             onConfirm={async (event) => {
               setError(null);

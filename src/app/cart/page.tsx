@@ -10,7 +10,9 @@ import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
+import { ExpressCheckoutBox } from "@/components/checkout/express-checkout-box";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
+import type { OrderLineInput } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
 
 export default function CartPage() {
@@ -27,6 +29,15 @@ export default function CartPage() {
       lines.reduce((sum, line) => sum + (line.price ?? 0) * line.quantity, 0) * 100
     ) / 100;
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
+  // Same shape the checkout sends; the server re-prices every line.
+  const orderLines: OrderLineInput[] = lines.map((line) => ({
+    productId: line.id,
+    category: line.category,
+    name: line.name,
+    unitPrice: line.price,
+    quantity: line.quantity,
+    options: line.options,
+  }));
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -142,6 +153,7 @@ export default function CartPage() {
                     Proceed to Checkout
                     <ArrowRight className="size-4" />
                   </Button>
+                  <ExpressCheckoutBox lines={orderLines} label="or pay with" />
                 </CardContent>
               </Card>
             </div>

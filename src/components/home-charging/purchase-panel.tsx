@@ -8,7 +8,7 @@ import { ArrowRight, Check, ChevronDown, Heart, Zap } from "lucide-react";
 import type { Product } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
 import { QuantityStepper } from "@/components/shared/quantity-stepper";
-import { InstallationPostcodeCheck } from "@/components/shared/installation-postcode-check";
+import { ExpressCheckoutBox } from "@/components/checkout/express-checkout-box";
 import { useCart } from "@/lib/cart/store";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
@@ -27,9 +27,6 @@ export function PurchasePanel({
   const router = useRouter();
   const [installation, setInstallation] = useState<"standard" | "none" | null>(null);
   const [installationOpen, setInstallationOpen] = useState(false);
-  // Confirmed by the postcode check — required before adding installation.
-  const [installPostcode, setInstallPostcode] = useState<string | null>(null);
-  const needsPostcode = installation === "standard" && !installPostcode;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
@@ -196,11 +193,6 @@ export function PurchasePanel({
           )}
         </div>
 
-        {installation === "standard" && (
-          <div className="sm:col-span-2">
-            <InstallationPostcodeCheck onChange={setInstallPostcode} />
-          </div>
-        )}
       </div>
 
 
@@ -213,11 +205,11 @@ export function PurchasePanel({
 
       <Button
         size="lg"
-        disabled={installation === null || needsPostcode}
+        disabled={installation === null}
         variant="cta"
         className="h-12 w-full gap-1.5 text-base"
         onClick={() => {
-          if (installation === null || needsPostcode) return;
+          if (installation === null) return;
           addItem(
             {
               id: product.id,
@@ -231,7 +223,6 @@ export function PurchasePanel({
             {
               cableLength: product.cableLength,
               installation,
-              ...(installation === "standard" && installPostcode ? { postcode: installPostcode } : {}),
             },
           );
           setAdded(true);
@@ -247,6 +238,25 @@ export function PurchasePanel({
           "Add to Cart"
         )}
       </Button>
+
+      <ExpressCheckoutBox
+        label="Or buy now with"
+        keepCart
+        disabledReason={installation === null ? "Choose an installation option above first." : null}
+        lines={[
+          {
+            productId: product.id,
+            category: "residential",
+            name: product.name,
+            unitPrice,
+            quantity,
+            options: {
+              cableLength: product.cableLength,
+              installation: installation ?? undefined,
+            },
+          },
+        ]}
+      />
 
       <button
         type="button"

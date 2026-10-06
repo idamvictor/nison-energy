@@ -40,6 +40,8 @@ export function AddressLookup({
   defaultValue = "",
   autoComplete = "address-line1",
   onTown,
+  value: controlledValue,
+  onValueChange,
 }: {
   postcode: string;
   name?: string;
@@ -48,9 +50,17 @@ export function AddressLookup({
   autoComplete?: string;
   /** Town for the postcode, once known — the parent fills Town / City with it. */
   onTown?: (town: string) => void;
+  /** Optional controlled value (e.g. kept in the saved checkout form). */
+  value?: string;
+  onValueChange?: (value: string) => void;
 }) {
   const listId = useId();
-  const [value, setValue] = useState(defaultValue);
+  const [innerValue, setInnerValue] = useState(defaultValue);
+  const value = controlledValue ?? innerValue;
+  const setValue = (next: string) => {
+    if (controlledValue === undefined) setInnerValue(next);
+    onValueChange?.(next);
+  };
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);

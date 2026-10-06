@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { authClient } from "@/lib/auth/client";
 import { withRedirect } from "@/lib/auth/redirect";
+import { useCheckoutForm } from "@/lib/checkout/form-store";
 
 const TILE = "flex flex-col gap-1 rounded-lg border px-5 py-4 text-left";
 
@@ -29,6 +30,7 @@ export function CustomerStep({ signedInEmail }: { signedInEmail: string | null }
             onClick={() =>
               startSignOut(async () => {
                 await authClient.signOut();
+                useCheckoutForm.getState().clear();
                 router.refresh();
               })
             }

@@ -28,6 +28,7 @@ import {
 } from "@/components/checkout/stripe-payment";
 import { SurveyNextStep } from "@/components/checkout/survey-next-step";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
+import { useCheckoutForm } from "@/lib/checkout/form-store";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { placeOrder, saveCheckoutDetails } from "@/lib/orders/actions";
 import { includesInstallation } from "@/lib/orders/installation";
@@ -60,23 +61,27 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const [reference, setReference] = useState("");
   // Captured before the cart is cleared: installation orders get the survey next.
   const [needsSurvey, setNeedsSurvey] = useState(false);
-  const [extraIds, setExtraIds] = useState<string[]>([]);
   const [pendingExtra, setPendingExtra] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  // Town + postcode are controlled so the postcode lookup can fill the town.
-  const [city, setCity] = useState("");
-  // Prefer the account postcode; otherwise the one checked on the product page.
-  const [postcode, setPostcode] = useState(
-    () => defaults?.postcode || items.find((i) => i.options?.postcode)?.options?.postcode || "",
-  );
-  const [billingSame, setBillingSame] = useState(true);
-  const [billingCity, setBillingCity] = useState("");
-  const [billingPostcode, setBillingPostcode] = useState("");
-  // The postcode lookup fills Town / City — unless the customer typed their own.
-  const cityTyped = useRef(false);
-  const billingCityTyped = useRef(false);
+  // Everything typed is saved in this browser as it's typed
+  // (src/lib/checkout/form-store.ts), so a reload or a trip back to the cart
+  // keeps it. Account details fill anything not typed yet.
+  const form = useCheckoutForm();
+  const setForm = useCheckoutForm((s) => s.set);
+  const clearForm = useCheckoutForm((s) => s.clear);
+  const extraIds = form.extraIds ?? [];
+  const setExtraIds = (update: (ids: string[]) => string[]) => setForm({ extraIds: update(extraIds) });
+  const city = form.city ?? "";
+  // Prefer a typed postcode, then the account's, then one from the product page.
+  const postcode =
+    form.postcode ?? (defaults?.postcode || items.find((i) => i.options?.postcode)?.options?.postcode || "");
+  const setPostcode = (value: string) => setForm({ postcode: value });
+  const billingSame = form.billingSame ?? true;
+  const billingCity = form.billingCity ?? "";
+  const billingPostcode = form.billingPostcode ?? "";
+  const setBillingPostcode = (value: string) => setForm({ billingPostcode: value });
 
   const lines = items
     .map((item) => resolveCartItem(item))
@@ -306,6 +311,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                     setNeedsSurvey(includesInstallation(lines));
                     setSubmitted(true);
                     clear();
+                    clearForm();
                   });
                 }}
               >
@@ -358,19 +364,45 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                   <CustomerStep signedInEmail={defaults?.email ?? null} />
                 </Section>
 
-                <Section title="Contact information">
+                <Section title="Contact information" aside={<span className="text-xs text-muted-foreground">Saved on this device until you order</span>}>
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="First name">
-                      <Input name="firstName" defaultValue={defaults?.firstName} required autoComplete="given-name" />
+                      <Input
+                        name="firstName"
+                        value={form.firstName ?? defaults?.firstName ?? ""}
+                        onChange={(e) => setForm({ firstName: e.target.value })}
+                        required
+                        autoComplete="given-name"
+                      />
                     </Field>
                     <Field label="Last name">
-                      <Input name="lastName" defaultValue={defaults?.lastName} required autoComplete="family-name" />
+                      <Input
+                        name="lastName"
+                        value={form.lastName ?? defaults?.lastName ?? ""}
+                        onChange={(e) => setForm({ lastName: e.target.value })}
+                        required
+                        autoComplete="family-name"
+                      />
                     </Field>
                     <Field label="Email" className="col-span-2 sm:col-span-1">
-                      <Input name="email" defaultValue={defaults?.email} required type="email" autoComplete="email" />
+                      <Input
+                        name="email"
+                        value={form.email ?? defaults?.email ?? ""}
+                        onChange={(e) => setForm({ email: e.target.value })}
+                        required
+                        type="email"
+                        autoComplete="email"
+                      />
                     </Field>
                     <Field label="Phone number" className="col-span-2 sm:col-span-1">
-                      <Input name="phone" defaultValue={defaults?.phone} required type="tel" autoComplete="tel" />
+                      <Input
+                        name="phone"
+                        value={form.phone ?? defaults?.phone ?? ""}
+                        onChange={(e) => setForm({ phone: e.target.value })}
+                        required
+                        type="tel"
+                        autoComplete="tel"
+                      />
                     </Field>
                   </div>
                 </Section>
@@ -387,8 +419,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         autoComplete="address-level2"
                         value={city}
                         onChange={(e) => {
-                          cityTyped.current = e.target.value.trim() !== "";
-                          setCity(e.target.value);
+                          setForm({ city: e.target.value, cityTyped: e.target.value.trim() !== "" });
                         }}
                       />
                     </Field>
@@ -396,10 +427,11 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       <AddressLookup
                         postcode={postcode}
                         name="address"
-                        defaultValue={defaults?.address}
+                        value={form.address ?? defaults?.address ?? ""}
+                        onValueChange={(value) => setForm({ address: value })}
                         required
                         autoComplete="address-line1"
-                        onTown={(town) => !cityTyped.current && setCity(town)}
+                        onTown={(town) => !useCheckoutForm.getState().cityTyped && setForm({ city: town })}
                       />
                     </Field>
                   </div>
@@ -408,7 +440,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                     <input
                       type="checkbox"
                       checked={billingSame}
-                      onChange={(e) => setBillingSame(e.target.checked)}
+                      onChange={(e) => setForm({ billingSame: e.target.checked })}
                       className="size-4 shrink-0 cursor-pointer accent-primary-ink"
                     />
                     Billing address is the same as delivery
@@ -433,8 +465,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                           autoComplete="billing address-level2"
                           value={billingCity}
                           onChange={(e) => {
-                            billingCityTyped.current = e.target.value.trim() !== "";
-                            setBillingCity(e.target.value);
+                            setForm({ billingCity: e.target.value, billingCityTyped: e.target.value.trim() !== "" });
                           }}
                         />
                       </Field>
@@ -444,7 +475,9 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                           name="billingAddress"
                           required
                           autoComplete="billing address-line1"
-                          onTown={(town) => !billingCityTyped.current && setBillingCity(town)}
+                          value={form.billingAddress ?? ""}
+                          onValueChange={(value) => setForm({ billingAddress: value })}
+                          onTown={(town) => !useCheckoutForm.getState().billingCityTyped && setForm({ billingCity: town })}
                         />
                       </Field>
                     </div>

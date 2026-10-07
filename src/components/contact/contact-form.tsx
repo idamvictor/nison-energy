@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth/client";
+import { useHydrated } from "@/lib/use-hydrated";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { submitEnquiry } from "@/lib/leads/actions";
 import type { EnquiryFormState } from "@/lib/leads/types";
@@ -44,7 +45,10 @@ export function ContactForm() {
     submitEnquiry,
     initialState,
   );
-  const { data: session } = authClient.useSession();
+  const { data: sessionData } = authClient.useSession();
+  // Prefill only after hydration so the first render matches the server HTML.
+  const hydrated = useHydrated();
+  const session = hydrated ? sessionData : null;
   const prefill = splitName(session?.user.name);
   const errors = state.status === "error" ? state.errors : {};
 

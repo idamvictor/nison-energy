@@ -74,12 +74,11 @@ export const deliveryPolicyMarkdown = `We are committed to providing fast, relia
 - **Product Inspection:** Customers are responsible for inspecting all goods upon arrival to ensure they are complete and in full working order before installation, integration, or resale to a third party.
 - **Non-Delivery & Issues:** In the rare event an item is lost or fails to deliver, Ocunio Energy's liability is strictly limited to either replacing the missing goods within a reasonable timeframe or refunding the original purchase price.
 
-## Specialist Delivery
+## Specialist Handling & Delivery
 
-A few product categories need extra care in transit:
+Due to their size or technical nature, select products require dedicated transit options:
 
-- Portable power stations — allow up to 4 working days for delivery.
-- Solar panels, battery storage, inverters, heat pumps and boilers — delivered via our pallet delivery service, priced at up to £110.
+- **Equipment such as Solar, Inverters, Batteries, Heat Pumps & Boilers:** Pallet delivery (rates to be confirmed). Dispatched via specialist courier (up to 4 working days).
 
 ## Delivery Coverage
 

@@ -14,7 +14,7 @@ const sections = [
   { id: "delivery-charges", label: "Delivery Charges" },
   { id: "managing-your-delivery", label: "Managing Your Delivery" },
   { id: "receiving-inspecting-your-goods", label: "Receiving Your Goods" },
-  { id: "specialist-delivery", label: "Specialist Delivery" },
+  { id: "specialist-handling-delivery", label: "Specialist Handling & Delivery" },
   { id: "delivery-coverage", label: "Delivery Coverage" },
   { id: "need-help", label: "Need Help?" },
 ];

@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart/store";
 import { useUnreadCount } from "@/lib/notifications/use-unread-count";
 import { authClient } from "@/lib/auth/client";
+import { useHydrated } from "@/lib/use-hydrated";
 import { signInHref } from "@/lib/auth/redirect";
 import {
   Sheet,
@@ -72,7 +73,10 @@ export function SiteHeader() {
     s.items.reduce((sum, item) => sum + item.quantity, 0)
   );
   const openCart = useCart((s) => s.openCart);
-  const { data: session } = authClient.useSession();
+  const { data: sessionData } = authClient.useSession();
+  // Server HTML is always signed-out; match it until hydrated (no hydration error).
+  const hydrated = useHydrated();
+  const session = hydrated ? sessionData : null;
 
   // "Get Started" returns the customer to this page after sign-in / sign-up.
   // The query + hash are read at click time (reading them during render would

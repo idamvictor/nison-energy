@@ -283,10 +283,10 @@ export function PurchasePanel({
           </span>
           <div>
             <p className="text-[15px] font-semibold text-foreground">
-              Pay £0 today. Get up to £500 funded by the UK government.
+              Did you know you could get up to £500 off with OZEV grant? Pay £0 today!
             </p>
-            <p className="mt-0.5 text-xs text-foreground/75">
-              No payment due until grant is approved.
+            <p className="mt-0.5 text-xs font-medium text-primary-ink underline-offset-2 group-hover:underline">
+              Check your OZEV grant eligibility.
             </p>
           </div>
         </div>

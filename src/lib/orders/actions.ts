@@ -141,9 +141,13 @@ export async function startCheckout(
       // over the address, email and phone from our form before confirming.
       shipping_address_collection: { allowed_countries: ["GB"] },
       billing_address_collection: "required",
-      phone_number_collection: { enabled: true },
+      // Card: our form's phone is handed to Stripe, which needs collection on.
+      // Wallets: off — the Express Checkout Element hides PayPal when a phone
+      // is requested, so wallet orders arrive without one (email + address only).
+      phone_number_collection: { enabled: kind === "card" },
       customer_creation: "always",
-      invoice_creation: { enabled: true },
+      // No Stripe invoice — customers get our branded invoice email + PDF
+      // (Stripe's would duplicate it and incurs an Invoicing fee in live mode).
       return_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}${opts?.keepCart ? "&keep_cart=1" : ""}`,
       metadata: { draftId: draft.id },
     });

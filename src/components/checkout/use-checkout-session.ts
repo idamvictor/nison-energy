@@ -18,11 +18,14 @@ const STORAGE_KEY = "ocunio-checkout-sessions";
 const MAX_AGE_MS = 23 * 60 * 60 * 1000; // Stripe expires sessions after 24h
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 const LIVE_KEY = PUBLISHABLE_KEY.startsWith("pk_live_");
+// Bump when session settings change, so sessions made with the old settings
+// aren't reused (v2: wallet sessions no longer collect a phone, for PayPal).
+const CACHE_TAG = `${PUBLISHABLE_KEY}|v2`;
 
 type CachedSession = CheckoutSession & { linesKey: string; createdAt: number; key?: string };
 
 function belongsToThisKey(entry: CachedSession): boolean {
-  if (entry.key !== PUBLISHABLE_KEY) return false;
+  if (entry.key !== CACHE_TAG) return false;
   // Belt and braces: a test session can never work with a live key, or vice versa.
   return entry.clientSecret.startsWith(LIVE_KEY ? "cs_live_" : "cs_test_");
 }
@@ -104,7 +107,7 @@ export function useCheckoutSession(
         if (result.ok) {
           draftRef.current = result.draftId;
           writeCache((cache) => {
-            cache[slot] = { ...result, kind, linesKey: orderLinesJson, createdAt: Date.now(), key: PUBLISHABLE_KEY };
+            cache[slot] = { ...result, kind, linesKey: orderLinesJson, createdAt: Date.now(), key: CACHE_TAG };
           });
         }
         if (cancelled) return;

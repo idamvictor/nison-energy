@@ -34,7 +34,16 @@ function Glyph({ path, className }: { path: string; className?: string }) {
 }
 
 /** Branded stand-in for a wallet Stripe can't show here — explains why on click. */
-function FallbackButton({ wallet, onClick }: { wallet: Wallet; onClick: () => void }) {
+function FallbackButton({
+  wallet,
+  onClick,
+  height = 40,
+}: {
+  wallet: Wallet;
+  onClick: () => void;
+  /** Matches Stripe's real buttons in the same row. */
+  height?: number;
+}) {
   const style: Record<Wallet, string> = {
     applePay: "bg-black text-white",
     googlePay: "bg-black text-white",
@@ -44,6 +53,7 @@ function FallbackButton({ wallet, onClick }: { wallet: Wallet; onClick: () => vo
     <button
       type="button"
       onClick={onClick}
+      style={{ height }}
       aria-label={`Pay with ${LABEL[wallet]}`}
       className={cn(
         "flex h-10 items-center justify-center rounded-md transition-opacity hover:opacity-90",
@@ -69,6 +79,7 @@ function FallbackButton({ wallet, onClick }: { wallet: Wallet; onClick: () => vo
  * that say why they can't be used here. Must sit inside a StripeCheckoutProvider.
  */
 const GRID: Record<number, string> = { 1: "grid-cols-1", 2: "grid-cols-2", 3: "grid-cols-3" };
+const SPAN: Record<number, string> = { 1: "col-span-1", 2: "col-span-2", 3: "col-span-3" };
 
 export function ExpressWallets({
   wallets = WALLETS,
@@ -90,20 +101,39 @@ export function ExpressWallets({
     paypal: wallets.includes("paypal") ? "auto" : "never",
   };
 
+  const realCount = available ? wallets.length - missing.length : 0;
+
+  // One row, one slot per wallet: Stripe's real buttons share a cell spanning
+  // as many slots as there are real buttons (so each matches a stand-in's
+  // size), and the stand-ins fill the rest of the row.
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
-      <ExpressCheckout methods={methods} onWallets={setAvailable} maxColumns={wallets.length} buttonHeight={buttonHeight} />
-      {available == null ? (
-        <WalletSkeleton count={wallets.length} />
-      ) : (
-        missing.length > 0 && (
-          <div className={cn("grid gap-2", GRID[wallets.length])}>
-            {missing.map((wallet) => (
-              <FallbackButton key={wallet} wallet={wallet} onClick={() => setNotice(wallet)} />
+      <div className={cn("grid gap-2", GRID[wallets.length])}>
+        <div
+          className={cn(
+            realCount > 0 ? SPAN[realCount] : cn(SPAN[wallets.length], "h-0 overflow-hidden"),
+          )}
+        >
+          <ExpressCheckout
+            methods={methods}
+            onWallets={setAvailable}
+            maxColumns={wallets.length}
+            buttonHeight={buttonHeight}
+          />
+        </div>
+        {available == null
+          ? wallets.map((wallet) => (
+              <span
+                key={wallet}
+                aria-hidden
+                style={{ height: buttonHeight }}
+                className="animate-pulse rounded-md bg-foreground/10"
+              />
+            ))
+          : missing.map((wallet) => (
+              <FallbackButton key={wallet} wallet={wallet} height={buttonHeight} onClick={() => setNotice(wallet)} />
             ))}
-          </div>
-        )
-      )}
+      </div>
       {notice && (
         <p role="status" className="rounded-lg bg-secondary px-3 py-2 text-sm text-foreground/80 ring-1 ring-foreground/10">
           {UNAVAILABLE[notice]}

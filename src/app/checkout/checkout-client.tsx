@@ -848,7 +848,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                 {(selectedExtras.length > 0 || remainingExtras.length > 0) && (
                   <section className="mt-6 flex flex-col gap-3.5">
                     <h2 className="text-base font-medium text-white">
-                      Extras <span className="text-sm font-normal text-white/70">(optional)</span>
+                      Extras <span className="text-sm font-normal text-white/70"></span>
                     </h2>
                     <ExtrasPicker
                       available={remainingExtras}

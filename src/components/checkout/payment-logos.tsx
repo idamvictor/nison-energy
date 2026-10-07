@@ -1,4 +1,4 @@
-import { siAmericanexpress, siApplepay, siGooglepay, siPaypal, siVisa } from "simple-icons";
+import { siAmericanexpress, siApplepay, siGooglepay, siKlarna, siPaypal, siVisa } from "simple-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -56,6 +56,22 @@ export function StripeLogo({ className }: { className?: string }) {
   return (
     <span role="img" aria-label="Stripe" className={cn("text-[17px] font-bold tracking-tight text-[#635bff]", className)}>
       stripe
+    </span>
+  );
+}
+
+/** Klarna badge: black mark on Klarna pink. */
+export function KlarnaLogo({ className }: { className?: string }) {
+  return (
+    <span
+      role="img"
+      aria-label="Klarna"
+      className={cn("inline-flex h-6 items-center rounded-[5px] bg-[#ffb3c7] px-1.5", className)}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden className="h-3.5 w-auto">
+        <path d={siKlarna.path} fill="#0b051d" />
+      </svg>
+      <span aria-hidden className="ml-1 text-[12px] font-bold text-[#0b051d]">Klarna</span>
     </span>
   );
 }

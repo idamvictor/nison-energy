@@ -115,9 +115,10 @@ export async function startCheckout(
       // Element). No payment_method_types: Stripe shows whatever is switched
       // on in the Dashboard, so newly enabled methods appear automatically.
       ui_mode: "elements",
-      // The Card category is card-only by definition; the wallet session
+      // Card / PayPal / Klarna options are single-method sessions paid through
+      // our form (PayPal and Klarna redirect to approve); the wallet session
       // stays Dashboard-driven so newly enabled wallets appear automatically.
-      ...(kind === "card" ? { payment_method_types: ["card" as const] } : {}),
+      ...(kind !== "wallet" ? { payment_method_types: [kind] } : {}),
       line_items: cart.lines.map((line) => ({
         price_data: {
           currency: "gbp",
@@ -141,10 +142,10 @@ export async function startCheckout(
       // over the address, email and phone from our form before confirming.
       shipping_address_collection: { allowed_countries: ["GB"] },
       billing_address_collection: "required",
-      // Card: our form's phone is handed to Stripe, which needs collection on.
+      // Card / PayPal / Klarna: our form's phone is handed to Stripe, which needs collection on.
       // Wallets: off — the Express Checkout Element hides PayPal when a phone
       // is requested, so wallet orders arrive without one (email + address only).
-      phone_number_collection: { enabled: kind === "card" },
+      phone_number_collection: { enabled: kind !== "wallet" },
       customer_creation: "always",
       // No Stripe invoice — customers get our branded invoice email + PDF
       // (Stripe's would duplicate it and incurs an Invoicing fee in live mode).

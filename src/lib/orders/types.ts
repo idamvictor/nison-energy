@@ -114,7 +114,8 @@ export type PlaceOrderResult =
   | { ok: false; errors: Record<string, string> };
 
 /** Which Stripe session a checkout category needs (see startCheckout). */
-export type CheckoutKind = "wallet" | "card";
+/** wallet = Express buttons (Dashboard-driven); card / paypal / klarna = one method, paid via our form. */
+export type CheckoutKind = "wallet" | "card" | "paypal" | "klarna";
 
 /** Server-priced totals for the checkout summary (GBP inc VAT). */
 export type CheckoutTotals = { subtotal: number; deliveryFee: number; total: number };

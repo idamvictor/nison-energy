@@ -231,10 +231,15 @@ export function ExpressCheckout({
 // ─── Card ──────────────────────────────────────────────────────────────────
 
 /** Card number / expiry / CVC only (the card session is card-only). */
+/**
+ * Stripe's Payment Element for a single-method session: card number / expiry /
+ * CVC for card, or Stripe's short "you'll be redirected" panel for PayPal and
+ * Klarna. Our form supplies name, email, phone and address.
+ */
 export function CardFields({ onComplete }: { onComplete: (complete: boolean) => void }) {
   const state = useCheckoutElements();
   if (state.type === "error") return <p className="text-sm text-destructive">{state.error.message}</p>;
-  if (state.type !== "success") return <p className="text-sm text-muted-foreground">Loading secure card form…</p>;
+  if (state.type !== "success") return <p className="text-sm text-muted-foreground">Loading secure payment form…</p>;
   return (
     <PaymentElement
       options={{
@@ -264,6 +269,9 @@ export function CardFields({ onComplete }: { onComplete: (complete: boolean) => 
   );
 }
 
+/** Same element, any single-method session (card, PayPal, Klarna). */
+export const PaymentFields = CardFields;
+
 export type PayDetails = {
   email: string;
   phone: string;
@@ -279,10 +287,15 @@ export function CardPlaceOrder({
   canPay,
   prepare,
   className,
+  label = "Place Order",
+  busyLabel = "Processing payment…",
 }: {
   canPay: boolean;
   prepare: () => Promise<PayDetails | null>;
   className?: string;
+  /** e.g. "Continue to PayPal" for redirect methods. */
+  label?: string;
+  busyLabel?: string;
 }) {
   const state = useCheckoutElements();
   const [confirming, setConfirming] = useState(false);
@@ -330,7 +343,7 @@ export function CardPlaceOrder({
         className={cn("h-12 w-full gap-1.5 text-base", className)}
       >
         <Lock className="size-4" />
-        {confirming ? "Processing payment…" : ready ? `Place Order · ${state.checkout.total.total.amount}` : "Loading…"}
+        {confirming ? busyLabel : ready ? `${label} · ${state.checkout.total.total.amount}` : "Loading…"}
       </Button>
     </div>
   );

@@ -16,9 +16,9 @@ import { useCheckoutSession } from "@/components/checkout/use-checkout-session";
 import { useInView } from "@/components/checkout/use-in-view";
 import { useInstallFees } from "@/components/checkout/use-install-fees";
 import { ExpressWallets, WalletSkeleton } from "@/components/checkout/express-wallets";
-import { AmexLogo, MastercardLogo, PayPalLogo, VisaLogo } from "@/components/checkout/payment-logos";
+import { AmexLogo, KlarnaLogo, MastercardLogo, PayPalLogo, VisaLogo } from "@/components/checkout/payment-logos";
 import {
-  CardFields,
+  PaymentFields,
   CardPlaceOrder,
   StripeCheckoutProvider,
   stripeConfigured,
@@ -57,7 +57,13 @@ export type CheckoutDefaults = {
 
 const UK_POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
-type PayMethod = "card" | "paypal";
+type PayMethod = "card" | "paypal" | "klarna";
+
+const METHOD_ACTION: Record<PayMethod, { label: string; busy: string }> = {
+  card: { label: "Place Order", busy: "Processing payment…" },
+  paypal: { label: "Continue to PayPal", busy: "Redirecting to PayPal…" },
+  klarna: { label: "Continue with Klarna", busy: "Redirecting to Klarna…" },
+};
 
 export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; defaults?: CheckoutDefaults }) {
   const items = useCart((s) => s.items);
@@ -196,15 +202,16 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const payable = lines.length > 0 && !hasQuoteOnlyItems && !submitted;
 
   // ── Stripe sessions (reused from this browser while the basket is unchanged):
-  // the Express Checkout row at the top, the card form (opened once Payment is
-  // near), and the PayPal option (opened when it's chosen).
+  // the Express Checkout row at the top, plus one per payment option — card
+  // (opened once Payment is near), PayPal and Klarna (opened when chosen; both
+  // redirect to approve). All three are paid through our form.
   const [paymentRef, paymentInView] = useInView<HTMLDivElement>();
   const express = useCheckoutSession("wallet", orderLinesJson, payable);
   const card = useCheckoutSession("card", orderLinesJson, payable && paymentInView);
-  const paypal = useCheckoutSession("wallet", orderLinesJson, payable && payMethod === "paypal", {
-    slot: "basket:paypal",
-  });
-  const session = card.session;
+  const paypal = useCheckoutSession("paypal", orderLinesJson, payable && payMethod === "paypal");
+  const klarna = useCheckoutSession("klarna", orderLinesJson, payable && payMethod === "klarna");
+  const active = { card, paypal, klarna }[payMethod];
+  const session = active.session;
 
   // Server totals once a session is open; a same-rule estimate before that.
   const estimateSubtotal =
@@ -251,7 +258,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
     // Not chosen yet: open the guest email field so its error can show too.
     if (!defaults?.email && !showEmail) setGuestChosen(true);
     if (!formEl || !session || !validateAll()) return null;
-    if (!cardComplete) {
+    if (payMethod === "card" && !methodComplete) {
       setError("Enter your card number, expiry date and security code.");
       return null;
     }
@@ -276,8 +283,8 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
     return { email: payload.email, phone: payload.phone, shipping, billing };
   }
 
-  const cardComplete = session != null && cardCompleteFor === session.clientSecret;
-  const sessionError = card.error ?? express.error;
+  const methodComplete = session != null && cardCompleteFor === session.clientSecret;
+  const sessionError = active.error ?? express.error;
   const paymentStatus = sessionError ? (
     <p className="text-sm text-red-300">{sessionError}</p>
   ) : !stripeConfigured ? (
@@ -306,7 +313,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   );
   const termsError = err("acceptedTerms");
 
-  // ── Billing address (inside the card panel, like the design) ──
+  // ── Billing address (under the payment list — used by every method) ──
   const billingFields = !billingSame && (
     <div className="grid grid-cols-2 gap-2.5 pt-1">
       <FloatField as="div" label="Postcode" filled={billingPostcode !== ""} error={err("billingPostcode")} tone="light">
@@ -368,7 +375,25 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
     </div>
   );
 
-  // ── Payment: Credit card (Stripe fields + billing) or PayPal, as a radio list ──
+  // ── Payment: Credit card, PayPal or Klarna, as a radio list ──
+  const methodRow = (method: PayMethod, title: string, logo: React.ReactNode, first = false) => (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={payMethod === method}
+      onClick={() => setPayMethod(method)}
+      className={cn(
+        "flex w-full items-center gap-2.5 p-3.5 text-left",
+        !first && "border-t border-[#dedede]",
+        payMethod === method ? "bg-[#f6f6f6]" : "bg-white",
+      )}
+    >
+      <Radio checked={payMethod === method} />
+      <span className="flex-1 text-sm font-medium">{title}</span>
+      {logo}
+    </button>
+  );
+
   const paymentSection = (
     <div ref={paymentRef} className="flex flex-col gap-3.5">
       <div>
@@ -377,30 +402,23 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
       </div>
       {paymentStatus ?? (
         <div className="overflow-hidden rounded-[12px] border border-[#dedede] bg-white text-black">
-          {/* Credit card */}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={payMethod === "card"}
-            onClick={() => setPayMethod("card")}
-            className={cn(
-              "flex w-full items-center gap-2.5 p-3.5 text-left",
-              payMethod === "card" ? "bg-[#f6f6f6]" : "bg-white",
-            )}
-          >
-            <Radio checked={payMethod === "card"} />
-            <span className="flex-1 text-sm font-medium">Credit card</span>
+          {methodRow(
+            "card",
+            "Credit card",
             <span className="flex items-center gap-1">
               <VisaLogo className="h-7" />
               <MastercardLogo className="h-[18px]" />
               <AmexLogo className="h-6" />
-            </span>
-          </button>
-          {payMethod === "card" && (
-            <div className="flex flex-col gap-3.5 border-t border-[#dedede] bg-black/[0.04] p-3.5">
-              {session ? (
-                <CardFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
-              ) : (
+            </span>,
+            true,
+          )}
+          {payMethod === "card" &&
+            (session ? (
+              <div className="flex flex-col gap-3 border-t border-[#dedede] bg-black/[0.04] p-3.5">
+                <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 border-t border-[#dedede] bg-black/[0.04] p-3.5">
                 <div className="flex flex-col gap-2.5" aria-hidden>
                   <span className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
                   <span className="grid grid-cols-2 gap-2.5">
@@ -408,93 +426,82 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                     <span className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
                   </span>
                 </div>
+              </div>
+            ))}
+          {methodRow("paypal", "PayPal", <PayPalLogo className="scale-90" />)}
+          {payMethod === "paypal" && (
+            <div className="flex flex-col gap-3 border-t border-[#dedede] bg-black/[0.04] p-3.5">
+              <p className="text-sm text-[#707070]">
+                After you continue, you&apos;ll be taken to PayPal to log in and approve the payment, then brought
+                straight back here.
+              </p>
+              {session ? (
+                <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
+              ) : (
+                <span aria-hidden className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
               )}
-              <label className="flex cursor-pointer items-center gap-2.5 text-sm">
-                <input
-                  type="checkbox"
-                  checked={billingSame}
-                  onChange={(e) => setForm({ billingSame: e.target.checked })}
-                  className="size-[18px] shrink-0 cursor-pointer accent-black"
-                />
-                Use shipping address as billing address
-              </label>
-              {billingFields}
             </div>
           )}
-          {/* PayPal */}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={payMethod === "paypal"}
-            onClick={() => setPayMethod("paypal")}
-            className={cn(
-              "flex w-full items-center gap-2.5 border-t border-[#dedede] p-3.5 text-left",
-              payMethod === "paypal" ? "bg-[#f6f6f6]" : "bg-white",
-            )}
-          >
-            <Radio checked={payMethod === "paypal"} />
-            <span className="flex-1 text-sm font-medium">PayPal</span>
-            <PayPalLogo className="scale-90" />
-          </button>
-          {payMethod === "paypal" && (
-            <div className="flex flex-col gap-2.5 border-t border-[#dedede] bg-black/[0.04] p-3.5">
+          {methodRow("klarna", "Klarna", <KlarnaLogo />)}
+          {payMethod === "klarna" && (
+            <div className="flex flex-col gap-3 border-t border-[#dedede] bg-black/[0.04] p-3.5">
               <p className="text-sm text-[#707070]">
-                Pay with your PayPal account — you&apos;ll confirm your delivery details with PayPal.
+                Pay in 3 interest-free instalments or later with Klarna. You&apos;ll be taken to Klarna to choose how to
+                pay, then brought straight back here.
               </p>
-              {paypal.error ? (
-                <p className="text-sm text-red-600">{paypal.error}</p>
-              ) : paypal.session ? (
-                <StripeCheckoutProvider
-                  key={`paypal-${paypal.session.clientSecret}`}
-                  clientSecret={paypal.session.clientSecret}
-                  onSessionError={paypal.discard}
-                >
-                  <ExpressWallets wallets={["paypal"]} buttonHeight={48} />
-                </StripeCheckoutProvider>
+              {session ? (
+                <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
               ) : (
-                <WalletSkeleton count={1} />
+                <span aria-hidden className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
               )}
             </div>
           )}
         </div>
       )}
+
+      {/* Billing address — for every payment method. */}
+      <div className="flex flex-col gap-3.5 rounded-[12px] border border-[#dedede] bg-[#f6f6f6] p-3.5 text-black">
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            checked={billingSame}
+            onChange={(e) => setForm({ billingSame: e.target.checked })}
+            className="size-[18px] shrink-0 cursor-pointer accent-black"
+          />
+          Use shipping address as billing address
+        </label>
+        {billingFields}
+      </div>
     </div>
   );
 
-  // ── Final action ──
-  const placeOrderArea =
-    payMethod === "paypal" ? (
-      <p className="text-xs text-white/65">
-        By paying with PayPal you agree to our{" "}
-        <Link href="/terms-of-sale" target="_blank" className="underline underline-offset-2">
-          Terms and Conditions of Sale
-        </Link>
-        .
-      </p>
-    ) : (
-      <div className="flex flex-col gap-4">
-        {termsBox}
-        {termsError && (
-          <p role="alert" className="-mt-2 text-xs text-[#ffb4b4]">
-            {termsError}
-          </p>
-        )}
-        {error && <p className="text-sm text-red-300">{error}</p>}
-        {!paymentStatus &&
-          (session ? (
-            <CardPlaceOrder
-              // Always clickable: a click runs the checks and points at what's missing.
-              canPay
-              prepare={preparePayment}
-              className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-black/60"
-            />
-          ) : (
-            <Button type="button" disabled className="h-[52px] w-full rounded-[12px] bg-black text-base text-white">
-              Loading secure payment…
-            </Button>
-          ))}
-      </div>
-    );
+  // ── Final action (same checks for every method; PayPal/Klarna then redirect) ──
+  const placeOrderArea = (
+    <div className="flex flex-col gap-4">
+      {termsBox}
+      {termsError && (
+        <p role="alert" className="-mt-2 text-xs text-[#ffb4b4]">
+          {termsError}
+        </p>
+      )}
+      {error && <p className="text-sm text-red-300">{error}</p>}
+      {!paymentStatus &&
+        (session ? (
+          <CardPlaceOrder
+            // Always clickable: a click runs the checks and points at what's missing.
+            canPay
+            prepare={preparePayment}
+            label={METHOD_ACTION[payMethod].label}
+            busyLabel={METHOD_ACTION[payMethod].busy}
+            className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-black/60"
+          />
+        ) : (
+          <Button type="button" disabled className="h-[52px] w-full rounded-[12px] bg-black text-base text-white">
+            Loading secure payment…
+          </Button>
+        ))}
+    </div>
+  );
 
   const summary = (
     <OrderSummary
@@ -886,9 +893,9 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                   <div className="mt-8 flex flex-col gap-6">
                     {payable && stripeConfigured && session ? (
                       <StripeCheckoutProvider
-                        key={`card-${session.clientSecret}`}
+                        key={`${payMethod}-${session.clientSecret}`}
                         clientSecret={session.clientSecret}
-                        onSessionError={card.discard}
+                        onSessionError={active.discard}
                       >
                         {paymentSection}
                         {placeOrderArea}

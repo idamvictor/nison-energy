@@ -19,8 +19,8 @@ const MAX_AGE_MS = 23 * 60 * 60 * 1000; // Stripe expires sessions after 24h
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 const LIVE_KEY = PUBLISHABLE_KEY.startsWith("pk_live_");
 // Bump when session settings change, so sessions made with the old settings
-// aren't reused (v2: wallet sessions no longer collect a phone, for PayPal).
-const CACHE_TAG = `${PUBLISHABLE_KEY}|v2`;
+// aren't reused (v2: wallet sessions without phone; v3: PayPal / Klarna redirect sessions).
+const CACHE_TAG = `${PUBLISHABLE_KEY}|v3`;
 
 type CachedSession = CheckoutSession & { linesKey: string; createdAt: number; key?: string };
 

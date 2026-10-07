@@ -447,6 +447,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                 <StripeCheckoutProvider
                   key={`paypal-${paypal.session.clientSecret}`}
                   clientSecret={paypal.session.clientSecret}
+                  onSessionError={paypal.discard}
                 >
                   <ExpressWallets wallets={["paypal"]} buttonHeight={48} />
                 </StripeCheckoutProvider>
@@ -638,6 +639,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         <StripeCheckoutProvider
                           key={`express-${express.session.clientSecret}`}
                           clientSecret={express.session.clientSecret}
+                          onSessionError={express.discard}
                         >
                           <ExpressWallets buttonHeight={48} />
                         </StripeCheckoutProvider>
@@ -883,7 +885,11 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                 ) : (
                   <div className="mt-8 flex flex-col gap-6">
                     {payable && stripeConfigured && session ? (
-                      <StripeCheckoutProvider key={`card-${session.clientSecret}`} clientSecret={session.clientSecret}>
+                      <StripeCheckoutProvider
+                        key={`card-${session.clientSecret}`}
+                        clientSecret={session.clientSecret}
+                        onSessionError={card.discard}
+                      >
                         {paymentSection}
                         {placeOrderArea}
                       </StripeCheckoutProvider>

@@ -42,9 +42,12 @@ export const stripeConfigured = stripePromise != null;
 export function StripeCheckoutProvider({
   clientSecret,
   children,
+  onSessionError,
 }: {
   clientSecret: string;
   children: React.ReactNode;
+  /** Stripe can't load this session (e.g. it no longer exists) — the caller replaces it. */
+  onSessionError?: () => void;
 }) {
   if (!stripePromise) return <>{children}</>;
   return (
@@ -52,9 +55,25 @@ export function StripeCheckoutProvider({
       stripe={stripePromise}
       options={{ clientSecret, elementsOptions: { appearance } }}
     >
+      {onSessionError && <SessionErrorWatcher onSessionError={onSessionError} />}
       {children}
     </CheckoutElementsProvider>
   );
+}
+
+/** Reports once when the checkout session fails to load (stale, expired, completed, wrong account). */
+function SessionErrorWatcher({ onSessionError }: { onSessionError: () => void }) {
+  const state = useCheckoutElements();
+  const reported = useRef(false);
+  const message = state.type === "error" ? state.error.message : null;
+  useEffect(() => {
+    if (message != null && !reported.current) {
+      reported.current = true;
+      console.warn("[checkout] Stripe could not load the session:", message);
+      onSessionError();
+    }
+  }, [message, onSessionError]);
+  return null;
 }
 
 /** UK numbers as Stripe expects them (E.164): "07700 900123" → "+447700900123". */

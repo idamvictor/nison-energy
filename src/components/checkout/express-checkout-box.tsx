@@ -32,7 +32,7 @@ export function ExpressCheckoutBox({
   // No Stripe call until the buttons are about to be seen.
   const [boxRef, inView] = useInView<HTMLDivElement>();
   const enabled = payable && stripeConfigured && !disabledReason && inView;
-  const { session, error } = useCheckoutSession("wallet", JSON.stringify(lines), enabled, { keepCart });
+  const { session, error, discard } = useCheckoutSession("wallet", JSON.stringify(lines), enabled, { keepCart });
 
   if (!payable || !stripeConfigured) return null;
 
@@ -48,7 +48,7 @@ export function ExpressCheckoutBox({
       ) : error ? (
         <p className="text-center text-xs text-destructive">{error}</p>
       ) : session ? (
-        <StripeCheckoutProvider key={session.clientSecret} clientSecret={session.clientSecret}>
+        <StripeCheckoutProvider key={session.clientSecret} clientSecret={session.clientSecret} onSessionError={discard}>
           <ExpressWallets />
         </StripeCheckoutProvider>
       ) : (

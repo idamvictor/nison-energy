@@ -48,12 +48,15 @@ export type OrderRecord = {
   lastName: string;
   email: string;
   phone: string;
+  company: string | null;
   address: string;
+  addressLine2: string | null;
   city: string | null;
   postcode: string;
   notes: string | null;
   billingSameAsDelivery: boolean;
   billingAddress: string | null;
+  billingAddressLine2: string | null;
   billingCity: string | null;
   billingPostcode: string | null;
   termsAcceptedAt: Date | null;
@@ -78,13 +81,18 @@ export type PlaceOrderPayload = {
   lastName: string;
   email: string;
   phone: string;
+  /** Optional business name. */
+  company?: string;
   /** Delivery & installation address. */
   address: string;
+  /** Apartment, suite, etc. */
+  addressLine2?: string;
   city: string;
   postcode: string;
   /** When false, the billing* fields are required. */
   billingSameAsDelivery: boolean;
   billingAddress?: string;
+  billingAddressLine2?: string;
   billingCity?: string;
   billingPostcode?: string;
   /** The Terms and Conditions of Sale tick box — re-checked on the server. */

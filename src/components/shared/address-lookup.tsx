@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,8 @@ export function AddressLookup({
   onTown,
   value: controlledValue,
   onValueChange,
+  placeholder: placeholderOverride,
+  inputClassName,
 }: {
   postcode: string;
   name?: string;
@@ -53,6 +55,9 @@ export function AddressLookup({
   /** Optional controlled value (e.g. kept in the saved checkout form). */
   value?: string;
   onValueChange?: (value: string) => void;
+  /** Overrides the built-in hint (e.g. "" when a floating label is used). */
+  placeholder?: string;
+  inputClassName?: string;
 }) {
   const listId = useId();
   const [innerValue, setInnerValue] = useState(defaultValue);
@@ -182,7 +187,7 @@ export function AddressLookup({
       <Input
         name={name}
         required={required}
-        placeholder={placeholder}
+        placeholder={placeholderOverride ?? placeholder}
         value={value}
         autoComplete={autoComplete}
         role="combobox"
@@ -211,13 +216,13 @@ export function AddressLookup({
             setOpen(false);
           }
         }}
-        className="pr-9"
+        className={cn("pr-9", inputClassName)}
       />
       <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2">
         {loading ? (
           <Loader2 className="size-4 animate-spin text-muted-foreground" />
         ) : (
-          <MapPin className="size-4 text-muted-foreground" />
+          <Search className="size-4 text-muted-foreground" />
         )}
       </span>
 

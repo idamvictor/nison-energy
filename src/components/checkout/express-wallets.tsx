@@ -5,7 +5,7 @@ import { siApple, siGooglepay } from "simple-icons";
 
 import { cn } from "@/lib/utils";
 import { PayPalLogo } from "@/components/checkout/payment-logos";
-import { ALL_WALLETS, ExpressCheckout, type AvailableWallets } from "@/components/checkout/stripe-payment";
+import { ExpressCheckout, NONE, type AvailableWallets, type ExpressMethods } from "@/components/checkout/stripe-payment";
 
 type Wallet = keyof AvailableWallets;
 
@@ -68,19 +68,36 @@ function FallbackButton({ wallet, onClick }: { wallet: Wallet; onClick: () => vo
  * wallet supplies name, address and payment); the rest are branded stand-ins
  * that say why they can't be used here. Must sit inside a StripeCheckoutProvider.
  */
-export function ExpressWallets() {
+const GRID: Record<number, string> = { 1: "grid-cols-1", 2: "grid-cols-2", 3: "grid-cols-3" };
+
+export function ExpressWallets({
+  wallets = WALLETS,
+  buttonHeight = 40,
+}: {
+  /** Which wallets to offer (e.g. just PayPal in the payment list). */
+  wallets?: Wallet[];
+  buttonHeight?: number;
+}) {
   const [available, setAvailable] = useState<AvailableWallets | null>(null);
   const [notice, setNotice] = useState<Wallet | null>(null);
-  const missing = available ? WALLETS.filter((w) => !available[w]) : [];
+  const missing = available ? wallets.filter((w) => !available[w]) : [];
+  // Apple/Google Pay "always" so they show on more browsers; PayPal on its own
+  // availability (test mode, or live once activated in Stripe).
+  const methods: ExpressMethods = {
+    ...NONE,
+    applePay: wallets.includes("applePay") ? "always" : "never",
+    googlePay: wallets.includes("googlePay") ? "always" : "never",
+    paypal: wallets.includes("paypal") ? "auto" : "never",
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
-      <ExpressCheckout methods={ALL_WALLETS} onWallets={setAvailable} maxColumns={3} buttonHeight={40} />
+      <ExpressCheckout methods={methods} onWallets={setAvailable} maxColumns={wallets.length} buttonHeight={buttonHeight} />
       {available == null ? (
-        <WalletSkeleton />
+        <WalletSkeleton count={wallets.length} />
       ) : (
         missing.length > 0 && (
-          <div className="grid grid-cols-3 gap-2">
+          <div className={cn("grid gap-2", GRID[wallets.length])}>
             {missing.map((wallet) => (
               <FallbackButton key={wallet} wallet={wallet} onClick={() => setNotice(wallet)} />
             ))}
@@ -119,10 +136,10 @@ export function WalletButtonsWaiting({ reason }: { reason: string }) {
 }
 
 /** Three button-shaped placeholders while Stripe works out which wallets this browser has. */
-export function WalletSkeleton() {
+export function WalletSkeleton({ count = WALLETS.length }: { count?: number }) {
   return (
-    <div aria-hidden className="mx-auto grid w-full max-w-xl grid-cols-3 gap-2">
-      {WALLETS.map((wallet) => (
+    <div aria-hidden className={cn("mx-auto grid w-full max-w-xl gap-2", GRID[count])}>
+      {WALLETS.slice(0, count).map((wallet) => (
         <span key={wallet} className="h-10 animate-pulse rounded-md bg-foreground/10" />
       ))}
     </div>

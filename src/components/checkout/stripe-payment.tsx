@@ -12,6 +12,7 @@ import {
 import { Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 // Module scope so Stripe.js loads once, not on every render.
@@ -67,16 +68,29 @@ export function toE164(phone: string): string {
 
 /** A Stripe address contact. UK addresses have no state, but Stripe rejects an
  *  empty one, so the town (closest UK equivalent) is used. */
-export function toStripeContact(name: string, line1: string, city: string, postcode: string): StripeCheckoutContact {
+export function toStripeContact(
+  name: string,
+  line1: string,
+  city: string,
+  postcode: string,
+  line2 = "",
+): StripeCheckoutContact {
   return {
     name,
-    address: { country: "GB", line1: line1.trim(), line2: "", city: city.trim(), postal_code: postcode.trim(), state: city.trim() },
+    address: {
+      country: "GB",
+      line1: line1.trim(),
+      line2: line2.trim(),
+      city: city.trim(),
+      postal_code: postcode.trim(),
+      state: city.trim(),
+    },
   };
 }
 
 // ─── One-tap buttons (Express Checkout Element) ────────────────────────────
 
-type ExpressMethods = {
+export type ExpressMethods = {
   applePay: "always" | "auto" | "never";
   googlePay: "always" | "auto" | "never";
   paypal: "auto" | "never";
@@ -85,7 +99,7 @@ type ExpressMethods = {
   link: "auto" | "never";
 };
 
-const NONE: ExpressMethods = {
+export const NONE: ExpressMethods = {
   applePay: "never",
   googlePay: "never",
   paypal: "never",
@@ -93,13 +107,6 @@ const NONE: ExpressMethods = {
   klarna: "never",
   link: "never",
 };
-
-/**
- * Express Checkout: Apple Pay and Google Pay ("always" so they show on more browsers).
- * PayPal is "never" until PayPal is connected in Stripe (Settings → Payment methods);
- * until then the row shows our PayPal stand-in. Switch it to "auto" once connected.
- */
-export const ALL_WALLETS: ExpressMethods = { ...NONE, applePay: "always", googlePay: "always", paypal: "never" };
 
 /** Which wallets Stripe could actually show in this browser. */
 export type AvailableWallets = { applePay: boolean; googlePay: boolean; paypal: boolean };
@@ -169,6 +176,17 @@ export function ExpressCheckout({
                 paypal: Boolean(a?.paypal),
               });
               if (!Object.values(a ?? {}).some(Boolean)) onAvailability?.(false);
+            }}
+            // Wallets can appear after "ready" (PayPal loads late) — keep the
+            // stand-ins in step so a wallet never shows twice.
+            onAvailablePaymentMethodsChange={(event) => {
+              const m = event.paymentMethods;
+              reported.current = true;
+              onWallets?.({
+                applePay: Boolean(m?.applePay?.available),
+                googlePay: Boolean(m?.googlePay?.available),
+                paypal: Boolean(m?.paypal?.available),
+              });
             }}
             onConfirm={async (event) => {
               setError(null);
@@ -241,9 +259,11 @@ export type PayDetails = {
 export function CardPlaceOrder({
   canPay,
   prepare,
+  className,
 }: {
   canPay: boolean;
   prepare: () => Promise<PayDetails | null>;
+  className?: string;
 }) {
   const state = useCheckoutElements();
   const [confirming, setConfirming] = useState(false);
@@ -288,7 +308,7 @@ export function CardPlaceOrder({
         variant="cta"
         disabled={!ready || !canPay || confirming}
         onClick={pay}
-        className="h-12 w-full gap-1.5 text-base"
+        className={cn("h-12 w-full gap-1.5 text-base", className)}
       >
         <Lock className="size-4" />
         {confirming ? "Processing payment…" : ready ? `Place Order · ${state.checkout.total.total.amount}` : "Loading…"}

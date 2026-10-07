@@ -21,6 +21,7 @@ export function PostcodeInput({
   value: controlledValue,
   onValueChange,
   autoComplete = "postal-code",
+  placeholder = "Postcode",
 }: {
   name?: string;
   required?: boolean;
@@ -29,6 +30,7 @@ export function PostcodeInput({
   value?: string;
   onValueChange?: (value: string) => void;
   autoComplete?: string;
+  placeholder?: string;
 }) {
   const [innerValue, setInnerValue] = useState("");
   const value = controlledValue ?? innerValue;
@@ -73,7 +75,7 @@ export function PostcodeInput({
       <Input
         name={name}
         required={required}
-        placeholder="Postcode"
+        placeholder={placeholder}
         autoComplete={autoComplete}
         value={value}
         onChange={(e) => setValue(e.target.value.toUpperCase())}

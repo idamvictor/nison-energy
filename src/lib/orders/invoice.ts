@@ -51,10 +51,20 @@ export function lineDetail(options: unknown): string | null {
 
 export function invoiceFor(order: OrderWithItems, paymentMethod: string): Invoice {
   const name = `${order.firstName} ${order.lastName}`.trim();
-  const deliverTo = [name, order.address, order.city ?? "", order.postcode].filter(Boolean);
+  const company = order.company ?? "";
+  const deliverTo = [name, company, order.address, order.addressLine2 ?? "", order.city ?? "", order.postcode].filter(
+    Boolean,
+  );
   const billTo = order.billingSameAsDelivery
     ? deliverTo
-    : [name, order.billingAddress ?? "", order.billingCity ?? "", order.billingPostcode ?? ""].filter(Boolean);
+    : [
+        name,
+        company,
+        order.billingAddress ?? "",
+        order.billingAddressLine2 ?? "",
+        order.billingCity ?? "",
+        order.billingPostcode ?? "",
+      ].filter(Boolean);
   const lines = order.items.map((item) => ({
     description: item.name,
     detail: lineDetail(item.options),

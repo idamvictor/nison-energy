@@ -218,7 +218,19 @@ export default async function OrderDetailPage({
               <div>
                 <p className="text-xs text-muted-foreground">Delivery &amp; installation</p>
                 <p>
+                  {order.company && (
+                    <>
+                      <span className="font-medium">{order.company}</span>
+                      <br />
+                    </>
+                  )}
                   {order.address}
+                  {order.addressLine2 && (
+                    <>
+                      <br />
+                      {order.addressLine2}
+                    </>
+                  )}
                   {order.city && (
                     <>
                       <br />
@@ -234,6 +246,12 @@ export default async function OrderDetailPage({
                 ) : (
                   <p>
                     {order.billingAddress}
+                    {order.billingAddressLine2 && (
+                      <>
+                        <br />
+                        {order.billingAddressLine2}
+                      </>
+                    )}
                     {order.billingCity && (
                       <>
                         <br />

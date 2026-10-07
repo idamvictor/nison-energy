@@ -105,11 +105,14 @@ export type ContactInput = {
   lastName?: unknown;
   email?: unknown;
   phone?: unknown;
+  company?: unknown;
   address?: unknown;
+  addressLine2?: unknown;
   city?: unknown;
   postcode?: unknown;
   billingSameAsDelivery?: unknown;
   billingAddress?: unknown;
+  billingAddressLine2?: unknown;
   billingCity?: unknown;
   billingPostcode?: unknown;
   acceptedTerms?: unknown;
@@ -128,11 +131,14 @@ export type ContactDetails = {
   lastName: string;
   email: string;
   phone: string;
+  company?: string | null;
   address: string;
+  addressLine2?: string | null;
   city: string | null;
   postcode: string;
   billingSameAsDelivery: boolean;
   billingAddress: string | null;
+  billingAddressLine2?: string | null;
   billingCity: string | null;
   billingPostcode: string | null;
   notes: string | null;
@@ -156,12 +162,15 @@ export function validateContactDetails(
   const lastName = str(input.lastName);
   const email = str(input.email);
   const phone = str(input.phone);
+  const company = str(input.company).slice(0, 120);
   const address = str(input.address);
+  const addressLine2 = str(input.addressLine2).slice(0, 120);
   const city = str(input.city);
   const postcode = str(input.postcode).toUpperCase();
   // Anything but an explicit `false` means "same as delivery".
   const billingSameAsDelivery = input.billingSameAsDelivery !== false;
   const billingAddress = str(input.billingAddress);
+  const billingAddressLine2 = str(input.billingAddressLine2).slice(0, 120);
   const billingCity = str(input.billingCity);
   const billingPostcode = str(input.billingPostcode).toUpperCase();
 
@@ -191,11 +200,14 @@ export function validateContactDetails(
       lastName,
       email,
       phone,
+      company: company || null,
       address,
+      addressLine2: addressLine2 || null,
       city: city || null,
       postcode,
       billingSameAsDelivery,
       billingAddress: billingSameAsDelivery ? null : billingAddress,
+      billingAddressLine2: billingSameAsDelivery ? null : billingAddressLine2 || null,
       billingCity: billingSameAsDelivery ? null : billingCity,
       billingPostcode: billingSameAsDelivery ? null : billingPostcode,
       notes: str(input.notes) || null,

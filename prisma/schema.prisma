@@ -63,18 +63,21 @@ model Order {
   reference String      @unique
   status    OrderStatus @default(Pending)
 
-  firstName String
-  lastName  String
-  email     String
-  phone     String
-  address   String // delivery & installation address, line 1
-  city      String?
-  postcode  String
-  notes     String?
+  firstName    String
+  lastName     String
+  email        String
+  phone        String
+  address      String // delivery & installation address, line 1
+  addressLine2 String? // apartment, suite, etc.
+  company      String? // optional business name
+  city         String?
+  postcode     String
+  notes        String?
 
   // Billing address — only stored when it differs from the delivery address.
   billingSameAsDelivery Boolean @default(true)
   billingAddress        String?
+  billingAddressLine2   String?
   billingCity           String?
   billingPostcode       String?
 
@@ -87,8 +90,8 @@ model Order {
   paymentStatus           PaymentStatus @default(Unpaid)
   stripeCheckoutSessionId String?       @unique
   stripePaymentIntentId   String?
-  taxAmount               Decimal? @db.Decimal(10, 2) // GBP, from Stripe's total_details.amount_tax
-  total                   Decimal? @db.Decimal(10, 2) // GBP, from Stripe's amount_total (subtotal + tax)
+  taxAmount               Decimal?      @db.Decimal(10, 2) // GBP, from Stripe's total_details.amount_tax
+  total                   Decimal?      @db.Decimal(10, 2) // GBP, from Stripe's amount_total (subtotal + tax)
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -105,9 +108,9 @@ model Order {
 }
 
 model OrderItem {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   orderId   String
-  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String // catalog id, or an extra's id
   category  String // residential | commercial | accessories | extra
   name      String // snapshot at time of order
@@ -268,27 +271,27 @@ enum QuoteStatus {
 // then run `npm run db:migrate`.
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  role          String?
-  banned        Boolean?  @default(false)
-  banReason     String?
-  banExpires    DateTime?
+  id             String          @id
+  name           String
+  email          String
+  emailVerified  Boolean         @default(false)
+  image          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  role           String?
+  banned         Boolean?        @default(false)
+  banReason      String?
+  banExpires     DateTime?
   // Customer profile fields (Better Auth additionalFields — see src/lib/auth.ts)
-  phone         String?
-  address       String?
-  postcode      String?
-  sessions      Session[]
-  accounts      Account[]
-  leads         Lead[]
-  orders        Order[]
-  notifications Notification[]
-  quotes        QuoteDocument[] @relation("QuoteOwner")
+  phone          String?
+  address        String?
+  postcode       String?
+  sessions       Session[]
+  accounts       Account[]
+  leads          Lead[]
+  orders         Order[]
+  notifications  Notification[]
+  quotes         QuoteDocument[] @relation("QuoteOwner")
   reviewedQuotes QuoteDocument[] @relation("QuoteReviewer")
 
   @@unique([email])

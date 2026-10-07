@@ -52,13 +52,13 @@ export function useCheckoutSession(
   kind: CheckoutKind,
   orderLinesJson: string,
   enabled: boolean,
-  opts?: { keepCart?: boolean },
+  opts?: { keepCart?: boolean; slot?: string },
 ) {
   const [session, setSession] = useState<CheckoutSession | null>(null);
   const [error, setError] = useState<string | null>(null);
   const draftRef = useRef<string | undefined>(undefined);
   const keepCart = opts?.keepCart ?? false;
-  const slot = `${keepCart ? "buynow" : "basket"}:${kind}`;
+  const slot = opts?.slot ?? `${keepCart ? "buynow" : "basket"}:${kind}`;
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;

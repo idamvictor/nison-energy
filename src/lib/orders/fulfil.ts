@@ -38,7 +38,7 @@ function detailsFromSession(session: Stripe.Checkout.Session): ContactDetails {
   const [firstName = "", ...rest] = name.split(/\s+/);
   const delivery = shipping?.address ?? customer?.address;
   const billing = customer?.address;
-  const line = (a?: Stripe.Address | null) => [a?.line1, a?.line2].filter(Boolean).join(", ");
+  const line = (a?: Stripe.Address | null) => a?.line1 ?? "";
   const sameAddress =
     !billing || !delivery || (billing.line1 === delivery.line1 && billing.postal_code === delivery.postal_code);
   return {
@@ -47,10 +47,12 @@ function detailsFromSession(session: Stripe.Checkout.Session): ContactDetails {
     email: customer?.email ?? "",
     phone: customer?.phone ?? "",
     address: line(delivery),
+    addressLine2: delivery?.line2 || null,
     city: delivery?.city ?? null,
     postcode: delivery?.postal_code ?? "",
     billingSameAsDelivery: sameAddress,
     billingAddress: sameAddress ? null : line(billing),
+    billingAddressLine2: sameAddress ? null : billing?.line2 || null,
     billingCity: sameAddress ? null : (billing?.city ?? null),
     billingPostcode: sameAddress ? null : (billing?.postal_code ?? null),
     notes: null,

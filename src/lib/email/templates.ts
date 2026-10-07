@@ -109,7 +109,9 @@ export type OrderEmailInput = {
   lastName: string;
   email: string;
   phone?: string;
+  company?: string | null;
   address: string;
+  addressLine2?: string | null;
   city?: string | null;
   postcode: string;
   subtotal: number;
@@ -123,8 +125,10 @@ export type OrderEmailInput = {
 
 export type EmailContent = { subject: string; html: string };
 
-function fullAddress(order: Pick<OrderEmailInput, "address" | "city" | "postcode">): string {
-  return [order.address, order.city, order.postcode].filter(Boolean).join(", ");
+function fullAddress(
+  order: Pick<OrderEmailInput, "company" | "address" | "addressLine2" | "city" | "postcode">,
+): string {
+  return [order.company, order.address, order.addressLine2, order.city, order.postcode].filter(Boolean).join(", ");
 }
 
 // ─── Lead ────────────────────────────────────────────────────────────────
@@ -230,7 +234,11 @@ function totalLine(order: OrderEmailInput): string {
 function ordersCta(order: OrderEmailInput): { label: string; href: string } {
   return order.userId
     ? { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` }
-    : { label: "Message us on WhatsApp", href: whatsappUrl() };
+    : {
+        label: "Message us on WhatsApp",
+        // Opens a chat with our number, pre-filled with the order reference.
+        href: whatsappUrl(`Hi ${COMPANY.tradingName} 👋 I have a question about my order ${order.reference}.`),
+      };
 }
 
 function surveyCallout(): string {

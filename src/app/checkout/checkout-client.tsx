@@ -3,22 +3,19 @@
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, ShoppingCart, Truck, Video, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, CircleHelp, ShoppingBag, Truck, Video } from "lucide-react";
 
-import { SiteHeader } from "@/components/shared/site-header";
-import { TrustBar } from "@/components/shared/trust-bar";
-import { SiteFooter } from "@/components/shared/site-footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PostcodeInput } from "@/components/shared/postcode-input";
 import { AddressLookup } from "@/components/shared/address-lookup";
-import { CustomerStep } from "@/components/checkout/customer-step";
+import { AccountRow, GuestOrSignIn } from "@/components/checkout/customer-step";
+import { FIELD_INPUT, FloatField } from "@/components/checkout/float-field";
+import { ExtrasPicker } from "@/components/checkout/extras-picker";
 import { useCheckoutSession } from "@/components/checkout/use-checkout-session";
 import { useInView } from "@/components/checkout/use-in-view";
 import { ExpressWallets, WalletSkeleton } from "@/components/checkout/express-wallets";
-import { AmexLogo, MastercardLogo, VisaLogo } from "@/components/checkout/payment-logos";
+import { AmexLogo, MastercardLogo, PayPalLogo, VisaLogo } from "@/components/checkout/payment-logos";
 import {
   CardFields,
   CardPlaceOrder,
@@ -31,6 +28,7 @@ import { SurveyNextStep } from "@/components/checkout/survey-next-step";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { useCheckoutForm } from "@/lib/checkout/form-store";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { cn } from "@/lib/utils";
 import { placeOrder, saveCheckoutDetails } from "@/lib/orders/actions";
 import { includesInstallation } from "@/lib/orders/installation";
 import { DELIVERY_LABEL, deliveryFeeFor, FREE_DELIVERY_THRESHOLD } from "@/lib/orders/delivery";
@@ -55,6 +53,10 @@ export type CheckoutDefaults = {
   postcode: string;
 };
 
+const UK_POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
+
+type PayMethod = "card" | "paypal";
+
 export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; defaults?: CheckoutDefaults }) {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
@@ -62,9 +64,11 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const [reference, setReference] = useState("");
   // Captured before the cart is cleared: installation orders get the survey next.
   const [needsSurvey, setNeedsSurvey] = useState(false);
-  const [pendingExtra, setPendingExtra] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  // Guests pick "Continue as guest" to reveal the email field.
+  const [guestChosen, setGuestChosen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   // Everything typed is saved in this browser as it's typed
   // (src/lib/checkout/form-store.ts), so a reload or a trip back to the cart
@@ -73,16 +77,24 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const setForm = useCheckoutForm((s) => s.set);
   const clearForm = useCheckoutForm((s) => s.clear);
   const extraIds = form.extraIds ?? [];
-  const setExtraIds = (update: (ids: string[]) => string[]) => setForm({ extraIds: update(extraIds) });
+  const firstName = form.firstName ?? defaults?.firstName ?? "";
+  const lastName = form.lastName ?? defaults?.lastName ?? "";
+  const email = form.email ?? defaults?.email ?? "";
+  const phone = form.phone ?? defaults?.phone ?? "";
+  const company = form.company ?? "";
+  const address = form.address ?? defaults?.address ?? "";
+  const addressLine2 = form.addressLine2 ?? "";
   const city = form.city ?? "";
   // Prefer a typed postcode, then the account's, then one from the product page.
   const postcode =
     form.postcode ?? (defaults?.postcode || items.find((i) => i.options?.postcode)?.options?.postcode || "");
-  const setPostcode = (value: string) => setForm({ postcode: value });
   const billingSame = form.billingSame ?? true;
   const billingCity = form.billingCity ?? "";
   const billingPostcode = form.billingPostcode ?? "";
-  const setBillingPostcode = (value: string) => setForm({ billingPostcode: value });
+  const billingAddress = form.billingAddress ?? "";
+  const billingAddressLine2 = form.billingAddressLine2 ?? "";
+  const postcodeValid = UK_POSTCODE_RE.test(postcode.trim());
+  const showEmail = !defaults?.email && (guestChosen || form.email !== undefined);
 
   const lines = items
     .map((item) => resolveCartItem(item))
@@ -94,6 +106,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
   const hasInstallation = includesInstallation(lines);
 
+  const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [cardCompleteFor, setCardCompleteFor] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -119,17 +132,18 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const orderLinesJson = JSON.stringify(orderLines);
   const payable = lines.length > 0 && !hasQuoteOnlyItems && !submitted;
 
-  // ── Two Stripe sessions: the Express Checkout buttons at the top use the
-  // wallet session (Dashboard-driven methods; the wallet supplies the details),
-  // the Payment section uses a card-only session with our form's details.
-  // Sessions are reused from this browser while the basket is unchanged
-  // (cart → checkout, reloads); the card one only opens once Payment is near.
+  // ── Stripe sessions (reused from this browser while the basket is unchanged):
+  // the Express Checkout row at the top, the card form (opened once Payment is
+  // near), and the PayPal option (opened when it's chosen).
   const [paymentRef, paymentInView] = useInView<HTMLDivElement>();
   const express = useCheckoutSession("wallet", orderLinesJson, payable);
   const card = useCheckoutSession("card", orderLinesJson, payable && paymentInView);
+  const paypal = useCheckoutSession("wallet", orderLinesJson, payable && payMethod === "paypal", {
+    slot: "basket:paypal",
+  });
   const session = card.session;
 
-  // Server totals once the session is open; a same-rule estimate before that.
+  // Server totals once a session is open; a same-rule estimate before that.
   const estimateSubtotal =
     Math.round(
       (lines.reduce((sum, l) => sum + (l.price ?? 0) * l.quantity, 0) +
@@ -143,6 +157,8 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
       total: estimateSubtotal + deliveryFeeFor(estimateSubtotal),
     };
   const toFreeDelivery = FREE_DELIVERY_THRESHOLD - totals.subtotal;
+  // Prices include VAT at 20%.
+  const vat = Math.round((totals.total / 6) * 100) / 100;
 
   function buildPayload(fd: FormData): PlaceOrderPayload {
     return {
@@ -150,11 +166,14 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
       lastName: String(fd.get("lastName") ?? ""),
       email: String(fd.get("email") ?? ""),
       phone: String(fd.get("phone") ?? ""),
+      company: String(fd.get("company") ?? ""),
       address: String(fd.get("address") ?? ""),
+      addressLine2: String(fd.get("addressLine2") ?? ""),
       city,
       postcode,
       billingSameAsDelivery: billingSame,
       billingAddress: billingSame ? undefined : String(fd.get("billingAddress") ?? ""),
+      billingAddressLine2: billingSame ? undefined : String(fd.get("billingAddressLine2") ?? ""),
       billingCity: billingSame ? undefined : billingCity,
       billingPostcode: billingSame ? undefined : billingPostcode,
       acceptedTerms: fd.get("acceptedTerms") === "on",
@@ -165,9 +184,14 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
 
   /** Card path: validate + save our form on the draft, then hand it to Stripe. */
   async function preparePayment(): Promise<PayDetails | null> {
-    const form = formRef.current;
-    if (!form || !session || !form.reportValidity()) return null;
-    const payload = buildPayload(new FormData(form));
+    const formEl = formRef.current;
+    if (!defaults?.email && !showEmail) {
+      setGuestChosen(true);
+      setError("Choose “Continue as guest” and enter your email, or sign in.");
+      return null;
+    }
+    if (!formEl || !session || !formEl.reportValidity()) return null;
+    const payload = buildPayload(new FormData(formEl));
     setError(null);
     const saved = await saveCheckoutDetails(session.draftId, payload);
     if (!saved.ok) {
@@ -175,39 +199,41 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
       return null;
     }
     const name = `${payload.firstName} ${payload.lastName}`.trim();
-    const shipping = toStripeContact(name, payload.address, payload.city, payload.postcode);
+    const shipping = toStripeContact(name, payload.address, payload.city, payload.postcode, payload.addressLine2);
     const billing = payload.billingSameAsDelivery
       ? shipping
-      : toStripeContact(name, payload.billingAddress ?? "", payload.billingCity ?? "", payload.billingPostcode ?? "");
+      : toStripeContact(
+          name,
+          payload.billingAddress ?? "",
+          payload.billingCity ?? "",
+          payload.billingPostcode ?? "",
+          payload.billingAddressLine2,
+        );
     return { email: payload.email, phone: payload.phone, shipping, billing };
   }
 
   const cardComplete = session != null && cardCompleteFor === session.clientSecret;
   const sessionError = card.error ?? express.error;
   const paymentStatus = sessionError ? (
-    <p className="text-sm text-destructive">{sessionError}</p>
+    <p className="text-sm text-red-300">{sessionError}</p>
   ) : !stripeConfigured ? (
-    <p className="text-sm text-destructive">
+    <p className="text-sm text-red-300">
       Online payment isn&apos;t configured yet — please use WhatsApp to complete your order.
     </p>
   ) : null;
 
   const termsBox = (
-    <label className="flex cursor-pointer items-start gap-2.5 text-sm text-foreground">
+    <label className="flex cursor-pointer items-start gap-2.5 text-sm text-white">
       <input
         type="checkbox"
         name="acceptedTerms"
         checked={termsAccepted}
         onChange={(e) => setTermsAccepted(e.target.checked)}
-        className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary-ink"
+        className="mt-0.5 size-[18px] shrink-0 cursor-pointer rounded accent-white"
       />
       <span>
         I have read and agree to the{" "}
-        <Link
-          href="/terms-of-sale"
-          target="_blank"
-          className="font-medium text-primary-ink underline underline-offset-2 hover:text-foreground"
-        >
+        <Link href="/terms-of-sale" target="_blank" className="underline underline-offset-2 hover:text-white/80">
           Terms and Conditions of Sale
         </Link>
         .
@@ -215,97 +241,260 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
     </label>
   );
 
-  // Card fields + Place Order share the card-only session.
-  const paymentArea = (
-    <div ref={paymentRef}>
-      <Section
-        title="Payment"
-        aside={
-          <span className="flex items-center gap-1.5" aria-label="Visa, Mastercard and American Express accepted">
-            <VisaLogo className="h-8" />
-            <MastercardLogo className="h-5" />
-            <AmexLogo className="h-6" />
-          </span>
-        }
-      >
-        {paymentStatus ??
-          (session ? (
-            <CardFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
-          ) : (
-            <p className="text-sm text-muted-foreground">Loading secure card form…</p>
-          ))}
-        <div className="flex flex-col gap-3 border-t border-border pt-4">
-          {termsBox}
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {!paymentStatus &&
-            (session ? (
-              <CardPlaceOrder canPay={termsAccepted && cardComplete} prepare={preparePayment} />
-            ) : (
-              <Button type="button" size="lg" variant="cta" disabled className="h-12 w-full text-base">
-                Loading secure payment…
-              </Button>
-            ))}
-        </div>
-      </Section>
+  // ── Billing address (inside the card panel, like the design) ──
+  const billingFields = !billingSame && (
+    <div className="grid grid-cols-2 gap-2.5 pt-1">
+      <FloatField as="div" label="Postcode" filled={billingPostcode !== ""}>
+        <PostcodeInput
+          name="billingPostcode"
+          required
+          autoComplete="billing postal-code"
+          placeholder=""
+          className={FIELD_INPUT}
+          value={billingPostcode}
+          onValueChange={(value) => setForm({ billingPostcode: value })}
+        />
+      </FloatField>
+      <FloatField label="City" filled={billingCity !== ""}>
+        <Input
+          name="billingCity"
+          required
+          autoComplete="billing address-level2"
+          className={FIELD_INPUT}
+          value={billingCity}
+          onChange={(e) => setForm({ billingCity: e.target.value, billingCityTyped: e.target.value.trim() !== "" })}
+        />
+      </FloatField>
+      <FloatField as="div" label="Billing address" filled={billingAddress !== ""} className="col-span-2">
+        <AddressLookup
+          postcode={billingPostcode}
+          name="billingAddress"
+          required
+          autoComplete="billing address-line1"
+          placeholder=""
+          inputClassName={FIELD_INPUT}
+          value={billingAddress}
+          onValueChange={(value) => setForm({ billingAddress: value })}
+          onTown={(town) => !useCheckoutForm.getState().billingCityTyped && setForm({ billingCity: town })}
+        />
+      </FloatField>
+      <FloatField label="Apartment, suite, etc. (optional)" filled={billingAddressLine2 !== ""} className="col-span-2">
+        <Input
+          name="billingAddressLine2"
+          autoComplete="billing address-line2"
+          className={FIELD_INPUT}
+          value={billingAddressLine2}
+          onChange={(e) => setForm({ billingAddressLine2: e.target.value })}
+        />
+      </FloatField>
     </div>
   );
 
-  return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <SiteHeader />
-      <TrustBar />
-      <main className="flex-1 bg-secondary/40">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">Checkout</h1>
-
-          {submitted ? (
-            <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-foreground/15 bg-card px-6 py-16 text-center shadow-md">
-              <span className="flex size-12 items-center justify-center rounded-full bg-success/15">
-                <CheckCircle2 className="size-6 text-success" />
-              </span>
-              <p className="font-heading text-lg font-semibold text-foreground">Thanks — we&apos;ve got your order</p>
-              <p className="text-sm text-muted-foreground">Your order reference</p>
-              <p className="font-heading text-2xl font-semibold text-primary-ink">{reference}</p>
-              <p className="max-w-sm text-sm text-muted-foreground">
-                A member of the team will be in touch to confirm payment and book your installation. If it&apos;s
-                urgent,{" "}
-                <a
-                  href={whatsappUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-primary-ink underline underline-offset-2"
-                >
-                  message us on WhatsApp
-                </a>
-                .
+  // ── Payment: Credit card (Stripe fields + billing) or PayPal, as a radio list ──
+  const paymentSection = (
+    <div ref={paymentRef} className="flex flex-col gap-3.5">
+      <div>
+        <h2 className="text-[20px] leading-6 font-medium text-white">Payment</h2>
+        <p className="mt-1 text-sm text-white/65">All transactions are secure and encrypted.</p>
+      </div>
+      {paymentStatus ?? (
+        <div className="overflow-hidden rounded-[12px] border border-[#dedede] bg-white text-black">
+          {/* Credit card */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={payMethod === "card"}
+            onClick={() => setPayMethod("card")}
+            className={cn(
+              "flex w-full items-center gap-2.5 p-3.5 text-left",
+              payMethod === "card" ? "bg-[#f6f6f6]" : "bg-white",
+            )}
+          >
+            <Radio checked={payMethod === "card"} />
+            <span className="flex-1 text-sm font-medium">Credit card</span>
+            <span className="flex items-center gap-1">
+              <VisaLogo className="h-7" />
+              <MastercardLogo className="h-[18px]" />
+              <AmexLogo className="h-6" />
+            </span>
+          </button>
+          {payMethod === "card" && (
+            <div className="flex flex-col gap-3.5 border-t border-[#dedede] bg-black/[0.04] p-3.5">
+              {session ? (
+                <CardFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
+              ) : (
+                <div className="flex flex-col gap-2.5" aria-hidden>
+                  <span className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
+                  <span className="grid grid-cols-2 gap-2.5">
+                    <span className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
+                    <span className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
+                  </span>
+                </div>
+              )}
+              <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+                <input
+                  type="checkbox"
+                  checked={billingSame}
+                  onChange={(e) => setForm({ billingSame: e.target.checked })}
+                  className="size-[18px] shrink-0 cursor-pointer accent-black"
+                />
+                Use shipping address as billing address
+              </label>
+              {billingFields}
+            </div>
+          )}
+          {/* PayPal */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={payMethod === "paypal"}
+            onClick={() => setPayMethod("paypal")}
+            className={cn(
+              "flex w-full items-center gap-2.5 border-t border-[#dedede] p-3.5 text-left",
+              payMethod === "paypal" ? "bg-[#f6f6f6]" : "bg-white",
+            )}
+          >
+            <Radio checked={payMethod === "paypal"} />
+            <span className="flex-1 text-sm font-medium">PayPal</span>
+            <PayPalLogo className="scale-90" />
+          </button>
+          {payMethod === "paypal" && (
+            <div className="flex flex-col gap-2.5 border-t border-[#dedede] bg-black/[0.04] p-3.5">
+              <p className="text-sm text-[#707070]">
+                Pay with your PayPal account — you&apos;ll confirm your delivery details with PayPal.
               </p>
-              <Button nativeButton={false} render={<Link href="/" />}>
-                Back to home
-              </Button>
+              {paypal.error ? (
+                <p className="text-sm text-red-600">{paypal.error}</p>
+              ) : paypal.session ? (
+                <StripeCheckoutProvider key={`paypal-${paypal.session.clientSecret}`} clientSecret={paypal.session.clientSecret}>
+                  <ExpressWallets wallets={["paypal"]} buttonHeight={48} />
+                </StripeCheckoutProvider>
+              ) : (
+                <WalletSkeleton count={1} />
+              )}
             </div>
-          ) : null}
+          )}
+        </div>
+      )}
+    </div>
+  );
 
-          {submitted && needsSurvey && <SurveyNextStep />}
-
-          {submitted ? null : lines.length === 0 ? (
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/20 bg-card py-20 text-center">
-              <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-ink">
-                <ShoppingCart className="size-5" />
-              </span>
-              <p className="font-heading text-lg font-semibold text-foreground">Your cart is empty</p>
-              <Button nativeButton={false} render={<Link href="/home-charging" />}>
-                Browse residential chargers
-              </Button>
-            </div>
+  // ── Final action ──
+  const placeOrderArea =
+    payMethod === "paypal" ? (
+      <p className="text-xs text-white/65">
+        By paying with PayPal you agree to our{" "}
+        <Link href="/terms-of-sale" target="_blank" className="underline underline-offset-2">
+          Terms and Conditions of Sale
+        </Link>
+        .
+      </p>
+    ) : (
+      <div className="flex flex-col gap-4">
+        {termsBox}
+        {error && <p className="text-sm text-red-300">{error}</p>}
+        {!paymentStatus &&
+          (session ? (
+            <CardPlaceOrder
+              canPay={termsAccepted && cardComplete}
+              prepare={preparePayment}
+              className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-black/60"
+            />
           ) : (
-            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+            <Button type="button" disabled className="h-[52px] w-full rounded-[12px] bg-black text-base text-white">
+              Loading secure payment…
+            </Button>
+          ))}
+      </div>
+    );
+
+  const summary = (
+    <OrderSummary
+      lines={lines}
+      extras={selectedExtras}
+      totals={totals}
+      vat={vat}
+      postcodeValid={postcodeValid}
+      toFreeDelivery={toFreeDelivery}
+      hasQuoteOnlyItems={hasQuoteOnlyItems}
+    />
+  );
+
+  return (
+    <div className="min-h-dvh bg-[#454545] lg:bg-[linear-gradient(to_right,#454545_50%,#f5f5f5_50%)]">
+      <div className="mx-auto grid max-w-[1160px] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+        {/* ── Left: the form ── */}
+        <div className="bg-[#454545] lg:border-r lg:border-[#787878]">
+          <div className="ml-auto flex w-full max-w-[580px] flex-col px-4 pt-6 pb-10 sm:px-10 lg:pt-10">
+            <header className="flex items-center justify-between pb-6">
+              <Link href="/" className="rounded-md bg-white px-3 py-2" aria-label="Ocunio Energy home">
+                <Image src="/ocunio-energy-logo.png" alt="Ocunio Energy" width={135} height={45} className="h-9 w-auto" priority />
+              </Link>
+              <Link href="/cart" aria-label="Back to cart" className="text-white hover:text-white/80">
+                <ShoppingBag className="size-6" />
+              </Link>
+            </header>
+
+            {/* Mobile: collapsible order summary */}
+            {!submitted && lines.length > 0 && (
+              <div className="-mx-4 mb-6 bg-[#f5f5f5] sm:-mx-10 lg:hidden">
+                <button
+                  type="button"
+                  onClick={() => setSummaryOpen((o) => !o)}
+                  className="flex w-full items-center justify-between px-4 py-4 text-sm sm:px-10"
+                  aria-expanded={summaryOpen}
+                >
+                  <span className="flex items-center gap-1.5 text-[#0280a3]">
+                    {summaryOpen ? "Hide" : "Show"} order summary
+                    <ChevronDown className={cn("size-4 transition-transform", summaryOpen && "rotate-180")} />
+                  </span>
+                  <span className="text-base font-medium text-black">{formatCurrency(totals.total)}</span>
+                </button>
+                {summaryOpen && <div className="px-4 pb-6 sm:px-10">{summary}</div>}
+              </div>
+            )}
+
+            {submitted ? (
+              <div className="flex flex-col items-center gap-3 rounded-[12px] bg-white px-6 py-14 text-center text-black">
+                <span className="flex size-12 items-center justify-center rounded-full bg-success/15">
+                  <CheckCircle2 className="size-6 text-success" />
+                </span>
+                <p className="font-heading text-lg font-semibold">Thanks — we&apos;ve got your order</p>
+                <p className="text-sm text-[#707070]">Your order reference</p>
+                <p className="font-heading text-2xl font-semibold text-primary-ink">{reference}</p>
+                <p className="max-w-sm text-sm text-[#707070]">
+                  A member of the team will be in touch to confirm payment and book your installation. If it&apos;s
+                  urgent,{" "}
+                  <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                    message us on WhatsApp
+                  </a>
+                  .
+                </p>
+                <Button nativeButton={false} render={<Link href="/" />}>
+                  Back to home
+                </Button>
+                {needsSurvey && (
+                  <div className="w-full pt-2">
+                    <SurveyNextStep />
+                  </div>
+                )}
+              </div>
+            ) : lines.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 rounded-[12px] border border-dashed border-white/30 py-16 text-center">
+                <ShoppingBag className="size-8 text-white/70" />
+                <p className="text-lg font-medium text-white">Your cart is empty</p>
+                <Button nativeButton={false} render={<Link href="/home-charging" />}>
+                  Browse residential chargers
+                </Button>
+              </div>
+            ) : (
               <form
                 ref={formRef}
-                className="flex flex-col gap-4"
+                className="flex flex-col"
                 onSubmit={(e) => {
                   e.preventDefault();
                   // Only quote-only carts submit the form ("Place Order");
-                  // payable carts pay through Stripe below.
+                  // payable carts pay through Stripe.
                   if (!hasQuoteOnlyItems) return;
                   const payload = buildPayload(new FormData(e.currentTarget));
                   setError(null);
@@ -333,368 +522,382 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                   className="absolute left-[-9999px] h-0 w-0 opacity-0"
                 />
 
-                {/* Express Checkout — the wallet supplies name, address and payment in one tap. */}
+                {/* Express checkout — the wallet supplies name, address and payment in one tap. */}
                 {payable && stripeConfigured && (
-                  <>
-                    <fieldset className="flex flex-col gap-3 rounded-xl border border-foreground/15 bg-card px-5 pt-2 pb-5">
-                      <legend className="mx-auto px-3 text-sm text-muted-foreground">Express Checkout</legend>
+                  <div className="flex flex-col">
+                    <p className="text-center text-sm text-white/65">Express checkout</p>
+                    <div className="pt-4">
                       {express.session ? (
                         <StripeCheckoutProvider
                           key={`express-${express.session.clientSecret}`}
                           clientSecret={express.session.clientSecret}
                         >
-                          <ExpressWallets />
+                          <ExpressWallets buttonHeight={48} />
                         </StripeCheckoutProvider>
                       ) : (
                         <WalletSkeleton />
                       )}
-                      <p className="text-center text-xs text-muted-foreground">
-                        By paying you agree to our{" "}
-                        <Link
-                          href="/terms-of-sale"
-                          target="_blank"
-                          className="font-medium text-primary-ink underline underline-offset-2"
-                        >
-                          Terms and Conditions of Sale
-                        </Link>
-                        .
-                      </p>
-                    </fieldset>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span className="h-px flex-1 bg-border" />
-                      Or continue below
-                      <span className="h-px flex-1 bg-border" />
                     </div>
-                  </>
+                    <div className="flex items-center py-5 text-sm text-white/65">
+                      <span className="h-px flex-1 bg-[#787878]" />
+                      <span className="px-3.5">OR</span>
+                      <span className="h-px flex-1 bg-[#787878]" />
+                    </div>
+                  </div>
                 )}
 
-                <Section title={defaults?.email ? "Your account" : "Continue as guest or log in"}>
-                  <CustomerStep signedInEmail={defaults?.email ?? null} />
-                </Section>
-
-                <Section
-                  title="Contact information"
-                  aside={<span className="text-xs text-muted-foreground">Saved on this device until you order</span>}
-                >
-                  <div className="grid grid-cols-2 gap-3">
-                    <Field label="First name">
-                      <Input
-                        name="firstName"
-                        value={form.firstName ?? defaults?.firstName ?? ""}
-                        onChange={(e) => setForm({ firstName: e.target.value })}
-                        required
-                        autoComplete="given-name"
-                      />
-                    </Field>
-                    <Field label="Last name">
-                      <Input
-                        name="lastName"
-                        value={form.lastName ?? defaults?.lastName ?? ""}
-                        onChange={(e) => setForm({ lastName: e.target.value })}
-                        required
-                        autoComplete="family-name"
-                      />
-                    </Field>
-                    <Field label="Email" className="col-span-2 sm:col-span-1">
+                {/* Contact */}
+                <section className="flex flex-col gap-3.5">
+                  <div className="flex items-baseline justify-between">
+                    <h2 className="text-[20px] leading-6 font-medium text-white">Contact</h2>
+                  </div>
+                  {defaults?.email ? (
+                    <AccountRow email={defaults.email} />
+                  ) : (
+                    <GuestOrSignIn guest={showEmail} onGuest={() => setGuestChosen(true)} />
+                  )}
+                  {/* Signed in: the account email is sent, not shown. */}
+                  <div className={cn("grid gap-2.5", !showEmail && "hidden")}>
+                    <FloatField label="Email" filled={email !== ""}>
                       <Input
                         name="email"
-                        value={form.email ?? defaults?.email ?? ""}
-                        onChange={(e) => setForm({ email: e.target.value })}
-                        required
                         type="email"
-                        autoComplete="email"
-                      />
-                    </Field>
-                    <Field label="Phone number" className="col-span-2 sm:col-span-1">
-                      <Input
-                        name="phone"
-                        value={form.phone ?? defaults?.phone ?? ""}
-                        onChange={(e) => setForm({ phone: e.target.value })}
                         required
-                        type="tel"
-                        autoComplete="tel"
+                        autoComplete="email"
+                        className={FIELD_INPUT}
+                        value={email}
+                        onChange={(e) => setForm({ email: e.target.value })}
                       />
-                    </Field>
+                    </FloatField>
                   </div>
-                </Section>
+                </section>
 
-                <Section title={hasInstallation ? "Delivery & installation" : "Delivery"}>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Field label={hasInstallation ? "Installation postcode" : "Postcode"}>
-                      <PostcodeInput required value={postcode} onValueChange={setPostcode} />
-                    </Field>
-                    <Field label="Town / City">
+                {/* Delivery */}
+                <section className="mt-8 flex flex-col gap-3.5">
+                  <h2 className="text-[20px] leading-6 font-medium text-white">
+                    {hasInstallation ? "Delivery & installation" : "Delivery"}
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <FloatField label="Country/Region" filled className="col-span-2">
+                      <select disabled className={cn(FIELD_INPUT, "w-full appearance-none border disabled:opacity-100")}>
+                        <option>United Kingdom</option>
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute top-1/2 right-3.5 size-3 -translate-y-1/2 text-black" />
+                    </FloatField>
+                    <FloatField label="First name" filled={firstName !== ""}>
+                      <Input
+                        name="firstName"
+                        required
+                        autoComplete="given-name"
+                        className={FIELD_INPUT}
+                        value={firstName}
+                        onChange={(e) => setForm({ firstName: e.target.value })}
+                      />
+                    </FloatField>
+                    <FloatField label="Last name" filled={lastName !== ""}>
+                      <Input
+                        name="lastName"
+                        required
+                        autoComplete="family-name"
+                        className={FIELD_INPUT}
+                        value={lastName}
+                        onChange={(e) => setForm({ lastName: e.target.value })}
+                      />
+                    </FloatField>
+                    <FloatField label="Company (optional)" filled={company !== ""} className="col-span-2">
+                      <Input
+                        name="company"
+                        autoComplete="organization"
+                        className={FIELD_INPUT}
+                        value={company}
+                        onChange={(e) => setForm({ company: e.target.value })}
+                      />
+                    </FloatField>
+                    <FloatField
+                      as="div"
+                      label="Postcode"
+                      filled={postcode !== ""}
+                    >
+                      <PostcodeInput
+                        required
+                        placeholder=""
+                        className={FIELD_INPUT}
+                        value={postcode}
+                        onValueChange={(value) => setForm({ postcode: value })}
+                      />
+                    </FloatField>
+                    <FloatField label="City" filled={city !== ""}>
                       <Input
                         name="city"
                         required
                         autoComplete="address-level2"
+                        className={FIELD_INPUT}
                         value={city}
-                        onChange={(e) => {
-                          setForm({ city: e.target.value, cityTyped: e.target.value.trim() !== "" });
-                        }}
+                        onChange={(e) => setForm({ city: e.target.value, cityTyped: e.target.value.trim() !== "" })}
                       />
-                    </Field>
-                    <Field label="Address line 1" className="col-span-2">
+                    </FloatField>
+                    <FloatField
+                      as="div"
+                      label={postcodeValid ? "Address" : "Address (enter your postcode first)"}
+                      filled={address !== ""}
+                      className="col-span-2"
+                    >
                       <AddressLookup
                         postcode={postcode}
                         name="address"
-                        value={form.address ?? defaults?.address ?? ""}
-                        onValueChange={(value) => setForm({ address: value })}
                         required
                         autoComplete="address-line1"
+                        placeholder=""
+                        inputClassName={FIELD_INPUT}
+                        value={address}
+                        onValueChange={(value) => setForm({ address: value })}
                         onTown={(town) => !useCheckoutForm.getState().cityTyped && setForm({ city: town })}
                       />
-                    </Field>
-                  </div>
-
-                  <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
-                    <input
-                      type="checkbox"
-                      checked={billingSame}
-                      onChange={(e) => setForm({ billingSame: e.target.checked })}
-                      className="size-4 shrink-0 cursor-pointer accent-primary-ink"
+                    </FloatField>
+                    <FloatField label="Apartment, suite, etc. (optional)" filled={addressLine2 !== ""} className="col-span-2">
+                      <Input
+                        name="addressLine2"
+                        autoComplete="address-line2"
+                        className={FIELD_INPUT}
+                        value={addressLine2}
+                        onChange={(e) => setForm({ addressLine2: e.target.value })}
+                      />
+                    </FloatField>
+                    <div className="col-span-2">
+                      <FloatField label="Phone" filled={phone !== ""}>
+                    <Input
+                      name="phone"
+                      type="tel"
+                      required
+                      autoComplete="tel"
+                      className={cn(FIELD_INPUT, "pr-10")}
+                      value={phone}
+                      onChange={(e) => setForm({ phone: e.target.value })}
                     />
-                    Billing address is the same as delivery
-                  </label>
-
-                  {!billingSame && (
-                    <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
-                      <p className="col-span-2 text-sm font-semibold text-foreground">Billing address</p>
-                      <Field label="Postcode">
-                        <PostcodeInput
-                          name="billingPostcode"
-                          required
-                          autoComplete="billing postal-code"
-                          value={billingPostcode}
-                          onValueChange={setBillingPostcode}
-                        />
-                      </Field>
-                      <Field label="Town / City">
-                        <Input
-                          name="billingCity"
-                          required
-                          autoComplete="billing address-level2"
-                          value={billingCity}
-                          onChange={(e) => {
-                            setForm({ billingCity: e.target.value, billingCityTyped: e.target.value.trim() !== "" });
-                          }}
-                        />
-                      </Field>
-                      <Field label="Address line 1" className="col-span-2">
-                        <AddressLookup
-                          postcode={billingPostcode}
-                          name="billingAddress"
-                          required
-                          autoComplete="billing address-line1"
-                          value={form.billingAddress ?? ""}
-                          onValueChange={(value) => setForm({ billingAddress: value })}
-                          onTown={(town) =>
-                            !useCheckoutForm.getState().billingCityTyped && setForm({ billingCity: town })
-                          }
-                        />
-                      </Field>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <div className="flex items-center gap-2.5 rounded-lg border border-primary-ink/60 bg-primary/5 px-3 py-2.5">
-                      <Truck className="size-4 shrink-0 text-primary-ink" />
-                      <span className="flex-1 text-sm leading-tight text-foreground">{DELIVERY_LABEL}</span>
-                      <span className="text-sm font-semibold">
-                        {totals.deliveryFee === 0 ? (
-                          <span className="text-success">FREE</span>
-                        ) : (
-                          formatCurrency(totals.deliveryFee)
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2.5 rounded-lg border border-foreground/12 px-3 py-2.5">
-                      <Video className="size-4 shrink-0 text-primary-ink" />
-                      <span className="flex-1 text-sm leading-tight text-foreground">
-                        Virtual self survey
-                        <span className="block text-xs text-muted-foreground">Photos + short questionnaire</span>
-                      </span>
-                      <span className="text-sm font-semibold text-success">Free</span>
+                    <span
+                      title="In case we need to contact you about your order or installation."
+                      className="absolute top-1/2 right-3 -translate-y-1/2 text-[#707070]"
+                    >
+                      <CircleHelp className="size-[18px]" />
+                    </span>
+                  </FloatField>
                     </div>
                   </div>
-                  {toFreeDelivery > 0 && (
-                    <p className="-mt-1 text-xs text-muted-foreground">
-                      Free delivery on orders of {formatCurrency(FREE_DELIVERY_THRESHOLD)} or more — add{" "}
-                      {formatCurrency(toFreeDelivery)} to qualify.
-                    </p>
-                  )}
+                </section>
 
-                  {extras.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                      {selectedExtras.map((extra) => (
-                        <div
-                          key={extra.id}
-                          className="flex items-center gap-3 rounded-lg border border-foreground/12 px-3 py-2"
-                        >
-                          <div className="relative size-9 shrink-0 overflow-hidden rounded-md bg-secondary ring-1 ring-border">
-                            <Image src={extra.image} alt="" fill sizes="36px" className="object-contain p-0.5" />
-                          </div>
-                          <p className="flex-1 text-sm text-foreground">{extra.name}</p>
-                          <p className="text-sm font-semibold text-foreground">{formatCurrency(extra.price)}</p>
-                          <button
-                            type="button"
-                            onClick={() => setExtraIds((ids) => ids.filter((id) => id !== extra.id))}
-                            aria-label={`Remove ${extra.name}`}
-                            className="text-muted-foreground transition-colors hover:text-destructive"
-                          >
-                            <X className="size-4" />
-                          </button>
-                        </div>
-                      ))}
-                      {remainingExtras.length > 0 && (
-                        <Select
-                          value={pendingExtra}
-                          onValueChange={(value) => {
-                            if (!value) return;
-                            setExtraIds((ids) => [...ids, value]);
-                            setPendingExtra("");
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Add an extra (optional)…" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {remainingExtras.map((extra) => (
-                              <SelectItem key={extra.id} value={extra.id}>
-                                {extra.name} — {formatCurrency(extra.price)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                {/* Shipping method */}
+                <section className="mt-6 flex flex-col gap-3.5">
+                  <h2 className="text-base font-medium text-white">Shipping method</h2>
+                  {postcodeValid ? (
+                    <>
+                      <div className="flex items-center gap-2.5 rounded-[12px] border border-[#dedede] bg-white p-3.5 text-black">
+                        <Radio checked />
+                        <Truck className="size-4 text-[#707070]" />
+                        <span className="flex-1 text-sm">{DELIVERY_LABEL}</span>
+                        <span className="text-sm font-medium">
+                          {totals.deliveryFee === 0 ? "FREE" : formatCurrency(totals.deliveryFee)}
+                        </span>
+                      </div>
+                      {toFreeDelivery > 0 && (
+                        <p className="text-xs text-white/65">
+                          Free delivery on orders of {formatCurrency(FREE_DELIVERY_THRESHOLD)} or more — add{" "}
+                          {formatCurrency(toFreeDelivery)} to qualify.
+                        </p>
                       )}
+                    </>
+                  ) : (
+                    <div className="rounded-[12px] bg-[#4c4c4c] p-4 text-center text-sm text-white/65">
+                      Enter your shipping address to view available shipping methods.
                     </div>
                   )}
-                </Section>
+                  {hasInstallation && (
+                    <div className="flex items-start gap-3 rounded-[12px] bg-[#4c4c4c] p-4 text-sm">
+                      <Video className="mt-0.5 size-4 shrink-0 text-white" />
+                      <div className="flex-1">
+                        <p className="flex justify-between font-medium text-white">
+                          Virtual self survey <span className="text-[#7ee2a8]">Free</span>
+                        </p>
+                        <p className="mt-0.5 text-white/65">
+                          Photos and a short questionnaire, reviewed by our team before installation.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                {/* Extras */}
+                {(selectedExtras.length > 0 || remainingExtras.length > 0) && (
+                  <section className="mt-6 flex flex-col gap-3.5">
+                    <h2 className="text-base font-medium text-white">
+                      Extras <span className="text-sm font-normal text-white/70">(optional)</span>
+                    </h2>
+                    <ExtrasPicker
+                      available={remainingExtras}
+                      selected={selectedExtras}
+                      onAdd={(id) => setForm({ extraIds: [...extraIds, id] })}
+                      onRemove={(id) => setForm({ extraIds: extraIds.filter((x) => x !== id) })}
+                    />
+                  </section>
+                )}
 
                 {hasQuoteOnlyItems ? (
                   // Quote-only items have no price, so they can't be paid online —
                   // the order goes to the team for review instead.
-                  <Section>
-                    <p className="text-xs text-muted-foreground">
+                  <section className="mt-8 flex flex-col gap-4">
+                    <p className="text-sm text-white/65">
                       No payment is taken online — this places your order for review, and we&apos;ll be in touch to
                       confirm payment and schedule installation.
                     </p>
                     {termsBox}
-                    {error && <p className="text-sm text-destructive">{error}</p>}
+                    {error && <p className="text-sm text-red-300">{error}</p>}
                     <Button
                       type="submit"
-                      size="lg"
-                      variant="cta"
                       disabled={pending || !termsAccepted}
-                      className="h-12 w-full text-base"
+                      className="h-[52px] w-full rounded-[12px] bg-black text-base text-white hover:bg-black/85"
                     >
                       {pending ? "Placing order…" : "Place Order"}
                     </Button>
-                  </Section>
-                ) : payable && stripeConfigured && session ? (
-                  <StripeCheckoutProvider key={`card-${session.clientSecret}`} clientSecret={session.clientSecret}>
-                    {paymentArea}
-                  </StripeCheckoutProvider>
+                  </section>
                 ) : (
-                  paymentArea
+                  <div className="mt-8 flex flex-col gap-6">
+                    {payable && stripeConfigured && session ? (
+                      <StripeCheckoutProvider key={`card-${session.clientSecret}`} clientSecret={session.clientSecret}>
+                        {paymentSection}
+                        {placeOrderArea}
+                      </StripeCheckoutProvider>
+                    ) : (
+                      <>
+                        {paymentSection}
+                        {placeOrderArea}
+                      </>
+                    )}
+                  </div>
                 )}
               </form>
+            )}
 
-              {/* Pinned below the sticky site header on desktop while the form scrolls;
-                  scrolls internally only if the summary itself outgrows the screen. */}
-              <Card className="h-fit border border-foreground/12 shadow-sm lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
-                <CardContent className="flex flex-col gap-4">
-                  <h2 className="font-heading text-lg font-semibold text-foreground">Order Summary</h2>
-                  <div className="flex flex-col gap-3">
-                    {lines.map((line) => (
-                      <div key={line.id} className="flex items-center gap-3">
-                        <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
-                          <Image src={line.image} alt={line.name} fill sizes="48px" className="object-contain p-1" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">{line.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            Qty {line.quantity}
-                            {formatCartOptions(line.options) && ` · ${formatCartOptions(line.options)}`}
-                          </p>
-                        </div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {line.price != null ? formatCurrency(line.price * line.quantity) : "Quote"}
-                        </p>
-                      </div>
-                    ))}
-                    {selectedExtras.map((extra) => (
-                      <div key={extra.id} className="flex items-center gap-3">
-                        <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
-                          <Image src={extra.image} alt={extra.name} fill sizes="48px" className="object-contain p-1" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">{extra.name}</p>
-                          <p className="text-xs text-muted-foreground">Qty 1</p>
-                        </div>
-                        <p className="text-sm font-semibold text-foreground">{formatCurrency(extra.price)}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-col gap-2 border-t border-border pt-3 text-sm">
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground">Subtotal</p>
-                      <p className="font-medium text-foreground">{formatCurrency(totals.subtotal)}</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="flex items-center gap-1.5 text-muted-foreground">
-                        <Truck className="size-3.5" /> Delivery
-                      </p>
-                      <p className="font-medium text-foreground">
-                        {totals.deliveryFee === 0 ? (
-                          <span className="font-semibold text-success">FREE</span>
-                        ) : (
-                          formatCurrency(totals.deliveryFee)
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
-                    <p className="font-medium text-foreground">Total (inc VAT)</p>
-                    <p className="font-heading text-lg font-semibold text-foreground">{formatCurrency(totals.total)}</p>
-                  </div>
-                  {hasQuoteOnlyItems && (
-                    <p className="text-xs text-muted-foreground">
-                      Some items don&apos;t have a fixed price yet — we&apos;ll confirm the full total when we&apos;re
-                      in touch.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
+            <footer className="mt-12 flex flex-wrap gap-x-3.5 gap-y-1 border-t border-[#787878] pt-3.5 text-sm text-[#d7d7d7]">
+              <Link href="/terms-of-sale" className="hover:text-white">
+                Refund policy
+              </Link>
+              <Link href="/delivery-information" className="hover:text-white">
+                Shipping
+              </Link>
+              <Link href="/privacy-policy" className="hover:text-white">
+                Privacy policy
+              </Link>
+              <Link href="/terms-of-sale" className="hover:text-white">
+                Terms of service
+              </Link>
+            </footer>
+          </div>
         </div>
-      </main>
-      <SiteFooter />
+
+        {/* ── Right: order summary (desktop) ── */}
+        <aside className="hidden bg-[#f5f5f5] lg:block">
+          <div className="sticky top-0 max-w-[480px] p-10">{!submitted && lines.length > 0 && summary}</div>
+        </aside>
+      </div>
     </div>
   );
 }
 
-/** One plain white card per section; optional heading with a right-hand aside. */
-function Section({ title, aside, children }: { title?: string; aside?: React.ReactNode; children: React.ReactNode }) {
+function Radio({ checked }: { checked: boolean }) {
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-foreground/12 bg-card p-5 shadow-sm">
-      {title && (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h2 className="font-heading text-base font-semibold text-foreground">{title}</h2>
-          {aside}
-        </div>
+    <span
+      aria-hidden
+      className={cn(
+        "size-[18px] shrink-0 rounded-full border",
+        checked ? "border-[5.6px] border-black bg-white" : "border-[#dedede] bg-white",
       )}
-      {children}
-    </section>
+    />
   );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function OrderSummary({
+  lines,
+  extras,
+  totals,
+  vat,
+  postcodeValid,
+  toFreeDelivery,
+  hasQuoteOnlyItems,
+}: {
+  lines: NonNullable<ReturnType<typeof resolveCartItem>>[];
+  extras: CheckoutExtra[];
+  totals: CheckoutTotals;
+  vat: number;
+  postcodeValid: boolean;
+  toFreeDelivery: number;
+  hasQuoteOnlyItems: boolean;
+}) {
+  const rows = [
+    ...lines.map((line) => ({
+      key: line.id,
+      image: line.image,
+      name: line.name,
+      detail: formatCartOptions(line.options),
+      quantity: line.quantity,
+      price: line.price != null ? formatCurrency(line.price * line.quantity) : "Quote",
+    })),
+    ...extras.map((extra) => ({
+      key: extra.id,
+      image: extra.image,
+      name: extra.name,
+      detail: "Extra",
+      quantity: 1,
+      price: formatCurrency(extra.price),
+    })),
+  ];
   return (
-    <label className={`flex flex-col gap-1.5 text-sm font-medium text-foreground ${className ?? ""}`}>
-      {label}
-      {children}
-    </label>
+    <div className="flex flex-col gap-5 text-black">
+      <ul className="flex flex-col gap-4">
+        {rows.map((row) => (
+          <li key={row.key} className="flex items-start gap-3.5">
+            <span className="relative shrink-0">
+              <span className="relative block size-16 overflow-hidden rounded-[16px] border-[1.6px] border-white bg-[#ececec] shadow-[0_0_0_0.5px_rgba(0,0,0,0.05),0_1px_3px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06)]">
+                <Image src={row.image} alt="" fill sizes="64px" className="object-contain p-1.5" />
+              </span>
+              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-[8px] bg-[#333] text-xs font-medium text-white">
+                {row.quantity}
+              </span>
+            </span>
+            <span className="flex-1">
+              <span className="block text-sm leading-[18.9px]">{row.name}</span>
+              {row.detail && <span className="block text-xs text-black/55">{row.detail}</span>}
+            </span>
+            <span className="text-sm">{row.price}</span>
+          </li>
+        ))}
+      </ul>
+      <dl className="flex flex-col gap-1.5 text-sm">
+        <div className="flex justify-between">
+          <dt>Subtotal</dt>
+          <dd>{formatCurrency(totals.subtotal)}</dd>
+        </div>
+        <div className="flex justify-between">
+          <dt>Shipping</dt>
+          <dd className={postcodeValid ? "" : "text-black/55"}>
+            {!postcodeValid ? "Enter shipping address" : totals.deliveryFee === 0 ? "FREE" : formatCurrency(totals.deliveryFee)}
+          </dd>
+        </div>
+        {postcodeValid && toFreeDelivery > 0 && (
+          <p className="text-xs text-black/55">Add {formatCurrency(toFreeDelivery)} more for free delivery.</p>
+        )}
+        <div className="mt-3 flex items-baseline justify-between">
+          <dt className="text-lg font-medium">Total</dt>
+          <dd className="flex items-baseline gap-2">
+            <span className="text-xs text-black/55">GBP</span>
+            <span className="text-lg font-medium">{formatCurrency(totals.total)}</span>
+          </dd>
+        </div>
+        <p className="text-sm text-black/55">Including {formatCurrency(vat)} in taxes</p>
+        {hasQuoteOnlyItems && (
+          <p className="mt-2 text-xs text-black/55">
+            Some items don&apos;t have a fixed price yet — we&apos;ll confirm the full total when we&apos;re in touch.
+          </p>
+        )}
+      </dl>
+    </div>
   );
 }

@@ -13,16 +13,19 @@ export type CheckoutFormFields = {
   lastName?: string;
   email?: string;
   phone?: string;
+  company?: string;
   postcode?: string;
   city?: string;
   /** The customer typed their own town — the postcode lookup mustn't overwrite it. */
   cityTyped?: boolean;
   address?: string;
+  addressLine2?: string;
   billingSame?: boolean;
   billingPostcode?: string;
   billingCity?: string;
   billingCityTyped?: boolean;
   billingAddress?: string;
+  billingAddressLine2?: string;
   extraIds?: string[];
 };
 
@@ -39,15 +42,18 @@ const EMPTY: Record<keyof CheckoutFormFields | "savedAt", undefined> = {
   lastName: undefined,
   email: undefined,
   phone: undefined,
+  company: undefined,
   postcode: undefined,
   city: undefined,
   cityTyped: undefined,
   address: undefined,
+  addressLine2: undefined,
   billingSame: undefined,
   billingPostcode: undefined,
   billingCity: undefined,
   billingCityTyped: undefined,
   billingAddress: undefined,
+  billingAddressLine2: undefined,
   extraIds: undefined,
   savedAt: undefined,
 };

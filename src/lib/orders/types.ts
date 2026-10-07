@@ -22,7 +22,13 @@ export type OrderLineInput = {
   name: string;
   unitPrice: number | null;
   quantity: number;
-  options?: { cableLength?: string; installation?: "standard" | "none"; postcode?: string };
+  options?: {
+    cableLength?: string;
+    installation?: "standard" | "none";
+    postcode?: string;
+    /** Installation fee included in unitPrice (set from the DB by priceCart). */
+    installFee?: number;
+  };
 };
 
 export type OrderItemRecord = {

@@ -75,7 +75,12 @@ export async function priceCart(
       name: row.name,
       unitPrice: withInstall == null ? null : round2(withInstall),
       quantity: line.quantity,
-      options: line.options,
+      // Keep the installation fee alongside the price so summaries, emails and
+      // the invoice can show charger and installation separately.
+      options:
+        base != null && line.options?.installation === "standard"
+          ? { ...line.options, installFee: round2(Number(row.installFee ?? 0)) }
+          : line.options,
     });
   }
 

@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 
 import { stripe } from "@/lib/stripe/client";
 import type { OrderWithItems } from "@/lib/orders/types";
+import { formatCurrency } from "@/lib/currency";
 
 /** UK standard rate. Catalogue prices and the delivery fee are VAT-inclusive. */
 export const VAT_RATE = 0.2;
@@ -39,12 +40,17 @@ export function invoiceNumber(reference: string): string {
 }
 
 /** "5m cable · Standard installation · SW1A 2AA" from an order line's options. */
-export function lineDetail(options: unknown): string | null {
+export function lineDetail(options: unknown, unitPrice: number | null = null): string | null {
   if (!options || typeof options !== "object") return null;
-  const o = options as { cableLength?: string; installation?: string; postcode?: string };
+  const o = options as { cableLength?: string; installation?: string; postcode?: string; installFee?: number };
   const parts: string[] = [];
   if (o.cableLength) parts.push(`${o.cableLength} cable`);
-  if (o.installation) parts.push(o.installation === "standard" ? "Standard installation" : "No installation");
+  if (o.installation === "standard" && typeof o.installFee === "number" && unitPrice != null) {
+    // Charger and installation shown separately (per unit).
+    parts.push(`Charger ${formatCurrency(unitPrice - o.installFee)} + standard installation ${formatCurrency(o.installFee)}`);
+  } else if (o.installation) {
+    parts.push(o.installation === "standard" ? "Standard installation" : "No installation");
+  }
   if (o.installation === "standard" && o.postcode) parts.push(o.postcode);
   return parts.length ? parts.join(" · ") : null;
 }
@@ -67,7 +73,7 @@ export function invoiceFor(order: OrderWithItems, paymentMethod: string): Invoic
       ].filter(Boolean);
   const lines = order.items.map((item) => ({
     description: item.name,
-    detail: lineDetail(item.options),
+    detail: lineDetail(item.options, item.unitPrice),
     quantity: item.quantity,
     unitPrice: item.unitPrice ?? 0,
     total: round((item.unitPrice ?? 0) * item.quantity),

@@ -223,6 +223,7 @@ export function PurchasePanel({
             {
               cableLength: product.cableLength,
               installation,
+              ...(installation === "standard" ? { installFee } : {}),
             },
           );
           setAdded(true);

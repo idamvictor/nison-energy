@@ -226,6 +226,7 @@ export function CommercialPurchasePanel({
             quantity,
             {
               installation,
+              ...(installation === "standard" ? { installFee } : {}),
             },
           );
           setAdded(true);

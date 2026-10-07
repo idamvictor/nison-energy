@@ -9,6 +9,8 @@ export type CartItemOptions = {
   installation?: "standard" | "none";
   /** Installation postcode, checked on the product page (installation orders). */
   postcode?: string;
+  /** Installation fee inside the unit price (standard installation), for the breakdown. */
+  installFee?: number;
 };
 
 // The catalog now lives in Postgres, so the cart snapshots the fields it needs

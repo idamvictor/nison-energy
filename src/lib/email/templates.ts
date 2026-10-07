@@ -2,7 +2,7 @@ import { COMPANY } from "@/lib/company";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/site";
 import { formatCurrency } from "@/lib/currency";
-import { includesInstallation } from "@/lib/orders/installation";
+import { includesInstallation, installSplit } from "@/lib/orders/installation";
 
 function esc(value: string): string {
   return value
@@ -200,6 +200,13 @@ export function customerEnquiryStatusUpdate(
 
 // ─── Order ───────────────────────────────────────────────────────────────
 
+/** "Charger £X + installation £Y" under an installation line, when the fee is known. */
+function installDetail(item: OrderItemEmailInput): string {
+  const split = installSplit(item.unitPrice, item.quantity, item.options);
+  if (split.install <= 0) return "";
+  return `<br><span style="font-size:12px;color:${MUTED}">Charger ${formatCurrency(split.product)} + installation ${formatCurrency(split.install)}</span>`;
+}
+
 function itemsTable(items: OrderItemEmailInput[]): string {
   const rows = items
     .map(
@@ -207,7 +214,7 @@ function itemsTable(items: OrderItemEmailInput[]): string {
         `<tr>
            <td style="padding:6px 0;border-bottom:1px solid #e6eef1">${esc(i.name)}${
              i.quantity > 1 ? ` &times;${i.quantity}` : ""
-           }</td>
+           }${installDetail(i)}</td>
            <td align="right" style="padding:6px 0;border-bottom:1px solid #e6eef1;white-space:nowrap">${money(
              i.unitPrice == null ? null : i.unitPrice * i.quantity,
            )}</td>

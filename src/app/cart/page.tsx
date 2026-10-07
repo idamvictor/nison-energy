@@ -13,6 +13,8 @@ import { QuantityStepper } from "@/components/shared/quantity-stepper";
 import { ExpressCheckoutBox } from "@/components/checkout/express-checkout-box";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import type { OrderLineInput } from "@/lib/orders/types";
+import { installSplit } from "@/lib/orders/installation";
+import { useInstallFees } from "@/components/checkout/use-install-fees";
 import { formatCurrency } from "@/lib/currency";
 
 export default function CartPage() {
@@ -23,12 +25,18 @@ export default function CartPage() {
   const lines = items
     .map((item) => resolveCartItem(item))
     .filter((line): line is NonNullable<typeof line> => line !== null);
+  // DB installation fees, so charger and installation always show separately.
+  const installFees = useInstallFees(lines.filter((l) => l.options?.installation === "standard").map((l) => l.id));
 
   const subtotal =
     Math.round(
       lines.reduce((sum, line) => sum + (line.price ?? 0) * line.quantity, 0) * 100
     ) / 100;
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
+  // Charger vs installation, when the installation fee is known.
+  const installTotal =
+    Math.round(lines.reduce((sum, line) => sum + installSplit(line.price, line.quantity, line.options, installFees[line.id]).install, 0) * 100) /
+    100;
   // Same shape the checkout sends; the server re-prices every line.
   const orderLines: OrderLineInput[] = lines.map((line) => ({
     productId: line.id,
@@ -99,6 +107,14 @@ export default function CartPage() {
                                 {formatCartOptions(line.options)}
                               </p>
                             )}
+                            {(() => {
+                              const split = installSplit(line.price, line.quantity, line.options, installFees[line.id]);
+                              return split.install > 0 ? (
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                  Charger {formatCurrency(split.product)} · Installation {formatCurrency(split.install)}
+                                </p>
+                              ) : null;
+                            })()}
                           </div>
                           <p className="text-lg font-semibold text-foreground">
                             {line.price != null
@@ -109,6 +125,7 @@ export default function CartPage() {
                         <div className="mt-auto flex items-center justify-between gap-2">
                           <QuantityStepper
                             quantity={line.quantity}
+                            min={0}
                             onChange={(q) => updateQuantity(line.id, q)}
                           />
                           <button
@@ -131,6 +148,20 @@ export default function CartPage() {
                   <h2 className="font-heading text-lg font-semibold text-foreground">
                     Order Summary
                   </h2>
+                  {installTotal > 0 && (
+                    <>
+                      <div className="flex items-center justify-between text-sm">
+                        <p className="text-muted-foreground">Chargers &amp; products</p>
+                        <p className="text-foreground">
+                          {formatCurrency(Math.round((subtotal - installTotal) * 100) / 100)}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <p className="text-muted-foreground">Installation</p>
+                        <p className="text-foreground">{formatCurrency(installTotal)}</p>
+                      </div>
+                    </>
+                  )}
                   <div className="flex items-center justify-between text-sm">
                     <p className="text-muted-foreground">Subtotal</p>
                     <p className="font-medium text-foreground">

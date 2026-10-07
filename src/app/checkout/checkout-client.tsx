@@ -14,6 +14,7 @@ import { FIELD_INPUT, FloatField } from "@/components/checkout/float-field";
 import { ExtrasPicker } from "@/components/checkout/extras-picker";
 import { useCheckoutSession } from "@/components/checkout/use-checkout-session";
 import { useInView } from "@/components/checkout/use-in-view";
+import { useInstallFees } from "@/components/checkout/use-install-fees";
 import { ExpressWallets, WalletSkeleton } from "@/components/checkout/express-wallets";
 import { AmexLogo, MastercardLogo, PayPalLogo, VisaLogo } from "@/components/checkout/payment-logos";
 import {
@@ -30,10 +31,11 @@ import { useCheckoutForm } from "@/lib/checkout/form-store";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 import { placeOrder, saveCheckoutDetails } from "@/lib/orders/actions";
-import { includesInstallation } from "@/lib/orders/installation";
+import { includesInstallation, installSplit } from "@/lib/orders/installation";
 import { DELIVERY_LABEL, deliveryFeeFor, FREE_DELIVERY_THRESHOLD } from "@/lib/orders/delivery";
 import type { CheckoutTotals, OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
+import { checkCheckoutDetails } from "@/lib/orders/schema";
 
 /** A real catalogue accessory offered as a checkout add-on (see src/lib/orders/extras.ts). */
 export type CheckoutExtra = {
@@ -88,7 +90,8 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   // Prefer a typed postcode, then the account's, then one from the product page.
   const postcode =
     form.postcode ?? (defaults?.postcode || items.find((i) => i.options?.postcode)?.options?.postcode || "");
-  const billingSame = form.billingSame ?? true;
+  // Unticked until the customer chooses to reuse the delivery address.
+  const billingSame = form.billingSame ?? false;
   const billingCity = form.billingCity ?? "";
   const billingPostcode = form.billingPostcode ?? "";
   const billingAddress = form.billingAddress ?? "";
@@ -105,10 +108,70 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const remainingExtras = extras.filter((extra) => !extraIds.includes(extra.id) && !inBasket.has(extra.id));
   const hasQuoteOnlyItems = lines.some((line) => line.price === null);
   const hasInstallation = includesInstallation(lines);
+  // DB installation fees, so charger and installation always show separately.
+  const installFees = useInstallFees(lines.filter((l) => l.options?.installation === "standard").map((l) => l.id));
 
   const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [cardCompleteFor, setCardCompleteFor] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // ── Validation: the same Zod rules as the server (src/lib/orders/schema.ts).
+  // A field shows its error once it's been left (blurred) or after a Place
+  // Order attempt, and the error clears as soon as the value is fixed.
+  const [touched, setTouched] = useState<Set<string>>(() => new Set());
+  const [attempted, setAttempted] = useState(false);
+  const check = checkCheckoutDetails({
+    firstName,
+    lastName,
+    email,
+    phone,
+    company,
+    address,
+    addressLine2,
+    city,
+    postcode,
+    billingSameAsDelivery: billingSame,
+    billingAddress,
+    billingAddressLine2,
+    billingCity,
+    billingPostcode,
+    acceptedTerms: termsAccepted,
+  });
+  const errors: Record<string, string> = check.ok ? {} : check.errors;
+  const err = (field: string) => ((attempted || touched.has(field)) && errors[field]) || null;
+  const markTouched = (field: string) => setTouched((prev) => (prev.has(field) ? prev : new Set(prev).add(field)));
+
+  /** Show every error and jump to the first one. Returns true when the form is valid. */
+  function validateAll(): boolean {
+    setAttempted(true);
+    if (check.ok) return true;
+    const order = [
+      "email",
+      "firstName",
+      "lastName",
+      "company",
+      "postcode",
+      "city",
+      "address",
+      "addressLine2",
+      "phone",
+      "billingPostcode",
+      "billingCity",
+      "billingAddress",
+      "billingAddressLine2",
+      "acceptedTerms",
+    ];
+    const first = order.find((field) => errors[field]);
+    // After the next paint, so a just-revealed field (guest email) can take focus.
+    window.setTimeout(() => {
+      const el = first ? formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`) : null;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus({ preventScroll: true });
+      }
+    }, 50);
+    return false;
+  }
 
   // What goes to the server. Prices here are display-only — the server
   // re-prices every line from the database (src/lib/orders/pricing.ts).
@@ -185,12 +248,13 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   /** Card path: validate + save our form on the draft, then hand it to Stripe. */
   async function preparePayment(): Promise<PayDetails | null> {
     const formEl = formRef.current;
-    if (!defaults?.email && !showEmail) {
-      setGuestChosen(true);
-      setError("Choose “Continue as guest” and enter your email, or sign in.");
+    // Not chosen yet: open the guest email field so its error can show too.
+    if (!defaults?.email && !showEmail) setGuestChosen(true);
+    if (!formEl || !session || !validateAll()) return null;
+    if (!cardComplete) {
+      setError("Enter your card number, expiry date and security code.");
       return null;
     }
-    if (!formEl || !session || !formEl.reportValidity()) return null;
     const payload = buildPayload(new FormData(formEl));
     setError(null);
     const saved = await saveCheckoutDetails(session.draftId, payload);
@@ -240,11 +304,12 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
       </span>
     </label>
   );
+  const termsError = err("acceptedTerms");
 
   // ── Billing address (inside the card panel, like the design) ──
   const billingFields = !billingSame && (
     <div className="grid grid-cols-2 gap-2.5 pt-1">
-      <FloatField as="div" label="Postcode" filled={billingPostcode !== ""}>
+      <FloatField as="div" label="Postcode" filled={billingPostcode !== ""} error={err("billingPostcode")} tone="light">
         <PostcodeInput
           name="billingPostcode"
           required
@@ -255,7 +320,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
           onValueChange={(value) => setForm({ billingPostcode: value })}
         />
       </FloatField>
-      <FloatField label="City" filled={billingCity !== ""}>
+      <FloatField label="City" filled={billingCity !== ""} error={err("billingCity")} tone="light">
         <Input
           name="billingCity"
           required
@@ -265,7 +330,14 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
           onChange={(e) => setForm({ billingCity: e.target.value, billingCityTyped: e.target.value.trim() !== "" })}
         />
       </FloatField>
-      <FloatField as="div" label="Billing address" filled={billingAddress !== ""} className="col-span-2">
+      <FloatField
+        as="div"
+        label="Billing address"
+        filled={billingAddress !== ""}
+        className="col-span-2"
+        error={err("billingAddress")}
+        tone="light"
+      >
         <AddressLookup
           postcode={billingPostcode}
           name="billingAddress"
@@ -278,7 +350,13 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
           onTown={(town) => !useCheckoutForm.getState().billingCityTyped && setForm({ billingCity: town })}
         />
       </FloatField>
-      <FloatField label="Apartment, suite, etc. (optional)" filled={billingAddressLine2 !== ""} className="col-span-2">
+      <FloatField
+        label="Apartment, suite, etc. (optional)"
+        filled={billingAddressLine2 !== ""}
+        className="col-span-2"
+        error={err("billingAddressLine2")}
+        tone="light"
+      >
         <Input
           name="billingAddressLine2"
           autoComplete="billing address-line2"
@@ -366,7 +444,10 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
               {paypal.error ? (
                 <p className="text-sm text-red-600">{paypal.error}</p>
               ) : paypal.session ? (
-                <StripeCheckoutProvider key={`paypal-${paypal.session.clientSecret}`} clientSecret={paypal.session.clientSecret}>
+                <StripeCheckoutProvider
+                  key={`paypal-${paypal.session.clientSecret}`}
+                  clientSecret={paypal.session.clientSecret}
+                >
                   <ExpressWallets wallets={["paypal"]} buttonHeight={48} />
                 </StripeCheckoutProvider>
               ) : (
@@ -392,11 +473,17 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
     ) : (
       <div className="flex flex-col gap-4">
         {termsBox}
+        {termsError && (
+          <p role="alert" className="-mt-2 text-xs text-[#ffb4b4]">
+            {termsError}
+          </p>
+        )}
         {error && <p className="text-sm text-red-300">{error}</p>}
         {!paymentStatus &&
           (session ? (
             <CardPlaceOrder
-              canPay={termsAccepted && cardComplete}
+              // Always clickable: a click runs the checks and points at what's missing.
+              canPay
               prepare={preparePayment}
               className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-black/60"
             />
@@ -411,6 +498,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   const summary = (
     <OrderSummary
       lines={lines}
+      installFees={installFees}
       extras={selectedExtras}
       totals={totals}
       vat={vat}
@@ -428,7 +516,14 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
           <div className="ml-auto flex w-full max-w-[580px] flex-col px-4 pt-6 pb-10 sm:px-10 lg:pt-10">
             <header className="flex items-center justify-between pb-6">
               <Link href="/" className="rounded-md bg-white px-3 py-2" aria-label="Ocunio Energy home">
-                <Image src="/ocunio-energy-logo.png" alt="Ocunio Energy" width={135} height={45} className="h-9 w-auto" priority />
+                <Image
+                  src="/ocunio-energy-logo.png"
+                  alt="Ocunio Energy"
+                  width={135}
+                  height={45}
+                  className="h-9 w-auto"
+                  priority
+                />
               </Link>
               <Link href="/cart" aria-label="Back to cart" className="text-white hover:text-white/80">
                 <ShoppingBag className="size-6" />
@@ -465,7 +560,12 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                 <p className="max-w-sm text-sm text-[#707070]">
                   A member of the team will be in touch to confirm payment and book your installation. If it&apos;s
                   urgent,{" "}
-                  <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                  <a
+                    href={whatsappUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2"
+                  >
                     message us on WhatsApp
                   </a>
                   .
@@ -490,12 +590,19 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
             ) : (
               <form
                 ref={formRef}
+                noValidate
+                onBlur={(e) => {
+                  const name = (e.target as unknown as HTMLInputElement).name;
+                  if (name) markTouched(name);
+                }}
                 className="flex flex-col"
                 onSubmit={(e) => {
                   e.preventDefault();
                   // Only quote-only carts submit the form ("Place Order");
                   // payable carts pay through Stripe.
                   if (!hasQuoteOnlyItems) return;
+                  if (!defaults?.email && !showEmail) setGuestChosen(true);
+                  if (!validateAll()) return;
                   const payload = buildPayload(new FormData(e.currentTarget));
                   setError(null);
                   startTransition(async () => {
@@ -558,7 +665,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                   )}
                   {/* Signed in: the account email is sent, not shown. */}
                   <div className={cn("grid gap-2.5", !showEmail && "hidden")}>
-                    <FloatField label="Email" filled={email !== ""}>
+                    <FloatField label="Email" filled={email !== ""} error={err("email")}>
                       <Input
                         name="email"
                         type="email"
@@ -579,12 +686,15 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                   </h2>
                   <div className="grid grid-cols-2 gap-2.5">
                     <FloatField label="Country/Region" filled className="col-span-2">
-                      <select disabled className={cn(FIELD_INPUT, "w-full appearance-none border disabled:opacity-100")}>
+                      <select
+                        disabled
+                        className={cn(FIELD_INPUT, "w-full appearance-none border disabled:opacity-100")}
+                      >
                         <option>United Kingdom</option>
                       </select>
                       <ChevronDown className="pointer-events-none absolute top-1/2 right-3.5 size-3 -translate-y-1/2 text-black" />
                     </FloatField>
-                    <FloatField label="First name" filled={firstName !== ""}>
+                    <FloatField label="First name" filled={firstName !== ""} error={err("firstName")}>
                       <Input
                         name="firstName"
                         required
@@ -594,7 +704,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         onChange={(e) => setForm({ firstName: e.target.value })}
                       />
                     </FloatField>
-                    <FloatField label="Last name" filled={lastName !== ""}>
+                    <FloatField label="Last name" filled={lastName !== ""} error={err("lastName")}>
                       <Input
                         name="lastName"
                         required
@@ -604,7 +714,12 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         onChange={(e) => setForm({ lastName: e.target.value })}
                       />
                     </FloatField>
-                    <FloatField label="Company (optional)" filled={company !== ""} className="col-span-2">
+                    <FloatField
+                      label="Company (optional)"
+                      filled={company !== ""}
+                      className="col-span-2"
+                      error={err("company")}
+                    >
                       <Input
                         name="company"
                         autoComplete="organization"
@@ -613,11 +728,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         onChange={(e) => setForm({ company: e.target.value })}
                       />
                     </FloatField>
-                    <FloatField
-                      as="div"
-                      label="Postcode"
-                      filled={postcode !== ""}
-                    >
+                    <FloatField as="div" label="Postcode" filled={postcode !== ""} error={err("postcode")}>
                       <PostcodeInput
                         required
                         placeholder=""
@@ -626,7 +737,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         onValueChange={(value) => setForm({ postcode: value })}
                       />
                     </FloatField>
-                    <FloatField label="City" filled={city !== ""}>
+                    <FloatField label="City" filled={city !== ""} error={err("city")}>
                       <Input
                         name="city"
                         required
@@ -641,6 +752,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       label={postcodeValid ? "Address" : "Address (enter your postcode first)"}
                       filled={address !== ""}
                       className="col-span-2"
+                      error={err("address")}
                     >
                       <AddressLookup
                         postcode={postcode}
@@ -654,7 +766,12 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         onTown={(town) => !useCheckoutForm.getState().cityTyped && setForm({ city: town })}
                       />
                     </FloatField>
-                    <FloatField label="Apartment, suite, etc. (optional)" filled={addressLine2 !== ""} className="col-span-2">
+                    <FloatField
+                      label="Apartment, suite, etc. (optional)"
+                      filled={addressLine2 !== ""}
+                      className="col-span-2"
+                      error={err("addressLine2")}
+                    >
                       <Input
                         name="addressLine2"
                         autoComplete="address-line2"
@@ -664,23 +781,23 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       />
                     </FloatField>
                     <div className="col-span-2">
-                      <FloatField label="Phone" filled={phone !== ""}>
-                    <Input
-                      name="phone"
-                      type="tel"
-                      required
-                      autoComplete="tel"
-                      className={cn(FIELD_INPUT, "pr-10")}
-                      value={phone}
-                      onChange={(e) => setForm({ phone: e.target.value })}
-                    />
-                    <span
-                      title="In case we need to contact you about your order or installation."
-                      className="absolute top-1/2 right-3 -translate-y-1/2 text-[#707070]"
-                    >
-                      <CircleHelp className="size-[18px]" />
-                    </span>
-                  </FloatField>
+                      <FloatField label="Phone" filled={phone !== ""} error={err("phone")}>
+                        <Input
+                          name="phone"
+                          type="tel"
+                          required
+                          autoComplete="tel"
+                          className={cn(FIELD_INPUT, "pr-10")}
+                          value={phone}
+                          onChange={(e) => setForm({ phone: e.target.value })}
+                        />
+                        <span
+                          title="In case we need to contact you about your order or installation."
+                          className="absolute top-1/2 right-3 -translate-y-1/2 text-[#707070]"
+                        >
+                          <CircleHelp className="size-[18px]" />
+                        </span>
+                      </FloatField>
                     </div>
                   </div>
                 </section>
@@ -749,6 +866,11 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       confirm payment and schedule installation.
                     </p>
                     {termsBox}
+                    {termsError && (
+                      <p role="alert" className="-mt-2 text-xs text-[#ffb4b4]">
+                        {termsError}
+                      </p>
+                    )}
                     {error && <p className="text-sm text-red-300">{error}</p>}
                     <Button
                       type="submit"
@@ -816,6 +938,7 @@ function Radio({ checked }: { checked: boolean }) {
 
 function OrderSummary({
   lines,
+  installFees,
   extras,
   totals,
   vat,
@@ -830,16 +953,28 @@ function OrderSummary({
   postcodeValid: boolean;
   toFreeDelivery: number;
   hasQuoteOnlyItems: boolean;
+  installFees: Record<string, number>;
 }) {
   const rows = [
-    ...lines.map((line) => ({
-      key: line.id,
-      image: line.image,
-      name: line.name,
-      detail: formatCartOptions(line.options),
-      quantity: line.quantity,
-      price: line.price != null ? formatCurrency(line.price * line.quantity) : "Quote",
-    })),
+    ...lines.map((line) => {
+      // Charger and installation shown separately when the fee is known.
+      const split = installSplit(line.price, line.quantity, line.options, installFees[line.id]);
+      return {
+        key: line.id,
+        image: line.image,
+        name: line.name,
+        detail:
+          split.install > 0
+            ? line.options?.cableLength
+              ? `${line.options.cableLength} cable`
+              : null
+            : formatCartOptions(line.options),
+        quantity: line.quantity,
+        price:
+          line.price == null ? "Quote" : formatCurrency(split.install > 0 ? split.product : line.price * line.quantity),
+        install: split.install,
+      };
+    }),
     ...extras.map((extra) => ({
       key: extra.id,
       image: extra.image,
@@ -847,8 +982,10 @@ function OrderSummary({
       detail: "Extra",
       quantity: 1,
       price: formatCurrency(extra.price),
+      install: 0,
     })),
   ];
+  const installTotal = Math.round(rows.reduce((sum, row) => sum + row.install, 0) * 100) / 100;
   return (
     <div className="flex flex-col gap-5 text-black">
       <ul className="flex flex-col gap-4">
@@ -863,22 +1000,47 @@ function OrderSummary({
               </span>
             </span>
             <span className="flex-1">
-              <span className="block text-sm leading-[18.9px]">{row.name}</span>
+              <span className="flex justify-between gap-3">
+                <span className="text-sm leading-[18.9px]">{row.name}</span>
+                <span className="text-sm whitespace-nowrap">{row.price}</span>
+              </span>
               {row.detail && <span className="block text-xs text-black/55">{row.detail}</span>}
+              {row.install > 0 && (
+                <span className="mt-1.5 flex justify-between gap-3 border-l-2 border-black/10 pl-2 text-xs text-black/70">
+                  <span>Standard installation{row.quantity > 1 ? ` × ${row.quantity}` : ""}</span>
+                  <span className="whitespace-nowrap">{formatCurrency(row.install)}</span>
+                </span>
+              )}
             </span>
-            <span className="text-sm">{row.price}</span>
           </li>
         ))}
       </ul>
       <dl className="flex flex-col gap-1.5 text-sm">
-        <div className="flex justify-between">
-          <dt>Subtotal</dt>
-          <dd>{formatCurrency(totals.subtotal)}</dd>
-        </div>
+        {installTotal > 0 ? (
+          <>
+            <div className="flex justify-between">
+              <dt>Chargers &amp; products</dt>
+              <dd>{formatCurrency(Math.round((totals.subtotal - installTotal) * 100) / 100)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt>Installation</dt>
+              <dd>{formatCurrency(installTotal)}</dd>
+            </div>
+          </>
+        ) : (
+          <div className="flex justify-between">
+            <dt>Subtotal</dt>
+            <dd>{formatCurrency(totals.subtotal)}</dd>
+          </div>
+        )}
         <div className="flex justify-between">
           <dt>Shipping</dt>
           <dd className={postcodeValid ? "" : "text-black/55"}>
-            {!postcodeValid ? "Enter shipping address" : totals.deliveryFee === 0 ? "FREE" : formatCurrency(totals.deliveryFee)}
+            {!postcodeValid
+              ? "Enter shipping address"
+              : totals.deliveryFee === 0
+                ? "FREE"
+                : formatCurrency(totals.deliveryFee)}
           </dd>
         </div>
         {postcodeValid && toFreeDelivery > 0 && (

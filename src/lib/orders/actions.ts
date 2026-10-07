@@ -266,3 +266,20 @@ export async function updateOrderStatus(
   revalidateTag(CACHE_TAGS.orders, { expire: 0 });
   return { ok: true };
 }
+
+/**
+ * Installation fee per product (from the DB) — lets the cart and checkout show
+ * charger and installation separately, even for basket lines saved before the
+ * fee was stored with them.
+ */
+export async function getInstallFees(productIds: string[]): Promise<Record<string, number>> {
+  const ids = Array.isArray(productIds)
+    ? [...new Set(productIds.filter((id) => typeof id === "string" && id.length < 200))].slice(0, 50)
+    : [];
+  if (ids.length === 0) return {};
+  const rows = await prisma.product.findMany({
+    where: { id: { in: ids }, installFee: { not: null } },
+    select: { id: true, installFee: true },
+  });
+  return Object.fromEntries(rows.map((r) => [r.id, Number(r.installFee)]));
+}

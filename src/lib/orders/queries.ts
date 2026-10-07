@@ -5,6 +5,8 @@ import { after } from "next/server";
 import { revalidateTag, unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
+import { checkCheckoutDetails } from "@/lib/orders/schema";
+import { normalisePostcode } from "@/lib/postcode";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createNotification } from "@/lib/notifications/queries";
 import { sendEmail } from "@/lib/email/client";
@@ -144,8 +146,6 @@ export type ContactDetails = {
   notes: string | null;
 };
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 function str(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -154,63 +154,53 @@ function newReference(): string {
   return `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-/** Contact, address and terms checks shared by "Place Order" and the card checkout. */
+/**
+ * Contact, address and terms checks shared by "Place Order" and the card
+ * checkout — the same Zod rules the form uses (src/lib/orders/schema.ts).
+ */
 export function validateContactDetails(
   input: ContactInput,
 ): { ok: true; details: ContactDetails } | { ok: false; errors: Record<string, string> } {
-  const firstName = str(input.firstName);
-  const lastName = str(input.lastName);
-  const email = str(input.email);
-  const phone = str(input.phone);
-  const company = str(input.company).slice(0, 120);
-  const address = str(input.address);
-  const addressLine2 = str(input.addressLine2).slice(0, 120);
-  const city = str(input.city);
-  const postcode = str(input.postcode).toUpperCase();
-  // Anything but an explicit `false` means "same as delivery".
-  const billingSameAsDelivery = input.billingSameAsDelivery !== false;
-  const billingAddress = str(input.billingAddress);
-  const billingAddressLine2 = str(input.billingAddressLine2).slice(0, 120);
-  const billingCity = str(input.billingCity);
-  const billingPostcode = str(input.billingPostcode).toUpperCase();
-
-  const errors: Record<string, string> = {};
-  if (!firstName) errors.firstName = "Enter your first name.";
-  if (!lastName) errors.lastName = "Enter your last name.";
-  if (!email) errors.email = "Enter your email.";
-  else if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
-  if (!phone) errors.phone = "Enter a phone number.";
-  if (!address) errors.address = "Enter the delivery and installation address.";
-  if (!city) errors.city = "Enter the town or city.";
-  if (!postcode) errors.postcode = "Enter the postcode.";
-  if (!billingSameAsDelivery) {
-    if (!billingAddress) errors.billingAddress = "Enter the billing address.";
-    if (!billingCity) errors.billingCity = "Enter the billing town or city.";
-    if (!billingPostcode) errors.billingPostcode = "Enter the billing postcode.";
-  }
-  if (input.acceptedTerms !== true) {
-    errors.acceptedTerms = "Please tick to agree to the Terms and Conditions of Sale.";
-  }
-  if (Object.keys(errors).length > 0) return { ok: false, errors };
-
+  const result = checkCheckoutDetails({
+    firstName: str(input.firstName),
+    lastName: str(input.lastName),
+    email: str(input.email),
+    phone: str(input.phone),
+    company: str(input.company),
+    address: str(input.address),
+    addressLine2: str(input.addressLine2),
+    city: str(input.city),
+    postcode: str(input.postcode),
+    // Anything but an explicit `false` means "same as delivery".
+    billingSameAsDelivery: input.billingSameAsDelivery !== false,
+    billingAddress: str(input.billingAddress),
+    billingAddressLine2: str(input.billingAddressLine2),
+    billingCity: str(input.billingCity),
+    billingPostcode: str(input.billingPostcode),
+    acceptedTerms: input.acceptedTerms === true,
+    notes: str(input.notes),
+  });
+  if (!result.ok) return { ok: false, errors: result.errors };
+  const d = result.data;
+  const same = d.billingSameAsDelivery;
   return {
     ok: true,
     details: {
-      firstName,
-      lastName,
-      email,
-      phone,
-      company: company || null,
-      address,
-      addressLine2: addressLine2 || null,
-      city: city || null,
-      postcode,
-      billingSameAsDelivery,
-      billingAddress: billingSameAsDelivery ? null : billingAddress,
-      billingAddressLine2: billingSameAsDelivery ? null : billingAddressLine2 || null,
-      billingCity: billingSameAsDelivery ? null : billingCity,
-      billingPostcode: billingSameAsDelivery ? null : billingPostcode,
-      notes: str(input.notes) || null,
+      firstName: d.firstName,
+      lastName: d.lastName,
+      email: d.email,
+      phone: d.phone,
+      company: d.company || null,
+      address: d.address,
+      addressLine2: d.addressLine2 || null,
+      city: d.city || null,
+      postcode: d.postcode,
+      billingSameAsDelivery: same,
+      billingAddress: same ? null : d.billingAddress,
+      billingAddressLine2: same ? null : d.billingAddressLine2 || null,
+      billingCity: same ? null : d.billingCity,
+      billingPostcode: same ? null : normalisePostcode(d.billingPostcode),
+      notes: d.notes || null,
     },
   };
 }

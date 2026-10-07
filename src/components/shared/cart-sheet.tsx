@@ -97,6 +97,7 @@ export function CartSheet() {
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <QuantityStepper
                           quantity={line.quantity}
+                          min={0}
                           onChange={(q) => updateQuantity(line.id, q)}
                           className="h-8 w-24"
                         />

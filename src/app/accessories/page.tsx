@@ -28,8 +28,14 @@ export default async function AccessoriesPage() {
           align="left"
           eyebrow="Cables & accessories"
           title="Accessories"
-          subtitle="TÜV-certified Type 2 charging cables — coiled or straight, discreet grey or hi-vis lime green, single-phase or three-phase."
-        />
+          subtitle="Get more from your EV charging setup with our range of smart, practical and accessories."
+        >
+          <p className="mt-3 max-w-2xl text-white/70">
+            Whether you&apos;re installing a new charger or enhancing an existing system, we have the essential extras
+            to help you get the most from your setup. From home charging to workplace and commercial installations, find
+            the accessories you need to improve performance, convenience and everyday usability.
+          </p>
+        </PageHero>
         <Suspense fallback={null}>
           <AccessoriesCatalog products={products} />
         </Suspense>

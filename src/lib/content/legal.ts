@@ -234,7 +234,7 @@ Nothing in these Terms affects your statutory rights as a consumer, including un
 
 We are **Nison Limited**, trading as **Ocunio Energy**, a company registered in England and Wales under company number 16371062, with our registered office at 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom. Our VAT number is GB495472057 and we are an OZEV-approved installer (installer number 13528).
 
-You can contact us by email at [info@ocunioenergy.com](mailto:info@ocunioenergy.com), on [WhatsApp](https://wa.me/443306330252), or through our [contact form](/contact-us). If we need to contact you, we'll use the email address, phone number or postal address you gave us with your order.
+You can contact us by email at [info@ocunioenergy.com](mailto:info@ocunioenergy.com), on [WhatsApp](https://wa.me/447525567054), or through our [contact form](/contact-us). If we need to contact you, we'll use the email address, phone number or postal address you gave us with your order.
 
 ## 2. Definitions
 
@@ -385,7 +385,7 @@ We may update these Terms from time to time, for example to reflect changes in t
 
 ## 20. Contact Us
 
-Questions about these Terms or your Order? Email [info@ocunioenergy.com](mailto:info@ocunioenergy.com), message us on [WhatsApp](https://wa.me/443306330252), or use our [contact form](/contact-us).`;
+Questions about these Terms or your Order? Email [info@ocunioenergy.com](mailto:info@ocunioenergy.com), message us on [WhatsApp](https://wa.me/447525567054), or use our [contact form](/contact-us).`;
 
 export const privacyPolicyMarkdown = `**Last updated:** ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
 
@@ -433,4 +433,4 @@ We may update this notice from time to time; the "Last updated" date above refle
 
 ## 11. Contact Us
 
-For any questions about this notice, or to exercise your privacy rights, contact our team at [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or [message us on WhatsApp](https://wa.me/443306330252).`;
+For any questions about this notice, or to exercise your privacy rights, contact our team at [info@ocunioenergy.com](mailto:info@ocunioenergy.com) or [message us on WhatsApp](https://wa.me/447525567054).`;

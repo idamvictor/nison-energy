@@ -50,3 +50,12 @@ export function MastercardLogo({ className }: { className?: string }) {
 export function AmexLogo({ className }: { className?: string }) {
   return <BrandIcon icon={siAmericanexpress} className={cn("h-7", className)} />;
 }
+
+/** Stripe wordmark (simple-icons only has the "S" mark). */
+export function StripeLogo({ className }: { className?: string }) {
+  return (
+    <span role="img" aria-label="Stripe" className={cn("text-[17px] font-bold tracking-tight text-[#635bff]", className)}>
+      stripe
+    </span>
+  );
+}

@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { MessageSquareText } from "lucide-react";
+import { MessageSquareText, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/reveal";
 import { WhatsAppIcon } from "@/components/shared/social-icons";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { COMPANY } from "@/lib/company";
 
 export function HelpSection() {
   return (
@@ -20,7 +21,7 @@ export function HelpSection() {
               aria-hidden
               className="absolute -right-16 -bottom-40 -z-10 size-80 rounded-full bg-accent/20 blur-[110px]"
             />
-            <div className="grid gap-8 p-8 sm:p-10 lg:grid-cols-[1fr_auto_auto] lg:items-center lg:gap-6">
+            <div className="grid gap-8 p-8 sm:p-10 lg:grid-cols-[1fr_auto_auto_auto] lg:items-center lg:gap-6">
               <div>
                 <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] text-accent uppercase">
                   <span className="size-1.5 rounded-full bg-accent" />
@@ -58,6 +59,20 @@ export function HelpSection() {
               >
                 <MessageSquareText className="size-5" />
                 Send us a message
+              </Button>
+
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-auto justify-start gap-3 border-white/25 bg-transparent px-5 py-3.5 text-white hover:border-primary hover:bg-white/5 hover:text-primary"
+                nativeButton={false}
+                render={<a href={`tel:${COMPANY.phoneTel}`} />}
+              >
+                <Phone className="size-5" />
+                <span className="flex flex-col items-start leading-tight">
+                  <span className="text-xs font-normal text-white/70">Call us</span>
+                  <span className="font-heading font-semibold">{COMPANY.phone}</span>
+                </span>
               </Button>
             </div>
           </div>

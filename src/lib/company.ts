@@ -8,9 +8,16 @@ export const COMPANY = {
   companyNumber: "16371062",
   ozevInstallerNumber: "13528",
   email: "info@ocunioenergy.com",
-  // No phone number is shown anywhere — customers reach us on WhatsApp.
-  // Digits only, international format (0330 633 0252 → 44 330 633 0252).
-  whatsapp: "443306330252",
+  // WhatsApp (07525 567054) — digits only, international format for wa.me.
+  whatsapp: "447525567054",
+  // Normal landline, shown in the help banner.
+  phone: "0330 633 0252",
+  phoneTel: "+443306330252",
+  social: {
+    facebook: "https://www.facebook.com/share/1ZrUVUn8vq/?mibextid=wwXIfr",
+    instagram: "https://www.instagram.com/ocunioenergy",
+    linkedin: "https://www.linkedin.com/company/ocunio-energy/",
+  },
   registeredOffice:
     "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom",
 } as const;

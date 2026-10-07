@@ -2,10 +2,20 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { CreditCard, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { COMPANY } from "@/lib/company";
+import {
+  AmexLogo,
+  ApplePayLogo,
+  GooglePayLogo,
+  MastercardLogo,
+  PayPalLogo,
+  StripeLogo,
+  VisaLogo,
+} from "@/components/checkout/payment-logos";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -39,7 +49,21 @@ const legalLinks = [
   { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 
-const paymentMethods = ["Visa", "Mastercard", "PayPal", "Stripe", "Apple Pay"];
+const paymentMethods = [
+  { name: "Visa", logo: <VisaLogo className="h-7" /> },
+  { name: "Mastercard", logo: <MastercardLogo className="h-4" /> },
+  { name: "American Express", logo: <AmexLogo className="h-5" /> },
+  { name: "Apple Pay", logo: <ApplePayLogo className="h-9" /> },
+  { name: "Google Pay", logo: <GooglePayLogo className="h-9" /> },
+  { name: "PayPal", logo: <PayPalLogo className="origin-center scale-[0.72]" /> },
+  { name: "Stripe", logo: <StripeLogo className="text-[15px]" /> },
+];
+
+const socialLinks = [
+  { name: "Facebook", href: COMPANY.social.facebook, Icon: FacebookIcon },
+  { name: "Instagram", href: COMPANY.social.instagram, Icon: InstagramIcon },
+  { name: "LinkedIn", href: COMPANY.social.linkedin, Icon: LinkedinIcon },
+];
 
 export function SiteFooter() {
   return (
@@ -77,10 +101,13 @@ export function SiteFooter() {
               Chat on WhatsApp
             </a>
             <div className="mt-5 flex items-center gap-3">
-              {[FacebookIcon, InstagramIcon, LinkedinIcon].map((Icon, i) => (
+              {socialLinks.map(({ name, href, Icon }) => (
                 <a
-                  key={i}
-                  href="#"
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Ocunio Energy on ${name}`}
                   className="flex size-9 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
                 >
                   <Icon className="size-4" />
@@ -147,11 +174,13 @@ export function SiteFooter() {
           <div className="flex flex-wrap gap-2">
             {paymentMethods.map((method) => (
               <span
-                key={method}
-                className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1 text-xs text-white/70"
+                key={method.name}
+                role="img"
+                aria-label={method.name}
+                title={method.name}
+                className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md bg-white px-1"
               >
-                <CreditCard className="size-3.5" />
-                {method}
+                {method.logo}
               </span>
             ))}
           </div>

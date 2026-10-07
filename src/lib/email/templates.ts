@@ -3,6 +3,7 @@ import { whatsappUrl } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/site";
 import { formatCurrency } from "@/lib/currency";
 import { includesInstallation, installSplit } from "@/lib/orders/installation";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
 function esc(value: string): string {
   return value
@@ -253,7 +254,7 @@ function surveyCallout(): string {
     `<strong style="color:${INK}">Next step: complete your virtual survey</strong><br>
      It takes about 5 minutes — a few photos and questions about where your charger is going.
      Our team reviews it before booking your installation.<br>
-     ${link(`${PUBLIC_ORIGIN}/virtual-survey`, "Start your survey →")}`,
+     ${link(OPENQUOTE_SURVEY_URL, "Start your survey →")}`,
   );
 }
 
@@ -404,7 +405,10 @@ export function staffOrderAlert(order: OrderEmailInput, opts?: { paymentMethod?:
         totalLine(order),
         row(`<strong>Delivery &amp; installation address</strong><br>${esc(fullAddress(order))}`),
         includesInstallation(order.items)
-          ? row("Includes installation — the customer has been asked to complete the virtual survey.")
+          ? row(
+              `Includes installation — the customer has been asked to complete the virtual survey:
+               ${link(OPENQUOTE_SURVEY_URL, "OpenQuote survey link")}`,
+            )
           : "",
       ].join(""),
       cta: { label: "Open in admin", href: `${PUBLIC_ORIGIN}/admin/orders/${order.id}` },

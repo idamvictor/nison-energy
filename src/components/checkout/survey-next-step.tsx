@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
 /**
  * Shown under the order confirmation when the order includes installation:
@@ -18,6 +19,17 @@ export function SurveyNextStep() {
         <p className="mt-1.5 text-sm text-muted-foreground">
           It takes about 5 minutes — a few photos and questions about where your charger is going.
           Our team reviews it before booking your installation.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Or open the survey directly:{" "}
+          <a
+            href={OPENQUOTE_SURVEY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium break-all text-primary-ink underline underline-offset-2 hover:text-foreground"
+          >
+            app.openquote.net/company/ocunioenergy
+          </a>
         </p>
       </div>
       <Button

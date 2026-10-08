@@ -512,12 +512,16 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
               prepare={preparePayment}
               label={METHOD_ACTION[payMethod].label}
               busyLabel={METHOD_ACTION[payMethod].busy}
-              className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-[#8a8a8a] disabled:text-white/85 disabled:opacity-100"
+              className="h-[52px] rounded-[12px] bg-accent text-accent-foreground hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-accent/45 disabled:text-white/80 disabled:opacity-100 disabled:shadow-none"
             />
             {!readyToPay && <p className="-mt-2 text-center text-xs text-white/65">{payHint}</p>}
           </>
         ) : (
-          <Button type="button" disabled className="h-[52px] w-full rounded-[12px] bg-black text-base text-white">
+          <Button
+            type="button"
+            disabled
+            className="h-[52px] w-full rounded-[12px] bg-accent/45 text-base text-white/80 disabled:opacity-100"
+          >
             Loading secure payment…
           </Button>
         ))}

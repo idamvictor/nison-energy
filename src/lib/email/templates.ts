@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { formatCurrency } from "@/lib/currency";
 import { includesInstallation, installSplit } from "@/lib/orders/installation";
 import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
+import { DELIVERY_LABEL } from "@/lib/orders/delivery";
 
 function esc(value: string): string {
   return value
@@ -233,7 +234,7 @@ function orderTotal(order: OrderEmailInput): number {
 function totalLine(order: OrderEmailInput): string {
   const fee = order.deliveryFee ?? 0;
   return [
-    row(`Delivery: ${fee > 0 ? formatCurrency(fee) : "FREE"}`),
+    row(`${DELIVERY_LABEL}: ${fee > 0 ? formatCurrency(fee) : "FREE"}`),
     row(`<strong>Total (inc VAT): ${formatCurrency(orderTotal(order))}</strong>`),
   ].join("");
 }
@@ -357,7 +358,7 @@ export function customerInvoiceEmail(order: OrderEmailInput, invoice: InvoiceEma
         row(itemsTable(order.items)),
         row(
           `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">
-             ${amountRow("Delivery", fee > 0 ? formatCurrency(fee) : "FREE")}
+             ${amountRow(DELIVERY_LABEL, fee > 0 ? formatCurrency(fee) : "FREE")}
              ${amountRow("Subtotal (ex VAT)", formatCurrency(invoice.net))}
              ${amountRow("VAT @ 20%", formatCurrency(invoice.vat))}
              ${amountRow("Total paid (inc VAT)", formatCurrency(invoice.gross), true)}

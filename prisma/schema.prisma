@@ -85,7 +85,7 @@ model Order {
   termsAcceptedAt DateTime?
 
   subtotal    Decimal @db.Decimal(10, 2) // GBP inc VAT, items only (server-priced)
-  deliveryFee Decimal @default(0) @db.Decimal(10, 2) // GBP; £10 under £1,000, free from £1,000
+  deliveryFee Decimal @default(0) @db.Decimal(10, 2) // GBP; £11.99 under £120, free from £120 (DPD)
 
   paymentStatus           PaymentStatus @default(Unpaid)
   stripeCheckoutSessionId String?       @unique

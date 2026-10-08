@@ -2,13 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, BadgeCheck, PoundSterling, Truck } from "lucide-react";
 
+import { FREE_DELIVERY_FROM } from "@/lib/orders/delivery";
+
 const PANEL_IMAGE =
   "/media/wp/2025/05/side-view-man-charging-his-car-min-scaled.webp";
 
 const facts = [
   { icon: PoundSterling, label: "OZEV grant support" },
   { icon: BadgeCheck, label: "Certified installers" },
-  { icon: Truck, label: "Free delivery over £1,000" },
+  { icon: Truck, label: `Free delivery over ${FREE_DELIVERY_FROM}` },
 ];
 
 const SEGMENTS = 8;

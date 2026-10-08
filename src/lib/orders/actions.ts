@@ -134,6 +134,11 @@ export async function startCheckout(
           shipping_rate_data: {
             display_name: DELIVERY_LABEL,
             type: "fixed_amount",
+            // 1–3 working days to dispatch + 1–2 days with DPD.
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: 2 },
+              maximum: { unit: "business_day", value: 5 },
+            },
             fixed_amount: { amount: Math.round(cart.deliveryFee * 100), currency: "gbp" },
           },
         },

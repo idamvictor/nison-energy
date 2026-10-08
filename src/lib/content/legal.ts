@@ -54,10 +54,18 @@ export const deliveryPolicyMarkdown = `We are committed to providing fast, relia
 
 ## Delivery Charges
 
-| Order Value | Shipping Fee |
-|---|---|
-| Orders of £1,000 or more (inc. VAT) | FREE Standard UK Delivery |
-| Orders under £1,000 (inc. VAT) | £10 Standard UK Delivery |
+### Shipping & Delivery Policy
+
+All standard UK mainland orders are dispatched quickly and delivered securely via our courier partner, DPD. Delivery charges are calculated at checkout based on your total order value:
+
+| Total Order Value | Standard Delivery Fee | Delivery Service |
+|---|---|---|
+| Orders £120 and over | FREE | DPD Tracked Delivery |
+| Orders under £120 | £11.99 | DPD Tracked Delivery |
+
+- **Free Delivery:** Spend £120 or more on any order to qualify for free standard delivery.
+- **Standard Shipping:** For all orders under £120, a flat delivery fee of £11.99 will be applied at checkout.
+- **Tracking:** Full DPD tracking information will be provided via email/SMS once your order has been dispatched.
 
 **Special Services:** Need your order on a weekend? Saturday deliveries and expedited options can be arranged upon request.
 
@@ -78,7 +86,7 @@ export const deliveryPolicyMarkdown = `We are committed to providing fast, relia
 
 Due to their size or technical nature, select products require dedicated transit options:
 
-- **Equipment such as Solar, Inverters, Batteries, Heat Pumps & Boilers:** Pallet delivery (rates to be confirmed). Dispatched via specialist courier (up to 4 working days).
+- **Equipment such as Solar, Inverters, Batteries & Heat Pumps:** Pallet delivery (rates to be confirmed). Dispatched via specialist courier (up to 4 working days).
 
 ## Delivery Coverage
 

@@ -32,7 +32,13 @@ import { whatsappUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 import { placeOrder, saveCheckoutDetails } from "@/lib/orders/actions";
 import { includesInstallation, installSplit } from "@/lib/orders/installation";
-import { DELIVERY_LABEL, deliveryFeeFor, FREE_DELIVERY_THRESHOLD } from "@/lib/orders/delivery";
+import {
+  DELIVERY_ESTIMATE,
+  DELIVERY_LABEL,
+  deliveryFeeFor,
+  FREE_DELIVERY_FROM,
+  FREE_DELIVERY_THRESHOLD,
+} from "@/lib/orders/delivery";
 import type { CheckoutTotals, OrderLineInput, PlaceOrderPayload } from "@/lib/orders/types";
 import { formatCurrency } from "@/lib/currency";
 import { checkCheckoutDetails } from "@/lib/orders/schema";
@@ -285,6 +291,17 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
 
   const methodComplete = session != null && cardCompleteFor === session.clientSecret;
   const sessionError = active.error ?? express.error;
+  // The pay button only becomes active once everything required is in place.
+  const readyToPay = check.ok && (payMethod !== "card" || methodComplete);
+  const missingFields = Object.keys(errors).filter((f) => f !== "acceptedTerms");
+  const payHint =
+    !defaults?.email && !showEmail
+      ? "Choose “Continue as guest” or sign in to continue."
+      : missingFields.length > 0
+        ? "Fill in all required fields to continue."
+        : errors.acceptedTerms
+          ? "Tick the Terms and Conditions to continue."
+          : "Enter your card details to continue.";
   const paymentStatus = sessionError ? (
     <p className="text-sm text-red-300">{sessionError}</p>
   ) : !stripeConfigured ? (
@@ -430,29 +447,29 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
             ))}
           {methodRow("paypal", "PayPal", <PayPalLogo className="scale-90" />)}
           {payMethod === "paypal" && (
-            <div className="flex flex-col gap-3 border-t border-[#dedede] bg-black/[0.04] p-3.5">
-              <p className="text-sm text-[#707070]">
-                After you continue, you&apos;ll be taken to PayPal to log in and approve the payment, then brought
-                straight back here.
+            <div className="relative border-t border-[#dedede] bg-black/[0.04] px-3.5 py-4">
+              <p className="text-center text-sm text-black">
+                You&apos;ll be redirected to PayPal to complete your purchase
               </p>
-              {session ? (
-                <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
-              ) : (
-                <span aria-hidden className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
+              {/* Stripe's element must stay mounted for the redirect to work — kept invisible. */}
+              {session && (
+                <div aria-hidden className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0">
+                  <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
+                </div>
               )}
             </div>
           )}
           {methodRow("klarna", "Klarna", <KlarnaLogo />)}
           {payMethod === "klarna" && (
-            <div className="flex flex-col gap-3 border-t border-[#dedede] bg-black/[0.04] p-3.5">
-              <p className="text-sm text-[#707070]">
-                Pay in 3 interest-free instalments or later with Klarna. You&apos;ll be taken to Klarna to choose how to
-                pay, then brought straight back here.
+            <div className="relative border-t border-[#dedede] bg-black/[0.04] px-3.5 py-4">
+              <p className="text-center text-sm text-black">
+                You&apos;ll be redirected to Klarna to complete your purchase
               </p>
-              {session ? (
-                <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
-              ) : (
-                <span aria-hidden className="h-[46px] animate-pulse rounded-[12px] bg-[#eee]" />
+              {/* Stripe's element must stay mounted for the redirect to work — kept invisible. */}
+              {session && (
+                <div aria-hidden className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0">
+                  <PaymentFields onComplete={(done) => setCardCompleteFor(done ? session.clientSecret : null)} />
+                </div>
               )}
             </div>
           )}
@@ -487,14 +504,18 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
       {error && <p className="text-sm text-red-300">{error}</p>}
       {!paymentStatus &&
         (session ? (
-          <CardPlaceOrder
-            // Always clickable: a click runs the checks and points at what's missing.
-            canPay
-            prepare={preparePayment}
-            label={METHOD_ACTION[payMethod].label}
-            busyLabel={METHOD_ACTION[payMethod].busy}
-            className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-black/60"
-          />
+          <>
+            <CardPlaceOrder
+              // Greyed out until every required field is valid, the terms are
+              // ticked and (for card) the card details are complete.
+              canPay={readyToPay}
+              prepare={preparePayment}
+              label={METHOD_ACTION[payMethod].label}
+              busyLabel={METHOD_ACTION[payMethod].busy}
+              className="h-[52px] rounded-[12px] bg-black text-white hover:bg-black/85 disabled:bg-[#8a8a8a] disabled:text-white/85 disabled:opacity-100"
+            />
+            {!readyToPay && <p className="-mt-2 text-center text-xs text-white/65">{payHint}</p>}
+          </>
         ) : (
           <Button type="button" disabled className="h-[52px] w-full rounded-[12px] bg-black text-base text-white">
             Loading secure payment…
@@ -819,15 +840,18 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       <div className="flex items-center gap-2.5 rounded-[12px] border border-[#dedede] bg-white p-3.5 text-black">
                         <Radio checked />
                         <Truck className="size-4 text-[#707070]" />
-                        <span className="flex-1 text-sm">{DELIVERY_LABEL}</span>
+                        <span className="flex-1 text-sm">
+                          {DELIVERY_LABEL}
+                          <span className="block text-xs text-[#707070]">{DELIVERY_ESTIMATE}</span>
+                        </span>
                         <span className="text-sm font-medium">
                           {totals.deliveryFee === 0 ? "FREE" : formatCurrency(totals.deliveryFee)}
                         </span>
                       </div>
                       {toFreeDelivery > 0 && (
                         <p className="text-xs text-white/65">
-                          Free delivery on orders of {formatCurrency(FREE_DELIVERY_THRESHOLD)} or more — add{" "}
-                          {formatCurrency(toFreeDelivery)} to qualify.
+                          Free delivery on orders of {FREE_DELIVERY_FROM} or more — add {formatCurrency(toFreeDelivery)}{" "}
+                          to qualify.
                         </p>
                       )}
                     </>
@@ -883,8 +907,8 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                     {error && <p className="text-sm text-red-300">{error}</p>}
                     <Button
                       type="submit"
-                      disabled={pending || !termsAccepted}
-                      className="h-[52px] w-full rounded-[12px] bg-black text-base text-white hover:bg-black/85"
+                      disabled={pending || !check.ok}
+                      className="h-[52px] w-full rounded-[12px] bg-black text-base text-white hover:bg-black/85 disabled:bg-[#8a8a8a] disabled:text-white/85 disabled:opacity-100"
                     >
                       {pending ? "Placing order…" : "Place Order"}
                     </Button>

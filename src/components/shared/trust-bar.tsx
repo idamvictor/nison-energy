@@ -1,10 +1,12 @@
-import { CalendarClock, CreditCard, Truck, Wrench } from "lucide-react";
+import { CreditCard, PackageCheck, Truck, Wrench } from "lucide-react";
+
+import { FREE_DELIVERY_FROM } from "@/lib/orders/delivery";
 
 const items = [
-  { icon: Truck, label: "Free UK delivery over £1,000" },
+  { icon: Truck, label: `Free UK delivery over ${FREE_DELIVERY_FROM}` },
   { icon: CreditCard, label: "Buy now, pay in 3" },
   { icon: Wrench, label: "Certified charger installation" },
-  { icon: CalendarClock, label: "Next day delivery available" },
+  { icon: PackageCheck, label: "DPD tracked delivery" },
 ];
 
 export function TrustBar() {

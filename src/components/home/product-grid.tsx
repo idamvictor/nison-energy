@@ -38,7 +38,7 @@ export async function ProductGrid({
         <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product, index) => (
             <Reveal key={product.id} delay={(index % 3) * 75}>
-              <ProductCard variants={[product]} />
+              <ProductCard variants={[product]} quickAdd />
             </Reveal>
           ))}
         </div>

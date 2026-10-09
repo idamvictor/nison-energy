@@ -41,7 +41,7 @@ const slides: Slide[] = [
   {
     headline: "On-site charging for your whole fleet.",
     copy: "Scalable, revenue-ready installations for offices, depots and car parks — backed by OZEV workplace funding.",
-    cta: "Explore workplace charging",
+    cta: "Shop Now",
     href: "/workplace-charging",
     image: `${IMG}/2025/05/EV_OneStop_Website_Commercial_EV_Chargers_02.png`,
   },
@@ -54,19 +54,33 @@ const slides: Slide[] = [
   },
 ];
 
-const SLIDE_DURATION = 7000;
+// Long enough to read the headline, copy and bullets before it moves on.
+const arrowClass =
+  "pointer-events-auto flex size-11 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/40 backdrop-blur-sm transition-colors hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none sm:absolute sm:top-1/2 sm:-translate-y-1/2";
+
+const SLIDE_DURATION = 12000;
 
 export function Hero() {
   const [index, setIndex] = useState(0);
+  // Paused while the pointer or focus is on the hero; once someone uses the
+  // arrows or dots, auto-advance stops for good — they are in control.
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [manual, setManual] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
 
+  // Re-armed on every slide change, so each slide gets its full duration.
   useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % slides.length);
-    }, SLIDE_DURATION);
-    return () => clearInterval(id);
-  }, []);
+    if (hovered || focused || manual) return;
+    const id = setTimeout(() => setIndex((i) => (i + 1) % slides.length), SLIDE_DURATION);
+    return () => clearTimeout(id);
+  }, [index, hovered, focused, manual]);
+
+  const goTo = (next: number) => {
+    setManual(true);
+    setIndex((next + slides.length) % slides.length);
+  };
 
   useGSAP(
     () => {
@@ -171,6 +185,12 @@ export function Hero() {
     <section
       ref={containerRef}
       className="relative overflow-hidden bg-foreground"
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      }}
     >
       <div className="relative h-[680px] sm:h-[640px]">
         <div
@@ -245,38 +265,41 @@ export function Hero() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setIndex((i) => (i - 1 + slides.length) % slides.length)
-          }
-          className="absolute top-1/2 left-4 flex size-8 -translate-y-1/2 items-center justify-center text-white/70 transition-colors hover:text-white sm:left-6"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="size-6" strokeWidth={1.5} />
-        </button>
-        <button
-          type="button"
-          onClick={() => setIndex((i) => (i + 1) % slides.length)}
-          className="absolute top-1/2 right-4 flex size-8 -translate-y-1/2 items-center justify-center text-white/70 transition-colors hover:text-white sm:right-6"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="size-6" strokeWidth={1.5} />
-        </button>
-
-        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
-          {slides.map((s, i) => (
-            <button
-              key={s.headline}
-              type="button"
-              onClick={() => setIndex(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={cn(
-                "h-1 rounded-full transition-all duration-300",
-                i === index ? "w-6 bg-white" : "w-1 bg-white/35"
-              )}
-            />
-          ))}
+        {/* Controls. Phones: one row at the bottom — [‹] dots [›] — clear of the
+            headline and the floating WhatsApp button. From sm up the row fills
+            the hero so the arrows can sit centred at its sides. */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 flex items-center justify-center gap-4 sm:inset-y-0 sm:items-end sm:pb-6">
+          <button
+            type="button"
+            onClick={() => goTo(index - 1)}
+            className={cn(arrowClass, "sm:left-6")}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="size-6" strokeWidth={2} />
+          </button>
+          <div className="pointer-events-auto flex gap-2">
+            {slides.map((s, i) => (
+              <button
+                key={s.headline}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                aria-current={i === index}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  i === index ? "w-7 bg-white" : "w-1.5 bg-white/45 hover:bg-white/70"
+                )}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => goTo(index + 1)}
+            className={cn(arrowClass, "sm:right-6")}
+            aria-label="Next slide"
+          >
+            <ChevronRight className="size-6" strokeWidth={2} />
+          </button>
         </div>
       </div>
     </section>

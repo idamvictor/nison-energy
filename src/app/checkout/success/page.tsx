@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
@@ -12,6 +12,7 @@ import { SurveyNextStep } from "@/components/checkout/survey-next-step";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { fulfilCheckoutSession } from "@/lib/orders/fulfil";
 import { includesInstallation } from "@/lib/orders/installation";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
 export const metadata: Metadata = { title: "Payment received | Ocunio Energy" };
 
@@ -50,20 +51,38 @@ export default async function CheckoutSuccessPage({
               {paid
                 ? "A confirmation email is on its way."
                 : "Your payment provider is still confirming the payment — we'll email you as soon as it clears."}{" "}
-              A member
-              of the team will be in touch to book your installation
-              {needsSurvey && " once your survey below is in"}. If it&apos;s urgent,{" "}
+              {needsSurvey ? (
+                <strong className="font-semibold text-foreground">
+                  Book your installation by completing this short survey.
+                </strong>
+              ) : (
+                "We'll be in touch when your order is dispatched."
+              )}
+            </p>
+            {needsSurvey && (
+              <Button
+                variant="cta"
+                className="gap-1.5"
+                nativeButton={false}
+                render={<a href={OPENQUOTE_SURVEY_URL} target="_blank" rel="noopener noreferrer" />}
+              >
+                Complete the survey
+                <ArrowRight className="size-4" />
+              </Button>
+            )}
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Questions?{" "}
               <a
                 href={whatsappUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-primary-ink underline underline-offset-2"
               >
-                message us on WhatsApp
+                Message us on WhatsApp
               </a>
               .
             </p>
-            <Button nativeButton={false} render={<Link href="/" />}>
+            <Button variant="outline" nativeButton={false} render={<Link href="/" />}>
               Back to home
             </Button>
           </div>

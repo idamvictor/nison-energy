@@ -18,15 +18,19 @@ import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/accessories/accessory-product-tag";
 import { useWishlist } from "@/lib/wishlist/store";
 import { formatCurrency } from "@/lib/currency";
+import { QuickAddToCart } from "@/components/shared/quick-add-to-cart";
 
 export function AccessoryProductCard({
   variants,
   compareIds,
   onToggleCompare,
+  quickAdd,
 }: {
   variants: AccessoryProduct[];
   compareIds?: string[];
   onToggleCompare?: (id: string) => void;
+  /** Homepage featured cards: a cart icon beside the wishlist heart. */
+  quickAdd?: boolean;
 }) {
   const product = variants.reduce((a, b) => (b.price < a.price ? b : a));
   const compareSelected = compareIds?.includes(product.id);
@@ -79,6 +83,18 @@ export function AccessoryProductCard({
                   <GitCompare className="size-4" />
                 )}
               </button>
+            )}
+            {quickAdd && (
+              <QuickAddToCart
+                snapshot={{
+                  id: product.id,
+                  category: "accessories",
+                  name: product.name,
+                  brand: product.brand,
+                  image: product.image,
+                  price: product.price,
+                }}
+              />
             )}
             <button
               type="button"

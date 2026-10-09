@@ -28,7 +28,7 @@ export async function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
         <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product, index) => (
             <Reveal key={product.id} delay={(index % 3) * 75}>
-              <AccessoryProductCard variants={[product]} />
+              <AccessoryProductCard variants={[product]} quickAdd />
             </Reveal>
           ))}
         </div>

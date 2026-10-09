@@ -18,15 +18,19 @@ import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/shared/product-tag";
 import { useWishlist } from "@/lib/wishlist/store";
 import { formatCurrency } from "@/lib/currency";
+import { QuickAddToCart } from "@/components/shared/quick-add-to-cart";
 
 export function ProductCard({
   variants,
   compareIds,
   onToggleCompare,
+  quickAdd,
 }: {
   variants: Product[];
   compareIds?: string[];
   onToggleCompare?: (id: string) => void;
+  /** Homepage featured cards: a cart icon beside the wishlist heart. */
+  quickAdd?: boolean;
 }) {
   const product = variants.reduce((a, b) => (b.price < a.price ? b : a));
   const compareSelected = compareIds?.includes(product.id);
@@ -79,6 +83,19 @@ export function ProductCard({
                   <GitCompare className="size-4" />
                 )}
               </button>
+            )}
+            {quickAdd && (
+              <QuickAddToCart
+                snapshot={{
+                  id: product.id,
+                  category: "residential",
+                  name: product.name,
+                  brand: product.brand,
+                  image: product.image,
+                  price: product.price,
+                }}
+                charger={{ installFee: product.installFee, cableLength: product.cableLength }}
+              />
             )}
             <button
               type="button"

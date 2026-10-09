@@ -1085,7 +1085,7 @@ function OrderSummary({
           </dd>
         </div>
         {postcodeValid && toFreeDelivery > 0 && (
-          <p className="text-xs text-black/55">Add {formatCurrency(toFreeDelivery)} more for free delivery.</p>
+          <p className="text-xs text-black/55">Spend {formatCurrency(toFreeDelivery)} or more for free delivery.</p>
         )}
         <div className="mt-3 flex items-baseline justify-between">
           <dt className="text-lg font-medium">Total</dt>

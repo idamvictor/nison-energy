@@ -40,7 +40,7 @@ export function generateWorkplaceQuotePdf(input: WorkplaceQuoteInput): Promise<B
   const rows = [
     [
       String(itemNum++),
-      `EV Chargepoint Unit(s) (${input.chargerModel}, ${input.sockets} socket(s) total)`,
+      input.chargerModel,
       String(input.chargepoints),
       fmtMoney(input.chargerCost),
       fmtMoney(chargerTotal),

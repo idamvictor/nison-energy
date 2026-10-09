@@ -17,8 +17,11 @@ type Sort = "recommended" | "price-asc" | "price-desc";
 
 const categoryLabel: Record<Category, string> = { home: "Home", commercial: "Commercial" };
 
+type Connection = GuideCharger["connectionType"];
+type Power = "7kW" | "22kW";
+
 /** 22kW-class vs 7kW-class — the distinction customers actually shop by. */
-function powerClass(powerOutput: string): "7kW" | "22kW" {
+function powerClass(powerOutput: string): Power {
   const kw = parseFloat(powerOutput);
   return Number.isFinite(kw) && kw >= 11 ? "22kW" : "7kW";
 }
@@ -48,9 +51,7 @@ function Chip({
     >
       {children}
       {count !== undefined && (
-        <span className={cn("text-xs", active ? "text-background/70" : "text-muted-foreground")}>
-          {count}
-        </span>
+        <span className={cn("text-xs", active ? "text-background/70" : "text-muted-foreground")}>{count}</span>
       )}
     </button>
   );
@@ -86,9 +87,7 @@ function ChargerCard({
       onClick={onPick}
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border bg-card text-left transition-all focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none motion-safe:hover:-translate-y-0.5 hover:shadow-lg",
-        selected
-          ? "border-foreground ring-2 ring-primary/40"
-          : "border-border hover:border-primary/50",
+        selected ? "border-foreground ring-2 ring-primary/40" : "border-border hover:border-primary/50",
         size === "feature" ? "w-60 shrink-0 snap-start" : "w-full",
       )}
     >
@@ -108,12 +107,8 @@ function ChargerCard({
         />
       </div>
       <div className="flex flex-1 flex-col gap-1.5 border-t border-border/70 p-3.5">
-        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          {charger.brand}
-        </p>
-        <p className="line-clamp-2 text-sm leading-snug font-semibold text-foreground">
-          {charger.name}
-        </p>
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{charger.brand}</p>
+        <p className="line-clamp-2 text-sm leading-snug font-semibold text-foreground">{charger.name}</p>
         <SpecChips charger={charger} />
         <div className="mt-auto flex items-end justify-between gap-2 pt-2">
           <div>
@@ -122,9 +117,7 @@ function ChargerCard({
               {gbp.format(charger.fromPriceExVat)}
               <span className="ml-1 text-xs font-normal text-muted-foreground">ex VAT</span>
             </p>
-            <p className="text-xs text-muted-foreground">
-              {gbp.format(charger.variants[0].priceIncVat)} inc VAT
-            </p>
+            <p className="text-xs text-muted-foreground">{gbp.format(charger.variants[0].priceIncVat)} inc VAT</p>
           </div>
           <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
         </div>
@@ -150,10 +143,9 @@ export function ChargerPicker({
   onChange: (value: ChargerSelection) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [category, setCategory] = useState<Category>(defaultCategory);
   const [query, setQuery] = useState("");
-  const [connection, setConnection] = useState<GuideCharger["connectionType"] | null>(null);
-  const [power, setPower] = useState<"7kW" | "22kW" | null>(null);
+  const [connection, setConnection] = useState<Connection | null>(null);
+  const [power, setPower] = useState<Power | null>(null);
   const [brand, setBrand] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recommended");
   const cardRef = useRef<HTMLDivElement>(null);
@@ -162,45 +154,54 @@ export function ChargerPicker({
   const selectedVariant = selectedGroup?.variants.find((v) => v.id === value?.variantId);
 
   const brandCount = useMemo(() => new Set(chargers.map((c) => c.brand)).size, [chargers]);
-  const categoryCounts = useMemo(
-    () => ({
-      home: chargers.filter((c) => c.category === "home").length,
-      commercial: chargers.filter((c) => c.category === "commercial").length,
-    }),
-    [chargers],
-  );
-
-  const inCategory = useMemo(
-    () => chargers.filter((c) => c.category === category),
-    [chargers, category],
-  );
-
-  const brands = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const c of inCategory) counts.set(c.brand, (counts.get(c.brand) ?? 0) + 1);
-    return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  }, [inCategory]);
-
   const filtersActive = Boolean(query.trim() || connection || power || brand);
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const list = inCategory.filter(
-      (c) =>
-        (!q ||
-          `${c.brand} ${c.name} ${c.powerOutput} ${c.connectionType}`.toLowerCase().includes(q)) &&
-        (!connection || c.connectionType === connection) &&
-        (!power || powerClass(c.powerOutput) === power) &&
-        (!brand || c.brand === brand),
-    );
-    return list.sort((a, b) => {
-      if (sort === "price-asc") return a.fromPriceExVat - b.fromPriceExVat;
-      if (sort === "price-desc") return b.fromPriceExVat - a.fromPriceExVat;
-      return Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name);
-    });
-  }, [inCategory, query, connection, power, brand, sort]);
+  // One search over every charger (home + commercial). Each chip's count is
+  // what you'd get by clicking it — i.e. the search plus every *other* active
+  // filter — so a count never promises results that aren't there.
+  const { results, connectionCounts, powerCounts, brandCounts } = useMemo(() => {
+    const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const matches = (c: GuideCharger, skip?: "connection" | "power" | "brand") => {
+      const text = `${c.brand} ${c.name} ${c.powerOutput} ${c.connectionType}`.toLowerCase();
+      return (
+        words.every((w) => text.includes(w)) &&
+        (skip === "connection" || !connection || c.connectionType === connection) &&
+        (skip === "power" || !power || powerClass(c.powerOutput) === power) &&
+        (skip === "brand" || !brand || c.brand === brand)
+      );
+    };
+    const tally = <K extends string>(skip: "connection" | "power" | "brand", key: (c: GuideCharger) => K) => {
+      const counts = new Map<K, number>();
+      for (const c of chargers) if (matches(c, skip)) counts.set(key(c), (counts.get(key(c)) ?? 0) + 1);
+      return counts;
+    };
+    const list = chargers
+      .filter((c) => matches(c))
+      .sort((a, b) => {
+        if (sort === "price-asc") return a.fromPriceExVat - b.fromPriceExVat;
+        if (sort === "price-desc") return b.fromPriceExVat - a.fromPriceExVat;
+        // Recommended: featured first, then this guide's own charger type.
+        return (
+          Number(b.featured) - Number(a.featured) ||
+          Number(b.category === defaultCategory) - Number(a.category === defaultCategory) ||
+          a.name.localeCompare(b.name)
+        );
+      });
+    return {
+      results: list,
+      connectionCounts: tally("connection", (c) => c.connectionType),
+      powerCounts: tally("power", (c) => powerClass(c.powerOutput)),
+      brandCounts: [...tally("brand", (c) => c.brand).entries()].sort((a, b) => a[0].localeCompare(b[0])),
+    };
+  }, [chargers, query, connection, power, brand, sort, defaultCategory]);
 
-  const popular = useMemo(() => inCategory.filter((c) => c.featured), [inCategory]);
+  const popular = useMemo(
+    () =>
+      chargers
+        .filter((c) => c.featured)
+        .sort((a, b) => Number(b.category === defaultCategory) - Number(a.category === defaultCategory)),
+    [chargers, defaultCategory],
+  );
 
   function clearFilters() {
     setQuery("");
@@ -210,17 +211,13 @@ export function ChargerPicker({
   }
 
   function pick(charger: GuideCharger) {
-    const keepVariant =
-      value?.key === charger.key && charger.variants.some((v) => v.id === value.variantId);
+    const keepVariant = value?.key === charger.key && charger.variants.some((v) => v.id === value.variantId);
     onChange({ key: charger.key, variantId: keepVariant ? value!.variantId : charger.variants[0].id });
     setOpen(false);
-    requestAnimationFrame(() =>
-      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-    );
+    requestAnimationFrame(() => cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }));
   }
 
   function openFinder() {
-    if (selectedGroup) setCategory(selectedGroup.category);
     setOpen(true);
   }
 
@@ -240,9 +237,8 @@ export function ChargerPicker({
   function chooseVariant(colour: string, length?: string) {
     if (!selectedGroup) return;
     const match =
-      selectedGroup.variants.find(
-        (v) => v.colour === colour && (length === undefined || v.cableLength === length),
-      ) ?? selectedGroup.variants.find((v) => v.colour === colour);
+      selectedGroup.variants.find((v) => v.colour === colour && (length === undefined || v.cableLength === length)) ??
+      selectedGroup.variants.find((v) => v.colour === colour);
     if (match) onChange({ key: selectedGroup.key, variantId: match.id });
   }
 
@@ -302,9 +298,7 @@ export function ChargerPicker({
 
             <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border/70 pt-2.5">
               <p className="text-sm">
-                <span className="font-semibold text-foreground">
-                  {gbp.format(selectedVariant.priceExVat)}
-                </span>{" "}
+                <span className="font-semibold text-foreground">{gbp.format(selectedVariant.priceExVat)}</span>{" "}
                 <span className="text-muted-foreground">
                   ex VAT · {gbp.format(selectedVariant.priceIncVat)} inc VAT
                 </span>
@@ -328,8 +322,7 @@ export function ChargerPicker({
           <span>
             <span className="block font-semibold text-foreground">Choose your charger</span>
             <span className="mt-0.5 block text-sm text-muted-foreground">
-              Browse {chargers.length} chargers from {brandCount} brands — search, filter and pick
-              in seconds.
+              Browse {chargers.length} chargers from {brandCount} brands — search, filter and pick in seconds.
             </span>
           </span>
           <span className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-medium text-background transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -344,17 +337,11 @@ export function ChargerPicker({
           showCloseButton={false}
           className="flex h-[100svh] max-h-[100svh] w-full max-w-full flex-col gap-0 overflow-hidden rounded-none p-0 sm:h-[88svh] sm:max-w-5xl sm:rounded-2xl"
         >
-          {/* Header: title, search, category toggle */}
+          {/* Header: title, search */}
           <div className="flex flex-col gap-3 border-b border-border bg-card px-4 pt-4 pb-3 sm:px-6">
             <div className="flex items-center justify-between gap-3">
               <DialogTitle className="text-lg font-semibold">Find your charger</DialogTitle>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Close"
-                onClick={() => setOpen(false)}
-              >
+              <Button type="button" variant="ghost" size="icon-sm" aria-label="Close" onClick={() => setOpen(false)}>
                 <X />
               </Button>
             </div>
@@ -370,50 +357,45 @@ export function ChargerPicker({
                   className="h-10 rounded-xl bg-background pl-9"
                 />
               </label>
-              <div role="tablist" aria-label="Charger type" className="grid grid-cols-2 rounded-xl bg-muted p-1">
-                {(["home", "commercial"] as const).map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    role="tab"
-                    aria-selected={category === c}
-                    onClick={() => {
-                      setCategory(c);
-                      setBrand(null);
-                    }}
-                    className={cn(
-                      "h-8 rounded-lg px-4 text-sm font-medium transition-all focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
-                      category === c
-                        ? "bg-card text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {categoryLabel[c]}
-                    <span className="ml-1.5 text-xs text-muted-foreground">{categoryCounts[c]}</span>
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Filters */}
             <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-0.5 sm:-mx-6 sm:px-6 [&::-webkit-scrollbar]:hidden">
-              {(["Tethered", "Untethered"] as const).map((c) => (
-                <Chip key={c} active={connection === c} onClick={() => setConnection(connection === c ? null : c)}>
-                  {c}
-                </Chip>
-              ))}
+              {(["Tethered", "Untethered"] as const).map((c) => {
+                const n = connectionCounts.get(c) ?? 0;
+                if (n === 0 && connection !== c) return null;
+                return (
+                  <Chip
+                    key={c}
+                    active={connection === c}
+                    count={n}
+                    onClick={() => setConnection(connection === c ? null : c)}
+                  >
+                    {c}
+                  </Chip>
+                );
+              })}
               <span aria-hidden className="h-5 w-px shrink-0 bg-border" />
-              {(["7kW", "22kW"] as const).map((p) => (
-                <Chip key={p} active={power === p} onClick={() => setPower(power === p ? null : p)}>
-                  {p}
-                </Chip>
-              ))}
+              {(["7kW", "22kW"] as const).map((p) => {
+                const n = powerCounts.get(p) ?? 0;
+                if (n === 0 && power !== p) return null;
+                return (
+                  <Chip key={p} active={power === p} count={n} onClick={() => setPower(power === p ? null : p)}>
+                    {p}
+                  </Chip>
+                );
+              })}
               <span aria-hidden className="h-5 w-px shrink-0 bg-border" />
-              {brands.map(([b, n]) => (
+              {brandCounts.map(([b, n]) => (
                 <Chip key={b} active={brand === b} count={n} onClick={() => setBrand(brand === b ? null : b)}>
                   {b}
                 </Chip>
               ))}
+              {brand && !brandCounts.some(([b]) => b === brand) && (
+                <Chip active count={0} onClick={() => setBrand(null)}>
+                  {brand}
+                </Chip>
+              )}
             </div>
           </div>
 
@@ -470,12 +452,7 @@ export function ChargerPicker({
             {results.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
                 {results.map((c) => (
-                  <ChargerCard
-                    key={c.key}
-                    charger={c}
-                    selected={value?.key === c.key}
-                    onPick={() => pick(c)}
-                  />
+                  <ChargerCard key={c.key} charger={c} selected={value?.key === c.key} onPick={() => pick(c)} />
                 ))}
               </div>
             ) : (

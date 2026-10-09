@@ -40,7 +40,7 @@ export function generateLandlordQuotePdf(input: LandlordQuoteInput): Promise<Blo
   const rows = [
     [
       String(itemNum++),
-      `EV Chargepoint Unit(s) (${input.chargerModel}, ${input.sockets} socket(s) total)`,
+      input.chargerModel,
       String(input.chargepoints),
       fmtMoney(input.chargerCost),
       fmtMoney(chargerTotal),

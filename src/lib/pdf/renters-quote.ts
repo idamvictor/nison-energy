@@ -62,7 +62,7 @@ export function generateRentersQuotePdf(input: RentersQuoteInput): Promise<Blob>
       align: ["left", "center", "right", "right"],
       widths: [undefined, 14, 36, 32],
       rows: [
-        row(`EV Chargepoint Unit (${input.chargerModel})`, input.chargerCost),
+        row(input.chargerModel, input.chargerCost),
         row("Installation Labour", input.labourCost),
         ...input.works.map((w) => row(w.desc, w.cost)),
       ],

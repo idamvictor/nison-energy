@@ -10,27 +10,43 @@
 // with nothing else to browse per-colour, so they collapse into one card
 // (colour is still fully choosable via the normal dropdown on its detail
 // page, just not via a separate card per colour in the listing grid).
+//
+// Pass `all` (the whole catalogue) when grouping a filtered list: whether a
+// product has a length choice must come from every row, not just the ones
+// left after filtering — otherwise ticking "10m" leaves one length per group
+// and its colour cards wrongly merge into one.
 
 export function groupByVariant<
   T extends { id: string; variantGroup?: string; price: number; colour: string },
 >(
   products: T[],
   typeOf: (p: T) => string,
-  lengthOf: (p: T) => string | null | undefined
+  lengthOf: (p: T) => string | null | undefined,
+  all: T[] = products
 ): { key: string; variants: T[] }[] {
+  const groupTypeKey = (p: T) =>
+    p.variantGroup ? `${p.variantGroup}::${typeOf(p)}` : p.id;
+
   const byGroupType = new Map<string, T[]>();
   for (const p of products) {
-    const gtKey = p.variantGroup ? `${p.variantGroup}::${typeOf(p)}` : p.id;
+    const gtKey = groupTypeKey(p);
     if (!byGroupType.has(gtKey)) byGroupType.set(gtKey, []);
     byGroupType.get(gtKey)!.push(p);
   }
 
+  // Distinct cable lengths per group, across the whole catalogue.
+  const lengthsByGroupType = new Map<string, Set<string>>();
+  for (const p of all) {
+    const length = lengthOf(p);
+    if (!length) continue;
+    const gtKey = groupTypeKey(p);
+    if (!lengthsByGroupType.has(gtKey)) lengthsByGroupType.set(gtKey, new Set());
+    lengthsByGroupType.get(gtKey)!.add(length);
+  }
+
   const groups = new Map<string, T[]>();
   for (const [gtKey, items] of byGroupType) {
-    const distinctLengths = new Set(
-      items.map(lengthOf).filter((l): l is string => Boolean(l))
-    );
-    const hasLengthVariation = distinctLengths.size > 1;
+    const hasLengthVariation = (lengthsByGroupType.get(gtKey)?.size ?? 0) > 1;
     for (const p of items) {
       const key = hasLengthVariation ? `${gtKey}::${p.colour}` : gtKey;
       if (!groups.has(key)) groups.set(key, []);
@@ -51,17 +67,18 @@ export function groupedFacetCounts<
   products: T[],
   typeOf: (p: T) => string,
   lengthOf: (p: T) => string | null | undefined,
-  valueOf: (p: T) => string
+  valueOf: (p: T) => string | null | undefined
 ): Map<string, number> {
   const byValue = new Map<string, T[]>();
   for (const p of products) {
     const v = valueOf(p);
+    if (!v) continue;
     if (!byValue.has(v)) byValue.set(v, []);
     byValue.get(v)!.push(p);
   }
   const counts = new Map<string, number>();
   for (const [v, items] of byValue) {
-    counts.set(v, groupByVariant(items, typeOf, lengthOf).length);
+    counts.set(v, groupByVariant(items, typeOf, lengthOf, products).length);
   }
   return counts;
 }
@@ -79,7 +96,7 @@ export function groupedBucketCounts<
   const counts = new Map<string, number>();
   for (const bucket of buckets) {
     const matching = products.filter((p) => bucket.test(p.price));
-    counts.set(bucket.key, groupByVariant(matching, typeOf, lengthOf).length);
+    counts.set(bucket.key, groupByVariant(matching, typeOf, lengthOf, products).length);
   }
   return counts;
 }

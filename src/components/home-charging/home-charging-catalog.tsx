@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/sheet";
 import {
   FilterGroup,
-  useCounts,
   toggle,
   useFilterParam,
   useSortParam,
@@ -91,8 +90,9 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
     () => groupedFacetCounts(products, typeOf, lengthOf, (p) => p.powerOutput),
     [products]
   );
-  const cableLengthCounts = useCounts(
-    products.filter((p) => p.cableLength).map((p) => p.cableLength as string)
+  const cableLengthCounts = useMemo(
+    () => groupedFacetCounts(products, typeOf, lengthOf, (p) => p.cableLength),
+    [products]
   );
   const bucketCounts = useMemo(
     () => groupedBucketCounts(products, typeOf, lengthOf, priceBuckets),
@@ -139,8 +139,8 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
   ]);
 
   const groups = useMemo(
-    () => groupByVariant(filtered, typeOf, lengthOf),
-    [filtered]
+    () => groupByVariant(filtered, typeOf, lengthOf, products),
+    [filtered, products]
   );
 
   const filterGroups = (

@@ -126,8 +126,8 @@ export function CommercialCatalog({
   ]);
 
   const groups = useMemo(
-    () => groupByVariant(filtered, typeOf, lengthOf),
-    [filtered]
+    () => groupByVariant(filtered, typeOf, lengthOf, commercialProducts),
+    [filtered, commercialProducts]
   );
 
   const filterGroups = (

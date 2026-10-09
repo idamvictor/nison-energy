@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/sheet";
 import {
   FilterGroup,
-  useCounts,
   toggle,
   useFilterParam,
   useSortParam,
@@ -80,9 +79,15 @@ export function AccessoriesCatalog({
     () => groupedFacetCounts(accessoryProducts, typeOf, lengthOf, (p) => p.phase),
     [accessoryProducts]
   );
-  const lengthCounts = useCounts(
-    accessoryProducts.flatMap((p) => p.lengthOptions)
-  );
+  // Cards per length (a product can list several lengths), grouped like the grid.
+  const lengthCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const length of new Set(accessoryProducts.flatMap((p) => p.lengthOptions))) {
+      const matching = accessoryProducts.filter((p) => p.lengthOptions.includes(length));
+      counts.set(length, groupByVariant(matching, typeOf, lengthOf, accessoryProducts).length);
+    }
+    return counts;
+  }, [accessoryProducts]);
 
   const filtered = useMemo(() => {
     let list = accessoryProducts.filter((p: AccessoryProduct) => {
@@ -107,8 +112,8 @@ export function AccessoriesCatalog({
   }, [accessoryProducts, brands, colours, styles, phases, lengths, sort]);
 
   const groups = useMemo(
-    () => groupByVariant(filtered, typeOf, lengthOf),
-    [filtered]
+    () => groupByVariant(filtered, typeOf, lengthOf, accessoryProducts),
+    [filtered, accessoryProducts]
   );
 
   const filterGroups = (

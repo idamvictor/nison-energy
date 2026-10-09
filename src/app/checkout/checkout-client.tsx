@@ -542,10 +542,10 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   );
 
   return (
-    <div className="min-h-dvh bg-[#454545] lg:bg-[linear-gradient(to_right,#454545_50%,#f5f5f5_50%)]">
+    <div className="min-h-dvh bg-[#0f1b24] lg:bg-[linear-gradient(to_right,#0f1b24_50%,#f5f5f5_50%)]">
       <div className="mx-auto grid max-w-[1160px] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
         {/* ── Left: the form ── */}
-        <div className="bg-[#454545] lg:border-r lg:border-[#787878]">
+        <div className="bg-[#0f1b24] lg:border-r lg:border-[#2c3f4c]">
           <div className="ml-auto flex w-full max-w-[580px] flex-col px-4 pt-6 pb-10 sm:px-10 lg:pt-10">
             <header className="flex items-center justify-between pb-6">
               <Link href="/" className="rounded-md bg-white px-3 py-2" aria-label="Ocunio Energy home">
@@ -680,9 +680,9 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       )}
                     </div>
                     <div className="flex items-center py-5 text-sm text-white/65">
-                      <span className="h-px flex-1 bg-[#787878]" />
+                      <span className="h-px flex-1 bg-[#2c3f4c]" />
                       <span className="px-3.5">OR</span>
-                      <span className="h-px flex-1 bg-[#787878]" />
+                      <span className="h-px flex-1 bg-[#2c3f4c]" />
                     </div>
                   </div>
                 )}
@@ -860,12 +860,12 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                       )}
                     </>
                   ) : (
-                    <div className="rounded-[12px] bg-[#4c4c4c] p-4 text-center text-sm text-white/65">
+                    <div className="rounded-[12px] bg-[#1a2a35] p-4 text-center text-sm text-white/65">
                       Enter your shipping address to view available shipping methods.
                     </div>
                   )}
                   {hasInstallation && (
-                    <div className="flex items-start gap-3 rounded-[12px] bg-[#4c4c4c] p-4 text-sm">
+                    <div className="flex items-start gap-3 rounded-[12px] bg-[#1a2a35] p-4 text-sm">
                       <Video className="mt-0.5 size-4 shrink-0 text-white" />
                       <div className="flex-1">
                         <p className="flex justify-between font-medium text-white">
@@ -939,7 +939,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
               </form>
             )}
 
-            <footer className="mt-12 flex flex-wrap gap-x-3.5 gap-y-1 border-t border-[#787878] pt-3.5 text-sm text-[#d7d7d7]">
+            <footer className="mt-12 flex flex-wrap gap-x-3.5 gap-y-1 border-t border-[#2c3f4c] pt-3.5 text-sm text-[#d7d7d7]">
               <Link href="/terms-of-sale" className="hover:text-white">
                 Refund policy
               </Link>

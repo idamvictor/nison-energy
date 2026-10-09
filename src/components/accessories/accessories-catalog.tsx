@@ -186,7 +186,7 @@ export function AccessoriesCatalog({
             {filterGroups}
           </aside>
 
-          <div className="min-w-0 flex-1">
+          <div id="catalog-results" className="min-w-0 flex-1 scroll-mt-24">
             <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
               <p className="text-sm text-muted-foreground">
                 {groups.length}{" "}

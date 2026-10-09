@@ -24,6 +24,23 @@ export function toggle<T>(set: Set<T>, value: T) {
   return next;
 }
 
+/** Distance the results bar sits below the sticky site header (scroll-mt-24). */
+const RESULTS_OFFSET = 96;
+
+/**
+ * After a filter or sort change, bring the top of the product grid (the
+ * "N products" bar, #catalog-results) into view — but only when the shopper
+ * has scrolled past it; near the top of the page nothing moves.
+ */
+function scrollToResults() {
+  requestAnimationFrame(() => {
+    const el = document.getElementById("catalog-results");
+    if (!el || el.getBoundingClientRect().top >= RESULTS_OFFSET - 1) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+  });
+}
+
 /**
  * Set-valued filter state backed by a URL query param instead of useState, so
  * browser Back restores the exact filtered view instead of resetting it.
@@ -49,10 +66,10 @@ export function useFilterParam(
       if (next.size > 0) params.set(key, [...next].join(","));
       else params.delete(key);
       const qs = params.toString();
-      // scroll: true — every filter change jumps back to the top of the
-      // results, even from far down a long list. Browser Back/Forward is a
-      // separate, native mechanism unaffected by this option.
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: true });
+      // Not the top of the page — the top of the product grid (Back/Forward
+      // still restore natively).
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      scrollToResults();
     },
     [value, searchParams, key, pathname, router],
   );
@@ -76,7 +93,8 @@ export function useSortParam<T extends string>(
       if (v === defaultValue) params.delete("sort");
       else params.set("sort", v);
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: true });
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      scrollToResults();
     },
     [searchParams, pathname, router, defaultValue],
   );

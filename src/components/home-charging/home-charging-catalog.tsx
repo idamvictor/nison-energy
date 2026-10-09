@@ -30,9 +30,10 @@ import {
 } from "@/lib/catalog/variant-grouping";
 
 const priceBuckets = [
-  { key: "under-1000", label: "Under £1,000", test: (p: number) => p < 1000 },
-  { key: "1000-1060", label: "£1,000 – £1,060", test: (p: number) => p >= 1000 && p < 1060 },
-  { key: "1060-plus", label: "£1,060+", test: (p: number) => p >= 1060 },
+  { key: "under-400", label: "Under £400", test: (p: number) => p < 400 },
+  { key: "400-500", label: "£400 – £500", test: (p: number) => p >= 400 && p < 500 },
+  { key: "500-600", label: "£500 – £600", test: (p: number) => p >= 500 && p < 600 },
+  { key: "600-plus", label: "£600+", test: (p: number) => p >= 600 },
 ];
 
 const sortOptions = [
@@ -159,11 +160,14 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
       <FilterGroup
         value="price"
         title="Price"
-        items={priceBuckets.map((b) => ({
-          value: b.key,
-          label: b.label,
-          count: bucketCounts.get(b.key) ?? 0,
-        }))}
+        // Empty ranges are hidden (unless ticked) so a price never shows 0 results.
+        items={priceBuckets
+          .map((b) => ({
+            value: b.key,
+            label: b.label,
+            count: bucketCounts.get(b.key) ?? 0,
+          }))
+          .filter((b) => b.count > 0 || buckets.has(b.value))}
         selected={buckets}
         onToggle={(v) => setBuckets((s) => toggle(s, v))}
       />
@@ -224,7 +228,7 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
             {filterGroups}
           </aside>
 
-          <div className="min-w-0 flex-1">
+          <div id="catalog-results" className="min-w-0 flex-1 scroll-mt-24">
             <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
               <p className="text-sm text-muted-foreground">
                 {groups.length}{" "}

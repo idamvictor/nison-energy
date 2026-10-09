@@ -61,7 +61,7 @@ export function AccountRow({ email }: { email: string }) {
 
   return (
     <div className="flex items-center gap-1.5">
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#4c4c4c] text-[15px] text-white uppercase">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1a2a35] text-[15px] text-white uppercase">
         {email.charAt(0)}
       </span>
       <span className="flex-1 truncate text-sm text-white">{email}</span>

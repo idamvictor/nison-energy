@@ -93,7 +93,7 @@ export function ExtrasPicker({
             </span>
             <span className="flex -space-x-2">
               {available.slice(0, 3).map((extra) => (
-                <span key={extra.id} className="block rounded-[10px] ring-2 ring-[#454545]">
+                <span key={extra.id} className="block rounded-[10px] ring-2 ring-[#0f1b24]">
                   <Thumb src={extra.image} size={32} />
                 </span>
               ))}

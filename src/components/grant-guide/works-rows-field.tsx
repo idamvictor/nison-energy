@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { EligibleCostsDialog } from "@/components/grant-guide/eligible-costs-dialog";
 
 export type WorkRow = { desc: string; cost: string };
 
@@ -25,9 +26,12 @@ export function WorksRowsField({
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex flex-col gap-0.5">
-        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          Additional works
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Additional works
+          </p>
+          <EligibleCostsDialog />
+        </div>
         <p className="text-xs text-muted-foreground">
           e.g. mounting/pedestal, electrical protection hardware, civil
           works, cabling — add as many lines as you need

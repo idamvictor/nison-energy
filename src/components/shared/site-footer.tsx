@@ -9,11 +9,11 @@ import { whatsappUrl } from "@/lib/whatsapp";
 import { COMPANY } from "@/lib/company";
 import {
   AmexLogo,
+  KlarnaLogo,
   ApplePayLogo,
   GooglePayLogo,
   MastercardLogo,
   PayPalLogo,
-  StripeLogo,
   VisaLogo,
 } from "@/components/checkout/payment-logos";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ const paymentMethods = [
   { name: "Apple Pay", logo: <ApplePayLogo className="h-9" /> },
   { name: "Google Pay", logo: <GooglePayLogo className="h-9" /> },
   { name: "PayPal", logo: <PayPalLogo className="origin-center scale-[0.72]" /> },
-  { name: "Stripe", logo: <StripeLogo className="text-[15px]" /> },
+  { name: "Klarna", logo: <KlarnaLogo className="h-5" /> },
 ];
 
 const socialLinks = [

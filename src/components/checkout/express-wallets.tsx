@@ -38,17 +38,26 @@ function FallbackButton({
   wallet,
   onClick,
   height = 40,
+  light = false,
 }: {
   wallet: Wallet;
   onClick: () => void;
   /** Matches Stripe's real buttons in the same row. */
   height?: number;
+  /** White versions, matching Stripe's light themes. */
+  light?: boolean;
 }) {
-  const style: Record<Wallet, string> = {
-    applePay: "bg-black text-white",
-    googlePay: "bg-black text-white",
-    paypal: "bg-[#ffc439]",
-  };
+  const style: Record<Wallet, string> = light
+    ? {
+        applePay: "bg-white text-black ring-1 ring-black",
+        googlePay: "bg-white text-black",
+        paypal: "bg-white",
+      }
+    : {
+        applePay: "bg-black text-white",
+        googlePay: "bg-black text-white",
+        paypal: "bg-[#ffc439]",
+      };
   return (
     <button
       type="button"
@@ -84,10 +93,13 @@ const SPAN: Record<number, string> = { 1: "col-span-1", 2: "col-span-2", 3: "col
 export function ExpressWallets({
   wallets = WALLETS,
   buttonHeight = 40,
+  light = false,
 }: {
   /** Which wallets to offer (e.g. just PayPal in the payment list). */
   wallets?: Wallet[];
   buttonHeight?: number;
+  /** White buttons (Apple Pay outlined) so each stands out on a dark background. */
+  light?: boolean;
 }) {
   const [available, setAvailable] = useState<AvailableWallets | null>(null);
   const [notice, setNotice] = useState<Wallet | null>(null);
@@ -119,6 +131,7 @@ export function ExpressWallets({
             onWallets={setAvailable}
             maxColumns={wallets.length}
             buttonHeight={buttonHeight}
+            light={light}
           />
         </div>
         {available == null
@@ -131,7 +144,13 @@ export function ExpressWallets({
               />
             ))
           : missing.map((wallet) => (
-              <FallbackButton key={wallet} wallet={wallet} height={buttonHeight} onClick={() => setNotice(wallet)} />
+              <FallbackButton
+                key={wallet}
+                wallet={wallet}
+                height={buttonHeight}
+                light={light}
+                onClick={() => setNotice(wallet)}
+              />
             ))}
       </div>
       {notice && (

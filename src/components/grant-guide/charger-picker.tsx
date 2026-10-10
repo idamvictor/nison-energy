@@ -136,11 +136,14 @@ export function ChargerPicker({
   defaultCategory,
   value,
   onChange,
+  label = "Your charger",
 }: {
   chargers: GuideCharger[];
   defaultCategory: Category;
   value: ChargerSelection | null;
   onChange: (value: ChargerSelection) => void;
+  /** Heading above the card — "Charger 2" etc. when a quote has several. */
+  label?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -153,7 +156,6 @@ export function ChargerPicker({
   const selectedGroup = value ? chargers.find((c) => c.key === value.key) : undefined;
   const selectedVariant = selectedGroup?.variants.find((v) => v.id === value?.variantId);
 
-  const brandCount = useMemo(() => new Set(chargers.map((c) => c.brand)).size, [chargers]);
   const filtersActive = Boolean(query.trim() || connection || power || brand);
 
   // One search over every charger (home + commercial). Each chip's count is
@@ -244,7 +246,7 @@ export function ChargerPicker({
 
   return (
     <div ref={cardRef} className="scroll-mt-28 sm:col-span-2">
-      <p className="mb-1.5 text-sm font-medium text-foreground">Your charger</p>
+      <p className="mb-1.5 text-sm font-medium text-foreground">{label}</p>
 
       {selectedGroup && selectedVariant ? (
         <div className="flex flex-col gap-4 rounded-2xl border border-foreground/15 bg-card p-3 shadow-sm sm:flex-row sm:items-stretch">
@@ -316,14 +318,8 @@ export function ChargerPicker({
           onClick={openFinder}
           className="group flex w-full flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-border bg-card/60 px-6 py-8 text-center transition-colors hover:border-primary/60 hover:bg-primary/5 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
         >
-          <span className="flex size-12 items-center justify-center rounded-full bg-foreground text-background transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-            <PlugZap className="size-5" />
-          </span>
           <span>
             <span className="block font-semibold text-foreground">Choose your charger</span>
-            <span className="mt-0.5 block text-sm text-muted-foreground">
-              Browse {chargers.length} chargers from {brandCount} brands — search, filter and pick in seconds.
-            </span>
           </span>
           <span className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-medium text-background transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
             Browse chargers

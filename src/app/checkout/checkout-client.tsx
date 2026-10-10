@@ -673,7 +673,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                           clientSecret={express.session.clientSecret}
                           onSessionError={express.discard}
                         >
-                          <ExpressWallets buttonHeight={48} />
+                          <ExpressWallets buttonHeight={48} light />
                         </StripeCheckoutProvider>
                       ) : (
                         <WalletSkeleton />
@@ -940,9 +940,6 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
             )}
 
             <footer className="mt-12 flex flex-wrap gap-x-3.5 gap-y-1 border-t border-[#2c3f4c] pt-3.5 text-sm text-[#d7d7d7]">
-              <Link href="/terms-of-sale" className="hover:text-white">
-                Refund policy
-              </Link>
               <Link href="/delivery-information" className="hover:text-white">
                 Shipping
               </Link>

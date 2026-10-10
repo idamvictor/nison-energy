@@ -5,6 +5,7 @@
 import { buildQuotePdf, fmtMoney } from "./quote-pdf";
 
 export type WorkItem = { desc: string; cost: number };
+export type ChargerItem = { model: string; unitCost: number; qty: number };
 
 export type LandlordQuoteInput = {
   reference: string;
@@ -18,16 +19,15 @@ export type LandlordQuoteInput = {
   installType: string;
   chargepoints: number;
   sockets: number;
-  chargerModel: string;
-  /** Price of ONE chargepoint unit (ex VAT) — multiplied by `chargepoints`. */
-  chargerCost: number;
+  /** One line per charger model: unit price (ex VAT) × number of units. */
+  chargers: ChargerItem[];
   labourCost: number;
   works: WorkItem[];
 };
 
 /** Builds the quote PDF. Grant: 75% of the inc-VAT cost, capped at £500 per socket. */
 export function generateLandlordQuotePdf(input: LandlordQuoteInput): Promise<Blob> {
-  const chargerTotal = input.chargerCost * input.chargepoints;
+  const chargerTotal = input.chargers.reduce((sum, c) => sum + c.unitCost * c.qty, 0);
   const worksTotal = input.works.reduce((sum, w) => sum + w.cost, 0);
   const subtotal = chargerTotal + input.labourCost + worksTotal;
   const vat = subtotal * 0.2;
@@ -38,13 +38,13 @@ export function generateLandlordQuotePdf(input: LandlordQuoteInput): Promise<Blo
 
   let itemNum = 1;
   const rows = [
-    [
+    ...input.chargers.map((c) => [
       String(itemNum++),
-      input.chargerModel,
-      String(input.chargepoints),
-      fmtMoney(input.chargerCost),
-      fmtMoney(chargerTotal),
-    ],
+      c.model,
+      String(c.qty),
+      fmtMoney(c.unitCost),
+      fmtMoney(c.unitCost * c.qty),
+    ]),
     [
       String(itemNum++),
       "Installation, Commissioning & Testing",

@@ -9,7 +9,6 @@ import {
   FileCheck2,
   Video,
   X,
-  Lock,
 } from "lucide-react";
 
 import { SiteHeader } from "@/components/shared/site-header";
@@ -28,7 +27,13 @@ import {
 import { Reveal } from "@/components/shared/reveal";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { WorksRowsField, type WorkRow } from "@/components/grant-guide/works-rows-field";
-import { ChargerPicker } from "@/components/grant-guide/charger-picker";
+import {
+  ChargerLinesField,
+  chargerSummary,
+  emptyChargerLine,
+  pricedChargerLines,
+  type ChargerLine,
+} from "@/components/grant-guide/charger-lines-field";
 import type { ChargerGuideProps, ChargerSelection } from "@/lib/grant-guide/types";
 import { DraftRestoredNotice, SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
 import { useGuideDraft } from "@/components/grant-guide/use-guide-draft";
@@ -94,7 +99,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const cardClass = "border border-foreground/18 shadow-md";
 
-type GuideDraftState = { answers: Answers; chargerSel: ChargerSelection | null; installType: string; chargepoints: string; sockets: string; labourCost: string; works: WorkRow[] };
+type GuideDraftState = { answers: Answers; lines?: ChargerLine[]; chargerSel?: ChargerSelection | null; installType: string; chargepoints?: string; sockets: string; labourCost: string; works: WorkRow[] };
 
 export default function ResidentialLandlordsGuide({
   chargers,
@@ -103,10 +108,9 @@ export default function ResidentialLandlordsGuide({
 }: ChargerGuideProps) {
   const { data: session } = authClient.useSession();
   const [answers, setAnswers] = useState<Answers>({ installType: null, parking: null, registered: null });
-  const [chargerSel, setChargerSel] = useState<ChargerSelection | null>(initialCharger ?? null);
+  const [lines, setLines] = useState<ChargerLine[]>([emptyChargerLine(initialCharger ?? null)]);
   const [chargerError, setChargerError] = useState(false);
   const [installType, setInstallType] = useState("Single Tenancy Rental");
-  const [chargepoints, setChargepoints] = useState("");
   const [sockets, setSockets] = useState("");
   const [labourCost, setLabourCost] = useState("");
   const [works, setWorks] = useState<WorkRow[]>([{ desc: "", cost: "" }]);
@@ -119,9 +123,8 @@ export default function ResidentialLandlordsGuide({
     key: "landlords",
     onRestore: (saved) => {
       setAnswers(saved.answers);
-      setChargerSel(saved.chargerSel);
+      setLines(saved.lines ?? [{ sel: saved.chargerSel ?? null, qty: saved.chargepoints || "1" }]);
       setInstallType(saved.installType);
-      setChargepoints(saved.chargepoints);
       setSockets(saved.sockets);
       setLabourCost(saved.labourCost);
       setWorks(saved.works);
@@ -151,19 +154,13 @@ export default function ResidentialLandlordsGuide({
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
-  const chargepointsNum = Math.max(parseInt(chargepoints, 10) || 1, 1);
   const socketsNum = parseInt(sockets, 10) || 1;
-  const selectedCharger = chargerSel
-    ? chargers
-        .find((c) => c.key === chargerSel.key)
-        ?.variants.find((v) => v.id === chargerSel.variantId)
-    : undefined;
-  // Locked to the product's shop price, converted to ex VAT.
-  const chargerCostNum = selectedCharger?.priceExVat ?? 0;
+  // Each charger line is locked to the product's shop price (ex VAT).
+  const chargerItems = pricedChargerLines(chargers, lines);
+  const chargepointsNum = chargerItems.reduce((n, c) => n + c.qty, 0);
   const labourCostNum = parseFloat(labourCost) || 0;
   const worksCostNum = works.reduce((sum, w) => sum + (parseFloat(w.cost) || 0), 0);
-  // The chargepoint cost is entered per unit — multiply by the number of chargepoints.
-  const chargerTotal = chargerCostNum * chargepointsNum;
+  const chargerTotal = chargerItems.reduce((sum, c) => sum + c.unitCost * c.qty, 0);
   const previewSubtotal = chargerTotal + labourCostNum + worksCostNum;
   const previewVat = previewSubtotal * 0.2;
   const previewTotal = previewSubtotal + previewVat;
@@ -358,7 +355,7 @@ export default function ResidentialLandlordsGuide({
                       className="mt-4 flex scroll-mt-28 flex-col gap-4 rounded-lg border border-border bg-secondary/40 p-4"
                       onSubmit={async (e) => {
                         e.preventDefault();
-                        if (!selectedCharger) {
+                        if (chargerItems.length === 0) {
                           setChargerError(true);
                           document
                             .getElementById("charger-picker")
@@ -366,7 +363,7 @@ export default function ResidentialLandlordsGuide({
                           return;
                         }
                         if (!session) {
-                          saveDraft({ answers, chargerSel, installType, chargepoints, sockets, labourCost, works });
+                          saveDraft({ answers, lines, installType, sockets, labourCost, works });
                           setShowSignIn(true);
                           return;
                         }
@@ -395,9 +392,7 @@ export default function ResidentialLandlordsGuide({
                             installType,
                             chargepoints: chargepointsNum,
                             sockets: socketsNum,
-                            chargerModel: selectedCharger.name,
-                            chargerProductId: selectedCharger.id,
-                            chargerCost: chargerCostNum,
+                            chargers: chargerItems.map(({ model, unitCost, qty }) => ({ model, unitCost, qty })),
                             labourCost: labourCostNum,
                             works: workItems,
                           };
@@ -410,7 +405,15 @@ export default function ResidentialLandlordsGuide({
                           body.append("reference", reference);
                           body.append("fileName", fileName);
                           body.append("file", blob, fileName);
-                          body.append("input", JSON.stringify(input));
+                          // Plus readable one-liners for the admin quote view.
+                          body.append(
+                            "input",
+                            JSON.stringify({
+                              ...input,
+                              chargerModel: chargerSummary(chargerItems),
+                              chargerProductIds: chargerItems.map((c) => c.productId).join(", "),
+                            }),
+                          );
                           body.append("company_website", String(data.get("company_website") ?? ""));
 
                           const res = await fetch("/api/quotes", { method: "POST", body });
@@ -478,15 +481,6 @@ export default function ResidentialLandlordsGuide({
                             </SelectContent>
                           </Select>
                         </Field>
-                        <Field label="Number of chargepoints">
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="e.g. 1"
-                            value={chargepoints}
-                            onChange={(e) => setChargepoints(e.target.value)}
-                          />
-                        </Field>
                         <Field label="Number of sockets requested">
                           <Input
                             type="text"
@@ -497,12 +491,12 @@ export default function ResidentialLandlordsGuide({
                           />
                         </Field>
                         <div id="charger-picker" className="scroll-mt-28 sm:col-span-2">
-                          <ChargerPicker
+                          <ChargerLinesField
                             chargers={chargers}
                             defaultCategory={defaultCategory}
-                            value={chargerSel}
-                            onChange={(v) => {
-                              setChargerSel(v);
+                            lines={lines}
+                            onChange={(next) => {
+                              setLines(next);
                               setChargerError(false);
                             }}
                           />
@@ -512,20 +506,6 @@ export default function ResidentialLandlordsGuide({
                             </p>
                           )}
                         </div>
-                        <Field
-                          label="EV chargepoint cost — per chargepoint (ex VAT)"
-                          hint="Set from the charger you selected — prices match our shop."
-                        >
-                          <div className="relative">
-                            <Input
-                              type="text"
-                              readOnly
-                              value={selectedCharger ? `£${chargerCostNum.toFixed(2)}` : "Choose a charger first"}
-                              className="cursor-not-allowed pr-9 opacity-80"
-                            />
-                            <Lock className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                          </div>
-                        </Field>
                         <Field
                           label="Standard installation cost (£, ex VAT)"
                           hint="Also ex VAT — VAT is added for you in the summary below."

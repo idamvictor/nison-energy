@@ -146,7 +146,10 @@ export function ExpressCheckout({
   maxColumns = 2,
   buttonHeight = 48,
   onWallets,
+  light = false,
 }: {
+  /** Stripe's white button themes (Apple Pay outlined) — for dark backgrounds. */
+  light?: boolean;
   /** Reports which wallets rendered (all false if Stripe never gets ready). */
   onWallets?: (available: AvailableWallets) => void;
   methods: ExpressMethods;
@@ -181,7 +184,7 @@ export function ExpressCheckout({
             options={{
               paymentMethods: methods,
               buttonHeight,
-              buttonTheme: undefined,
+              buttonTheme: light ? { applePay: "white-outline", googlePay: "white", paypal: "white" } : undefined,
               buttonType: undefined,
               layout: { maxColumns, overflow: "never" },
               paymentMethodOrder: ["apple_pay", "google_pay", "paypal"],

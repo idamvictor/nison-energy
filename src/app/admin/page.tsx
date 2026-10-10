@@ -8,6 +8,7 @@ import {
   ShoppingBag,
   Target,
   Zap,
+  Sun,
 } from "lucide-react";
 
 import { StatCard } from "@/components/admin/dashboard/stat-card";
@@ -140,7 +141,7 @@ export default async function AdminDashboardPage({
         <ActivityFeed items={activity} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Residential"
           value={productCounts.residential}
@@ -164,6 +165,14 @@ export default async function AdminDashboardPage({
           icon={Cable}
           tone="success"
           href="/admin/accessories"
+        />
+        <StatCard
+          label="Solar Panels"
+          value={productCounts.solar}
+          subtext="Plug-in solar kits"
+          icon={Sun}
+          tone="primary"
+          href="/admin/solar-panels"
         />
       </div>
     </div>

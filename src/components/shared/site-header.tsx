@@ -53,6 +53,7 @@ const navLinks = [
   { href: "/home-charging", label: "Residential Chargers" },
   { href: "/workplace-charging", label: "Commercial Chargers" },
   { href: "/accessories", label: "Accessories" },
+  { href: "/solar-panels", label: "Solar Panels" },
   { href: "/about-us", label: "About Us" },
   { href: "/ozev-grants", label: "OZEV Grants" },
 ];
@@ -117,7 +118,7 @@ export function SiteHeader() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden items-center gap-6 xl:flex">
           {navLinks.map((link) => {
             const active = isActive(link.href);
             return (
@@ -126,7 +127,7 @@ export function SiteHeader() {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group relative py-1 text-sm font-medium transition-colors hover:text-foreground",
+                  "group relative py-1 text-sm font-medium whitespace-nowrap transition-colors hover:text-foreground",
                   active ? "text-foreground" : "text-foreground/70"
                 )}
               >
@@ -213,7 +214,7 @@ export function SiteHeader() {
           <Sheet>
             <SheetTrigger
               render={
-                <Button variant="outline" size="icon" className="lg:hidden" />
+                <Button variant="outline" size="icon" className="xl:hidden" />
               }
             >
               <Menu className="size-5" />

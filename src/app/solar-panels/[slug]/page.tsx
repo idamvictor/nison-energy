@@ -1,0 +1,204 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ChevronRight } from "lucide-react";
+
+import { getSolarCatalog, getProductRow, dbToSolar, dbToDetail } from "@/lib/catalog/queries";
+import { getDatasheetNames, warmDatasheet } from "@/lib/media/queries";
+import { adminRoute } from "@/lib/catalog/types";
+import { AdminEditLink } from "@/components/shared/admin-edit-link";
+import { deliveryPolicyMarkdown, returnsPolicyMarkdown } from "@/lib/content/legal";
+import { SiteHeader } from "@/components/shared/site-header";
+import { TrustBar } from "@/components/shared/trust-bar";
+import { SiteFooter } from "@/components/shared/site-footer";
+import { HelpSection } from "@/components/shared/help-section";
+import { ProductGallery } from "@/components/shared/product-gallery";
+import { FreeDeliveryBadge } from "@/components/shared/free-delivery-badge";
+import { ProductDatasheet } from "@/components/shared/product-datasheet";
+import { BrandLogo } from "@/components/shared/brand-logo";
+import { SpecTable } from "@/components/shared/spec-table";
+import { SolarPurchasePanel } from "@/components/solar/solar-purchase-panel";
+import { SolarProductCard } from "@/components/solar/solar-product-card";
+import { tagClass } from "@/components/accessories/accessory-product-tag";
+import { Badge } from "@/components/ui/badge";
+import { BlogMarkdown } from "@/components/blog/blog-markdown";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+export const dynamicParams = true;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const products = await getSolarCatalog();
+  return products.map((product) => ({ slug: product.id }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const row = await getProductRow(slug);
+  if (!row || row.category !== "Solar") return {};
+  return {
+    title: `${row.name} | Ocunio Energy`,
+    description: row.tagline ?? undefined,
+  };
+}
+
+/** "Title: detail" → bold title, then the detail (features and guideline lines). */
+function TitledLine({ text }: { text: string }) {
+  const i = text.indexOf(": ");
+  if (i <= 0 || i > 60) return <>{text}</>;
+  return (
+    <span>
+      <span className="font-semibold text-foreground">{text.slice(0, i)}:</span> {text.slice(i + 2)}
+    </span>
+  );
+}
+
+export default async function SolarDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const row = await getProductRow(slug);
+
+  if (!row || row.category !== "Solar" || !row.active) notFound();
+
+  const product = dbToSolar(row);
+  const detail = dbToDetail(row);
+  // Pull the datasheet into memory now so the viewer finds it cached on first click.
+  for (const url of detail.datasheets) warmDatasheet(url);
+  const datasheetNames = await getDatasheetNames(detail.datasheets);
+
+  const catalog = await getSolarCatalog();
+  const similar = catalog.filter((p) => p.id !== product.id).slice(0, 3);
+
+  return (
+    <div className="flex min-h-full flex-1 flex-col">
+      <SiteHeader />
+      <TrustBar />
+      <main className="flex-1">
+        <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-foreground">
+              Home
+            </Link>
+            <ChevronRight className="size-3.5" />
+            <Link href="/solar-panels" className="hover:text-foreground">
+              Solar Panels
+            </Link>
+            <ChevronRight className="size-3.5" />
+            <span className="text-foreground">{product.name}</span>
+          </nav>
+        </div>
+
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+            <ProductGallery images={detail.gallery} name={product.name} />
+
+            <div className="flex flex-col gap-6">
+              <div>
+                <BrandLogo brand={product.brand} />
+                <div className="mt-1 flex items-center gap-2">
+                  <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
+                    {product.name}
+                  </h1>
+                  <AdminEditLink href={`${adminRoute.Solar}/${product.id}`} />
+                </div>
+                {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
+                <FreeDeliveryBadge warranty={detail.warranty} />
+              </div>
+
+              {product.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag) => (
+                    <Badge key={tag} className={tagClass()}>
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <SolarPurchasePanel product={product} />
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <Tabs defaultValue="description">
+            <TabsList variant="line" className="border-b border-border">
+              <TabsTrigger value="description">Description</TabsTrigger>
+              <TabsTrigger value="specification">Specification</TabsTrigger>
+              <TabsTrigger value="delivery">Delivery Information</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
+              {detail.datasheets.length > 0 && (
+                <TabsTrigger value="datasheet">
+                  {detail.datasheets.length === 1 ? "Datasheet" : "Datasheets"}
+                </TabsTrigger>
+              )}
+            </TabsList>
+
+            <TabsContent value="description" className="py-6">
+              {/* A paragraph starting "## " is a sub-heading (e.g. the placement guidelines). */}
+              <div className="flex flex-col gap-4 text-foreground/80">
+                {detail.description.map((paragraph, i) =>
+                  paragraph.startsWith("## ") ? (
+                    <h2 key={i} className="mt-4 font-heading text-lg font-semibold text-foreground">
+                      {paragraph.slice(3)}
+                    </h2>
+                  ) : (
+                    <p key={i}>
+                      <TitledLine text={paragraph} />
+                    </p>
+                  ),
+                )}
+              </div>
+              {detail.features.length > 0 && (
+                <>
+                  <h2 className="mt-8 font-heading text-lg font-semibold text-foreground">Features</h2>
+                  <ul className="mt-4 flex flex-col gap-2.5">
+                    {detail.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
+                        <TitledLine text={feature} />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value="specification" className="py-6">
+              <SpecTable specs={detail.specs} />
+            </TabsContent>
+
+            <TabsContent value="delivery" className="py-6">
+              <BlogMarkdown content={deliveryPolicyMarkdown} />
+            </TabsContent>
+
+            <TabsContent value="returns" className="py-6">
+              <BlogMarkdown content={returnsPolicyMarkdown} />
+            </TabsContent>
+
+            {detail.datasheets.length > 0 && (
+              <TabsContent value="datasheet" className="py-6">
+                <ProductDatasheet urls={detail.datasheets} names={datasheetNames} />
+              </TabsContent>
+            )}
+          </Tabs>
+        </section>
+
+        {similar.length > 0 && (
+          <section className="bg-secondary">
+            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+              <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground">Similar Products</h2>
+              <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+                {similar.map((p) => (
+                  <SolarProductCard key={p.id} variants={[p]} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <HelpSection />
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}

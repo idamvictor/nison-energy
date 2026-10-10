@@ -18,6 +18,7 @@ const categoryLabel: Record<SearchResult["category"], string> = {
   Residential: "Home Charging",
   Commercial: "Workplace Charging",
   Accessory: "Accessory",
+  Solar: "Solar",
 };
 
 export function SiteSearch() {

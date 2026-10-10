@@ -3,12 +3,13 @@
 // maps a row to the view types below.
 
 // ─── Category / routing ────────────────────────────────────────────────────
-export type ProductCategory = "Residential" | "Commercial" | "Accessory";
+export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar";
 
 export const productCategories: ProductCategory[] = [
   "Residential",
   "Commercial",
   "Accessory",
+  "Solar",
 ];
 
 // The storefront route + cart-category string for each catalog category.
@@ -16,6 +17,7 @@ export const categoryRoute: Record<ProductCategory, string> = {
   Residential: "/home-charging",
   Commercial: "/workplace-charging",
   Accessory: "/accessories",
+  Solar: "/solar-panels",
 };
 
 // The admin edit route for each catalog category — same `[slug]` param as
@@ -24,24 +26,27 @@ export const adminRoute: Record<ProductCategory, string> = {
   Residential: "/admin/residential",
   Commercial: "/admin/commercial",
   Accessory: "/admin/accessories",
+  Solar: "/admin/solar-panels",
 };
 
-export type CartCategory = "residential" | "commercial" | "accessories";
+export type CartCategory = "residential" | "commercial" | "accessories" | "solar";
 
 export const categoryToCart: Record<ProductCategory, CartCategory> = {
   Residential: "residential",
   Commercial: "commercial",
   Accessory: "accessories",
+  Solar: "solar",
+};
+
+const cartRoute: Record<CartCategory, string> = {
+  residential: "/home-charging",
+  commercial: "/workplace-charging",
+  accessories: "/accessories",
+  solar: "/solar-panels",
 };
 
 export function cartItemHref(category: CartCategory, id: string): string {
-  const base =
-    category === "residential"
-      ? "/home-charging"
-      : category === "commercial"
-        ? "/workplace-charging"
-        : "/accessories";
-  return `${base}/${id}`;
+  return `${cartRoute[category] ?? "/accessories"}/${id}`;
 }
 
 // Admin form option lists.
@@ -111,8 +116,23 @@ export type AccessoryProduct = {
   featured?: boolean;
 };
 
+// ─── Solar ─────────────────────────────────────────────────────────────────
+// Plug-in solar kits: no installation option and no cable/length variants.
+export type SolarProduct = {
+  id: string;
+  name: string;
+  brand: string;
+  colour: string;
+  price: number;
+  tags: string[];
+  image: string;
+  active?: boolean;
+  featured?: boolean;
+};
+
 // ─── Detail-page content ───────────────────────────────────────────────────
-export type Spec = { label: string; value: string };
+/** One row of the spec table; `section` groups rows under a heading (e.g. "Panel"). */
+export type Spec = { label: string; value: string; section?: string };
 
 export type ProductDetail = {
   tagline: string;

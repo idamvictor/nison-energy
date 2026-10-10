@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   Users,
   Zap,
+  Sun,
 } from "lucide-react";
 
 import {
@@ -38,6 +39,7 @@ const overviewLinks = [
 const catalogLinks = [
   { href: "/admin/chargers", label: "Chargers", icon: Zap },
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
+  { href: "/admin/solar-panels", label: "Solar Panels", icon: Sun },
 ];
 
 function navItemClass(active: boolean) {

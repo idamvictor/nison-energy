@@ -7,19 +7,22 @@ import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/lib/wishlist/store";
 import type { Product } from "@/lib/catalog/types";
 import type { CommercialProduct } from "@/lib/catalog/types";
-import type { AccessoryProduct } from "@/lib/catalog/types";
+import type { AccessoryProduct, SolarProduct } from "@/lib/catalog/types";
 import { ProductCard } from "@/components/shared/product-card";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
+import { SolarProductCard } from "@/components/solar/solar-product-card";
 
 export function AccountWishlist({
   residential,
   commercial,
   accessories,
+  solar,
 }: {
   residential: Product[];
   commercial: CommercialProduct[];
   accessories: AccessoryProduct[];
+  solar: SolarProduct[];
 }) {
   const { items } = useWishlist();
 
@@ -27,6 +30,7 @@ export function AccountWishlist({
   const savedResidential = residential.filter((p) => savedIds.has(p.id));
   const savedCommercial = commercial.filter((p) => savedIds.has(p.id));
   const savedAccessories = accessories.filter((p) => savedIds.has(p.id));
+  const savedSolar = solar.filter((p) => savedIds.has(p.id));
 
   if (items.length === 0) {
     return (
@@ -38,7 +42,7 @@ export function AccountWishlist({
           Your wishlist is empty
         </p>
         <p className="max-w-sm text-sm text-muted-foreground">
-          Tap the heart on any charger or accessory to save it here for
+          Tap the heart on any charger, accessory or solar kit to save it here for
           later.
         </p>
         <Button nativeButton={false} render={<Link href="/home-charging" />}>
@@ -68,6 +72,13 @@ export function AccountWishlist({
         <WishlistSection title="Accessories">
           {savedAccessories.map((product) => (
             <AccessoryProductCard key={product.id} variants={[product]} />
+          ))}
+        </WishlistSection>
+      )}
+      {savedSolar.length > 0 && (
+        <WishlistSection title="Solar Panels">
+          {savedSolar.map((product) => (
+            <SolarProductCard key={product.id} variants={[product]} />
           ))}
         </WishlistSection>
       )}

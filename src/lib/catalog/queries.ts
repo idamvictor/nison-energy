@@ -10,6 +10,7 @@ import { MAX_DATASHEETS } from "@/lib/media/datasheet";
 import type { Product as ProductRow } from "@/generated/prisma/client";
 import type {
   AccessoryProduct,
+  SolarProduct,
   CommercialProduct,
   Product,
   ProductCategory,
@@ -103,6 +104,20 @@ export function dbToAccessory(row: ProductRow): AccessoryProduct {
   };
 }
 
+export function dbToSolar(row: ProductRow): SolarProduct {
+  return {
+    id: row.id,
+    name: row.name,
+    brand: row.brand,
+    colour: row.colour,
+    price: toNumber(row.price) ?? 0,
+    tags: row.tags,
+    image: row.cardImage,
+    active: row.active,
+    featured: row.featured,
+  };
+}
+
 // Next.js Server -> Client Component props must be plain-serializable — a
 // Prisma Decimal is a class instance, not a plain object, so raw `ProductRow`
 // can't be passed straight into a "use client" component (e.g. ProductForm)
@@ -180,6 +195,14 @@ export const getAccessoryCatalog = cache(async (): Promise<AccessoryProduct[]> =
   return rows.map(dbToAccessory);
 });
 
+export const getSolarCatalog = cache(async (): Promise<SolarProduct[]> => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, category: "Solar" },
+    orderBy: catalogOrder,
+  });
+  return rows.map(dbToSolar);
+});
+
 export const getProductRow = cache((id: string) =>
   prisma.product.findUnique({ where: { id } }),
 );
@@ -206,6 +229,7 @@ export const getProductCounts = cache(
         residential: count("Residential"),
         commercial: count("Commercial"),
         accessory: count("Accessory"),
+        solar: count("Solar"),
       };
     },
     ["catalog-product-counts"],

@@ -112,7 +112,7 @@ model OrderItem {
   orderId   String
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String // catalog id, or an extra's id
-  category  String // residential | commercial | accessories | extra
+  category  String // residential | commercial | accessories | solar | extra
   name      String // snapshot at time of order
   unitPrice Decimal? @db.Decimal(10, 2) // GBP, penny-precise; null for quote-only accessories
   quantity  Int
@@ -206,6 +206,7 @@ enum ProductCategory {
   Residential
   Commercial
   Accessory
+  Solar
 }
 
 /// A blog article. `id` is the URL slug (caller-supplied, like `Product`).

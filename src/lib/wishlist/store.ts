@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type WishlistCategory = "residential" | "commercial" | "accessories";
+export type WishlistCategory = "residential" | "commercial" | "accessories" | "solar";
 export type WishlistItem = { id: string; category: WishlistCategory };
 
 type WishlistState = {

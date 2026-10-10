@@ -14,6 +14,7 @@ import {
   Trash2,
   Zap,
   Package,
+  Sun,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -68,6 +69,7 @@ const meta: Record<
   Residential: { title: "Residential Chargers", noun: "home chargers", icon: Zap, admin: "/admin/residential" },
   Commercial: { title: "Commercial Chargers", noun: "workplace chargers", icon: Package, admin: "/admin/commercial" },
   Accessory: { title: "Accessories", noun: "charging cables", icon: Cable, admin: "/admin/accessories" },
+  Solar: { title: "Solar Panels", noun: "solar panel kits", icon: Sun, admin: "/admin/solar-panels" },
 };
 
 export function ProductsView({
@@ -84,6 +86,7 @@ export function ProductsView({
 
   const m = meta[category];
   const Icon = m.icon;
+  // Accessories list Style / Phase; chargers and solar kits list a Price.
   const isCharger = category !== "Accessory";
 
   const filtered = useMemo(() => {

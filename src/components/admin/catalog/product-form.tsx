@@ -40,6 +40,8 @@ import { cn } from "@/lib/utils";
 import {
   accessoryPhases,
   accessoryStyles,
+  adminRoute,
+  categoryRoute,
   connectionTypes,
   type ProductCategory,
   type ProductInput,
@@ -47,7 +49,7 @@ import {
 import { saveProduct } from "@/lib/catalog/actions";
 import type { SerializableProductRow } from "@/lib/catalog/queries";
 
-type Spec = { label: string; value: string };
+type Spec = { label: string; value: string; section?: string };
 
 function toCsv(values: string[]): string {
   return values.join(", ");
@@ -94,20 +96,12 @@ export function ProductForm({
   const router = useRouter();
   const isNew = row === null;
   const originalId = row?.id ?? "";
-  const adminBack =
-    category === "Residential"
-      ? "/admin/residential"
-      : category === "Commercial"
-        ? "/admin/commercial"
-        : "/admin/accessories";
-  const storefrontBase =
-    category === "Residential"
-      ? "/home-charging"
-      : category === "Commercial"
-        ? "/workplace-charging"
-        : "/accessories";
+  const adminBack = adminRoute[category];
+  const storefrontBase = categoryRoute[category];
 
-  const isCharger = category !== "Accessory";
+  // Only chargers have connection type, power, cable length and install fee.
+  const isCharger = category === "Residential" || category === "Commercial";
+  const isSolar = category === "Solar";
 
   const [slug, setSlug] = useState(row?.id ?? "");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -202,7 +196,14 @@ export function ProductForm({
       gallery: galleryImages,
       description: fromParas(description),
       features: fromLines(features),
-      specs: specs.filter((s) => s.label.trim() && s.value.trim()),
+      specs: specs
+        .filter((s) => s.label.trim() && s.value.trim())
+        .map((s) => ({
+          label: s.label,
+          value: s.value,
+          // Optional heading the row is grouped under (e.g. "Panel").
+          ...(s.section?.trim() ? { section: s.section.trim() } : {}),
+        })),
       warranty: warranty.trim() || null,
       datasheets,
     };
@@ -440,6 +441,8 @@ export function ProductForm({
               />
               Featured on home page
             </label>
+            {!isSolar && (
+              <>
             <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
@@ -458,6 +461,8 @@ export function ProductForm({
               />
               OVO Energy partner
             </label>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -594,6 +599,25 @@ export function ProductForm({
         </Card>
       )}
 
+      {isSolar && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Pricing</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Price (£, inc. VAT)">
+              <Input
+                type="number"
+                min={0}
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </Field>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Detail page content</CardTitle>
@@ -626,6 +650,19 @@ export function ProductForm({
             </p>
             {specs.map((spec, index) => (
               <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={spec.section ?? ""}
+                  onChange={(e) =>
+                    setSpecs((prev) =>
+                      prev.map((s, i) =>
+                        i === index ? { ...s, section: e.target.value } : s,
+                      ),
+                    )
+                  }
+                  placeholder="Section (optional)"
+                  aria-label="Section"
+                  className="w-40 shrink-0"
+                />
                 <Input
                   value={spec.label}
                   onChange={(e) =>

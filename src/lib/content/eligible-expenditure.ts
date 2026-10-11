@@ -1,5 +1,5 @@
 // OZEV eligible / ineligible expenditure — shown from the grant guides' quote
-// form ("What costs can I claim?"). Wording from the client's guidance document.
+// form ("Eligible & ineligible expenditure"). Wording from the client's guidance document.
 
 export type ExpenditureItem = { title: string; detail: string };
 

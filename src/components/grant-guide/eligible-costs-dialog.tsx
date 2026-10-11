@@ -42,7 +42,7 @@ function ItemList({ items, eligible }: { items: ExpenditureItem[]; eligible: boo
 }
 
 /**
- * "What costs can I claim?" — opens OZEV's eligible / ineligible expenditure
+ * "Eligible & ineligible expenditure" link — opens OZEV's eligible / ineligible expenditure
  * rules, so customers know what belongs in their quote's cost lines.
  */
 export function EligibleCostsDialog() {
@@ -50,7 +50,7 @@ export function EligibleCostsDialog() {
     <Dialog>
       <DialogTrigger className="inline-flex items-center gap-1 text-xs font-medium text-primary-ink underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none">
         <Info className="size-3.5" />
-        What costs can I claim?
+        Eligible &amp; ineligible expenditure
       </DialogTrigger>
       <DialogContent className="flex max-h-[90svh] flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
         <DialogHeader className="border-b border-border px-5 pt-5 pb-4 pr-12">

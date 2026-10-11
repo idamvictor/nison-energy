@@ -99,6 +99,7 @@ export function useCheckoutSession(
             subtotal: cached.subtotal,
             deliveryFee: cached.deliveryFee,
             total: cached.total,
+            pallet: cached.pallet,
           });
           setError(null);
           return;

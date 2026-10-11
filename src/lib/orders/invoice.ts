@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 
 import { stripe } from "@/lib/stripe/client";
 import type { OrderWithItems } from "@/lib/orders/types";
+import { deliveryLabelFor, needsPallet } from "@/lib/orders/delivery";
 import { formatCurrency } from "@/lib/currency";
 
 /** UK standard rate. Catalogue prices and the delivery fee are VAT-inclusive. */
@@ -26,6 +27,8 @@ export type Invoice = {
   deliverTo: string[];
   lines: InvoiceLine[];
   deliveryFee: number;
+  /** "DPD Tracked Delivery", or "Pallet Delivery" for solar orders. */
+  deliveryLabel: string;
   /** Gross (inc VAT) = net + vat. */
   net: number;
   vat: number;
@@ -90,6 +93,7 @@ export function invoiceFor(order: OrderWithItems, paymentMethod: string): Invoic
     deliverTo,
     lines,
     deliveryFee: order.deliveryFee,
+    deliveryLabel: deliveryLabelFor(needsPallet(order.items)),
     net: round(gross - vat),
     vat,
     gross,

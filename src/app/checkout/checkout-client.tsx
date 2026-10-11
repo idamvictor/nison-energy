@@ -36,6 +36,9 @@ import {
   DELIVERY_ESTIMATE,
   DELIVERY_LABEL,
   deliveryFeeFor,
+  needsPallet,
+  PALLET_DELIVERY_ESTIMATE,
+  PALLET_DELIVERY_LABEL,
   FREE_DELIVERY_FROM,
   FREE_DELIVERY_THRESHOLD,
 } from "@/lib/orders/delivery";
@@ -226,13 +229,16 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
         selectedExtras.reduce((sum, e) => sum + e.price, 0)) *
         100,
     ) / 100;
-  const totals: CheckoutTotals = card.session ??
-    express.session ?? {
+  // Solar kits ship by pallet: a flat fee, never free (the server decides
+  // the same from the product rows).
+  const serverTotals = card.session ?? express.session;
+  const pallet = serverTotals?.pallet ?? needsPallet(lines);
+  const totals: CheckoutTotals = serverTotals ?? {
       subtotal: estimateSubtotal,
-      deliveryFee: deliveryFeeFor(estimateSubtotal),
-      total: estimateSubtotal + deliveryFeeFor(estimateSubtotal),
+      deliveryFee: deliveryFeeFor(estimateSubtotal, pallet),
+      total: estimateSubtotal + deliveryFeeFor(estimateSubtotal, pallet),
     };
-  const toFreeDelivery = FREE_DELIVERY_THRESHOLD - totals.subtotal;
+  const toFreeDelivery = pallet ? 0 : FREE_DELIVERY_THRESHOLD - totals.subtotal;
   // Prices include VAT at 20%.
   const vat = Math.round((totals.total / 6) * 100) / 100;
 
@@ -845,8 +851,10 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
                         <Radio checked />
                         <Truck className="size-4 text-[#707070]" />
                         <span className="flex-1 text-sm">
-                          {DELIVERY_LABEL}
-                          <span className="block text-xs text-[#707070]">{DELIVERY_ESTIMATE}</span>
+                          {pallet ? PALLET_DELIVERY_LABEL : DELIVERY_LABEL}
+                          <span className="block text-xs text-[#707070]">
+                            {pallet ? PALLET_DELIVERY_ESTIMATE : DELIVERY_ESTIMATE}
+                          </span>
                         </span>
                         <span className="text-sm font-medium">
                           {totals.deliveryFee === 0 ? "FREE" : formatCurrency(totals.deliveryFee)}

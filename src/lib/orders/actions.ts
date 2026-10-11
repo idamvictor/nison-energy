@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, requireAdmin } from "@/lib/auth/session";
 import { createOrder, toOrderRecord, validateContactDetails } from "@/lib/orders/queries";
 import { priceCart, type PricedLine } from "@/lib/orders/pricing";
-import { DELIVERY_LABEL } from "@/lib/orders/delivery";
+import { deliveryLabelFor } from "@/lib/orders/delivery";
 import { checkUkPostcode } from "@/lib/postcode";
 import type { Prisma } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/notifications/queries";
@@ -132,13 +132,13 @@ export async function startCheckout(
       shipping_options: [
         {
           shipping_rate_data: {
-            display_name: DELIVERY_LABEL,
+            display_name: deliveryLabelFor(cart.pallet),
             type: "fixed_amount",
-            // 1–3 working days to dispatch + 1–2 days with DPD.
-            delivery_estimate: {
-              minimum: { unit: "business_day", value: 2 },
-              maximum: { unit: "business_day", value: 5 },
-            },
+            // DPD: 1–3 working days to dispatch + 1–2 in transit.
+            // Pallet (solar): specialist courier, up to 4 working days.
+            delivery_estimate: cart.pallet
+              ? { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 4 } }
+              : { minimum: { unit: "business_day", value: 2 }, maximum: { unit: "business_day", value: 5 } },
             fixed_amount: { amount: Math.round(cart.deliveryFee * 100), currency: "gbp" },
           },
         },
@@ -170,6 +170,7 @@ export async function startCheckout(
       draftId: draft.id,
       subtotal: cart.subtotal,
       deliveryFee: cart.deliveryFee,
+      pallet: cart.pallet,
       total: cart.total,
     };
   } catch {

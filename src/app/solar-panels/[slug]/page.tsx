@@ -101,7 +101,7 @@ export default async function SolarDetailPage({ params }: { params: Promise<{ sl
                   <AdminEditLink href={`${adminRoute.Solar}/${product.id}`} />
                 </div>
                 {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
-                <FreeDeliveryBadge warranty={detail.warranty} />
+                <FreeDeliveryBadge warranty={detail.warranty} pallet />
               </div>
 
               {product.tags.length > 0 && (

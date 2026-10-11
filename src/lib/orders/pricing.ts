@@ -21,6 +21,8 @@ export type PricedCart = {
   /** Items total of the priced lines (GBP inc VAT). */
   subtotal: number;
   deliveryFee: number;
+  /** Ships by pallet (contains a solar kit) — flat £40 delivery. */
+  pallet: boolean;
   total: number;
   /** True when any line has no fixed price (can't be paid online). */
   hasQuoteOnly: boolean;
@@ -48,7 +50,7 @@ export async function priceCart(
   const ids = [...new Set(input.map((l) => l.productId))];
   const rows = await prisma.product.findMany({
     where: { id: { in: ids } },
-    select: { id: true, name: true, price: true, installFee: true, active: true },
+    select: { id: true, name: true, price: true, installFee: true, active: true, category: true },
   });
   const byId = new Map(rows.map((r) => [r.id, r]));
   const extraIds = new Set<string>(CHECKOUT_EXTRA_PRODUCT_IDS);
@@ -85,13 +87,17 @@ export async function priceCart(
   }
 
   const subtotal = round2(lines.reduce((sum, l) => sum + (l.unitPrice ?? 0) * l.quantity, 0));
-  const deliveryFee = deliveryFeeFor(subtotal);
+  // Pallet delivery is decided from the product rows, not the category the
+  // browser sent, so a tampered cart can't dodge it.
+  const pallet = input.some((l) => byId.get(l.productId)?.category === "Solar");
+  const deliveryFee = deliveryFeeFor(subtotal, pallet);
   return {
     ok: true,
     cart: {
       lines,
       subtotal,
       deliveryFee,
+      pallet,
       total: round2(subtotal + deliveryFee),
       hasQuoteOnly: lines.some((l) => l.unitPrice == null),
     },

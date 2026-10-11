@@ -115,7 +115,7 @@ export async function buildOrderInvoicePdf(invoice: Invoice): Promise<Buffer> {
     fmt(line.total),
   ]);
   body.push([
-    "DPD Tracked Delivery",
+    invoice.deliveryLabel,
     "1",
     invoice.deliveryFee > 0 ? fmt(invoice.deliveryFee) : "FREE",
     invoice.deliveryFee > 0 ? fmt(invoice.deliveryFee) : "FREE",

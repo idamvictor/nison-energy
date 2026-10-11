@@ -118,7 +118,13 @@ export type PlaceOrderResult =
 export type CheckoutKind = "wallet" | "card" | "paypal" | "klarna";
 
 /** Server-priced totals for the checkout summary (GBP inc VAT). */
-export type CheckoutTotals = { subtotal: number; deliveryFee: number; total: number };
+export type CheckoutTotals = {
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  /** Ships by pallet (solar kit in the order) — set by the server. */
+  pallet?: boolean;
+};
 
 export type StartCheckoutResult =
   | ({ ok: true; clientSecret: string; draftId: string } & CheckoutTotals)

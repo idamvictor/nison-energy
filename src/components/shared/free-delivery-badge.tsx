@@ -1,14 +1,21 @@
 import { ShieldCheck, Truck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { FREE_DELIVERY_FROM } from "@/lib/orders/delivery";
+import { FREE_DELIVERY_FROM, PALLET_DELIVERY_FEE } from "@/lib/orders/delivery";
 
 const badgeClass =
   "flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-full pl-1.5 pr-4 text-sm font-semibold ring-1 ring-inset";
 
 // Delivery + (optional) warranty pills. An auto-width inline grid with
 // 1fr columns sizes both columns to the widest pill, so they always match.
-export function FreeDeliveryBadge({ warranty }: { warranty?: string }) {
+export function FreeDeliveryBadge({
+  warranty,
+  pallet = false,
+}: {
+  warranty?: string;
+  /** Solar kits: flat-rate pallet delivery instead of the free-over-£120 offer. */
+  pallet?: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -20,7 +27,7 @@ export function FreeDeliveryBadge({ warranty }: { warranty?: string }) {
         <span className="flex size-6 items-center justify-center rounded-full bg-success/15">
           <Truck className="size-3.5" />
         </span>
-        Free delivery over {FREE_DELIVERY_FROM}
+        {pallet ? `£${PALLET_DELIVERY_FEE} pallet delivery` : `Free delivery over ${FREE_DELIVERY_FROM}`}
       </span>
       {warranty && (
         <span className={cn(badgeClass, "bg-primary/10 text-primary-ink ring-primary/25")}>

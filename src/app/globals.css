@@ -254,3 +254,50 @@
     transform: scale(1.7);
   }
 }
+
+/* ─── OZEV grant guides ──────────────────────────────────────────────────────
+   A cooler grey canvas so the white cards lift off the page, and stronger
+   field/divider borders for contrast. Scoped to <main class="grant-guide">;
+   unlayered so it wins over the shared defaults, while focus and error
+   states (which only change border/ring) still apply on top. */
+.grant-guide {
+  /* Tailwind's @theme is inline, so these flow into border-border / border-input. */
+  --border: #cdd8dc;
+  --input: #9badb5;
+  --guide-card-edge: #c7d3d8;
+  --guide-field-hover: #6b818a;
+
+  background:
+    radial-gradient(120% 420px at 50% 0%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 70%),
+    #e3e9ec;
+}
+
+/* Cards: white surface, crisp edge, a soft two-layer lift and a thin
+   cyan → orange brand strip along the top (the same gradient as the active nav link). */
+.grant-guide [data-slot="card"] {
+  position: relative;
+  background-color: #ffffff;
+  border-color: var(--guide-card-edge);
+  box-shadow:
+    0 1px 2px rgb(11 20 24 / 0.06),
+    0 12px 32px -12px rgb(11 20 24 / 0.18);
+}
+.grant-guide [data-slot="card"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  pointer-events: none;
+}
+
+/* Fields: white so they read clearly against tinted form panels. */
+.grant-guide :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):not(:disabled) {
+  background-color: #ffffff;
+}
+.grant-guide
+  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):hover:not(:focus-visible):not(
+    [aria-invalid="true"]
+  ):not(:disabled) {
+  border-color: var(--guide-field-hover);
+}

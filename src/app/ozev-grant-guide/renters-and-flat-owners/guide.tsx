@@ -156,7 +156,7 @@ export default function RentersFlatOwnersGuide({
     <div className="flex min-h-full flex-1 flex-col">
       <SiteHeader />
       <TrustBar />
-      <main className="flex-1 bg-linear-to-b from-secondary/80 via-secondary/30 to-background">
+      <main className="grant-guide flex-1">
         <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
           <Reveal>
             <SectionKicker />

@@ -2,15 +2,15 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth/session";
+import { checkPermission } from "@/lib/auth/session";
 
 /**
- * For admin-only /api routes (proxy.ts doesn't cover /api). Returns a 401
- * response to send back, or null when the caller is an admin.
+ * For media /api routes (proxy.ts doesn't cover /api): anyone who can edit
+ * products may upload/manage images and datasheets. Returns a 401 response to
+ * send back, or null when allowed.
  */
 export async function adminOnly(): Promise<NextResponse | null> {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
+  if (!(await checkPermission("products.edit"))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   return null;

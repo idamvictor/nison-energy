@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getLeads, createLead } from "@/lib/leads/queries";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getClientIp } from "@/lib/rate-limit/ip";
+import { can } from "@/lib/auth/permissions";
 
 // Reads/writes a real database, so never statically cache this route.
 export const dynamic = "force-dynamic";
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   // Lead data is customer PII — admin only. proxy.ts doesn't cover /api routes.
   const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
+  if (!user || !can(user.role, "admin.access")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

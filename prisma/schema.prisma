@@ -456,3 +456,20 @@ enum PriceProposalStatus {
   Approved
   Rejected
 }
+
+/// Email invite to join the admin team (src/lib/team). The raw token only
+/// lives in the email link; we store its SHA-256. Single use, 7-day expiry.
+model StaffInvite {
+  id            String    @id @default(cuid())
+  email         String
+  role          String // "admin" | "staff"
+  tokenHash     String    @unique
+  invitedById   String?
+  invitedByName String?
+  expiresAt     DateTime
+  acceptedAt    DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([email])
+}

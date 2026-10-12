@@ -8,6 +8,7 @@ import { getNewLeadCount } from "@/lib/leads/queries";
 import { getPendingOrderCount } from "@/lib/orders/queries";
 import { getPendingQuoteCount } from "@/lib/quotes/queries";
 import { getPendingPriceReviewCount } from "@/lib/pricing-review/queries";
+import { can } from "@/lib/auth/permissions";
 
 export const metadata: Metadata = {
   title: "Admin | Ocunio Energy",
@@ -21,13 +22,14 @@ export default async function AdminLayout({
 }) {
   // Layouts don't re-render on client navigation, so this isn't the only gate —
   // proxy.ts covers navigations and the leads route handler guards the data.
-  await requireAdmin();
+  const me = await requireAdmin();
+  const seesPrices = can(me.role, "prices.manage");
 
   const [newLeadCount, pendingOrderCount, pendingQuoteCount, pendingPriceReviewCount] = await Promise.all([
     getNewLeadCount(),
     getPendingOrderCount(),
     getPendingQuoteCount(),
-    getPendingPriceReviewCount(),
+    seesPrices ? getPendingPriceReviewCount() : 0,
   ]);
 
   return (
@@ -37,6 +39,7 @@ export default async function AdminLayout({
         pendingOrderCount={pendingOrderCount}
         pendingQuoteCount={pendingQuoteCount}
         pendingPriceReviewCount={pendingPriceReviewCount}
+        role={me.role ?? "user"}
       />
       <SidebarInset>
         <AdminTopbar />

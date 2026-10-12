@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { getCurrentUser, requireAdmin } from "@/lib/auth/session";
+import { getCurrentUser, requirePermission } from "@/lib/auth/session";
 import { createOrder, toOrderRecord, validateContactDetails } from "@/lib/orders/queries";
 import { priceCart, type PricedLine } from "@/lib/orders/pricing";
 import { deliveryLabelFor } from "@/lib/orders/delivery";
@@ -242,7 +242,7 @@ export async function updateOrderStatus(
   id: string,
   status: string,
 ): Promise<OrderActionResult> {
-  await requireAdmin();
+  await requirePermission("orders.edit");
   if (!orderStatuses.includes(status as OrderStatus)) {
     return { ok: false, error: "Unknown status." };
   }

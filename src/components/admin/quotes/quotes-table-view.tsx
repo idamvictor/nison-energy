@@ -53,7 +53,14 @@ function formatDate(iso: string) {
   });
 }
 
-export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
+export function QuotesTableView({
+  quotes,
+  canDelete,
+}: {
+  quotes: AdminQuoteRow[];
+  /** Staff can approve/reject but not delete. */
+  canDelete: boolean;
+}) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<QuoteStatus | "all">("all");
   const [rejectTarget, setRejectTarget] = useState<AdminQuoteRow | null>(null);
@@ -214,14 +221,16 @@ export function QuotesTableView({ quotes }: { quotes: AdminQuoteRow[] }) {
                             </DropdownMenuItem>
                           </>
                         )}
-                        <DropdownMenuItem
-                          variant="destructive"
-                          disabled={pending}
-                          onClick={() => setDeleteTarget(quote)}
-                        >
-                          <Trash2 />
-                          Delete…
-                        </DropdownMenuItem>
+                        {canDelete && (
+                          <DropdownMenuItem
+                            variant="destructive"
+                            disabled={pending}
+                            onClick={() => setDeleteTarget(quote)}
+                          >
+                            <Trash2 />
+                            Delete…
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

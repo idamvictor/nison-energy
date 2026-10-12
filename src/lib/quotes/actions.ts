@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { createNotification } from "@/lib/notifications/queries";
 import { deleteDocument } from "@/lib/media/queries";
 import { sendEmail } from "@/lib/email/client";
@@ -26,7 +26,7 @@ export async function reviewQuote(
   decision: "approve" | "reject",
   reason?: string,
 ): Promise<QuoteActionResult> {
-  const me = await requireAdmin();
+  const me = await requirePermission("quotes.review");
 
   const existing = await prisma.quoteDocument.findUnique({
     where: { id },
@@ -90,7 +90,7 @@ export async function reviewQuote(
 }
 
 export async function deleteQuote(id: string): Promise<QuoteActionResult> {
-  await requireAdmin();
+  await requirePermission("quotes.delete");
 
   const existing = await prisma.quoteDocument.findUnique({ where: { id } });
   if (!existing) return { ok: false, error: "Quote not found." };

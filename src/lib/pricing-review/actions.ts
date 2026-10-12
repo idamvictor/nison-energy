@@ -4,11 +4,11 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getClientIp } from "@/lib/rate-limit/ip";
 import { sendEmail } from "@/lib/email/client";
-import { getStaffEmails } from "@/lib/email/recipients";
+import { getSuperAdminEmails } from "@/lib/email/recipients";
 import { staffPriceReviewSubmitted } from "@/lib/email/templates";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { categoryRoute, type ProductCategory } from "@/lib/catalog/types";
@@ -24,7 +24,7 @@ const isPennies = (n: number) => Math.abs(Math.round(n * 100) - n * 100) < 1e-6;
 
 /** Open or close /price-review (closed = it redirects home). */
 export async function setPriceReviewOpen(open: boolean): Promise<AdminActionResult> {
-  await requireAdmin();
+  await requirePermission("prices.manage");
   const now = new Date();
   await prisma.priceReviewWindow.upsert({
     where: { id: "default" },
@@ -95,7 +95,7 @@ export async function submitPriceReview(input: {
   revalidatePath("/admin", "layout");
 
   after(async () => {
-    const staff = await getStaffEmails();
+    const staff = await getSuperAdminEmails();
     await sendEmail({
       to: staff,
       ...staffPriceReviewSubmitted({
@@ -115,7 +115,7 @@ export async function submitPriceReview(input: {
  * the submission is then done.
  */
 export async function decidePriceSubmission(id: string, approveIds: string[]): Promise<AdminActionResult> {
-  await requireAdmin();
+  await requirePermission("prices.manage");
   const submission = await prisma.priceReviewSubmission.findUnique({
     where: { id },
     include: { proposals: { include: { product: { select: { category: true } } } } },

@@ -9,6 +9,8 @@ import { QuoteStatusBadge } from "@/components/admin/quotes/quote-status-badge";
 import { QuoteReviewActions } from "@/components/admin/quotes/quote-review-actions";
 import { DeleteQuoteButton } from "@/components/admin/quotes/delete-quote-button";
 import { getQuote } from "@/lib/quotes/queries";
+import { requireAdmin } from "@/lib/auth/session";
+import { can } from "@/lib/auth/permissions";
 import { quoteSchemeLabels } from "@/lib/quotes/types";
 
 function formatDateTime(iso: string) {
@@ -56,7 +58,7 @@ export default async function QuoteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const quote = await getQuote(id);
+  const [me, quote] = await Promise.all([requireAdmin(), getQuote(id)]);
   if (!quote) notFound();
 
   const inputEntries = Object.entries(quote.input).filter(
@@ -155,7 +157,11 @@ export default async function QuoteDetailPage({
               <CardTitle>Danger zone</CardTitle>
             </CardHeader>
             <CardContent>
-              <DeleteQuoteButton quoteId={quote.id} reference={quote.reference} />
+              {can(me.role, "quotes.delete") ? (
+                <DeleteQuoteButton quoteId={quote.id} reference={quote.reference} />
+              ) : (
+                <p className="text-sm text-muted-foreground">Only admins can delete quotes.</p>
+              )}
             </CardContent>
           </Card>
         </div>

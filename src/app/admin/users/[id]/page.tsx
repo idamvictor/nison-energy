@@ -24,6 +24,7 @@ import { StatusBadge } from "@/components/admin/shared/status-badge";
 import { OrderStatusBadge } from "@/components/admin/orders/order-status-badge";
 import { QuoteStatusBadge } from "@/components/admin/quotes/quote-status-badge";
 import { requireAdmin } from "@/lib/auth/session";
+import { canManageUser, toRole } from "@/lib/auth/permissions";
 import { getUser } from "@/lib/users/queries";
 import { getLeadsForUser } from "@/lib/leads/queries";
 import { getOrdersForUser } from "@/lib/orders/queries";
@@ -82,6 +83,7 @@ export default async function UserDetailPage({
   ]);
 
   const isSelf = user.id === me.id;
+  const manageable = !isSelf && canManageUser(me.role, user.role);
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-5">
@@ -322,7 +324,7 @@ export default async function UserDetailPage({
               <CardTitle>Quick actions</CardTitle>
             </CardHeader>
             <CardContent>
-              <UserAccountActions user={user} isSelf={isSelf} />
+              <UserAccountActions user={user} isSelf={isSelf} myRole={toRole(me.role)} />
             </CardContent>
           </Card>
 
@@ -336,6 +338,8 @@ export default async function UserDetailPage({
             <CardContent>
               {isSelf ? (
                 <p className="text-sm text-muted-foreground">You can&rsquo;t delete your own account.</p>
+              ) : !manageable ? (
+                <p className="text-sm text-muted-foreground">You don&rsquo;t have permission to delete this account.</p>
               ) : (
                 <DeleteUserButton userId={user.id} userName={user.name} />
               )}

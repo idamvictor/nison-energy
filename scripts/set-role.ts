@@ -3,19 +3,22 @@
  *
  *   npx tsx scripts/set-role.ts <email> [role]
  *
- * `role` defaults to "admin". Pass "user" to demote.
- * The email must already have signed in once (so the user row exists).
- * This is the bootstrap for the FIRST admin — after that, use /admin/users.
+ * `role` is one of superadmin | admin | staff | user (default "admin");
+ * "user" = customer. The email must already have signed in once (so the user
+ * row exists). This is the bootstrap for the Super admin — after that, invite
+ * and manage the team from /admin/users.
  */
 import "dotenv/config";
 
 import { prisma } from "../src/lib/db";
 
+const ROLES = ["superadmin", "admin", "staff", "user"];
+
 async function main() {
   const [email, role = "admin"] = process.argv.slice(2);
 
-  if (!email) {
-    console.error("Usage: npx tsx scripts/set-role.ts <email> [role]");
+  if (!email || !ROLES.includes(role)) {
+    console.error(`Usage: npx tsx scripts/set-role.ts <email> [${ROLES.join(" | ")}]`);
     process.exit(1);
   }
 

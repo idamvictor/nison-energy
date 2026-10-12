@@ -589,6 +589,33 @@ export function staffPriceReviewSubmitted(input: {
   };
 }
 
+// ─── Team ────────────────────────────────────────────────────────────────
+
+export function teamInviteEmail(input: {
+  inviterName: string;
+  roleLabel: string;
+  url: string;
+}): EmailContent {
+  return {
+    subject: `You've been invited to the ${COMPANY.tradingName} admin`,
+    html: emailLayout({
+      heading: "You've been invited to join the team",
+      bodyHtml: [
+        row(
+          `${esc(input.inviterName)} has invited you to join the ${esc(COMPANY.tradingName)} admin as
+           <strong>${esc(input.roleLabel)}</strong>.`,
+        ),
+        row(
+          `Accept the invite to create your account (or sign in if you already have one).
+           This link expires in 7 days and can only be used once.`,
+        ),
+        row("If you weren't expecting this, you can safely ignore this email."),
+      ].join(""),
+      cta: { label: "Accept invite", href: input.url },
+    }),
+  };
+}
+
 // ─── Auth ────────────────────────────────────────────────────────────────
 
 export function passwordResetEmail(input: {

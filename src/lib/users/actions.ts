@@ -4,8 +4,13 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth/server";
-import { requireAdmin } from "@/lib/auth/session";
-import { roleOptions, type Role, type UserActionResult } from "@/lib/users/types";
+import { prisma } from "@/lib/db";
+import { NOT_ALLOWED, checkPermission } from "@/lib/auth/session";
+import { canManageUser, type Role } from "@/lib/auth/permissions";
+import type { UserActionResult } from "@/lib/users/types";
+
+/** Roles that can be set from the admin: team roles below Super admin, or back to customer. */
+const SETTABLE: Role[] = ["admin", "staff", "user"];
 
 function errorMessage(err: unknown, fallback: string): string {
   if (err && typeof err === "object") {
@@ -22,22 +27,32 @@ function revalidate() {
   revalidatePath("/admin");
 }
 
-export async function setUserRole(
-  userId: string,
-  role: Role,
-): Promise<UserActionResult> {
-  const me = await requireAdmin();
-  if (!roleOptions.includes(role)) {
-    return { ok: false, error: "Unknown role." };
-  }
-  if (userId === me.id) {
-    return { ok: false, error: "You can't change your own role." };
-  }
+/**
+ * Loads the target and checks the signed-in user may manage them: needs
+ * team.manage, never yourself, never the Super admin, never someone above you.
+ */
+async function authorise(userId: string, selfError: string) {
+  const me = await checkPermission("team.manage");
+  if (!me) return { error: NOT_ALLOWED } as const;
+  if (userId === me.id) return { error: selfError } as const;
+  const target = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true } });
+  if (!target) return { error: "User not found." } as const;
+  if (!canManageUser(me.role, target.role)) return { error: NOT_ALLOWED } as const;
+  return { me, target } as const;
+}
+
+/** Sign someone out everywhere, so a role change / removal takes effect now. */
+async function endSessions(userId: string) {
+  await prisma.session.deleteMany({ where: { userId } });
+}
+
+export async function setUserRole(userId: string, role: Role): Promise<UserActionResult> {
+  if (!SETTABLE.includes(role)) return { ok: false, error: "Unknown role." };
+  const auth_ = await authorise(userId, "You can't change your own role.");
+  if ("error" in auth_) return { ok: false, error: auth_.error as string };
   try {
-    await auth.api.setRole({
-      headers: await headers(),
-      body: { userId, role },
-    });
+    await prisma.user.update({ where: { id: userId }, data: { role } });
+    await endSessions(userId);
     revalidate();
     return { ok: true };
   } catch (err) {
@@ -46,15 +61,10 @@ export async function setUserRole(
 }
 
 export async function removeUser(userId: string): Promise<UserActionResult> {
-  const me = await requireAdmin();
-  if (userId === me.id) {
-    return { ok: false, error: "You can't delete your own account." };
-  }
+  const auth_ = await authorise(userId, "You can't delete your own account.");
+  if ("error" in auth_) return { ok: false, error: auth_.error as string };
   try {
-    await auth.api.removeUser({
-      headers: await headers(),
-      body: { userId },
-    });
+    await auth.api.removeUser({ headers: await headers(), body: { userId } });
     revalidate();
     return { ok: true };
   } catch (err) {
@@ -62,29 +72,17 @@ export async function removeUser(userId: string): Promise<UserActionResult> {
   }
 }
 
-export async function setUserBanned(
-  userId: string,
-  banned: boolean,
-  reason?: string,
-): Promise<UserActionResult> {
-  const me = await requireAdmin();
-  if (userId === me.id) {
-    return { ok: false, error: "You can't ban your own account." };
-  }
+export async function setUserBanned(userId: string, banned: boolean, reason?: string): Promise<UserActionResult> {
+  const auth_ = await authorise(userId, "You can't ban your own account.");
+  if ("error" in auth_) return { ok: false, error: auth_.error as string };
   try {
     if (banned) {
       await auth.api.banUser({
         headers: await headers(),
-        body: {
-          userId,
-          ...(reason?.trim() ? { banReason: reason.trim() } : {}),
-        },
+        body: { userId, ...(reason?.trim() ? { banReason: reason.trim() } : {}) },
       });
     } else {
-      await auth.api.unbanUser({
-        headers: await headers(),
-        body: { userId },
-      });
+      await auth.api.unbanUser({ headers: await headers(), body: { userId } });
     }
     revalidate();
     return { ok: true };

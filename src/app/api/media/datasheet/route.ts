@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { uploadDatasheet } from "@/lib/media/queries";
+import { can } from "@/lib/auth/permissions";
 
 // Uses the S3 SDK — not edge-compatible.
 export const runtime = "nodejs";
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   // Admin-only (product datasheet PDFs). proxy.ts doesn't cover /api routes.
   const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
+  if (!user || !can(user.role, "products.edit")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

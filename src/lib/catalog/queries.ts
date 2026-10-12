@@ -4,7 +4,8 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
+import { can } from "@/lib/auth/permissions";
 import { DATASHEET_URL_PREFIX } from "@/lib/media/queries";
 import { MAX_DATASHEETS } from "@/lib/media/datasheet";
 import type { Product as ProductRow } from "@/generated/prisma/client";
@@ -312,7 +313,7 @@ export async function createProduct(
   slug: string,
   input: ProductInput,
 ): Promise<WriteResult> {
-  await requireAdmin();
+  const me = await requirePermission("products.edit");
   const id = slug.trim().toLowerCase();
   if (!SLUG_RE.test(id)) {
     return { ok: false, error: "Slug must be lowercase words separated by hyphens." };
@@ -322,7 +323,11 @@ export async function createProduct(
   if (await prisma.product.findUnique({ where: { id }, select: { id: true } })) {
     return { ok: false, error: `A product with slug "${id}" already exists.` };
   }
-  await prisma.product.create({ data: { id, ...toData(input) } });
+  const data = toData(input);
+  // Staff can add products but not price them: saved as "price on request"
+  // until an admin sets the price.
+  if (!can(me.role, "products.pricing")) Object.assign(data, { price: null, installFee: null });
+  await prisma.product.create({ data: { id, ...data } });
   return { ok: true, id };
 }
 
@@ -331,7 +336,7 @@ export async function updateProduct(
   newId: string,
   input: ProductInput,
 ): Promise<WriteResult> {
-  await requireAdmin();
+  const me = await requirePermission("products.edit");
   const err = validate(input);
   if (err) return { ok: false, error: err };
 
@@ -347,15 +352,19 @@ export async function updateProduct(
 
   // Datasheets are shared by URL across products, so removing one here only
   // unlinks it — the file stays in the PDF library (deleted from there only).
+  const { price, installFee, ...rest } = toData(input);
+  // Without products.pricing the stored price and install fee are kept, so a
+  // forged form submission can't change them.
+  const pricing = can(me.role, "products.pricing") ? { price, installFee } : {};
   await prisma.product.update({
     where: { id },
-    data: { id: nextId, ...toData(input) },
+    data: { id: nextId, ...rest, ...pricing },
   });
   return { ok: true, id: nextId };
 }
 
 export async function deleteProduct(id: string): Promise<WriteResult> {
-  await requireAdmin();
+  await requirePermission("products.delete");
   // Its datasheets stay in the PDF library (they may be shared with other products).
   await prisma.product.delete({ where: { id } });
   return { ok: true, id };

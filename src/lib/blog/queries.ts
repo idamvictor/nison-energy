@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { cleanBodyHtml, htmlToText } from "@/lib/blog/sanitize";
 import type { Post as PostRow } from "@/generated/prisma/client";
 import type {
@@ -106,7 +106,7 @@ export async function createPost(
   slug: string,
   input: PostInput,
 ): Promise<WriteResult> {
-  await requireAdmin();
+  await requirePermission("blog.edit");
   const id = slug.trim().toLowerCase();
   if (!SLUG_RE.test(id)) {
     return { ok: false, error: "Slug must be lowercase words separated by hyphens." };
@@ -124,7 +124,7 @@ export async function updatePost(
   id: string,
   input: PostInput,
 ): Promise<WriteResult> {
-  await requireAdmin();
+  await requirePermission("blog.edit");
   const err = validate(input);
   if (err) return { ok: false, error: err };
   await prisma.post.update({ where: { id }, data: toData(input) });
@@ -132,7 +132,7 @@ export async function updatePost(
 }
 
 export async function deletePost(id: string): Promise<WriteResult> {
-  await requireAdmin();
+  await requirePermission("blog.edit");
   await prisma.post.delete({ where: { id } });
   return { ok: true, id };
 }

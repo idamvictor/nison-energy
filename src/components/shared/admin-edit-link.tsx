@@ -5,6 +5,7 @@ import { Pencil } from "lucide-react";
 
 import { authClient } from "@/lib/auth/client";
 import { useHydrated } from "@/lib/use-hydrated";
+import { can } from "@/lib/auth/permissions";
 
 /**
  * Small "Edit" link shown next to a product title, admin-only. Deliberately
@@ -18,7 +19,7 @@ export function AdminEditLink({ href }: { href: string }) {
   // The server never has the session, so render nothing until hydrated —
   // otherwise a cached client session makes the first render differ (hydration error).
   const hydrated = useHydrated();
-  if (!hydrated || session?.user.role !== "admin") return null;
+  if (!hydrated || !can(session?.user.role, "products.edit")) return null;
 
   return (
     <Link

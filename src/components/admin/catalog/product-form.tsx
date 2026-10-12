@@ -37,6 +37,8 @@ import { ProductGallery } from "@/components/shared/product-gallery";
 import { ImageUploadField } from "@/components/shared/image-upload-field";
 import { DatasheetsField } from "@/components/admin/catalog/datasheet-upload-field";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth/client";
+import { can } from "@/lib/auth/permissions";
 import {
   accessoryPhases,
   accessoryStyles,
@@ -95,6 +97,15 @@ export function ProductForm({
 }) {
   const router = useRouter();
   const isNew = row === null;
+  // Staff can edit products but not prices — the server ignores price changes
+  // from them anyway; this just makes it obvious in the form.
+  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const pricingLocked = !sessionPending && !can(session?.user.role, "products.pricing");
+  const priceNote = pricingLocked && (
+    <p className="text-xs text-muted-foreground sm:col-span-2">
+      Prices are set by an admin.
+    </p>
+  );
   const originalId = row?.id ?? "";
   const adminBack = adminRoute[category];
   const storefrontBase = categoryRoute[category];
@@ -518,6 +529,8 @@ export function ProductForm({
                 step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                readOnly={pricingLocked}
+                className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
             <Field label="Installation fee (£)">
@@ -527,8 +540,11 @@ export function ProductForm({
                 step="0.01"
                 value={installFee}
                 onChange={(e) => setInstallFee(e.target.value)}
+                readOnly={pricingLocked}
+                className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
+            {priceNote}
             {category === "Residential" && (
               <Field label="Cable length options (comma separated)">
                 <Input
@@ -593,8 +609,11 @@ export function ProductForm({
                 step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                readOnly={pricingLocked}
+                className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
+            {priceNote}
           </CardContent>
         </Card>
       )}
@@ -612,8 +631,11 @@ export function ProductForm({
                 step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                readOnly={pricingLocked}
+                className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
+            {priceNote}
           </CardContent>
         </Card>
       )}

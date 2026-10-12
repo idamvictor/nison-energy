@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { createLead } from "@/lib/leads/queries";
 import { createNotification } from "@/lib/notifications/queries";
 import { checkRateLimit } from "@/lib/rate-limit/check";
@@ -166,7 +166,7 @@ export async function updateLeadStatus(
   id: string,
   status: string,
 ): Promise<LeadActionResult> {
-  await requireAdmin();
+  await requirePermission("leads.edit");
   if (!leadStatuses.includes(status as LeadStatus)) {
     return { ok: false, error: "Unknown status." };
   }
@@ -203,7 +203,7 @@ export async function updateLeadInstallation(
   id: string,
   input: InstallationInput,
 ): Promise<LeadActionResult> {
-  await requireAdmin();
+  await requirePermission("leads.edit");
 
   const stage = input.stage;
   if (!installationStages.includes(stage as InstallationStage)) {

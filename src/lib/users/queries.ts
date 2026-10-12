@@ -1,10 +1,9 @@
 import "server-only";
 
 import { cache } from "react";
-import { headers } from "next/headers";
 
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth/server";
+import { teamRoles, toRole } from "@/lib/auth/permissions";
 import type { AdminUserDetail, AdminUserRow, Role } from "@/lib/users/types";
 
 type ListUser = {
@@ -24,7 +23,7 @@ function toRow(u: ListUser): AdminUserRow {
     id: u.id,
     name: u.name?.trim() || u.email.split("@")[0],
     email: u.email,
-    role: u.role === "admin" ? "admin" : "user",
+    role: toRole(u.role),
     banned: u.banned ?? false,
     banReason: u.banReason ?? null,
     emailVerified: u.emailVerified ?? false,
@@ -41,34 +40,16 @@ export const getUsers = cache(
     offset?: number;
   }): Promise<{ users: AdminUserRow[]; total: number }> => {
     const { q, role, limit = 50, offset = 0 } = opts;
-    const result = await auth.api.listUsers({
-      headers: await headers(),
-      query: {
-        limit,
-        offset,
-        sortBy: "createdAt",
-        sortDirection: "desc",
-        ...(q
-          ? {
-              searchField: "email" as const,
-              searchOperator: "contains" as const,
-              searchValue: q,
-            }
-          : {}),
-        ...(role
-          ? {
-              filterField: "role",
-              filterOperator: "eq" as const,
-              filterValue: role,
-            }
-          : {}),
-      },
-    });
-
-    return {
-      users: (result.users as ListUser[]).map(toRow),
-      total: result.total,
+    // Straight from the DB (not the auth admin API) so view-only staff can list users too.
+    const where = {
+      ...(q ? { email: { contains: q, mode: "insensitive" as const } } : {}),
+      ...(role ? (role === "user" ? { NOT: { role: { in: [...teamRoles] } } } : { role }) : {}),
     };
+    const [rows, total] = await Promise.all([
+      prisma.user.findMany({ where, orderBy: { createdAt: "desc" }, take: limit, skip: offset }),
+      prisma.user.count({ where }),
+    ]);
+    return { users: rows.map(toRow), total };
   },
 );
 
@@ -107,7 +88,7 @@ export const getUser = cache(
 export const getUserCounts = cache(async () => {
   const [total, admins, banned] = await Promise.all([
     prisma.user.count(),
-    prisma.user.count({ where: { role: "admin" } }),
+    prisma.user.count({ where: { role: { in: [...teamRoles] } } }),
     prisma.user.count({ where: { banned: true } }),
   ]);
   return { total, admins, banned };

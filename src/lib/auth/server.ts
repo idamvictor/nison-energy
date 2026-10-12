@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
+import { adminAc, userAc } from "better-auth/plugins/admin/access";
 
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/client";
@@ -69,7 +70,14 @@ export const auth = betterAuth({
   plugins: [
     // New users get role "user" (customer). Staff are promoted to "admin" with
     // scripts/set-role.ts; `/admin` + the leads API check for it.
-    admin({ adminRoles: ["admin"], defaultRole: "user" }),
+    // Our team roles (src/lib/auth/permissions.ts). The plugin's own endpoints
+    // (ban/remove) need its admin permissions, so Super admin + Admin get them;
+    // Staff are plain users as far as the plugin is concerned.
+    admin({
+      roles: { superadmin: adminAc, admin: adminAc, staff: userAc, user: userAc },
+      adminRoles: ["superadmin", "admin"],
+      defaultRole: "user",
+    }),
     // Keep last — lets Better Auth set cookies from Server Actions.
     nextCookies(),
   ],

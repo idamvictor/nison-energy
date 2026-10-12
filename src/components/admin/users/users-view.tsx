@@ -7,7 +7,6 @@ import {
   MoreHorizontal,
   Search,
   ShieldCheck,
-  ShieldOff,
   UserRoundCheck,
   UserRoundX,
 } from "lucide-react";
@@ -34,6 +33,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -47,7 +47,8 @@ import {
 } from "@/components/ui/dialog";
 import { RoleBadge } from "@/components/admin/users/role-badge";
 import { setUserBanned, setUserRole } from "@/lib/users/actions";
-import { roleOptions, type AdminUserRow } from "@/lib/users/types";
+import { canManageUser, roleLabels } from "@/lib/auth/permissions";
+import { roleOptions, settableRoles, type AdminUserRow, type Role } from "@/lib/users/types";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -61,10 +62,12 @@ export function UsersView({
   users,
   counts,
   currentUserId,
+  myRole,
 }: {
   users: AdminUserRow[];
   counts: { total: number; admins: number; banned: number };
   currentUserId: string;
+  myRole: Role;
 }) {
   const [query, setQuery] = useState("");
   const [role, setRole] = useState<"all" | (typeof roleOptions)[number]>("all");
@@ -82,7 +85,7 @@ export function UsersView({
     });
   }, [users, query, role]);
 
-  function runRole(user: AdminUserRow, next: (typeof roleOptions)[number]) {
+  function runRole(user: AdminUserRow, next: Role) {
     setError(null);
     startTransition(async () => {
       const result = await setUserRole(user.id, next);
@@ -116,7 +119,7 @@ export function UsersView({
       <div>
         <h2 className="font-heading text-base font-semibold text-foreground">Users</h2>
         <p className="text-sm text-muted-foreground">
-          {counts.total} {counts.total === 1 ? "user" : "users"} · {counts.admins} admin
+          {counts.total} {counts.total === 1 ? "user" : "users"} · {counts.admins} team member
           {counts.admins === 1 ? "" : "s"}
           {counts.banned > 0 && ` · ${counts.banned} banned`}
         </p>
@@ -136,6 +139,7 @@ export function UsersView({
         </div>
 
         <Select
+          items={{ all: "All roles", ...roleLabels }}
           value={role}
           onValueChange={(v) => v && setRole(v as typeof role)}
         >
@@ -146,7 +150,7 @@ export function UsersView({
             <SelectItem value="all">All roles</SelectItem>
             {roleOptions.map((r) => (
               <SelectItem key={r} value={r}>
-                {r}
+                {roleLabels[r]}
               </SelectItem>
             ))}
           </SelectContent>
@@ -173,6 +177,7 @@ export function UsersView({
             <TableBody>
               {filtered.map((user) => {
                 const isSelf = user.id === currentUserId;
+                const manageable = !isSelf && canManageUser(myRole, user.role);
                 return (
                   <TableRow key={user.id}>
                     <TableCell>
@@ -226,6 +231,7 @@ export function UsersView({
                       {formatDate(user.createdAt)}
                     </TableCell>
                     <TableCell>
+                      {manageable && (
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           render={<Button variant="ghost" size="icon-sm" />}
@@ -234,23 +240,19 @@ export function UsersView({
                           <span className="sr-only">User actions</span>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          {user.role === "admin" ? (
-                            <DropdownMenuItem
-                              disabled={isSelf || pending}
-                              onClick={() => runRole(user, "user")}
-                            >
-                              <ShieldOff />
-                              Remove admin
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              disabled={pending}
-                              onClick={() => runRole(user, "admin")}
-                            >
-                              <ShieldCheck />
-                              Make admin
-                            </DropdownMenuItem>
-                          )}
+                          {settableRoles
+                            .filter((r) => r !== user.role)
+                            .map((r) => (
+                              <DropdownMenuItem
+                                key={r}
+                                disabled={pending}
+                                onClick={() => runRole(user, r)}
+                              >
+                                <ShieldCheck />
+                                {r === "user" ? "Make customer" : `Make ${roleLabels[r].toLowerCase()}`}
+                              </DropdownMenuItem>
+                            ))}
+                          <DropdownMenuSeparator />
                           {user.banned ? (
                             <DropdownMenuItem
                               disabled={pending}
@@ -262,7 +264,7 @@ export function UsersView({
                           ) : (
                             <DropdownMenuItem
                               variant="destructive"
-                              disabled={isSelf || pending}
+                              disabled={pending}
                               onClick={() => {
                                 setBanReason("");
                                 setBanTarget(user);
@@ -274,6 +276,7 @@ export function UsersView({
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

@@ -31,6 +31,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { can, type Permission } from "@/lib/auth/permissions";
 import { cn } from "@/lib/utils";
 
 const overviewLinks = [
@@ -41,8 +42,8 @@ const catalogLinks = [
   { href: "/admin/chargers", label: "Chargers", icon: Zap },
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
   { href: "/admin/solar-panels", label: "Solar Panels", icon: Sun },
-  { href: "/admin/prices", label: "Price list", icon: PoundSterling },
-];
+  { href: "/admin/prices", label: "Price list", icon: PoundSterling, permission: "prices.manage" },
+] as { href: string; label: string; icon: typeof Zap; permission?: Permission }[];
 
 function navItemClass(active: boolean) {
   return cn(
@@ -56,12 +57,15 @@ export function AdminSidebar({
   pendingOrderCount = 0,
   pendingQuoteCount = 0,
   pendingPriceReviewCount = 0,
+  role,
 }: {
   newLeadCount?: number;
   pendingOrderCount?: number;
   pendingQuoteCount?: number;
   /** Client price-review submissions waiting for approval. */
   pendingPriceReviewCount?: number;
+  /** The signed-in team member's role — hides sections they can't use. */
+  role: string;
 }) {
   const pathname = usePathname();
   const isActive = (href: string) => {
@@ -127,7 +131,9 @@ export function AdminSidebar({
           <SidebarGroupLabel>Catalog</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {catalogLinks.map((link) => {
+              {catalogLinks
+                .filter((link) => !link.permission || can(role, link.permission))
+                .map((link) => {
                 const active = isActive(link.href);
                 return (
                   <SidebarMenuItem key={link.href}>

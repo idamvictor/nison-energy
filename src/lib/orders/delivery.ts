@@ -23,9 +23,9 @@ export const DELIVERY_LABEL = "DPD Tracked Delivery";
 /** Dispatched in 1–3 working days, then 1–2 days with DPD. */
 export const DELIVERY_ESTIMATE = "Dispatched in 1–3 working days";
 
-export const PALLET_DELIVERY_LABEL = "Pallet Delivery";
-/** From the delivery policy: dispatched via specialist courier, up to 4 working days. */
-export const PALLET_DELIVERY_ESTIMATE = "Specialist courier — up to 4 working days";
+export const PALLET_DELIVERY_LABEL = "Specialist Delivery";
+/** From the delivery policy: plug-in solar may take 5 to 7 days via specialist delivery. */
+export const PALLET_DELIVERY_ESTIMATE = "Estimated delivery 5 to 7 days";
 
 /** The delivery name for an order (solar kits ship by pallet). */
 export function deliveryLabelFor(pallet: boolean): string {

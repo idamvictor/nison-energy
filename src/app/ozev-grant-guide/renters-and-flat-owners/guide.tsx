@@ -25,6 +25,7 @@ import { ChargerPicker } from "@/components/grant-guide/charger-picker";
 import type { ChargerGuideProps, ChargerSelection } from "@/lib/grant-guide/types";
 import { DraftRestoredNotice, SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
 import { useGuideDraft } from "@/components/grant-guide/use-guide-draft";
+import { EligibilityPrompt } from "@/components/grant-guide/eligibility-prompt";
 import { OnStreetIntakeForm } from "@/components/grant-guide/on-street-intake-form";
 import { getGrantScheme } from "@/lib/content/grant-schemes";
 import { generateRentersQuotePdf } from "@/lib/pdf/renters-quote";
@@ -191,6 +192,10 @@ export default function RentersFlatOwnersGuide({
             </h2>
             <Card className="border border-foreground/18 shadow-md">
               <CardContent className="flex flex-col gap-5">
+                <EligibilityPrompt
+                  selected={Object.values(answers).filter(Boolean).length}
+                  total={questions.length}
+                />
                 {questions.map((question) => (
                   <div key={question.key}>
                     <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -309,11 +314,14 @@ export default function RentersFlatOwnersGuide({
                       </p>
                     </div>
                     <p className="text-sm text-foreground/80">
-                      Complete the form below with your details and itemised
-                      costs, then choose &quot;Generate My Quote&quot; to
-                      download a compliant, pre-filled quote — itemised in
-                      the format OZEV expects for your Renters &amp; Flat
-                      Owners grant application.
+                      Complete the form below with your details and itemised costs or start with a{" "}
+                      <Link
+                        href="/virtual-survey"
+                        className="font-medium text-primary-ink underline underline-offset-2"
+                      >
+                        free online home survey via OpenQuote
+                      </Link>{" "}
+                      before generating your OZEV-compliant Renters &amp; Flat Owners grant quote.
                     </p>
 
                     <form
@@ -679,39 +687,39 @@ export default function RentersFlatOwnersGuide({
                         3
                       </span>
                       <p className="font-heading text-base font-semibold text-foreground">
-                        Once Your Authorisation Code Arrives
+                        Once Your Authorisation Code is approved
                       </p>
                     </div>
-                    <p className="mb-3 text-sm text-foreground/80">
-                      As soon as OZEV issues your authorisation code, we move
-                      things forward in three steps:
-                    </p>
+                    <p className="mb-3 text-sm text-foreground/80">The following activities will commence:</p>
                     <ul className="flex flex-col gap-2">
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
                         <Video className="mt-0.5 size-4 shrink-0 text-primary-ink" />
                         <span>
-                          We send you a link to start the home survey
-                          through our{" "}
+                          <span className="font-semibold text-foreground">Confirm Your Installation:</span> We’ll send
+                          you a link via the{" "}
                           <Link
                             href="/virtual-survey"
                             className="font-medium text-primary-ink underline underline-offset-2"
                           >
                             OpenQuote system
-                          </Link>
-                          , confirming your charger, any additional work
-                          required, and the grant-adjusted price
+                          </Link>{" "}
+                          to capture survey information and any additional site works required.
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
                         <FileCheck2 className="mt-0.5 size-4 shrink-0 text-primary-ink" />
-                        We&apos;ll then send you an invoice for a deposit of
-                        at least 50% of the total — or full payment, if
-                        required — to secure your installation slot
+                        <span>
+                          <span className="font-semibold text-foreground">Receive Your Final Quote:</span> We’ll
+                          confirm the installation costs, your approved OZEV grant amount and any additional costs
+                          payable by your business. Your approved grant amount will remain unchanged.
+                        </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm text-foreground/80">
                         <FileCheck2 className="mt-0.5 size-4 shrink-0 text-primary-ink" />
-                        The remaining balance is due and must clear before
-                        our engineer arrives on site
+                        <span>
+                          <span className="font-semibold text-foreground">Secure Your Installation:</span> We’ll issue
+                          an invoice to secure your installation slot(s).
+                        </span>
                       </li>
                     </ul>
                   </CardContent>

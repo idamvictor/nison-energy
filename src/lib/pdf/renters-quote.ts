@@ -37,11 +37,11 @@ export function generateRentersQuotePdf(input: RentersQuoteInput): Promise<Blob>
     left: {
       heading: "Installer Details",
       lines: [
-        ["Installer Business Name:", "Nison Limited (trading as Ocunio Energy)"],
+        ["Installer Business Name:", "Nison Limited"],
         ["OZEV Installer Number:", "13528"],
         ["Company Registration No.:", "16371062"],
         ["VAT No.:", "GB495472057"],
-        ["Installer Contact:", "info@ocunioenergy.com"],
+        ["Installer Contact:", "nisonenergy@gmail.com"],
         ["Website:", "www.ocunioenergy.com"],
       ],
     },

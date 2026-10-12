@@ -27,7 +27,7 @@ export function FreeDeliveryBadge({
         <span className="flex size-6 items-center justify-center rounded-full bg-success/15">
           <Truck className="size-3.5" />
         </span>
-        {pallet ? `£${PALLET_DELIVERY_FEE} pallet delivery` : `Free delivery over ${FREE_DELIVERY_FROM}`}
+        {pallet ? `£${PALLET_DELIVERY_FEE} specialist delivery` : `Free delivery over ${FREE_DELIVERY_FROM}`}
       </span>
       {warranty && (
         <span className={cn(badgeClass, "bg-primary/10 text-primary-ink ring-primary/25")}>

@@ -29,6 +29,7 @@ import {
 import type { ChargerGuideProps, ChargerSelection } from "@/lib/grant-guide/types";
 import { DraftRestoredNotice, SignInRequiredDialog } from "@/components/grant-guide/sign-in-required-dialog";
 import { useGuideDraft } from "@/components/grant-guide/use-guide-draft";
+import { EligibilityPrompt } from "@/components/grant-guide/eligibility-prompt";
 import { generateWorkplaceQuotePdf } from "@/lib/pdf/workplace-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
@@ -196,6 +197,10 @@ export default function WorkplaceChargingSchemeGuide({
             </h2>
             <Card className={cardClass}>
               <CardContent className="flex flex-col gap-5">
+                <EligibilityPrompt
+                  selected={Object.values(answers).filter(Boolean).length}
+                  total={questions.length}
+                />
                 {questions.map((question) => (
                   <div key={question.key}>
                     <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -537,17 +542,16 @@ export default function WorkplaceChargingSchemeGuide({
                         >
                           <Check className="mt-0.5 size-4 shrink-0 text-success" />
                           <p>
-                            Your quote has been submitted for review.
-                            We&apos;ll check it over and notify you (in your
-                            account and by email) once it&apos;s approved and
-                            ready to download — find it anytime under
-                            Account → Quotes.{" "}
+                            Your quote has been submitted for review. We’ll review your submission and notify you by email
+                            and in your account once it’s approved and ready to download. You can check its status anytime
+                            under{" "}
                             <Link
                               href="/account/quotes"
                               className="font-medium text-primary-ink underline underline-offset-2"
                             >
-                              View in Account → Quotes
+                              Account → Quotes
                             </Link>
+                            .
                           </p>
                         </div>
                       )}

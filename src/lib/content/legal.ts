@@ -56,16 +56,16 @@ export const deliveryPolicyMarkdown = `We are committed to providing fast, relia
 
 ### Shipping & Delivery Policy
 
-All standard UK mainland orders are dispatched quickly and delivered securely via our courier partner, DPD. Delivery charges are calculated at checkout based on your total order value:
+All standard UK mainland orders are dispatched quickly and delivered securely via DPD and other courier services. Delivery charges are calculated at checkout based on your total order value:
 
 | Total Order Value | Standard Delivery Fee | Delivery Service |
 |---|---|---|
-| Orders £120 and over | FREE | DPD Tracked Delivery |
-| Orders under £120 | £11.99 | DPD Tracked Delivery |
+| Orders £120 and over | FREE | DPD and other courier services |
+| Orders under £120 | £11.99 | DPD and other courier services |
 
 - **Free Delivery:** Spend £120 or more on any order to qualify for free standard delivery.
 - **Standard Shipping:** For all orders under £120, a flat delivery fee of £11.99 will be applied at checkout.
-- **Tracking:** Full DPD tracking information will be provided via email/SMS once your order has been dispatched.
+- **Tracking:** Full tracking information will be provided via email/SMS once your order has been dispatched.
 
 **Special Services:** Need your order on a weekend? Saturday deliveries and expedited options can be arranged upon request.
 
@@ -86,7 +86,7 @@ All standard UK mainland orders are dispatched quickly and delivered securely vi
 
 Due to their size or technical nature, select products require dedicated transit options:
 
-- **Equipment such as Solar, Inverters, Batteries & Heat Pumps:** Pallet delivery (rates to be confirmed). Dispatched via specialist courier (up to 4 working days).
+- Solar panels, inverters, batteries and heat pumps are sent by specialist delivery (up to 4 working days, price confirmed separately). However, the delivery of plug-in solar may take 5 to 7 days via specialist delivery.
 
 ## Delivery Coverage
 

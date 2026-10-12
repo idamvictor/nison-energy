@@ -59,7 +59,7 @@ export function generateLandlordQuotePdf(input: LandlordQuoteInput): Promise<Blo
     docTitle: "OZEV Landlord Quote",
     strapline: [
       "Nison Limited — OZEV-Approved Installer, No. 13528 · VAT No. GB495472057 · Company Reg. No. 16371062",
-      "info@ocunioenergy.com · www.ocunioenergy.com",
+      "nisonenergy@gmail.com · www.ocunioenergy.com",
     ],
     title: "Residential Landlord Grant — Itemised Quote",
     meta: [
@@ -69,11 +69,11 @@ export function generateLandlordQuotePdf(input: LandlordQuoteInput): Promise<Blo
     left: {
       heading: "Installer Details",
       lines: [
-        ["Installer Business Name:", "Nison Limited (trading as Ocunio Energy)"],
+        ["Installer Business Name:", "Nison Limited"],
         ["OZEV Installer Number:", "13528"],
         ["Company Registration No.:", "16371062"],
         ["VAT No.:", "GB495472057"],
-        ["Installer Contact:", "info@ocunioenergy.com"],
+        ["Installer Contact:", "nisonenergy@gmail.com"],
         ["Website:", "www.ocunioenergy.com"],
       ],
     },

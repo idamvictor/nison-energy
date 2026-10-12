@@ -102,6 +102,7 @@ export default async function SolarDetailPage({ params }: { params: Promise<{ sl
                 </div>
                 {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
                 <FreeDeliveryBadge warranty={detail.warranty} pallet />
+                <p className="mt-2 text-sm text-muted-foreground">Estimated delivery for plug-in solar – 5 to 7 days</p>
               </div>
 
               {product.tags.length > 0 && (

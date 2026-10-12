@@ -7,7 +7,7 @@ import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
 import { getFeatured, dbToAccessory } from "@/lib/catalog/queries";
 
-export async function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
+export async function FeaturedAccessories({ limit }: { limit?: number }) {
   const products = (await getFeatured("Accessory", limit)).map(dbToAccessory);
 
   return (
@@ -25,9 +25,9 @@ export async function FeaturedAccessories({ limit = 3 }: { limit?: number }) {
           </div>
         </Reveal>
 
-        <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 flex flex-wrap justify-center gap-7">
           {products.map((product, index) => (
-            <Reveal key={product.id} delay={(index % 3) * 75}>
+            <Reveal key={product.id} delay={(index % 3) * 75} className="w-full sm:w-[calc((100%-1.75rem)/2)] lg:w-[calc((100%-3.5rem)/3)]">
               <AccessoryProductCard variants={[product]} quickAdd />
             </Reveal>
           ))}

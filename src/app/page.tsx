@@ -26,14 +26,14 @@ export default function Home() {
       <main className="flex-1">
         <HeroReveal>
           <ProductGrid
-            limit={3}
+            featured
             viewAllHref="/home-charging"
             title="Our Best-Selling Chargers"
             subtitle="A curated selection of our best-selling chargers."
           />
         </HeroReveal>
-        <FeaturedCommercial limit={3} />
-        <FeaturedAccessories limit={3} />
+        <FeaturedCommercial />
+        <FeaturedAccessories />
         <CategoryCards />
         <TrustedInstallers />
         <LatestBlog limit={3} />

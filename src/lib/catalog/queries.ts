@@ -207,8 +207,9 @@ export const getProductRow = cache((id: string) =>
   prisma.product.findUnique({ where: { id } }),
 );
 
+/** Every active featured product in a category (or the first `limit`), in sort order. */
 export const getFeatured = cache(
-  (category: ProductCategory, limit: number) =>
+  (category: ProductCategory, limit?: number) =>
     prisma.product.findMany({
       where: { active: true, category, featured: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],

@@ -8,18 +8,19 @@ import { Button } from "@/components/ui/button";
 import { getResidentialCatalog, getFeatured, dbToResidential } from "@/lib/catalog/queries";
 
 export async function ProductGrid({
-  limit,
+  featured = false,
   viewAllHref,
   title = "Residential Charging Units",
   subtitle = "Every charger is professionally installed and backed by our certified engineer network.",
 }: {
-  limit?: number;
+  /** Homepage: only products marked "Featured on home page" (all of them). */
+  featured?: boolean;
   viewAllHref?: string;
   title?: string;
   subtitle?: string;
 }) {
-  const products = limit
-    ? (await getFeatured("Residential", limit)).map(dbToResidential)
+  const products = featured
+    ? (await getFeatured("Residential")).map(dbToResidential)
     : await getResidentialCatalog();
 
   return (
@@ -35,9 +36,9 @@ export async function ProductGrid({
           </div>
         </Reveal>
 
-        <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 flex flex-wrap justify-center gap-7">
           {products.map((product, index) => (
-            <Reveal key={product.id} delay={(index % 3) * 75}>
+            <Reveal key={product.id} delay={(index % 3) * 75} className="w-full sm:w-[calc((100%-1.75rem)/2)] lg:w-[calc((100%-3.5rem)/3)]">
               <ProductCard variants={[product]} quickAdd />
             </Reveal>
           ))}

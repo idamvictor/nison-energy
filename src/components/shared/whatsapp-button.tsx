@@ -6,7 +6,7 @@ import { WhatsAppIcon } from "@/components/shared/social-icons";
 import { contextualMessage, whatsappUrl } from "@/lib/whatsapp";
 
 // Pages where a floating chat bubble would get in the way.
-const HIDDEN_PREFIXES = ["/admin", "/sign-in", "/forgot-password", "/reset-password"];
+const HIDDEN_PREFIXES = ["/admin", "/sign-in", "/forgot-password", "/reset-password", "/price-review"];
 
 /**
  * Floating "chat with us" button — the site's only direct line to the team

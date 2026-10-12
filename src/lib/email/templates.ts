@@ -567,6 +567,28 @@ export function staffQuoteSubmitted(
   };
 }
 
+export function staffPriceReviewSubmitted(input: {
+  submissionId: string;
+  reviewerName: string;
+  changes: number;
+  note: string | null;
+}): EmailContent {
+  const plural = input.changes === 1 ? "change" : "changes";
+  return {
+    subject: `Price review submitted by ${input.reviewerName} — ${input.changes} ${plural} waiting for approval`,
+    html: emailLayout({
+      heading: "Price changes are waiting for approval",
+      bodyHtml: [
+        row(`<strong>Submitted by</strong><br>${esc(input.reviewerName)}`),
+        row(`<strong>Proposed price ${plural}</strong><br>${input.changes}`),
+        ...(input.note ? [row(`<strong>Note</strong><br>${esc(input.note)}`)] : []),
+        row("Nothing has changed on the website yet — approve or reject each change in admin."),
+      ].join(""),
+      cta: { label: "Review in admin", href: `${PUBLIC_ORIGIN}/admin/prices/submissions/${input.submissionId}` },
+    }),
+  };
+}
+
 // ─── Auth ────────────────────────────────────────────────────────────────
 
 export function passwordResetEmail(input: {

@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { getNewLeadCount } from "@/lib/leads/queries";
 import { getPendingOrderCount } from "@/lib/orders/queries";
 import { getPendingQuoteCount } from "@/lib/quotes/queries";
+import { getPendingPriceReviewCount } from "@/lib/pricing-review/queries";
 
 export const metadata: Metadata = {
   title: "Admin | Ocunio Energy",
@@ -22,10 +23,11 @@ export default async function AdminLayout({
   // proxy.ts covers navigations and the leads route handler guards the data.
   await requireAdmin();
 
-  const [newLeadCount, pendingOrderCount, pendingQuoteCount] = await Promise.all([
+  const [newLeadCount, pendingOrderCount, pendingQuoteCount, pendingPriceReviewCount] = await Promise.all([
     getNewLeadCount(),
     getPendingOrderCount(),
     getPendingQuoteCount(),
+    getPendingPriceReviewCount(),
   ]);
 
   return (
@@ -34,6 +36,7 @@ export default async function AdminLayout({
         newLeadCount={newLeadCount}
         pendingOrderCount={pendingOrderCount}
         pendingQuoteCount={pendingQuoteCount}
+        pendingPriceReviewCount={pendingPriceReviewCount}
       />
       <SidebarInset>
         <AdminTopbar />

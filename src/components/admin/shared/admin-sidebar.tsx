@@ -14,6 +14,7 @@ import {
   Users,
   Zap,
   Sun,
+  PoundSterling,
 } from "lucide-react";
 
 import {
@@ -40,6 +41,7 @@ const catalogLinks = [
   { href: "/admin/chargers", label: "Chargers", icon: Zap },
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
   { href: "/admin/solar-panels", label: "Solar Panels", icon: Sun },
+  { href: "/admin/prices", label: "Price list", icon: PoundSterling },
 ];
 
 function navItemClass(active: boolean) {
@@ -53,10 +55,13 @@ export function AdminSidebar({
   newLeadCount = 0,
   pendingOrderCount = 0,
   pendingQuoteCount = 0,
+  pendingPriceReviewCount = 0,
 }: {
   newLeadCount?: number;
   pendingOrderCount?: number;
   pendingQuoteCount?: number;
+  /** Client price-review submissions waiting for approval. */
+  pendingPriceReviewCount?: number;
 }) {
   const pathname = usePathname();
   const isActive = (href: string) => {
@@ -134,6 +139,9 @@ export function AdminSidebar({
                       <link.icon />
                       <span>{link.label}</span>
                     </SidebarMenuButton>
+                    {link.href === "/admin/prices" && pendingPriceReviewCount > 0 && (
+                      <SidebarMenuBadge className="text-primary">{pendingPriceReviewCount}</SidebarMenuBadge>
+                    )}
                   </SidebarMenuItem>
                 );
               })}

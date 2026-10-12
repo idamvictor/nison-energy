@@ -195,6 +195,8 @@ model Product {
   warranty    String?
   datasheets  String[] @default([]) // /api/media/datasheets/<uuid>/<name>.pdf, shown in this order
 
+  priceProposals PriceProposal[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -402,4 +404,55 @@ model DatasheetUploadPart {
 
   @@id([uploadId, index])
   @@index([createdAt])
+}
+
+/// Client price review (/price-review). One settings row (id "default") that
+/// admin switches open/closed; while closed the page redirects home.
+model PriceReviewWindow {
+  id       String    @id @default("default")
+  open     Boolean   @default(false)
+  openedAt DateTime?
+  closedAt DateTime?
+}
+
+/// One "Submit for approval" from the client price review page.
+model PriceReviewSubmission {
+  id           String            @id @default(cuid())
+  reviewerName String
+  note         String?
+  status       PriceReviewStatus @default(Pending)
+  submittedAt  DateTime          @default(now())
+  decidedAt    DateTime?
+  proposals    PriceProposal[]
+
+  @@index([status, submittedAt])
+}
+
+/// A proposed new price for one product. Prices are GBP; the client types the
+/// ex-VAT price and proposedPrice (inc VAT, like Product.price) is derived.
+model PriceProposal {
+  id            String                @id @default(cuid())
+  submissionId  String
+  submission    PriceReviewSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  currentPrice  Decimal?              @db.Decimal(10, 2) // inc VAT, snapshot at submit
+  proposedExVat Decimal               @db.Decimal(10, 2)
+  proposedPrice Decimal               @db.Decimal(10, 2) // inc VAT
+  status        PriceProposalStatus   @default(Pending)
+  decidedAt     DateTime?
+
+  @@index([submissionId])
+  @@index([productId])
+}
+
+enum PriceReviewStatus {
+  Pending
+  Done
+}
+
+enum PriceProposalStatus {
+  Pending
+  Approved
+  Rejected
 }

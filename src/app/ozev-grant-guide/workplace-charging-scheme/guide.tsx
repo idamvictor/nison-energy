@@ -93,6 +93,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const cardClass = "border border-foreground/18 shadow-md";
 
+const QUOTE_ERROR = "We couldn't generate your quote — please try again, or message us on WhatsApp.";
+
 type GuideDraftState = { answers: Answers; lines?: ChargerLine[]; chargerSel?: ChargerSelection | null; chargepoints?: string; sockets: string; labourCost: string; works: WorkRow[] };
 
 export default function WorkplaceChargingSchemeGuide({
@@ -111,6 +113,14 @@ export default function WorkplaceChargingSchemeGuide({
   const [showSignIn, setShowSignIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Bring the outcome into view — the button often sits at the bottom of the screen.
+  const resultRef = useRef<HTMLDivElement & HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (submitted || submitError) {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      resultRef.current?.focus({ preventScroll: true });
+    }
+  }, [submitted, submitError]);
   // Survives the sign-in detour — see use-guide-draft.ts.
   const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
     key: "workplace",
@@ -373,6 +383,9 @@ export default function WorkplaceChargingSchemeGuide({
                           // Needs admin review before it can be downloaded.
                           setSubmitted(true);
                           clearDraft();
+                        } catch (err) {
+                          console.error("[quote]", err);
+                          setSubmitError(QUOTE_ERROR);
                         } finally {
                           setSubmitting(false);
                         }
@@ -493,26 +506,48 @@ export default function WorkplaceChargingSchemeGuide({
 
                       <Button
                         type="submit"
-                        disabled={submitting}
+                        disabled={submitting || submitted}
                         variant="cta"
                         className="w-fit gap-1.5"
                       >
-                        {submitting ? "Submitting…" : "Generate My Quote →"}
+                        {submitted ? (
+                          <>
+                            <Check className="size-4" />
+                            Quote submitted
+                          </>
+                        ) : submitting ? (
+                          "Submitting…"
+                        ) : (
+                          "Generate My Quote →"
+                        )}
                       </Button>
 
                       {submitError && (
-                        <p className="text-sm font-medium text-destructive">{submitError}</p>
+                        <p ref={resultRef} tabIndex={-1} role="alert" className="text-sm font-medium text-destructive outline-none">
+                          {submitError}
+                        </p>
                       )}
 
                       {submitted && (
-                        <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80">
+                        <div
+                          ref={resultRef}
+                          tabIndex={-1}
+                          role="status"
+                          className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80 outline-none"
+                        >
                           <Check className="mt-0.5 size-4 shrink-0 text-success" />
                           <p>
                             Your quote has been submitted for review.
                             We&apos;ll check it over and notify you (in your
                             account and by email) once it&apos;s approved and
                             ready to download — find it anytime under
-                            Account → Quotes.
+                            Account → Quotes.{" "}
+                            <Link
+                              href="/account/quotes"
+                              className="font-medium text-primary-ink underline underline-offset-2"
+                            >
+                              View in Account → Quotes
+                            </Link>
                           </p>
                         </div>
                       )}

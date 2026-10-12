@@ -93,6 +93,11 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
+/** A quote reference stamped at submit time, e.g. NSE-12345678. */
+const newQuoteReference = () => `NSE-${Date.now().toString().slice(-8)}`;
+
+const QUOTE_ERROR = "We couldn't generate your quote — please try again, or message us on WhatsApp.";
+
 type GuideDraftState = { answers: Answers; chargerSel: ChargerSelection | null; works: WorkRow[] };
 
 export default function RentersFlatOwnersGuide({
@@ -109,6 +114,14 @@ export default function RentersFlatOwnersGuide({
   const [showSignIn, setShowSignIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Bring the outcome into view — the button often sits at the bottom of the screen.
+  const resultRef = useRef<HTMLDivElement & HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (submitError) {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      resultRef.current?.focus({ preventScroll: true });
+    }
+  }, [submitError]);
   // Survives the sign-in detour — see use-guide-draft.ts.
   const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
     key: "renters",
@@ -329,7 +342,7 @@ export default function RentersFlatOwnersGuide({
                             .filter((w) => w.desc || w.cost)
                             .map((w) => ({ desc: w.desc || "Additional works", cost: parseFloat(w.cost) || 0 }));
 
-                          const reference = `NSE-${Date.now().toString().slice(-8)}`;
+                          const reference = newQuoteReference();
                           const fullName = String(data.get("fullName") ?? "");
                           const input = {
                             reference,
@@ -372,6 +385,9 @@ export default function RentersFlatOwnersGuide({
 
                           setQuoteResult({ netPayable: previewNet, grant: previewGrant });
                           clearDraft();
+                        } catch (err) {
+                          console.error("[quote]", err);
+                          setSubmitError(QUOTE_ERROR);
                         } finally {
                           setSubmitting(false);
                         }
@@ -485,7 +501,9 @@ export default function RentersFlatOwnersGuide({
                       </Button>
 
                       {submitError && (
-                        <p className="text-sm font-medium text-destructive">{submitError}</p>
+                        <p ref={resultRef} tabIndex={-1} role="alert" className="text-sm font-medium text-destructive outline-none">
+                          {submitError}
+                        </p>
                       )}
 
                       {quoteResult && (

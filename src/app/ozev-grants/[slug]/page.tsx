@@ -270,7 +270,7 @@ export default async function GrantSchemePage({
                   nativeButton={false}
                   render={<Link href="/ozev-grant-guide" />}
                 >
-                  Learn &amp; Apply for OZEV Grant
+                  Apply for OZEV grant
                   <ArrowRight className="size-4" />
                 </Button>
               </div>

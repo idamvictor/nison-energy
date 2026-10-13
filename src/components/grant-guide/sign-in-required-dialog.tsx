@@ -59,8 +59,8 @@ export function DraftRestoredNotice() {
     <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/5 px-3.5 py-3 text-sm text-foreground/80">
       <Check className="mt-0.5 size-4 shrink-0 text-success" />
       <p>
-        <strong className="text-foreground">Welcome back — your details are still here.</strong>{" "}
-        Check them over, then choose &quot;Generate My Quote&quot; again.
+        <strong className="text-foreground">Thank you for registering!</strong> Review your details and
+        click Generate My Quote again. Click the button in the top-right corner to view your account.
       </p>
     </div>
   );

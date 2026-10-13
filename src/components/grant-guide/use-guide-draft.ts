@@ -5,13 +5,20 @@ import { useEffect, useRef, useState } from "react";
 // Keeps an OZEV guide's progress across the sign-in detour: when a signed-out
 // customer hits "Generate My Quote", the guide saves its state (answers,
 // charger, works rows, …) plus every named form field to sessionStorage, the
-// sign-in page sends them back here, and the guide restores it all.
+// sign-in page sends them back here, and the guide restores it all — then
+// submits the form once by itself, so the quote is made without a 2nd click.
 
 const PREFIX = "ozev-guide-draft:";
 const MAX_AGE_MS = 2 * 60 * 60 * 1000; // stale after 2 hours
 const SKIP_FIELDS = new Set(["company_website"]); // honeypot
 
-type Draft<S> = { state: S; fields: Record<string, string>; savedAt: number };
+type Draft<S> = {
+  state: S;
+  fields: Record<string, string>;
+  savedAt: number;
+  /** Generate the quote automatically once they're back and signed in. */
+  autoSubmit?: boolean;
+};
 
 function readDraft<S>(key: string): Draft<S> | null {
   try {
@@ -31,16 +38,22 @@ function readDraft<S>(key: string): Draft<S> | null {
 export function useGuideDraft<S>({
   key,
   onRestore,
+  autoSubmit = false,
 }: {
   /** One per guide, e.g. "renters". */
   key: string;
   /** Put the saved guide state back (called once, on mount). */
   onRestore: (state: S) => void;
+  /** True once the customer is signed in (the session loads after mount). */
+  autoSubmit?: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const pendingFields = useRef<Record<string, string> | null>(null);
   const onRestoreRef = useRef(onRestore);
   const [restored, setRestored] = useState(false);
+  // Set once the restored fields are back in the form, if the draft asked for it.
+  const [readyToSubmit, setReadyToSubmit] = useState(false);
+  const wantsSubmit = useRef(false);
 
   // Restore on mount (sessionStorage isn't available during SSR).
   useEffect(() => {
@@ -48,12 +61,15 @@ export function useGuideDraft<S>({
     if (!draft) return;
     onRestoreRef.current(draft.state);
     pendingFields.current = draft.fields;
+    wantsSubmit.current = draft.autoSubmit === true;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-off restore from sessionStorage
     setRestored(true);
   }, [key]);
 
   // The form only renders once the restored answers pass eligibility, so fill
   // its fields (uncontrolled inputs) on the first commit where it exists.
+  // Runs every commit on purpose; the body only acts once (pendingFields).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const form = formRef.current;
     const fields = pendingFields.current;
@@ -65,9 +81,25 @@ export function useGuideDraft<S>({
         el.value = value;
       }
     }
+    if (wantsSubmit.current) setReadyToSubmit(true);
     // After the guide's own "scroll to the guide" animation.
     window.setTimeout(() => form.scrollIntoView({ behavior: "smooth", block: "start" }), 450);
   });
+
+  // Submit once: fields are back and the session has loaded. The flag is
+  // cleared first so a refresh or a failed attempt never fires it again.
+  useEffect(() => {
+    if (!readyToSubmit || !autoSubmit || !wantsSubmit.current) return;
+    wantsSubmit.current = false;
+    try {
+      const draft = readDraft<S>(key);
+      if (draft) sessionStorage.setItem(PREFIX + key, JSON.stringify({ ...draft, autoSubmit: false }));
+    } catch {
+      // ignore
+    }
+    // Let the restored charger / works state render before submitting.
+    window.setTimeout(() => formRef.current?.requestSubmit(), 600);
+  }, [readyToSubmit, autoSubmit, key]);
 
   /** Save everything before sending the customer to sign in. */
   function saveDraft(state: S) {
@@ -78,7 +110,7 @@ export function useGuideDraft<S>({
       }
     }
     try {
-      sessionStorage.setItem(PREFIX + key, JSON.stringify({ state, fields, savedAt: Date.now() }));
+      sessionStorage.setItem(PREFIX + key, JSON.stringify({ state, fields, savedAt: Date.now(), autoSubmit: true }));
     } catch {
       // Storage blocked (private mode) — the customer just re-enters details.
     }

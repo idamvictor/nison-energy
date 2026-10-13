@@ -126,6 +126,7 @@ export default function RentersFlatOwnersGuide({
   // Survives the sign-in detour — see use-guide-draft.ts.
   const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
     key: "renters",
+    autoSubmit: !!session,
     onRestore: (saved) => {
       setAnswers(saved.answers);
       setChargerSel(saved.chargerSel);

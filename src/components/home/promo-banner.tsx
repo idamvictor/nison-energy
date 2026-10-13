@@ -93,15 +93,15 @@ function PromoButton({ href, children, className }: { href: string; children: Re
 export function PromoBanner() {
   return (
     <section className="bg-background">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-[10px] px-4 py-12 sm:px-6 sm:py-14 lg:px-[18px]">
-        <Reveal>
-          {/* Banner */}
+      <div className="mx-auto flex max-w-[1600px] flex-col gap-[10px] px-4 pt-4 pb-10 sm:px-6 sm:pt-6 lg:px-[18px]">
+        {/* Banner */}
           <div className="relative overflow-hidden bg-[linear-gradient(180deg,#d9effc_0%,#eef8fe_45%,#f6fbfe_100%)] lg:min-h-[347px]">
             <div className="relative h-52 sm:h-64 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[42%] min-[1400px]:w-[49%]">
               <Image
                 src={MEDIA.hero}
                 alt="Dark blue EV charging from a wall-mounted charger on a red brick wall"
                 fill
+                priority
                 sizes="(min-width: 1024px) 780px, 100vw"
                 className="object-cover lg:[mask-image:linear-gradient(90deg,transparent_0,#000_40px)]"
               />
@@ -115,11 +115,11 @@ export function PromoBanner() {
                 <p className="text-sm font-semibold tracking-[0.1px] text-[#0b4f9f] sm:text-[19px]">
                   EV CHARGERS, ACCESSORIES, INSTALLATION AND
                 </p>
-                <h2 className="mt-1 text-[30px] leading-[1] font-bold tracking-[-0.6px] text-[#0a5bb4] sm:text-[44px] xl:text-[50px] xl:leading-[52px] min-[1400px]:text-[54px] min-[1400px]:leading-[53px]">
+                <h1 className="mt-1 text-[30px] leading-[1] font-bold tracking-[-0.6px] text-[#0a5bb4] sm:text-[44px] xl:text-[50px] xl:leading-[52px] min-[1400px]:text-[54px] min-[1400px]:leading-[53px]">
                   Buy, install, claim your
                   <br />
                   <span className="text-[#19a5ee]">ozev grant, All in one place.</span>
-                </h2>
+                </h1>
                 <p className="mt-4 max-w-[600px] text-base leading-[23px] font-medium text-[#1f3655] sm:text-[19px]">
                   Quality EV chargers, accessories, professional installation and help with your OZEV grant. Simple, seamless, complete.
                 </p>
@@ -148,7 +148,6 @@ export function PromoBanner() {
               </PromoButton>
             </div>
           </div>
-        </Reveal>
 
         {/* Promo cards */}
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-3">

@@ -125,6 +125,7 @@ export default function WorkplaceChargingSchemeGuide({
   // Survives the sign-in detour — see use-guide-draft.ts.
   const { formRef: draftFormRef, restored: draftRestored, saveDraft, clearDraft } = useGuideDraft<GuideDraftState>({
     key: "workplace",
+    autoSubmit: !!session,
     onRestore: (saved) => {
       setAnswers(saved.answers);
       setLines(saved.lines ?? [{ sel: saved.chargerSel ?? null, qty: saved.chargepoints || "1" }]);

@@ -7,6 +7,7 @@ import { Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { COMPANY } from "@/lib/company";
+import { cn } from "@/lib/utils";
 import {
   AmexLogo,
   KlarnaLogo,
@@ -49,14 +50,19 @@ const legalLinks = [
   { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 
-const paymentMethods = [
+// `tile` overrides the default white tile (Klarna uses its own pink badge).
+const paymentMethods: { name: string; logo: React.ReactNode; tile?: string }[] = [
   { name: "Visa", logo: <VisaLogo className="h-7" /> },
   { name: "Mastercard", logo: <MastercardLogo className="h-4" /> },
   { name: "American Express", logo: <AmexLogo className="h-5" /> },
   { name: "Apple Pay", logo: <ApplePayLogo className="h-9" /> },
   { name: "Google Pay", logo: <GooglePayLogo className="h-9" /> },
   { name: "PayPal", logo: <PayPalLogo className="origin-center scale-[0.72]" /> },
-  { name: "Klarna", logo: <KlarnaLogo className="h-5" /> },
+  {
+    name: "Klarna",
+    logo: <KlarnaLogo className="h-full w-full justify-center rounded-none bg-transparent px-0" />,
+    tile: "bg-[#ffb3c7] px-0",
+  },
 ];
 
 const socialLinks = [
@@ -178,7 +184,10 @@ export function SiteFooter() {
                 role="img"
                 aria-label={method.name}
                 title={method.name}
-                className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md bg-white px-1"
+                className={cn(
+                  "flex h-8 w-16 items-center justify-center overflow-hidden rounded-md bg-white px-1",
+                  method.tile,
+                )}
               >
                 {method.logo}
               </span>

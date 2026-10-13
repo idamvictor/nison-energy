@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Reveal } from "@/components/shared/reveal";
+import { jakarta } from "@/components/shared/banner-fonts";
 import { cn } from "@/lib/utils";
 
 // Home page banner + promo cards, rebuilt from the "Homepage hero + promo
-// cards" design. Images live in the media store (uploaded once).
+// cards" design, in the solar banner's palette and type (Plus Jakarta Sans,
+// navy + amber). Images live in the media store (uploaded once).
 const MEDIA = {
   hero: "/api/media/uploads/489b3e10-1cc6-4d25-b150-93cf4d241324.jpg",
   iconChargers: "/api/media/uploads/240fd8e0-36aa-4ade-87b5-8a85cbe86781.png",
@@ -92,10 +94,9 @@ function PromoButton({ href, children, className }: { href: string; children: Re
 
 export function PromoBanner() {
   return (
-    <section className="bg-background">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-[10px] px-4 pt-4 pb-10 sm:px-6 sm:pt-6 lg:px-[18px]">
-        {/* Banner */}
-          <div className="relative overflow-hidden bg-[linear-gradient(180deg,#d9effc_0%,#eef8fe_45%,#f6fbfe_100%)] lg:min-h-[347px]">
+    <section className={cn(jakarta.className, "bg-background")}>
+        {/* Banner — full width, edge to edge */}
+          <div className="relative overflow-hidden border-b border-[#d3dae2] bg-[linear-gradient(180deg,#eaf2f8_0%,#f4f8fb_50%,#ffffff_100%)] lg:min-h-[347px]">
             <div className="relative h-52 sm:h-64 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[42%] min-[1400px]:w-[49%]">
               <Image
                 src={MEDIA.hero}
@@ -107,20 +108,21 @@ export function PromoBanner() {
               />
             </div>
             <svg aria-hidden="true" width="60" height="80" viewBox="0 0 60 80" className="absolute top-0 left-0 hidden lg:block">
-              <polygon points="0,0 54,0 0,76" fill="#00b7fd" />
+              <polygon points="0,0 54,0 0,76" fill="#fdb313" />
             </svg>
 
             <div className="relative flex flex-col gap-5 px-5 py-7 sm:px-8 lg:max-w-[60%] lg:py-6 lg:pl-[64px] min-[1400px]:max-w-[52%]">
               <div>
-                <p className="text-sm font-semibold tracking-[0.1px] text-[#0b4f9f] sm:text-[19px]">
+                <p className="text-xs font-extrabold tracking-[2.5px] text-[#17375e] sm:text-[15px] sm:tracking-[4px]">
                   EV CHARGERS, ACCESSORIES, INSTALLATION AND
                 </p>
-                <h1 className="mt-1 text-[30px] leading-[1] font-bold tracking-[-0.6px] text-[#0a5bb4] sm:text-[44px] xl:text-[50px] xl:leading-[52px] min-[1400px]:text-[54px] min-[1400px]:leading-[53px]">
+                <div className="mt-1.5 mb-2 h-[5px] w-[54px] bg-[#fdb313]" />
+                <h1 className="mt-1 text-[30px] leading-[1] font-extrabold tracking-[-1px] text-[#17426a] sm:text-[44px] xl:text-[50px] xl:leading-[52px] min-[1400px]:text-[54px] min-[1400px]:leading-[53px]">
                   Buy, install, claim your
                   <br />
-                  <span className="text-[#19a5ee]">ozev grant, All in one place.</span>
+                  <span className="text-[#fca80c]">ozev grant, All in one place.</span>
                 </h1>
-                <p className="mt-4 max-w-[600px] text-base leading-[23px] font-medium text-[#1f3655] sm:text-[19px]">
+                <p className="mt-4 max-w-[600px] text-base leading-[23px] font-medium text-[#1f2f45] sm:text-[19px]">
                   Quality EV chargers, accessories, professional installation and help with your OZEV grant. Simple, seamless, complete.
                 </p>
               </div>
@@ -131,13 +133,13 @@ export function PromoBanner() {
                     key={f.title}
                     className={cn(
                       "flex items-center gap-2.5",
-                      i > 0 && "min-[1400px]:ml-3 min-[1400px]:border-l min-[1400px]:border-[#c9dbea] min-[1400px]:pl-3",
+                      i > 0 && "min-[1400px]:ml-3 min-[1400px]:border-l min-[1400px]:border-[#d3dae2] min-[1400px]:pl-3",
                     )}
                   >
                     <Image src={f.icon} alt="" width={46} height={48} className="size-[46px] shrink-0 object-contain mix-blend-multiply" />
                     <div>
-                      <b className="block text-xs leading-4 font-semibold text-[#14284a]">{f.title}</b>
-                      <span className="block text-[10px] leading-[14px] font-medium text-[#5b6b80]">{f.sub}</span>
+                      <b className="block text-xs leading-4 font-bold text-[#17375e]">{f.title}</b>
+                      <span className="block text-[10px] leading-[14px] font-medium text-[#2b3d55]">{f.sub}</span>
                     </div>
                   </li>
                 ))}
@@ -149,13 +151,14 @@ export function PromoBanner() {
             </div>
           </div>
 
+      <div className="-mt-px pb-10">
         {/* Promo cards */}
-        <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3">
           {cards.map((card, i) => (
-            <Reveal key={card.cta} delay={i * 80} className="h-full">
+            <Reveal key={card.cta} delay={i * 80} className={cn("h-full", i > 0 && "-mt-px lg:mt-0 lg:-ml-px")}>
               <div
                 className={cn(
-                  "relative flex h-full min-h-[255px] overflow-hidden bg-[linear-gradient(160deg,#dcf0fc_0%,#eef7fd_55%,#f4f9fd_100%)]",
+                  "relative flex h-full min-h-[255px] overflow-hidden border border-[#d3dae2] bg-[linear-gradient(160deg,#eaf2f8_0%,#f4f8fb_55%,#ffffff_100%)]",
                   "comingSoon" in card && "opacity-60 grayscale select-none",
                 )}
                 aria-disabled={"comingSoon" in card || undefined}
@@ -165,12 +168,12 @@ export function PromoBanner() {
                 </div>
                 <div className={cn("relative flex flex-col gap-3 px-5 py-4", card.textWidth)}>
                   <Image src={card.icon} alt="" width={68} height={60} className="h-[60px] w-auto self-start object-contain object-left mix-blend-multiply" />
-                  <h3 className="text-[22px] leading-[1.05] font-bold tracking-[-0.2px] text-[#0b5cad] sm:text-[24px] min-[1400px]:text-[28px]">
+                  <h3 className="text-[22px] leading-[1.05] font-extrabold tracking-[-0.4px] text-[#17426a] sm:text-[24px] min-[1400px]:text-[28px]">
                     {card.title.map((line, j) => (
                       <span key={j} className="block">{line}</span>
                     ))}
                   </h3>
-                  <p className="text-[15px] leading-[18px] font-medium text-[#2a4466]">{card.copy}</p>
+                  <p className="text-[15px] leading-[18px] font-medium text-[#1f2f45]">{card.copy}</p>
                   {"comingSoon" in card ? (
                     <span className="mt-auto inline-flex h-[41px] w-fit cursor-not-allowed items-center rounded-[2px] bg-[#9aa5b1] px-4 text-[15px] font-semibold text-white sm:text-[17px]">
                       Coming Soon

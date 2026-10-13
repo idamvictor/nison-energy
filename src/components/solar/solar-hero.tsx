@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Kalam, Plus_Jakarta_Sans } from "next/font/google";
 
+import { jakarta, kalam } from "@/components/shared/banner-fonts";
 import { cn } from "@/lib/utils";
 
 // /solar-panels hero, rebuilt from the "UKSOL plug-in solar banner" design
@@ -9,8 +9,6 @@ import { cn } from "@/lib/utils";
 // artboard and lines up with the divider marks baked into the photo. Below
 // xl it falls back to a stacked layout. Images live in the media store.
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["500", "600", "700", "800"], display: "swap" });
-const kalam = Kalam({ subsets: ["latin"], weight: "700", display: "swap" });
 
 const MEDIA = {
   bg: "/api/media/uploads/ea9d0e20-35dd-4465-a82f-bdf1c2a3877a.jpg",

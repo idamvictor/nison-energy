@@ -31,6 +31,7 @@ import { getGrantScheme } from "@/lib/content/grant-schemes";
 import { generateRentersQuotePdf } from "@/lib/pdf/renters-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
 const scheme = getGrantScheme("renters-and-flat-owners")!;
 
@@ -316,12 +317,14 @@ export default function RentersFlatOwnersGuide({
                     </div>
                     <p className="text-sm text-foreground/80">
                       Complete the form below with your details and itemised costs or start with a{" "}
-                      <Link
-                        href="/virtual-survey"
+                      <a
+                        href={OPENQUOTE_SURVEY_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="font-medium text-primary-ink underline underline-offset-2"
                       >
                         free online home survey via OpenQuote
-                      </Link>{" "}
+                      </a>{" "}
                       before generating your OZEV-compliant Renters &amp; Flat Owners grant quote.
                     </p>
 
@@ -698,12 +701,14 @@ export default function RentersFlatOwnersGuide({
                         <span>
                           <span className="font-semibold text-foreground">Confirm Your Installation:</span> We’ll send
                           you a link via the{" "}
-                          <Link
-                            href="/virtual-survey"
+                          <a
+                            href={OPENQUOTE_SURVEY_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="font-medium text-primary-ink underline underline-offset-2"
                           >
                             OpenQuote system
-                          </Link>{" "}
+                          </a>{" "}
                           to capture survey information and any additional site works required.
                         </span>
                       </li>

@@ -29,7 +29,6 @@ const STATIC_PATHS = [
   "/about-us",
   "/contact-us",
   "/faq",
-  "/virtual-survey",
   "/independent-subcontractor",
   "/delivery-information",
   "/privacy-policy",

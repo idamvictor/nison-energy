@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,24 +19,13 @@ export function SurveyNextStep() {
           It takes about 5 minutes — a few photos and questions about where your charger is going.
           Our team reviews it before booking your installation.
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Or open the survey directly:{" "}
-          <a
-            href={OPENQUOTE_SURVEY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium break-all text-primary-ink underline underline-offset-2 hover:text-foreground"
-          >
-            app.openquote.net/company/ocunioenergy
-          </a>
-        </p>
       </div>
       <Button
         size="lg"
         variant="cta"
         className="shrink-0 gap-1.5"
         nativeButton={false}
-        render={<Link href="/virtual-survey" />}
+        render={<a href={OPENQUOTE_SURVEY_URL} target="_blank" rel="noopener noreferrer" />}
       >
         Start your survey
         <ArrowRight className="size-4" />

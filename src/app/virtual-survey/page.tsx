@@ -1,13 +1,9 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { VirtualSurveyView } from "@/components/grant-guide/virtual-survey-view";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
-export const metadata: Metadata = {
-  title: "Virtual Survey | Ocunio Energy",
-  description:
-    "Complete your virtual home survey to confirm your charger, any additional work required, and your grant-adjusted price.",
-};
-
+// The survey now opens on OpenQuote directly (no embed). Old links, emails and
+// search results that still point here are sent straight there.
 export default function VirtualSurveyPage() {
-  return <VirtualSurveyView />;
+  redirect(OPENQUOTE_SURVEY_URL);
 }

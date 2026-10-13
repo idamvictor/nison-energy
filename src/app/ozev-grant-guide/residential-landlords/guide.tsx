@@ -41,6 +41,7 @@ import { EligibilityPrompt } from "@/components/grant-guide/eligibility-prompt";
 import { generateLandlordQuotePdf } from "@/lib/pdf/landlord-quote";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
+import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 
 type Answers = { installType: string | null; parking: string | null; registered: string | null };
 
@@ -360,12 +361,14 @@ export default function ResidentialLandlordsGuide({
                     </div>
                     <p className="text-sm text-foreground/80">
                       Complete the form below with your business, site, and itemised costs, or start with a{" "}
-                      <Link
-                        href="/virtual-survey"
+                      <a
+                        href={OPENQUOTE_SURVEY_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="font-medium text-primary-ink underline underline-offset-2"
                       >
                         free online home survey via OpenQuote
-                      </Link>{" "}
+                      </a>{" "}
                       before generating your OZEV-compliant Residential Landlord grant quote.
                     </p>
 
@@ -801,12 +804,14 @@ export default function ResidentialLandlordsGuide({
                         <span>
                           <span className="font-semibold text-foreground">Confirm Your Installation:</span> We’ll send
                           you a link via the{" "}
-                          <Link
-                            href="/virtual-survey"
+                          <a
+                            href={OPENQUOTE_SURVEY_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="font-medium text-primary-ink underline underline-offset-2"
                           >
                             OpenQuote system
-                          </Link>{" "}
+                          </a>{" "}
                           to capture survey information and any additional site works required.
                         </span>
                       </li>

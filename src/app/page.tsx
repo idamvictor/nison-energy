@@ -1,6 +1,6 @@
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
-import { PromoBanner } from "@/components/home/promo-banner";
+import { HeroReveal } from "@/components/home/hero-reveal";
 import { CategoryCards } from "@/components/home/category-cards";
 import { TrustedInstallers } from "@/components/home/trusted-installers";
 import { ProductGrid } from "@/components/home/product-grid";
@@ -24,13 +24,14 @@ export default function Home() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <PromoBanner />
-        <ProductGrid
-          featured
-          viewAllHref="/home-charging"
-          title="Our Best-Selling Chargers"
-          subtitle="A curated selection of our best-selling chargers."
-        />
+        <HeroReveal>
+          <ProductGrid
+            featured
+            viewAllHref="/home-charging"
+            title="Our Best-Selling Chargers"
+            subtitle="A curated selection of our best-selling chargers."
+          />
+        </HeroReveal>
         <FeaturedCommercial />
         <FeaturedAccessories />
         <CategoryCards />

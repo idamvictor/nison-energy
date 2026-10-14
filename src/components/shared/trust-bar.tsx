@@ -12,7 +12,8 @@ export function TrustBar() {
   return (
     <div className="border-b border-border/70 bg-secondary">
       <div className="mx-auto flex max-w-7xl justify-center px-4 py-2.5 text-center sm:px-6 lg:px-8">
-        <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5">
+        {/* Phones: one line, messages rotate (globals.css .trust-cycle). */}
+        <ul className="trust-cycle relative h-5 w-full sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 sm:gap-y-1.5">
           {items.map(({ icon: Icon, label }) => (
             <li
               key={label}

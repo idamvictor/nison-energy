@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
 import type { StripeCheckoutContact } from "@stripe/stripe-js";
 import {
   CheckoutElementsProvider,
@@ -13,10 +12,8 @@ import { Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { stripePromise } from "@/components/checkout/stripe-promise";
 
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-// Module scope so Stripe.js loads once, not on every render.
-const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
 // Stripe's Appearance API takes literal values, not CSS variables — these
 // mirror --primary-ink, --foreground, --font-sans and --radius in globals.css.

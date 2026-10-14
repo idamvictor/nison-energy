@@ -16,6 +16,7 @@ import type { OrderLineInput } from "@/lib/orders/types";
 import { installSplit } from "@/lib/orders/installation";
 import { useInstallFees } from "@/components/checkout/use-install-fees";
 import { formatCurrency } from "@/lib/currency";
+import { InstalmentsMessage } from "@/components/shared/instalments-message";
 
 export default function CartPage() {
   const items = useCart((s) => s.items);
@@ -185,6 +186,7 @@ export default function CartPage() {
                     <ArrowRight className="size-4" />
                   </Button>
                   <ExpressCheckoutBox lines={orderLines} label="or pay with" />
+                  <InstalmentsMessage amount={subtotal} className="mt-1" />
                 </CardContent>
               </Card>
             </div>

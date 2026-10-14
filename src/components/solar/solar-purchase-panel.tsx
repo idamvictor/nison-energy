@@ -11,6 +11,7 @@ import { ExpressCheckoutBox } from "@/components/checkout/express-checkout-box";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/currency";
+import { InstalmentsMessage } from "@/components/shared/instalments-message";
 
 /** Plug-in solar kits: one fixed kit per product — no colour, length or installation choice. */
 export function SolarPurchasePanel({ product }: { product: SolarProduct }) {
@@ -85,6 +86,7 @@ export function SolarPurchasePanel({ product }: { product: SolarProduct }) {
           },
         ]}
       />
+      <InstalmentsMessage amount={total} className="mt-1" />
 
       <button
         type="button"

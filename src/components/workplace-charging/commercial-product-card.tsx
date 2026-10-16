@@ -18,6 +18,8 @@ import { cn } from "@/lib/utils";
 import { tagClass } from "@/components/workplace-charging/commercial-product-tag";
 import { useWishlist } from "@/lib/wishlist/store";
 import { formatCurrency } from "@/lib/currency";
+import { saleOf } from "@/lib/catalog/sale";
+import { SaleBadge, WasPrice } from "@/components/shared/sale-price";
 import { QuickAddToCart } from "@/components/shared/quick-add-to-cart";
 
 export function CommercialProductCard({
@@ -33,6 +35,7 @@ export function CommercialProductCard({
   quickAdd?: boolean;
 }) {
   const product = variants.reduce((a, b) => (b.price < a.price ? b : a));
+  const sale = saleOf(product.price, product.compareAtPrice);
   const compareSelected = compareIds?.includes(product.id);
 
   const { isWishlisted, toggle } = useWishlist();
@@ -53,8 +56,9 @@ export function CommercialProductCard({
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
           />
-          {product.tags.length > 0 && (
+          {(sale || product.tags.length > 0) && (
             <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+              {sale && <SaleBadge sale={sale} />}
               {product.tags.map((tag) => (
                 <Badge key={tag} className={tagClass(tag)}>
                   {tag}
@@ -122,6 +126,7 @@ export function CommercialProductCard({
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <p className="mt-auto text-2xl font-semibold text-foreground">
           {formatCurrency(product.price)}
+          {sale && <WasPrice amount={sale.was} className="ml-2 text-base" />}
           <span className="ml-1.5 text-sm font-normal text-muted-foreground">
             inc VAT
           </span>

@@ -52,6 +52,7 @@ export function dbToResidential(row: ProductRow): Product {
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
     price: toNumber(row.price) ?? 0,
+    compareAtPrice: toNumber(row.compareAtPrice),
     installFee: toNumber(row.installFee),
     tags: row.tags,
     image: row.cardImage,
@@ -76,6 +77,7 @@ export function dbToCommercial(row: ProductRow): CommercialProduct {
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
     price: toNumber(row.price) ?? 0,
+    compareAtPrice: toNumber(row.compareAtPrice),
     installFee: toNumber(row.installFee),
     tags: row.tags,
     image: row.cardImage,
@@ -98,6 +100,7 @@ export function dbToAccessory(row: ProductRow): AccessoryProduct {
     compatibleTariffs:
       row.compatibleTariffs.length > 0 ? row.compatibleTariffs : undefined,
     price: toNumber(row.price) ?? 0,
+    compareAtPrice: toNumber(row.compareAtPrice),
     tags: row.tags,
     image: row.cardImage,
     active: row.active,
@@ -112,6 +115,7 @@ export function dbToSolar(row: ProductRow): SolarProduct {
     brand: row.brand,
     colour: row.colour,
     price: toNumber(row.price) ?? 0,
+    compareAtPrice: toNumber(row.compareAtPrice),
     tags: row.tags,
     image: row.cardImage,
     active: row.active,
@@ -124,9 +128,10 @@ export function dbToSolar(row: ProductRow): SolarProduct {
 // can't be passed straight into a "use client" component (e.g. ProductForm)
 // the way every other field on it already can. Convert just the two Decimal
 // fields once, here, at the boundary.
-export type SerializableProductRow = Omit<ProductRow, "price" | "installFee"> & {
+export type SerializableProductRow = Omit<ProductRow, "price" | "installFee" | "compareAtPrice"> & {
   price: number | null;
   installFee: number | null;
+  compareAtPrice: number | null;
 };
 
 export function toSerializableRow(row: ProductRow): SerializableProductRow {
@@ -134,6 +139,7 @@ export function toSerializableRow(row: ProductRow): SerializableProductRow {
     ...row,
     price: toNumber(row.price) ?? null,
     installFee: toNumber(row.installFee) ?? null,
+    compareAtPrice: toNumber(row.compareAtPrice) ?? null,
   };
 }
 
@@ -293,6 +299,7 @@ function toData(input: ProductInput) {
     powerOutput: input.powerOutput?.trim() || null,
     price: input.price ?? null,
     installFee: input.installFee ?? null,
+    compareAtPrice: input.compareAtPrice ?? null,
     cableLengthOptions: input.cableLengthOptions,
     compatibleTariffs: input.compatibleTariffs,
     style: input.style || null,
@@ -326,7 +333,7 @@ export async function createProduct(
   const data = toData(input);
   // Staff can add products but not price them: saved as "price on request"
   // until an admin sets the price.
-  if (!can(me.role, "products.pricing")) Object.assign(data, { price: null, installFee: null });
+  if (!can(me.role, "products.pricing")) Object.assign(data, { price: null, installFee: null, compareAtPrice: null });
   await prisma.product.create({ data: { id, ...data } });
   return { ok: true, id };
 }
@@ -352,10 +359,10 @@ export async function updateProduct(
 
   // Datasheets are shared by URL across products, so removing one here only
   // unlinks it — the file stays in the PDF library (deleted from there only).
-  const { price, installFee, ...rest } = toData(input);
+  const { price, installFee, compareAtPrice, ...rest } = toData(input);
   // Without products.pricing the stored price and install fee are kept, so a
   // forged form submission can't change them.
-  const pricing = can(me.role, "products.pricing") ? { price, installFee } : {};
+  const pricing = can(me.role, "products.pricing") ? { price, installFee, compareAtPrice } : {};
   await prisma.product.update({
     where: { id },
     data: { id: nextId, ...rest, ...pricing },

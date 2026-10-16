@@ -33,6 +33,10 @@ export async function saveProduct(
   isNew: boolean,
   input: ProductInput,
 ): Promise<WriteResult> {
+  // A sale needs a "was" price above the price it's sold at.
+  if (input.compareAtPrice != null && (input.price == null || input.compareAtPrice <= input.price)) {
+    return { ok: false, error: "The \"Was price\" must be higher than the price (it's the pre-sale price). Clear it to end the sale." };
+  }
   const result = isNew
     ? await createProduct(slug, { ...input, category })
     : await updateProduct(originalId, slug, { ...input, category });

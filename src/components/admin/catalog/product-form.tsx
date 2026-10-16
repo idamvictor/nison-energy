@@ -38,6 +38,7 @@ import { ImageUploadField } from "@/components/shared/image-upload-field";
 import { DatasheetsField } from "@/components/admin/catalog/datasheet-upload-field";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth/client";
+import { formatOff } from "@/lib/catalog/sale";
 import { can } from "@/lib/auth/permissions";
 import {
   accessoryPhases,
@@ -135,7 +136,16 @@ export function ProductForm({
   const [connectionType, setConnectionType] = useState(row?.connectionType ?? "");
   const [cableLength, setCableLength] = useState(row?.cableLength ?? "");
   const [powerOutput, setPowerOutput] = useState(row?.powerOutput ?? "");
-  const [price, setPrice] = useState(row?.price != null ? String(row.price) : "");
+  // Sales: "Price" is always the normal price. Ticking "On sale" reveals a
+  // sale price; saved as price = sale price, compareAtPrice = normal price
+  // (the shop then shows the normal price slashed with "£X off").
+  const savedOnSale =
+    row?.price != null && row.compareAtPrice != null && row.compareAtPrice > row.price;
+  const [price, setPrice] = useState(
+    savedOnSale ? String(row.compareAtPrice) : row?.price != null ? String(row.price) : "",
+  );
+  const [onSale, setOnSale] = useState(savedOnSale);
+  const [salePrice, setSalePrice] = useState(savedOnSale ? String(row.price) : "");
   const [installFee, setInstallFee] = useState(
     row?.installFee != null ? String(row.installFee) : "",
   );
@@ -175,6 +185,12 @@ export function ProductForm({
 
   const galleryImages = gallery.map((g) => g.url).filter((s) => s.trim() !== "");
 
+  function pricing(): Pick<ProductInput, "price" | "compareAtPrice"> {
+    const normal = price.trim() !== "" ? Number(price) : null;
+    const sale = onSale && salePrice.trim() !== "" ? Number(salePrice) : null;
+    return sale != null ? { price: sale, compareAtPrice: normal } : { price: normal, compareAtPrice: null };
+  }
+
   function buildInput(): ProductInput {
     return {
       category,
@@ -192,7 +208,7 @@ export function ProductForm({
       connectionType: isCharger ? connectionType || null : null,
       cableLength: isCharger ? cableLength.trim() || null : null,
       powerOutput: isCharger ? powerOutput.trim() || null : null,
-      price: price.trim() !== "" ? Number(price) : null,
+      ...pricing(),
       installFee: isCharger && installFee.trim() !== "" ? Number(installFee) : null,
       cableLengthOptions:
         category === "Residential" ? fromCsv(cableLengthOptions) : [],
@@ -244,6 +260,17 @@ export function ProductForm({
     e.preventDefault();
     setError(null);
     setSaved(false);
+
+    if (onSale && !pricingLocked) {
+      if (salePrice.trim() === "") {
+        setError("Enter the sale price, or untick \"On sale\".");
+        return;
+      }
+      if (price.trim() === "" || Number(salePrice) >= Number(price)) {
+        setError("The sale price must be lower than the normal price.");
+        return;
+      }
+    }
 
     const input = buildInput();
     const finalSlug = currentSlug.trim();
@@ -533,6 +560,14 @@ export function ProductForm({
                 className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
+            <SaleFields
+              onSale={onSale}
+              setOnSale={setOnSale}
+              salePrice={salePrice}
+              setSalePrice={setSalePrice}
+              normalPrice={price}
+              locked={pricingLocked}
+            />
             <Field label="Installation fee (£)">
               <Input
                 type="number"
@@ -613,6 +648,14 @@ export function ProductForm({
                 className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
+            <SaleFields
+              onSale={onSale}
+              setOnSale={setOnSale}
+              salePrice={salePrice}
+              setSalePrice={setSalePrice}
+              normalPrice={price}
+              locked={pricingLocked}
+            />
             {priceNote}
           </CardContent>
         </Card>
@@ -635,6 +678,14 @@ export function ProductForm({
                 className={pricingLocked ? "bg-muted" : undefined}
               />
             </Field>
+            <SaleFields
+              onSale={onSale}
+              setOnSale={setOnSale}
+              salePrice={salePrice}
+              setSalePrice={setSalePrice}
+              normalPrice={price}
+              locked={pricingLocked}
+            />
             {priceNote}
           </CardContent>
         </Card>
@@ -837,6 +888,59 @@ function SortableGalleryItem({
       >
         <X />
       </Button>
+    </div>
+  );
+}
+
+/** "On sale" toggle + the sale price it reveals (product pricing cards). */
+function SaleFields({
+  onSale,
+  setOnSale,
+  salePrice,
+  setSalePrice,
+  normalPrice,
+  locked,
+}: {
+  onSale: boolean;
+  setOnSale: (on: boolean) => void;
+  salePrice: string;
+  setSalePrice: (value: string) => void;
+  normalPrice: string;
+  locked: boolean;
+}) {
+  const off = Number(normalPrice) - Number(salePrice);
+  return (
+    <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+      <label className="flex h-5 items-center gap-2">
+        <input
+          type="checkbox"
+          className="size-4 accent-primary"
+          checked={onSale}
+          disabled={locked}
+          onChange={(e) => setOnSale(e.target.checked)}
+        />
+        On sale
+      </label>
+      {onSale && (
+        <>
+          <Input
+            type="number"
+            min={0}
+            step="0.01"
+            value={salePrice}
+            onChange={(e) => setSalePrice(e.target.value)}
+            placeholder="Sale price (£, inc. VAT)"
+            aria-label="Sale price (£, inc. VAT)"
+            readOnly={locked}
+            className={locked ? "bg-muted" : undefined}
+          />
+          <p className="text-xs font-normal text-muted-foreground">
+            {salePrice.trim() !== "" && off > 0
+              ? `Shop shows the price slashed with "${formatOff(Math.round(off * 100) / 100)}".`
+              : "Sale price (inc. VAT) — must be lower than the price."}
+          </p>
+        </>
+      )}
     </div>
   );
 }

@@ -176,6 +176,8 @@ model Product {
   powerOutput    String?
   price          Decimal? @db.Decimal(10, 2) // GBP, penny-precise inc. VAT
   installFee     Decimal? @db.Decimal(10, 2) // GBP, penny-precise
+  /// "Was" price (inc. VAT) while on sale — shown slashed with "£X off" when above `price`.
+  compareAtPrice Decimal? @db.Decimal(10, 2)
 
   // Residential only
   cableLengthOptions String[] @default([])

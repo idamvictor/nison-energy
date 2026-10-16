@@ -11,6 +11,8 @@ import { ExpressCheckoutBox } from "@/components/checkout/express-checkout-box";
 import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/currency";
+import { saleOf } from "@/lib/catalog/sale";
+import { SaleBadge, WasPrice } from "@/components/shared/sale-price";
 import { InstalmentsMessage } from "@/components/shared/instalments-message";
 
 /** Plug-in solar kits: one fixed kit per product — no colour, length or installation choice. */
@@ -22,6 +24,12 @@ export function SolarPurchasePanel({ product }: { product: SolarProduct }) {
   const wishlisted = isWishlisted(product.id);
 
   const total = product.price * quantity;
+
+  // On sale: the saving scales with quantity (installation isn't discounted).
+
+  const sale = saleOf(product.price, product.compareAtPrice);
+
+  const saleOff = sale ? Math.round(sale.off * quantity * 100) / 100 : 0;
   const totalExVat = Math.round((total / 1.2) * 100) / 100;
 
   return (
@@ -34,6 +42,12 @@ export function SolarPurchasePanel({ product }: { product: SolarProduct }) {
         <p className="text-sm text-muted-foreground">
           {formatCurrency(totalExVat)} <span>ex VAT</span>
         </p>
+        {sale && (
+          <div className="mt-2 flex items-center gap-2">
+            <WasPrice amount={total + saleOff} className="text-base" />
+            <SaleBadge sale={{ was: total + saleOff, off: saleOff }} />
+          </div>
+        )}
       </div>
 
       <div>

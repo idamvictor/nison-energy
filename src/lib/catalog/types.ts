@@ -69,6 +69,8 @@ export type Product = {
   variantGroup?: string;
   compatibleTariffs?: string[];
   price: number;
+  /** "Was" price inc VAT while on sale (only shown when above `price`). */
+  compareAtPrice?: number;
   installFee?: number;
   tags: string[];
   image: string;
@@ -90,6 +92,8 @@ export type CommercialProduct = {
   variantGroup?: string;
   compatibleTariffs?: string[];
   price: number;
+  /** "Was" price inc VAT while on sale (only shown when above `price`). */
+  compareAtPrice?: number;
   installFee?: number;
   tags: string[];
   image: string;
@@ -110,6 +114,8 @@ export type AccessoryProduct = {
   variantGroup: string;
   compatibleTariffs?: string[];
   price: number;
+  /** "Was" price inc VAT while on sale (only shown when above `price`). */
+  compareAtPrice?: number;
   tags: string[];
   image: string;
   active?: boolean;
@@ -124,6 +130,8 @@ export type SolarProduct = {
   brand: string;
   colour: string;
   price: number;
+  /** "Was" price inc VAT while on sale (only shown when above `price`). */
+  compareAtPrice?: number;
   tags: string[];
   image: string;
   active?: boolean;
@@ -166,6 +174,7 @@ export type ProductInput = {
   powerOutput: string | null;
   price: number | null;
   installFee: number | null;
+  compareAtPrice: number | null;
   cableLengthOptions: string[];
   compatibleTariffs: string[];
   style: string | null;

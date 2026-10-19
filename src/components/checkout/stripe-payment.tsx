@@ -285,12 +285,15 @@ export type PayDetails = {
  */
 export function CardPlaceOrder({
   canPay,
+  onBlocked,
   prepare,
   className,
   label = "Place Order",
   busyLabel = "Processing payment…",
 }: {
   canPay: boolean;
+  /** Tapped while `canPay` is false: show what's missing (the button stays greyed but clickable). */
+  onBlocked?: () => void;
   prepare: () => Promise<PayDetails | null>;
   className?: string;
   /** e.g. "Continue to PayPal" for redirect methods. */
@@ -338,9 +341,10 @@ export function CardPlaceOrder({
         type="button"
         size="lg"
         variant="cta"
-        disabled={!ready || !canPay || confirming}
-        onClick={pay}
-        className={cn("h-12 w-full gap-1.5 text-base", className)}
+        disabled={!ready || confirming}
+        aria-disabled={!canPay || undefined}
+        onClick={() => (canPay ? pay() : onBlocked?.())}
+        className={cn("h-12 w-full gap-1.5 text-base aria-disabled:opacity-50", className)}
       >
         <Lock className="size-4" />
         {confirming ? busyLabel : ready ? `${label} · ${state.checkout.total.total.amount}` : "Loading…"}

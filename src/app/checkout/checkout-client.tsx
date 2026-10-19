@@ -515,12 +515,24 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
               // Greyed out until every required field is valid, the terms are
               // ticked and (for card) the card details are complete.
               canPay={readyToPay}
+              // Tapped before everything's filled in: show every red field error
+              // and jump to the first one.
+              onBlocked={() => {
+                validateAll();
+              }}
               prepare={preparePayment}
               label={METHOD_ACTION[payMethod].label}
               busyLabel={METHOD_ACTION[payMethod].busy}
-              className="h-[52px] rounded-[12px] bg-accent text-accent-foreground hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-accent/45 disabled:text-white/80 disabled:opacity-100 disabled:shadow-none"
+              className="h-[52px] rounded-[12px] bg-accent text-accent-foreground hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-accent/45 disabled:text-white/80 disabled:opacity-100 disabled:shadow-none aria-disabled:cursor-not-allowed aria-disabled:bg-accent/45 aria-disabled:text-white/80 aria-disabled:opacity-100 aria-disabled:shadow-none aria-disabled:hover:bg-accent/45"
             />
-            {!readyToPay && <p className="-mt-2 text-center text-xs text-white/65">{payHint}</p>}
+            {!readyToPay && (
+              <p
+                role={attempted ? "alert" : undefined}
+                className={cn("-mt-2 text-center text-xs", attempted ? "font-medium text-red-300" : "text-white/65")}
+              >
+                {payHint}
+              </p>
+            )}
           </>
         ) : (
           <Button

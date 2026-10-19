@@ -166,17 +166,24 @@ export function ExpressWallets({
  * The same three buttons before express payment can start (e.g. no
  * installation option chosen yet) — tapping one says what's missing.
  */
-export function WalletButtonsWaiting({ reason }: { reason: string }) {
+export function WalletButtonsWaiting({ reason, onAttempt }: { reason: string; onAttempt?: () => void }) {
   const [shown, setShown] = useState(false);
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
       <div className="grid grid-cols-3 gap-2">
         {WALLETS.map((wallet) => (
-          <FallbackButton key={wallet} wallet={wallet} onClick={() => setShown(true)} />
+          <FallbackButton
+            key={wallet}
+            wallet={wallet}
+            onClick={() => {
+              setShown(true);
+              onAttempt?.();
+            }}
+          />
         ))}
       </div>
       {shown && (
-        <p role="status" className="rounded-lg bg-secondary px-3 py-2 text-sm text-foreground/80 ring-1 ring-foreground/10">
+        <p role="alert" className="rounded-lg bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive ring-1 ring-destructive/25">
           {reason}
         </p>
       )}

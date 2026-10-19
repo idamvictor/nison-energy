@@ -19,12 +19,15 @@ export function ExpressCheckoutBox({
   lines,
   label,
   disabledReason,
+  onBlockedAttempt,
   keepCart = false,
 }: {
   lines: OrderLineInput[];
   /** Divider text above the buttons, e.g. "or pay with". */
   label: string;
   disabledReason?: string | null;
+  /** Called when a button is tapped while `disabledReason` is set (e.g. highlight the missing field). */
+  onBlockedAttempt?: () => void;
   /** Product-page buy-now: don't empty the basket after paying. */
   keepCart?: boolean;
 }) {
@@ -44,7 +47,7 @@ export function ExpressCheckoutBox({
         <span className="h-px flex-1 bg-border" />
       </div>
       {disabledReason ? (
-        <WalletButtonsWaiting reason={disabledReason} />
+        <WalletButtonsWaiting reason={disabledReason} onAttempt={onBlockedAttempt} />
       ) : error ? (
         <p className="text-center text-xs text-destructive">{error}</p>
       ) : session ? (

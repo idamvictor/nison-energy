@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, ChevronDown, Heart, Zap } from "lucide-react";
@@ -30,6 +30,14 @@ export function CommercialPurchasePanel({
   const router = useRouter();
   const [installation, setInstallation] = useState<"standard" | "none" | null>(null);
   const [installationOpen, setInstallationOpen] = useState(false);
+  // Tried to buy without choosing installation: highlight the picker in red.
+  const [showInstallError, setShowInstallError] = useState(false);
+  const installRef = useRef<HTMLDivElement>(null);
+  const installMissing = showInstallError && installation === null;
+  function flagInstallation() {
+    setShowInstallError(true);
+    installRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
@@ -156,14 +164,15 @@ export function CommercialPurchasePanel({
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
           Add Installation
-          <div className="relative">
+          <div ref={installRef} className="relative scroll-mt-28">
             <button
               type="button"
               onClick={() => setInstallationOpen((open) => !open)}
               className={cn(
                 selectClass,
                 "flex items-center justify-between text-left font-normal",
-                installation === null && "text-muted-foreground"
+                installation === null && "text-muted-foreground",
+                installMissing && "border-destructive ring-1 ring-destructive/30"
               )}
             >
               {installationLabel}
@@ -202,11 +211,16 @@ export function CommercialPurchasePanel({
               </div>
             )}
           </div>
-          {installation === null && (
-            <p className="text-xs font-normal text-muted-foreground">
-              Select an installation option to continue.
-            </p>
-          )}
+          {installation === null &&
+            (installMissing ? (
+              <p role="alert" className="text-xs font-medium text-destructive">
+                Please choose an installation option to continue.
+              </p>
+            ) : (
+              <p className="text-xs font-normal text-muted-foreground">
+                Select an installation option to continue.
+              </p>
+            ))}
         </div>
 
       </div>
@@ -221,11 +235,11 @@ export function CommercialPurchasePanel({
 
       <Button
         size="lg"
-        disabled={installation === null}
+        aria-disabled={installation === null || undefined}
         variant="cta"
-        className="h-12 w-full gap-1.5 text-base"
+        className={cn("h-12 w-full gap-1.5 text-base", installation === null && "opacity-50")}
         onClick={() => {
-          if (installation === null) return;
+          if (installation === null) return flagInstallation();
           addItem(
             {
               id: product.id,
@@ -259,6 +273,7 @@ export function CommercialPurchasePanel({
         label="Or buy now with"
         keepCart
         disabledReason={installation === null ? "Choose an installation option above first." : null}
+        onBlockedAttempt={flagInstallation}
         lines={[
           {
             productId: product.id,

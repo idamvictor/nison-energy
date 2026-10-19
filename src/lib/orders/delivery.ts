@@ -1,6 +1,6 @@
 // Delivery pricing — one rule for the checkout summary (client) and the
 // Stripe session / Order (server). Amounts are GBP inc VAT.
-// Policy: DPD Tracked Delivery, free on orders of £120 or more, £11.99 under.
+// Policy: Tracked Delivery (1–3 days), free on orders of £120 or more, £11.99 under.
 // Any order with a solar kit goes by pallet instead: a flat £40 per order.
 
 export const DELIVERY_FEE = 11.99;
@@ -11,7 +11,7 @@ export const PALLET_DELIVERY_FEE = 40;
 export const FREE_DELIVERY_FROM = `£${FREE_DELIVERY_THRESHOLD.toLocaleString("en-GB")}`;
 
 /**
- * £11.99 DPD tracked delivery under £120 (items total inc VAT), free from
+ * £11.99 tracked delivery under £120 (items total inc VAT), free from
  * £120 — or a flat £40 pallet delivery when the order contains a solar kit.
  */
 export function deliveryFeeFor(itemsTotal: number, pallet = false): number {
@@ -19,9 +19,9 @@ export function deliveryFeeFor(itemsTotal: number, pallet = false): number {
   return itemsTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
 }
 
-export const DELIVERY_LABEL = "DPD Tracked Delivery";
-/** Dispatched in 1–3 working days, then 1–2 days with DPD. */
-export const DELIVERY_ESTIMATE = "Dispatched in 1–3 working days";
+export const DELIVERY_LABEL = "Tracked Delivery";
+/** Chargers and accessories: 1 to 3 days. */
+export const DELIVERY_ESTIMATE = "Estimated delivery 1 to 3 days";
 
 export const PALLET_DELIVERY_LABEL = "Specialist Delivery";
 /** From the delivery policy: plug-in solar may take 5 to 7 days via specialist delivery. */

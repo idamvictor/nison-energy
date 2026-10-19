@@ -27,7 +27,7 @@ export type Invoice = {
   deliverTo: string[];
   lines: InvoiceLine[];
   deliveryFee: number;
-  /** "DPD Tracked Delivery", or "Specialist Delivery" for solar orders. */
+  /** "Tracked Delivery", or "Specialist Delivery" for solar orders. */
   deliveryLabel: string;
   /** Gross (inc VAT) = net + vat. */
   net: number;

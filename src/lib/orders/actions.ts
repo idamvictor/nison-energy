@@ -134,11 +134,11 @@ export async function startCheckout(
           shipping_rate_data: {
             display_name: deliveryLabelFor(cart.pallet),
             type: "fixed_amount",
-            // DPD: 1–3 working days to dispatch + 1–2 in transit.
+            // Tracked delivery (chargers, accessories): 1 to 3 days.
             // Specialist delivery (plug-in solar): 5 to 7 days.
             delivery_estimate: cart.pallet
               ? { minimum: { unit: "business_day", value: 5 }, maximum: { unit: "business_day", value: 7 } }
-              : { minimum: { unit: "business_day", value: 2 }, maximum: { unit: "business_day", value: 5 } },
+              : { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 3 } },
             fixed_amount: { amount: Math.round(cart.deliveryFee * 100), currency: "gbp" },
           },
         },

@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { Reveal } from "@/components/shared/reveal";
-import { SectionKicker } from "@/components/shared/section-kicker";
 
 const IMG = "/media/wp/2025/05";
 
@@ -14,6 +12,10 @@ const logos = [
   { src: `${IMG}/Easee.png`, alt: "Easee" },
   { src: `${IMG}/download.png`, alt: "Tesla" },
   { src: `${IMG}/download-1.png`, alt: "myenergi" },
+  // Media store (uploaded once).
+  { src: "/api/media/uploads/f5f7704f-c032-4280-a237-bb5fe0d255a2.webp", alt: "Doncaster Cables" },
+  { src: "/api/media/uploads/836a8521-c358-4987-bf3f-5bd031a1f785.webp", alt: "Matt:e" },
+  { src: "/api/media/uploads/a309e648-2df5-4148-947f-b4ac80477647.webp", alt: "Whitecliffe" },
 ];
 
 export function TrustedInstallers() {
@@ -22,14 +24,7 @@ export function TrustedInstallers() {
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-        <Reveal>
-          <SectionKicker center />
-          <h2 className="mt-4 text-center text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
-            Our Trusted Installers
-          </h2>
-        </Reveal>
-
-        <div className="mt-10 overflow-hidden mask-[linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+        <div className="overflow-hidden mask-[linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
           <div className="flex w-max animate-[marquee_28s_linear_infinite] items-center gap-20 motion-reduce:animate-none">
             {track.map((logo, i) => (
               <div

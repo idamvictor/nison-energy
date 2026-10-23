@@ -113,7 +113,9 @@ export function ProductForm({
 
   // Only chargers have connection type, power, cable length and install fee.
   const isCharger = category === "Residential" || category === "Commercial";
-  const isSolar = category === "Solar";
+  // Solar kits and circuit protectors: just a price (no install fee, cable
+  // options or energy-tariff badges).
+  const isSimple = category === "Solar" || category === "CircuitProtection";
 
   const [slug, setSlug] = useState(row?.id ?? "");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -479,7 +481,7 @@ export function ProductForm({
               />
               Featured on home page
             </label>
-            {!isSolar && (
+            {!isSimple && (
               <>
             <label className="flex items-center gap-2 text-sm font-medium">
               <input
@@ -661,7 +663,7 @@ export function ProductForm({
         </Card>
       )}
 
-      {isSolar && (
+      {isSimple && (
         <Card>
           <CardHeader>
             <CardTitle>Pricing</CardTitle>

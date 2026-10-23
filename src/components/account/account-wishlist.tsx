@@ -7,22 +7,25 @@ import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/lib/wishlist/store";
 import type { Product } from "@/lib/catalog/types";
 import type { CommercialProduct } from "@/lib/catalog/types";
-import type { AccessoryProduct, SolarProduct } from "@/lib/catalog/types";
+import type { AccessoryProduct, CircuitProtectorProduct, SolarProduct } from "@/lib/catalog/types";
 import { ProductCard } from "@/components/shared/product-card";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { SolarProductCard } from "@/components/solar/solar-product-card";
+import { CircuitProtectorCard } from "@/components/circuit-protectors/circuit-protector-card";
 
 export function AccountWishlist({
   residential,
   commercial,
   accessories,
   solar,
+  circuitProtectors,
 }: {
   residential: Product[];
   commercial: CommercialProduct[];
   accessories: AccessoryProduct[];
   solar: SolarProduct[];
+  circuitProtectors: CircuitProtectorProduct[];
 }) {
   const { items } = useWishlist();
 
@@ -31,6 +34,7 @@ export function AccountWishlist({
   const savedCommercial = commercial.filter((p) => savedIds.has(p.id));
   const savedAccessories = accessories.filter((p) => savedIds.has(p.id));
   const savedSolar = solar.filter((p) => savedIds.has(p.id));
+  const savedCircuitProtectors = circuitProtectors.filter((p) => savedIds.has(p.id));
 
   if (items.length === 0) {
     return (
@@ -79,6 +83,13 @@ export function AccountWishlist({
         <WishlistSection title="Solar Panels">
           {savedSolar.map((product) => (
             <SolarProductCard key={product.id} variants={[product]} />
+          ))}
+        </WishlistSection>
+      )}
+      {savedCircuitProtectors.length > 0 && (
+        <WishlistSection title="Circuit Protectors">
+          {savedCircuitProtectors.map((product) => (
+            <CircuitProtectorCard key={product.id} variants={[product]} />
           ))}
         </WishlistSection>
       )}

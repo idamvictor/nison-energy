@@ -9,6 +9,7 @@ import {
   Target,
   Zap,
   Sun,
+  ShieldCheck,
 } from "lucide-react";
 
 import { StatCard } from "@/components/admin/dashboard/stat-card";
@@ -141,7 +142,7 @@ export default async function AdminDashboardPage({
         <ActivityFeed items={activity} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatCard
           label="Residential"
           value={productCounts.residential}
@@ -173,6 +174,14 @@ export default async function AdminDashboardPage({
           icon={Sun}
           tone="primary"
           href="/admin/solar-panels"
+        />
+        <StatCard
+          label="Circuit Protectors"
+          value={productCounts.circuitProtection}
+          subtext="Consumer units, RCBO kits"
+          icon={ShieldCheck}
+          tone="primary"
+          href="/admin/circuit-protectors"
         />
       </div>
     </div>

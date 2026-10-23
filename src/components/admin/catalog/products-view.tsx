@@ -15,6 +15,7 @@ import {
   Zap,
   Package,
   Sun,
+  ShieldCheck,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -70,6 +71,7 @@ const meta: Record<
   Commercial: { title: "Commercial Chargers", noun: "workplace chargers", icon: Package, admin: "/admin/commercial" },
   Accessory: { title: "Accessories", noun: "charging cables", icon: Cable, admin: "/admin/accessories" },
   Solar: { title: "Solar Panels", noun: "solar panel kits", icon: Sun, admin: "/admin/solar-panels" },
+  CircuitProtection: { title: "Circuit Protectors", noun: "circuit protectors", icon: ShieldCheck, admin: "/admin/circuit-protectors" },
 };
 
 export function ProductsView({

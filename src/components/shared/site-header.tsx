@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowRight,
+  ChevronDown,
   Heart,
   Inbox,
   LayoutDashboard,
@@ -48,11 +49,20 @@ const accountLinks = [
   { href: "/account/inbox", label: "Inbox", icon: Inbox },
 ];
 
-const navLinks = [
+type NavLink = { href: string; label: string; children?: { href: string; label: string }[] };
+
+const navLinks: NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/home-charging", label: "Residential Chargers" },
   { href: "/workplace-charging", label: "Commercial Chargers" },
-  { href: "/accessories", label: "Accessories" },
+  {
+    href: "/accessories",
+    label: "Accessories",
+    children: [
+      { href: "/accessories", label: "Cables" },
+      { href: "/circuit-protectors", label: "Circuit Protectors" },
+    ],
+  },
   { href: "/solar-panels", label: "Solar Panels" },
   { href: "/about-us", label: "About Us" },
   { href: "/ozev-grants", label: "OZEV Grants" },
@@ -70,6 +80,9 @@ export function SiteHeader() {
   const router = useRouter();
   const isActive = (href: string) =>
     href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
+  // A dropdown item is active when any of its pages is.
+  const isLinkActive = (link: NavLink) =>
+    link.children ? link.children.some((child) => isActive(child.href)) : isActive(link.href);
   const cartCount = useCart((s) =>
     s.items.reduce((sum, item) => sum + item.quantity, 0)
   );
@@ -120,7 +133,51 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-6 xl:flex">
           {navLinks.map((link) => {
-            const active = isActive(link.href);
+            const active = isLinkActive(link);
+            if (link.children) {
+              // Opens on hover or keyboard focus; the menu sits right under the label.
+              return (
+                <div key={link.href} className="group/menu relative">
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    className={cn(
+                      "group relative flex items-center gap-1 py-1 text-sm font-medium whitespace-nowrap transition-colors hover:text-foreground",
+                      active ? "text-foreground" : "text-foreground/70"
+                    )}
+                  >
+                    {link.label}
+                    <ChevronDown className="size-3.5 transition-transform group-hover/menu:rotate-180 group-focus-within/menu:rotate-180" />
+                    <span
+                      className={cn(
+                        "absolute inset-x-0 -bottom-0.5 h-0.5 origin-left rounded-full bg-linear-to-r from-primary to-accent transition-transform duration-200 ease-out group-hover:scale-x-100",
+                        active ? "scale-x-100" : "scale-x-0"
+                      )}
+                    />
+                  </button>
+                  <div className="invisible absolute top-full left-1/2 z-50 -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-150 group-focus-within/menu:visible group-focus-within/menu:opacity-100 group-hover/menu:visible group-hover/menu:opacity-100">
+                    <div className="flex min-w-48 flex-col rounded-xl border border-border bg-popover p-1.5 shadow-lg">
+                      {link.children.map((child) => {
+                        const childActive = isActive(child.href);
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            aria-current={childActive ? "page" : undefined}
+                            className={cn(
+                              "rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors hover:bg-muted hover:text-foreground",
+                              childActive ? "bg-secondary text-foreground" : "text-foreground/80"
+                            )}
+                          >
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
             return (
               <Link
                 key={link.href}
@@ -227,6 +284,29 @@ export function SiteHeader() {
               <nav className="flex flex-col gap-1 px-4">
                 {navLinks.map((link) => {
                   const active = isActive(link.href);
+                  if (link.children) {
+                    return (
+                      <div key={link.href} className="flex flex-col gap-1">
+                        <p className="px-2 pt-2.5 pb-1 text-sm font-medium text-foreground">{link.label}</p>
+                        {link.children.map((child) => {
+                          const childActive = isActive(child.href);
+                          return (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              aria-current={childActive ? "page" : undefined}
+                              className={cn(
+                                "ml-3 rounded-md border-l border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground",
+                                childActive ? "bg-secondary text-foreground" : "text-foreground/70"
+                              )}
+                            >
+                              {child.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
                   return (
                     <Link
                       key={link.href}

@@ -19,6 +19,7 @@ export const categoryLabels: Record<ProductCategory, string> = {
   Commercial: "Commercial chargers",
   Accessory: "Accessories",
   Solar: "Solar panels",
+  CircuitProtection: "Circuit protectors",
 };
 
 /** One product on the price list (admin + the client review page). */

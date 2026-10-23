@@ -12,6 +12,7 @@ import type { Product as ProductRow } from "@/generated/prisma/client";
 import type {
   AccessoryProduct,
   SolarProduct,
+  CircuitProtectorProduct,
   CommercialProduct,
   Product,
   ProductCategory,
@@ -210,6 +211,15 @@ export const getSolarCatalog = cache(async (): Promise<SolarProduct[]> => {
   return rows.map(dbToSolar);
 });
 
+/** Circuit protectors share the solar kit shape (no installation, no variants). */
+export const getCircuitProtectorCatalog = cache(async (): Promise<CircuitProtectorProduct[]> => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, category: "CircuitProtection" },
+    orderBy: catalogOrder,
+  });
+  return rows.map(dbToSolar);
+});
+
 export const getProductRow = cache((id: string) =>
   prisma.product.findUnique({ where: { id } }),
 );
@@ -238,6 +248,7 @@ export const getProductCounts = cache(
         commercial: count("Commercial"),
         accessory: count("Accessory"),
         solar: count("Solar"),
+        circuitProtection: count("CircuitProtection"),
       };
     },
     ["catalog-product-counts"],

@@ -3,13 +3,14 @@
 // maps a row to the view types below.
 
 // ─── Category / routing ────────────────────────────────────────────────────
-export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar";
+export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar" | "CircuitProtection";
 
 export const productCategories: ProductCategory[] = [
   "Residential",
   "Commercial",
   "Accessory",
   "Solar",
+  "CircuitProtection",
 ];
 
 // The storefront route + cart-category string for each catalog category.
@@ -18,6 +19,7 @@ export const categoryRoute: Record<ProductCategory, string> = {
   Commercial: "/workplace-charging",
   Accessory: "/accessories",
   Solar: "/solar-panels",
+  CircuitProtection: "/circuit-protectors",
 };
 
 // The admin edit route for each catalog category — same `[slug]` param as
@@ -27,15 +29,17 @@ export const adminRoute: Record<ProductCategory, string> = {
   Commercial: "/admin/commercial",
   Accessory: "/admin/accessories",
   Solar: "/admin/solar-panels",
+  CircuitProtection: "/admin/circuit-protectors",
 };
 
-export type CartCategory = "residential" | "commercial" | "accessories" | "solar";
+export type CartCategory = "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors";
 
 export const categoryToCart: Record<ProductCategory, CartCategory> = {
   Residential: "residential",
   Commercial: "commercial",
   Accessory: "accessories",
   Solar: "solar",
+  CircuitProtection: "circuit-protectors",
 };
 
 const cartRoute: Record<CartCategory, string> = {
@@ -43,6 +47,7 @@ const cartRoute: Record<CartCategory, string> = {
   commercial: "/workplace-charging",
   accessories: "/accessories",
   solar: "/solar-panels",
+  "circuit-protectors": "/circuit-protectors",
 };
 
 export function cartItemHref(category: CartCategory, id: string): string {
@@ -137,6 +142,11 @@ export type SolarProduct = {
   active?: boolean;
   featured?: boolean;
 };
+
+// ─── Circuit protectors ────────────────────────────────────────────────────
+// Consumer units, RCBO kits, isolators… (under Accessories in the menu): no
+// installation option and no variants. Same shape as a solar kit.
+export type CircuitProtectorProduct = SolarProduct;
 
 // ─── Detail-page content ───────────────────────────────────────────────────
 /** One row of the spec table; `section` groups rows under a heading (e.g. "Panel"). */

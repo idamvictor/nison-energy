@@ -13,6 +13,7 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { pgPool, prisma } from "@/lib/db";
+import type { MediaScope } from "@/lib/catalog/types";
 import {
   DATASHEET_PREVIEW_TYPES,
   DATASHEET_URL_PREFIX,
@@ -596,15 +597,17 @@ export async function deleteDocument(key: string): Promise<void> {
 }
 
 /**
- * Every image URL currently referenced by a product (card + gallery) or a
- * blog post (cover image) — the "file manager" picker in
- * src/components/shared/image-upload-field.tsx browses this list instead of
- * re-uploading an image that's already in use elsewhere.
+ * Every image URL already used in one admin section — a product category's
+ * card + gallery images, or blog cover images — for the "file manager"
+ * picker in src/components/shared/image-upload-field.tsx, so each section
+ * only browses its own pictures instead of re-uploading them.
  */
-export const getMediaLibrary = cache(async (): Promise<string[]> => {
+export const getMediaLibrary = cache(async (scope: MediaScope): Promise<string[]> => {
   const [products, posts] = await Promise.all([
-    prisma.product.findMany({ select: { cardImage: true, gallery: true } }),
-    prisma.post.findMany({ select: { coverImage: true } }),
+    scope === "blog"
+      ? Promise.resolve([] as { cardImage: string; gallery: string[] }[])
+      : prisma.product.findMany({ where: { category: scope }, select: { cardImage: true, gallery: true } }),
+    scope === "blog" ? prisma.post.findMany({ select: { coverImage: true } }) : Promise.resolve([] as { coverImage: string }[]),
   ]);
   const urls = new Set<string>();
   for (const p of products) {

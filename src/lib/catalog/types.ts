@@ -32,6 +32,22 @@ export const adminRoute: Record<ProductCategory, string> = {
   CircuitProtection: "/admin/circuit-protectors",
 };
 
+/** Which images the admin media library shows: one product section, or blog covers. */
+export type MediaScope = ProductCategory | "blog";
+
+export const mediaScopeLabel: Record<MediaScope, string> = {
+  Residential: "Residential Chargers",
+  Commercial: "Commercial Chargers",
+  Accessory: "Accessories",
+  Solar: "Solar Panels",
+  CircuitProtection: "Circuit Protectors",
+  blog: "Blog",
+};
+
+export function isMediaScope(value: string | null): value is MediaScope {
+  return value === "blog" || productCategories.includes(value as ProductCategory);
+}
+
 export type CartCategory = "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors";
 
 export const categoryToCart: Record<ProductCategory, CartCategory> = {

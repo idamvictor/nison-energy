@@ -348,6 +348,7 @@ export function ProductForm({
                 value={cardImage}
                 onChange={setCardImage}
                 label="Card image"
+                scope={category}
               />
             </Field>
             <p className="pt-1 text-xs font-medium text-muted-foreground">
@@ -368,6 +369,7 @@ export function ProductForm({
                     id={item.id}
                     url={item.url}
                     index={index}
+                    scope={category}
                     removable={gallery.length > 1}
                     isThumbnail={item.url.trim() !== "" && item.url === cardImage}
                     onChange={(url) =>
@@ -823,6 +825,7 @@ function SortableGalleryItem({
   id,
   url,
   index,
+  scope,
   removable,
   isThumbnail,
   onChange,
@@ -832,6 +835,7 @@ function SortableGalleryItem({
   id: string;
   url: string;
   index: number;
+  scope: ProductCategory;
   removable: boolean;
   isThumbnail: boolean;
   onChange: (url: string) => void;
@@ -861,6 +865,7 @@ function SortableGalleryItem({
           value={url}
           onChange={onChange}
           label={`Gallery image ${index + 1}`}
+          scope={scope}
         />
       </div>
       <Button

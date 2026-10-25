@@ -159,6 +159,7 @@ export function BlogPostForm({ post }: { post: PostRow | null }) {
               value={coverImage}
               onChange={setCoverImage}
               label="Cover image"
+              scope="blog"
             />
           </Field>
           <Field label="Tags (comma separated)">

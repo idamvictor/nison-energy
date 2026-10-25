@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaLibraryDialog } from "@/components/shared/media-library-dialog";
+import type { MediaScope } from "@/lib/catalog/types";
 
 /**
  * Drop-in replacement for a plain image-URL <Input>. Offers the existing
@@ -19,10 +20,13 @@ export function ImageUploadField({
   value,
   onChange,
   label,
+  scope,
 }: {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  /** Which images the Media Library shows (this product section, or "blog"). */
+  scope: MediaScope;
 }) {
   const [libraryOpen, setLibraryOpen] = useState(false);
 
@@ -69,6 +73,7 @@ export function ImageUploadField({
         open={libraryOpen}
         onOpenChange={setLibraryOpen}
         onSelect={onChange}
+        scope={scope}
       />
     </div>
   );

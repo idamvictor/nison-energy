@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { mediaScopeLabel, type MediaScope } from "@/lib/catalog/types";
 
 // How many thumbnails render (and therefore actually fetch) at a time —
 // the full URL list can be a couple hundred long, but nothing past this
@@ -28,10 +29,13 @@ export function MediaLibraryDialog({
   open,
   onOpenChange,
   onSelect,
+  scope,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelect: (url: string) => void;
+  /** Only this section's images (e.g. the product's category, or "blog"). */
+  scope: MediaScope;
 }) {
   const [urls, setUrls] = useState<string[] | null>(null);
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
@@ -67,7 +71,7 @@ export function MediaLibraryDialog({
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
-    fetch("/api/media/library")
+    fetch(`/api/media/library?scope=${encodeURIComponent(scope)}`)
       .then((res) => res.json())
       .then((data: { urls?: string[]; error?: string }) => {
         if (cancelled) return;
@@ -84,7 +88,7 @@ export function MediaLibraryDialog({
     return () => {
       cancelled = true;
     };
-  }, [open]);
+  }, [open, scope]);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -115,7 +119,7 @@ export function MediaLibraryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Media library</DialogTitle>
+          <DialogTitle>Media library — {mediaScopeLabel[scope]}</DialogTitle>
         </DialogHeader>
 
         <div className="flex items-center gap-3">

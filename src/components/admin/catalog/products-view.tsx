@@ -93,11 +93,14 @@ export function ProductsView({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // SKUs match ignoring case and separators, so "wtb5set3" finds WTB5-SET3.
+    const skuQ = q.replace(/[^a-z0-9]+/g, "");
     return products.filter(
       (p) =>
         q === "" ||
         p.name.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q),
+        p.brand.toLowerCase().includes(q) ||
+        (skuQ !== "" && (p.sku ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "").includes(skuQ)),
     );
   }, [products, query]);
 
@@ -151,7 +154,7 @@ export function ProductsView({
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search…"
+          placeholder="Search name, brand or SKU…"
           className="pl-8"
         />
       </div>

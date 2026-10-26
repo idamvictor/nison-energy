@@ -23,6 +23,13 @@ export function toPrefixTsQuery(raw: string): string | null {
   return tokens.map((token) => `${token}:*`).join(" & ");
 }
 
+// SKUs mix letters, digits and separators (WTB5-SET3, WPEPME08/C40) that the
+// full-text parser splits unpredictably, so they're also matched directly with
+// everything but letters and digits stripped from both sides.
+export function toSkuKey(raw: string): string {
+  return raw.toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
 type SearchRow = {
   id: string;
   category: ProductCategory;
@@ -44,16 +51,18 @@ type SearchRow = {
  * index, is plenty fast — no migration needed.
  */
 const searchProductsCached = unstable_cache(
-  async (tsQuery: string, limit: number): Promise<SearchResult[]> => {
+  async (tsQuery: string, skuKey: string, limit: number): Promise<SearchResult[]> => {
   const rows = await prisma.$queryRaw<SearchRow[]>`
     WITH scored AS (
       SELECT
         "id", "category", "name", "brand", "cardImage", "price", "tags",
         coalesce("spec", '') AS spec,
         coalesce("tagline", '') AS tagline,
+        regexp_replace(lower(coalesce("sku", '')), '[^a-z0-9]+', '', 'g') AS sku_key,
         to_tsvector('english',
           coalesce("name", '') || ' ' ||
           coalesce("brand", '') || ' ' ||
+          coalesce("sku", '') || ' ' ||
           coalesce("colour", '') || ' ' ||
           array_to_string("tags", ' ') || ' ' ||
           coalesce("spec", '') || ' ' ||
@@ -77,7 +86,14 @@ const searchProductsCached = unstable_cache(
     SELECT "id", "category", "name", "brand", "cardImage", "price"::float8 AS "price", "tags", spec, tagline
     FROM scored
     WHERE doc @@ to_tsquery('english', ${tsQuery})
-    ORDER BY ts_rank(doc, to_tsquery('english', ${tsQuery})) DESC, "id" ASC
+      OR (${skuKey} <> '' AND sku_key <> '' AND sku_key LIKE ${skuKey} || '%')
+    ORDER BY
+      CASE
+        WHEN sku_key <> '' AND sku_key = ${skuKey} THEN 0
+        WHEN sku_key <> '' AND sku_key LIKE ${skuKey} || '%' THEN 1
+        ELSE 2
+      END,
+      ts_rank(doc, to_tsquery('english', ${tsQuery})) DESC, "id" ASC
     LIMIT ${limit}
   `;
 
@@ -102,5 +118,5 @@ export async function searchProducts(
 ): Promise<SearchResult[]> {
   const tsQuery = toPrefixTsQuery(query);
   if (!tsQuery) return [];
-  return searchProductsCached(tsQuery, limit);
+  return searchProductsCached(tsQuery, toSkuKey(query), limit);
 }

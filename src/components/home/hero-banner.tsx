@@ -116,28 +116,6 @@ function OrangeButton({
   );
 }
 
-/** Same size as the orange CTA, but grey and not clickable. */
-function ComingSoonButton({ spec, unit }: { spec: ButtonSpec; unit: (px: number) => string }) {
-  return (
-    <span
-      aria-disabled="true"
-      className="inline-flex w-fit cursor-not-allowed items-center whitespace-nowrap text-white uppercase"
-      style={{
-        padding: `${unit(spec.padY)} ${unit(spec.padX)}`,
-        border: `${unit(spec.border)} solid transparent`,
-        borderRadius: unit(spec.radius),
-        backgroundColor: "#9aa5b1",
-        fontWeight: spec.weight,
-        fontSize: unit(spec.font),
-        lineHeight: unit(spec.lineHeight),
-        letterSpacing: unit(spec.tracking),
-      }}
-    >
-      Coming Soon
-    </span>
-  );
-}
-
 const px = (n: number) => `${n}px`;
 
 const headline = (
@@ -220,9 +198,8 @@ export function HeroBanner() {
         </p>
         <OrangeButton href="/ozev-grant-guide" label="Calculate Your Quote" arrow={MEDIA.arrowCalc} spec={BTN_CALC} unit={u} style={box(527, 537)} />
 
-        {/* Card 3 — Circuit Protection & EV Home Install Kits (coming soon: greyed out) */}
-        <div className="bg-[#eceff3]" style={{ ...box(942, 419, 423, 190), borderRadius: u(10) }} />
-        <div className="pointer-events-none absolute inset-0 opacity-55 grayscale select-none" aria-disabled="true">
+        {/* Card 3 — Circuit Protection & EV Home Install Kits */}
+        <div className="bg-white" style={{ ...box(942, 419, 423, 190), borderRadius: u(10) }} />
         <div className="flex flex-col justify-between" style={{ ...box(963, 441, 227.576, 147), padding: `${u(14)} 0` }}>
           <div className="flex flex-col" style={{ gap: u(3.721), color: NAVY }}>
             <h2 className={cn(montserrat.className, "font-black")} style={{ ...text(14.885, 18.606, -0.3721), paddingTop: u(0.93) }}>
@@ -237,12 +214,11 @@ export function HeroBanner() {
             </p>
           </div>
           <div style={{ paddingTop: u(9.303) }}>
-            <ComingSoonButton spec={BTN_KIT} unit={u} />
+            <OrangeButton href="/circuit-protectors" label="Shop Install Kits" arrow={MEDIA.arrowKit} spec={BTN_KIT} unit={u} />
           </div>
         </div>
         <div style={box(1161, 435, 184, 184)}>
           <Image src={MEDIA.kit} alt="Open consumer unit with circuit protection" fill sizes="190px" className="-scale-x-100 object-cover" />
-        </div>
         </div>
       </div>
 
@@ -282,8 +258,7 @@ export function HeroBanner() {
           <MobileCard
             title="Circuit Protection & EV Home Install Kits"
             copy="Keep your installation safe with trusted protection solutions and complete kits."
-            button={<ComingSoonButton spec={BTN_KIT} unit={px} />}
-            comingSoon
+            button={<OrangeButton href="/circuit-protectors" label="Shop Install Kits" arrow={MEDIA.arrowKit} spec={BTN_KIT} unit={px} />}
             image={<Image src={MEDIA.kit} alt="Open consumer unit with circuit protection" fill sizes="160px" className="-scale-x-100 object-contain" />}
           />
         </div>
@@ -297,27 +272,22 @@ function MobileCard({
   copy,
   button,
   image,
-  comingSoon = false,
 }: {
   title: string;
   copy: string;
   button: React.ReactNode;
   image: React.ReactNode;
-  comingSoon?: boolean;
 }) {
   return (
-    <div
-      className={cn("relative flex min-h-[170px] overflow-hidden rounded-[10px]", comingSoon ? "bg-[#eceff3] select-none" : "bg-white")}
-      aria-disabled={comingSoon || undefined}
-    >
-      <div className={cn("relative z-10 flex w-[62%] flex-col justify-between gap-3 py-5 pl-4", comingSoon && "opacity-55 grayscale")} style={{ color: NAVY }}>
+    <div className="relative flex min-h-[170px] overflow-hidden rounded-[10px] bg-white">
+      <div className="relative z-10 flex w-[62%] flex-col justify-between gap-3 py-5 pl-4" style={{ color: NAVY }}>
         <div className="flex flex-col gap-1.5">
           <h2 className={cn(montserrat.className, "text-[18px] leading-[22px] font-black tracking-[-0.45px]")}>{title}</h2>
           <p className="text-[13px] leading-[17px]">{copy}</p>
         </div>
         {button}
       </div>
-      <div className={cn("absolute inset-y-3 right-2 w-[34%]", comingSoon && "opacity-55 grayscale")}>{image}</div>
+      <div className="absolute inset-y-3 right-2 w-[34%]">{image}</div>
     </div>
   );
 }

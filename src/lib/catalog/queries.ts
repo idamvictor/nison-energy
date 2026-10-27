@@ -280,7 +280,6 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 function validate(input: ProductInput): string | null {
   if (!input.name.trim()) return "Name is required.";
   if (!input.brand.trim()) return "Brand is required.";
-  if (!input.colour.trim()) return "Colour is required.";
   if (!input.cardImage.trim()) return "A card image URL is required.";
   if (input.datasheets.length > MAX_DATASHEETS) {
     return `A product can have at most ${MAX_DATASHEETS} datasheets.`;

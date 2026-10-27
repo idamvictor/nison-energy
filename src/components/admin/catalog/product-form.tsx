@@ -440,9 +440,8 @@ export function ProductForm({
           <Field label="SKU">
             <Input value={sku} onChange={(e) => setSku(e.target.value)} />
           </Field>
-          <Field label="Colour">
+          <Field label="Colour (optional)">
             <Input
-              required
               value={colour}
               onChange={(e) => setColour(e.target.value)}
             />

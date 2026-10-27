@@ -87,7 +87,7 @@ export function AccountWishlist({
         </WishlistSection>
       )}
       {savedCircuitProtectors.length > 0 && (
-        <WishlistSection title="Circuit Protectors">
+        <WishlistSection title="Circuit Protection">
           {savedCircuitProtectors.map((product) => (
             <CircuitProtectorCard key={product.id} variants={[product]} />
           ))}

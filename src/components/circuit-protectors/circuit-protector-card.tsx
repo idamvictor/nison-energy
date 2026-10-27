@@ -40,7 +40,7 @@ export function CircuitProtectorCard({
 
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
-  const href = `/circuit-protectors/${product.id}`;
+  const href = `/circuit-protection/${product.id}`;
 
   return (
     <Card className="group relative h-full gap-0 overflow-hidden py-0 ring-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:ring-primary/20">

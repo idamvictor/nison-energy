@@ -79,8 +79,8 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
               Home
             </Link>
             <ChevronRight className="size-3.5" />
-            <Link href="/circuit-protectors" className="hover:text-foreground">
-              Circuit Protectors
+            <Link href="/circuit-protection" className="hover:text-foreground">
+              Circuit Protection
             </Link>
             <ChevronRight className="size-3.5" />
             <span className="text-foreground">{product.name}</span>

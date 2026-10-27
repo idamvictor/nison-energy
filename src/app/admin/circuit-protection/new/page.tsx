@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { ProductForm } from "@/components/admin/catalog/product-form";
 
-export const metadata: Metadata = { title: "Add circuit protector | Admin" };
+export const metadata: Metadata = { title: "Add circuit protection product | Admin" };
 
 export default function NewCircuitProtectorPage() {
   return (

@@ -717,7 +717,7 @@ export function ProductForm({
           <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <p className="text-xs text-muted-foreground sm:col-span-2">
               Tick everything that applies — shoppers use these to filter the
-              Circuit Protectors page.
+              Circuit Protection page.
             </p>
             {CIRCUIT_PROTECTOR_FILTERS.map((def) => (
               <fieldset key={def.key} className="flex flex-col gap-2">

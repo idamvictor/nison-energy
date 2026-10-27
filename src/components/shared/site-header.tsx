@@ -60,7 +60,7 @@ const navLinks: NavLink[] = [
     label: "Accessories",
     children: [
       { href: "/accessories", label: "Cables" },
-      { href: "/circuit-protectors", label: "Circuit Protectors" },
+      { href: "/circuit-protection", label: "Circuit Protection" },
     ],
   },
   { href: "/solar-panels", label: "Solar Panels" },

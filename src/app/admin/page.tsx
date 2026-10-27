@@ -176,12 +176,12 @@ export default async function AdminDashboardPage({
           href="/admin/solar-panels"
         />
         <StatCard
-          label="Circuit Protectors"
+          label="Circuit Protection"
           value={productCounts.circuitProtection}
           subtext="Consumer units, RCBO kits"
           icon={ShieldCheck}
           tone="primary"
-          href="/admin/circuit-protectors"
+          href="/admin/circuit-protection"
         />
       </div>
     </div>

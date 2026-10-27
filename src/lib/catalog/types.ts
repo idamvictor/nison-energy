@@ -19,7 +19,7 @@ export const categoryRoute: Record<ProductCategory, string> = {
   Commercial: "/workplace-charging",
   Accessory: "/accessories",
   Solar: "/solar-panels",
-  CircuitProtection: "/circuit-protectors",
+  CircuitProtection: "/circuit-protection",
 };
 
 // The admin edit route for each catalog category — same `[slug]` param as
@@ -29,7 +29,7 @@ export const adminRoute: Record<ProductCategory, string> = {
   Commercial: "/admin/commercial",
   Accessory: "/admin/accessories",
   Solar: "/admin/solar-panels",
-  CircuitProtection: "/admin/circuit-protectors",
+  CircuitProtection: "/admin/circuit-protection",
 };
 
 /** Which images the admin media library shows: one product section, or blog covers. */
@@ -40,7 +40,7 @@ export const mediaScopeLabel: Record<MediaScope, string> = {
   Commercial: "Commercial Chargers",
   Accessory: "Accessories",
   Solar: "Solar Panels",
-  CircuitProtection: "Circuit Protectors",
+  CircuitProtection: "Circuit Protection",
   blog: "Blog",
 };
 
@@ -63,7 +63,7 @@ const cartRoute: Record<CartCategory, string> = {
   commercial: "/workplace-charging",
   accessories: "/accessories",
   solar: "/solar-panels",
-  "circuit-protectors": "/circuit-protectors",
+  "circuit-protectors": "/circuit-protection",
 };
 
 export function cartItemHref(category: CartCategory, id: string): string {

@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
     // cache TTL to that instead of the 60s default.
     minimumCacheTTL: 31536000,
   },
+  // The category was renamed "Circuit Protectors" → "Circuit Protection";
+  // keep old links, bookmarks and search results working.
+  redirects() {
+    return [
+      { source: "/circuit-protectors", destination: "/circuit-protection", permanent: true },
+      { source: "/circuit-protectors/:slug", destination: "/circuit-protection/:slug", permanent: true },
+      { source: "/admin/circuit-protectors/:path*", destination: "/admin/circuit-protection/:path*", permanent: true },
+    ];
+  },
   experimental: {
     // Each static-generation worker opens its own pg pool (max 5). Hostinger's
     // build box reports 63 CPUs → 63 workers → Prisma Postgres "too many

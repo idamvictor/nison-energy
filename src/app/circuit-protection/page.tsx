@@ -12,7 +12,7 @@ import { getCircuitProtectorCatalog } from "@/lib/catalog/queries";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Circuit Protectors | Ocunio Energy",
+  title: "Circuit Protection | Ocunio Energy",
   description:
     "EV protection kits, RCBO units, heat pump and solar consumer units for safe, compliant EV charger, heat pump and solar installations.",
 };
@@ -24,7 +24,7 @@ export default async function CircuitProtectorsPage() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <PageHero align="left" eyebrow="Accessories" title="Circuit Protectors" />
+        <PageHero align="left" eyebrow="Accessories" title="Circuit Protection" />
         <Suspense fallback={null}>
           <CircuitProtectorCatalog products={products} />
         </Suspense>

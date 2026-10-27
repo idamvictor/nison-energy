@@ -214,7 +214,7 @@ export function HeroBanner() {
             </p>
           </div>
           <div style={{ paddingTop: u(9.303) }}>
-            <OrangeButton href="/circuit-protectors" label="Shop Install Kits" arrow={MEDIA.arrowKit} spec={BTN_KIT} unit={u} />
+            <OrangeButton href="/circuit-protection" label="Shop Install Kits" arrow={MEDIA.arrowKit} spec={BTN_KIT} unit={u} />
           </div>
         </div>
         <div style={box(1161, 435, 184, 184)}>
@@ -258,7 +258,7 @@ export function HeroBanner() {
           <MobileCard
             title="Circuit Protection & EV Home Install Kits"
             copy="Keep your installation safe with trusted protection solutions and complete kits."
-            button={<OrangeButton href="/circuit-protectors" label="Shop Install Kits" arrow={MEDIA.arrowKit} spec={BTN_KIT} unit={px} />}
+            button={<OrangeButton href="/circuit-protection" label="Shop Install Kits" arrow={MEDIA.arrowKit} spec={BTN_KIT} unit={px} />}
             image={<Image src={MEDIA.kit} alt="Open consumer unit with circuit protection" fill sizes="160px" className="-scale-x-100 object-contain" />}
           />
         </div>

@@ -201,7 +201,7 @@ export function CircuitProtectorCatalog({ products }: { products: CircuitProtect
                 No products match those filters. Try clearing one or two.
               </p>
             ) : (
-              <p className="py-16 text-center text-muted-foreground">New circuit protectors are coming soon.</p>
+              <p className="py-16 text-center text-muted-foreground">New circuit protection products are coming soon.</p>
             )}
           </div>
         </div>

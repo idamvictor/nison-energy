@@ -43,7 +43,7 @@ const catalogLinks = [
   { href: "/admin/chargers", label: "Chargers", icon: Zap },
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
   { href: "/admin/solar-panels", label: "Solar Panels", icon: Sun },
-  { href: "/admin/circuit-protectors", label: "Circuit Protectors", icon: ShieldCheck },
+  { href: "/admin/circuit-protection", label: "Circuit Protection", icon: ShieldCheck },
   { href: "/admin/prices", label: "Price list", icon: PoundSterling, permission: "prices.manage" },
 ] as { href: string; label: string; icon: typeof Zap; permission?: Permission }[];
 

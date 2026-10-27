@@ -3,6 +3,7 @@ import { SiteLoader } from "@/components/shared/site-loader";
 import { AppHydration } from "@/components/shared/app-hydration";
 import { CartSheet } from "@/components/shared/cart-sheet";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
+import { PaymentPreconnect } from "@/components/shared/payment-preconnect";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <PaymentPreconnect />
         <SiteLoader />
         <AppHydration />
         <CartSheet />

@@ -163,10 +163,12 @@ export function ExpressCheckout({
   const areaRef = useRef<HTMLDivElement>(null);
   const reported = useRef(false);
   useEffect(() => {
+    // Generous: on slow mobile connections Stripe (and PayPal, which loads
+    // last) can take several seconds — don't give up on them too early.
     const timer = setTimeout(() => {
       onAvailability?.((areaRef.current?.offsetHeight ?? 0) >= 24);
       if (!reported.current) onWallets?.(NO_WALLETS);
-    }, 4000);
+    }, 10000);
     return () => clearTimeout(timer);
   }, [onAvailability, onWallets]);
 

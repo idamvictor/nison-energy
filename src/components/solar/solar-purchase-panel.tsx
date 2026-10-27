@@ -88,6 +88,7 @@ export function SolarPurchasePanel({ product }: { product: SolarProduct }) {
       </Button>
 
       <ExpressCheckoutBox
+        eager
         label="Or buy now with"
         keepCart
         lines={[

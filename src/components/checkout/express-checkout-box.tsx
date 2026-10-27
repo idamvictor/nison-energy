@@ -21,6 +21,7 @@ export function ExpressCheckoutBox({
   disabledReason,
   onBlockedAttempt,
   keepCart = false,
+  eager = false,
 }: {
   lines: OrderLineInput[];
   /** Divider text above the buttons, e.g. "or pay with". */
@@ -30,11 +31,13 @@ export function ExpressCheckoutBox({
   onBlockedAttempt?: () => void;
   /** Product-page buy-now: don't empty the basket after paying. */
   keepCart?: boolean;
+  /** Product pages: open the wallet session straight away (the buttons sit just under "Add to Cart"). */
+  eager?: boolean;
 }) {
   const payable = lines.length > 0 && lines.every((line) => line.unitPrice != null);
-  // No Stripe call until the buttons are about to be seen.
+  // No Stripe call until the buttons are about to be seen (unless eager).
   const [boxRef, inView] = useInView<HTMLDivElement>();
-  const enabled = payable && stripeConfigured && !disabledReason && inView;
+  const enabled = payable && stripeConfigured && !disabledReason && (eager || inView);
   const { session, error, discard } = useCheckoutSession("wallet", JSON.stringify(lines), enabled, { keepCart });
 
   if (!payable || !stripeConfigured) return null;

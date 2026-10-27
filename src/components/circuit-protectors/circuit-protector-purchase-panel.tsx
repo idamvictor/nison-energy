@@ -88,6 +88,7 @@ export function CircuitProtectorPurchasePanel({ product }: { product: CircuitPro
       </Button>
 
       <ExpressCheckoutBox
+        eager
         label="Or buy now with"
         keepCart
         lines={[

@@ -267,6 +267,7 @@ export function PurchasePanel({
       </Button>
 
       <ExpressCheckoutBox
+        eager
         label="Or buy now with"
         keepCart
         disabledReason={installation === null ? "Choose an installation option above first." : null}

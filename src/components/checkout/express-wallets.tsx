@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { siApple, siGooglepay } from "simple-icons";
 
 import { cn } from "@/lib/utils";
@@ -22,8 +22,11 @@ const UNAVAILABLE: Record<Wallet, string> = {
     "Apple Pay isn't available on this device or browser. Use Safari on an iPhone, iPad or Mac with a card in Apple Wallet — or pay by card instead.",
   googlePay:
     "Google Pay isn't available in this browser. Use Chrome with a card saved to Google Pay — or pay by card instead.",
-  paypal: "PayPal isn't available right now. Please pay by card instead.",
+  paypal: "PayPal can't load in this browser — try Chrome or Safari, or pay by card.",
 };
+
+/** PayPal arrives after Stripe's other wallets; until this long after mount its stand-in says "loading". */
+const PAYPAL_GRACE_MS = 10000;
 
 function Glyph({ path, className }: { path: string; className?: string }) {
   return (
@@ -103,7 +106,19 @@ export function ExpressWallets({
 }) {
   const [available, setAvailable] = useState<AvailableWallets | null>(null);
   const [notice, setNotice] = useState<Wallet | null>(null);
+  // PayPal often turns up a few seconds after the other wallets. Until the
+  // grace period ends its stand-in says "loading" rather than "unavailable",
+  // and the real button takes its place as soon as Stripe reports it.
+  const [paypalSettled, setPaypalSettled] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setPaypalSettled(true), PAYPAL_GRACE_MS);
+    return () => clearTimeout(timer);
+  }, []);
   const missing = available ? wallets.filter((w) => !available[w]) : [];
+  // A notice for a wallet that has since loaded no longer applies.
+  const shownNotice = notice && missing.includes(notice) ? notice : null;
+  const noticeText = (wallet: Wallet) =>
+    wallet === "paypal" && !paypalSettled ? "PayPal is loading, one moment…" : UNAVAILABLE[wallet];
   // Apple/Google Pay "always" so they show on more browsers; PayPal on its own
   // availability (test mode, or live once activated in Stripe).
   const methods: ExpressMethods = {
@@ -153,9 +168,9 @@ export function ExpressWallets({
               />
             ))}
       </div>
-      {notice && (
+      {shownNotice && (
         <p role="status" className="rounded-lg bg-secondary px-3 py-2 text-sm text-foreground/80 ring-1 ring-foreground/10">
-          {UNAVAILABLE[notice]}
+          {noticeText(shownNotice)}
         </p>
       )}
     </div>

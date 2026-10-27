@@ -174,6 +174,7 @@ export function AccessoryPurchasePanel({
       </Button>
 
       <ExpressCheckoutBox
+        eager
         label="Or buy now with"
         keepCart
         lines={[

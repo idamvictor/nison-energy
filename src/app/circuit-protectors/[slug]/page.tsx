@@ -102,7 +102,6 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
                 </div>
                 {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
                 <FreeDeliveryBadge warranty={detail.warranty} />
-                <p className="mt-2 text-sm text-muted-foreground">Tracked delivery – estimated 1 to 3 days</p>
               </div>
 
               {product.tags.length > 0 && (

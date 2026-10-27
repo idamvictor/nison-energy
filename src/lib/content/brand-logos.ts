@@ -22,8 +22,9 @@ export const brandLogos: Record<string, string> = {
   VCHRGD: "/api/media/uploads/b5833c1f-9104-4cc8-88ac-07d990e62785.png",
   Vestel: "/api/media/uploads/6f7f94d8-9f77-405b-bfa9-2ee920a5cdde.jpg",
   "waEV-charge": "/api/media/uploads/fb61a7d3-f8ea-485a-aa8c-8b055480397d.png",
-  // WCED is Doncaster Cables' own range, so it carries the Doncaster logo.
-  WCED: "/api/media/uploads/f5f7704f-c032-4280-a237-bb5fe0d255a2.webp",
+  // WCED products are Whitecliffe's circuit protection range, so they carry
+  // the Whitecliffe logo.
+  WCED: "/api/media/uploads/a309e648-2df5-4148-947f-b4ac80477647.webp",
   Whitecliffe: "/api/media/uploads/a309e648-2df5-4148-947f-b4ac80477647.webp",
   Wottz: "/api/media/uploads/649af99b-ce8d-4ffb-a7f6-a6b06830936b.png",
   Zaptec: "/api/media/uploads/02e001a3-1b81-4216-85f3-b6409935d9c6.png",

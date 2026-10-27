@@ -21,6 +21,7 @@ import type {
   Spec,
   WriteResult,
 } from "@/lib/catalog/types";
+import { cleanCircuitProtectorFilters } from "@/lib/catalog/circuit-protector-filters";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { CACHE_TTL } from "@/lib/cache/config";
 
@@ -124,6 +125,10 @@ export function dbToSolar(row: ProductRow): SolarProduct {
   };
 }
 
+export function dbToCircuitProtector(row: ProductRow): CircuitProtectorProduct {
+  return { ...dbToSolar(row), filters: cleanCircuitProtectorFilters(row.filters) };
+}
+
 // Next.js Server -> Client Component props must be plain-serializable — a
 // Prisma Decimal is a class instance, not a plain object, so raw `ProductRow`
 // can't be passed straight into a "use client" component (e.g. ProductForm)
@@ -217,7 +222,7 @@ export const getCircuitProtectorCatalog = cache(async (): Promise<CircuitProtect
     where: { active: true, category: "CircuitProtection" },
     orderBy: catalogOrder,
   });
-  return rows.map(dbToSolar);
+  return rows.map(dbToCircuitProtector);
 });
 
 export const getProductRow = cache((id: string) =>
@@ -323,6 +328,10 @@ function toData(input: ProductInput) {
     warranty: input.warranty?.trim() || null,
     // Trimmed, de-duplicated, order kept (first is shown first).
     datasheets: [...new Set(input.datasheets.map((d) => d.trim()).filter(Boolean))],
+    // Only circuit protectors have filters; other categories leave the column alone.
+    ...(input.category === "CircuitProtection" && input.filters
+      ? { filters: cleanCircuitProtectorFilters(input.filters) }
+      : {}),
   };
 }
 

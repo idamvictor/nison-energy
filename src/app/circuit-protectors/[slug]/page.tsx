@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
-import { getCircuitProtectorCatalog, getProductRow, dbToSolar, dbToDetail } from "@/lib/catalog/queries";
+import { getCircuitProtectorCatalog, getProductRow, dbToCircuitProtector, dbToDetail } from "@/lib/catalog/queries";
 import { getDatasheetNames, warmDatasheet } from "@/lib/media/queries";
 import { adminRoute } from "@/lib/catalog/types";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
@@ -59,7 +59,7 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
 
   if (!row || row.category !== "CircuitProtection" || !row.active) notFound();
 
-  const product = dbToSolar(row);
+  const product = dbToCircuitProtector(row);
   const detail = dbToDetail(row);
   // Pull the datasheet into memory now so the viewer finds it cached on first click.
   for (const url of detail.datasheets) warmDatasheet(url);

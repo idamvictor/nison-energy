@@ -161,8 +161,9 @@ export type SolarProduct = {
 
 // ─── Circuit protectors ────────────────────────────────────────────────────
 // Consumer units, RCBO kits, isolators… (under Accessories in the menu): no
-// installation option and no variants. Same shape as a solar kit.
-export type CircuitProtectorProduct = SolarProduct;
+// installation option and no variants. A solar kit's shape plus the catalogue
+// filter values (see src/lib/catalog/circuit-protector-filters.ts).
+export type CircuitProtectorProduct = SolarProduct & { filters: Record<string, string[]> };
 
 // ─── Detail-page content ───────────────────────────────────────────────────
 /** One row of the spec table; `section` groups rows under a heading (e.g. "Panel"). */
@@ -213,6 +214,8 @@ export type ProductInput = {
   specs: Spec[];
   warranty: string | null;
   datasheets: string[];
+  /** Circuit protectors only: catalogue filter values by filter key. */
+  filters?: Record<string, string[]>;
 };
 
 export type WriteResult =

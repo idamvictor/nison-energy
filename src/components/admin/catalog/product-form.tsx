@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink, GripVertical, ImageOff, Plus, Star, X } from "lucide-react";
 import {
+  CIRCUIT_PROTECTOR_FILTERS,
+  type CircuitProtectorFilters,
+  cleanCircuitProtectorFilters,
+} from "@/lib/catalog/circuit-protector-filters";
+import {
   DndContext,
   type DragEndEvent,
   KeyboardSensor,
@@ -180,6 +185,15 @@ export function ProductForm({
   });
   const [warranty, setWarranty] = useState(row?.warranty ?? "");
   const [datasheets, setDatasheets] = useState<string[]>(row?.datasheets ?? []);
+  const [filters, setFilters] = useState<CircuitProtectorFilters>(() =>
+    cleanCircuitProtectorFilters(row?.filters),
+  );
+  const toggleFilter = (key: string, value: string) =>
+    setFilters((prev) => {
+      const current = prev[key] ?? [];
+      const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+      return cleanCircuitProtectorFilters({ ...prev, [key]: next });
+    });
 
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -235,6 +249,7 @@ export function ProductForm({
         })),
       warranty: warranty.trim() || null,
       datasheets,
+      ...(category === "CircuitProtection" ? { filters } : {}),
     };
   }
 
@@ -690,6 +705,36 @@ export function ProductForm({
               locked={pricingLocked}
             />
             {priceNote}
+          </CardContent>
+        </Card>
+      )}
+
+      {category === "CircuitProtection" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Filters</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <p className="text-xs text-muted-foreground sm:col-span-2">
+              Tick everything that applies — shoppers use these to filter the
+              Circuit Protectors page.
+            </p>
+            {CIRCUIT_PROTECTOR_FILTERS.map((def) => (
+              <fieldset key={def.key} className="flex flex-col gap-2">
+                <legend className="mb-1 text-sm font-medium">{def.title}</legend>
+                {(def.values as readonly string[]).map((value) => (
+                  <label key={value} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-primary"
+                      checked={(filters[def.key] ?? []).includes(value)}
+                      onChange={() => toggleFilter(def.key, value)}
+                    />
+                    {value}
+                  </label>
+                ))}
+              </fieldset>
+            ))}
           </CardContent>
         </Card>
       )}

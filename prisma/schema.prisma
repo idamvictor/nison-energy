@@ -188,6 +188,11 @@ model Product {
   phase         String?
   lengthOptions String[] @default([])
 
+  // Circuit protectors only: catalogue filter values by filter key, e.g.
+  // {"supply":["Single-Phase"],"features":["Surge Protection"]} — keys and
+  // values are defined in src/lib/catalog/circuit-protector-filters.ts.
+  filters Json?
+
   // detail-page content (all categories)
   tagline     String?
   gallery     String[] @default([])

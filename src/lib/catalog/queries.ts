@@ -241,6 +241,49 @@ export const getFeatured = cache(
     }),
 );
 
+/** One row per charger family (variantGroup, or the product itself) — the first seen wins. */
+function onePerFamily(rows: ProductRow[], limit: number): ProductRow[] {
+  const seen = new Set<string>();
+  const picked: ProductRow[] = [];
+  for (const row of rows) {
+    const family = row.variantGroup ?? row.id;
+    if (seen.has(family)) continue;
+    seen.add(family);
+    picked.push(row);
+    if (picked.length === limit) break;
+  }
+  return picked;
+}
+
+/** Home page: residential chargers that work with an energy tariff, one per family. */
+export const getTariffChargers = cache(async (tariff: string, limit = 6): Promise<Product[]> => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, category: "Residential", compatibleTariffs: { has: tariff } },
+    orderBy: catalogOrder,
+  });
+  return onePerFamily(rows, limit).map(dbToResidential);
+});
+
+/** Home page: residential chargers under `maxPrice` (inc VAT), cheapest first, one per family. */
+export const getBudgetChargers = cache(async (maxPrice = 400, limit = 6): Promise<Product[]> => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, category: "Residential", price: { lt: maxPrice } },
+    orderBy: [{ price: "asc" }, { name: "asc" }],
+  });
+  return onePerFamily(rows, limit).map(dbToResidential);
+});
+
+/** Home page "For Installers": featured circuit protection, then featured accessories. */
+export const getInstallerPicks = cache(async (limit = 6) => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, featured: true, category: { in: ["CircuitProtection", "Accessory"] } },
+    orderBy: catalogOrder,
+  });
+  const circuit = rows.filter((r) => r.category === "CircuitProtection").slice(0, limit);
+  const accessories = rows.filter((r) => r.category === "Accessory").slice(0, limit - circuit.length);
+  return { circuit: circuit.map(dbToCircuitProtector), accessories: accessories.map(dbToAccessory) };
+});
+
 export const getProductCounts = cache(
   unstable_cache(
     async () => {

@@ -4,8 +4,9 @@ import { HeroBanner } from "@/components/home/hero-banner";
 import { CategoryCards } from "@/components/home/category-cards";
 import { TrustedInstallers } from "@/components/home/trusted-installers";
 import { ProductGrid } from "@/components/home/product-grid";
-import { FeaturedCommercial } from "@/components/home/featured-commercial";
-import { FeaturedAccessories } from "@/components/home/featured-accessories";
+import { OctopusChargers } from "@/components/home/octopus-chargers";
+import { BudgetChargers } from "@/components/home/budget-chargers";
+import { InstallerPicks } from "@/components/home/installer-picks";
 import { LatestBlog } from "@/components/home/latest-blog";
 import { InstallationGallery } from "@/components/home/installation-gallery";
 import { AccreditationBadge } from "@/components/about/accreditation-badge";
@@ -33,8 +34,9 @@ export default function Home() {
           title="Our Best-Selling Chargers"
           subtitle="A curated selection of our best-selling chargers."
         />
-        <FeaturedCommercial />
-        <FeaturedAccessories />
+        <OctopusChargers />
+        <BudgetChargers />
+        <InstallerPicks />
         <CategoryCards />
         <TrustedInstallers />
         <LatestBlog limit={3} />

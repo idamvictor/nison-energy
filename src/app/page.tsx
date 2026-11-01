@@ -7,6 +7,7 @@ import { ProductGrid } from "@/components/home/product-grid";
 import { FeaturedCommercial } from "@/components/home/featured-commercial";
 import { FeaturedAccessories } from "@/components/home/featured-accessories";
 import { LatestBlog } from "@/components/home/latest-blog";
+import { InstallationGallery } from "@/components/home/installation-gallery";
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -36,6 +37,7 @@ export default function Home() {
         <CategoryCards />
         <TrustedInstallers />
         <LatestBlog limit={3} />
+        <InstallationGallery />
         <FaqSection
           categories={orderingDeliveryFaq}
           title="Ordering & Delivery"

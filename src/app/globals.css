@@ -255,6 +255,26 @@
   }
 }
 
+/* Home installation gallery — slow zoom on the active photo, and the active
+   dot's fill (its end advances the carousel). */
+@keyframes gallery-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes gallery-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* Trust bar on phones: one line, the three messages take turns (3s each).
    From sm up they sit side by side as before. */
 @keyframes trust-cycle {

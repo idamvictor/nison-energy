@@ -8,6 +8,7 @@ import { FeaturedCommercial } from "@/components/home/featured-commercial";
 import { FeaturedAccessories } from "@/components/home/featured-accessories";
 import { LatestBlog } from "@/components/home/latest-blog";
 import { InstallationGallery } from "@/components/home/installation-gallery";
+import { AccreditationBadge } from "@/components/about/accreditation-badge";
 import { FaqSection } from "@/components/home/faq-section";
 import { HelpSection } from "@/components/shared/help-section";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -44,6 +45,7 @@ export default function Home() {
           viewAllHref="/faq"
         />
         <HelpSection />
+        <AccreditationBadge />
       </main>
       <SiteFooter />
     </div>

@@ -9,7 +9,7 @@ export const installationProcessMarkdown = `## Ocunio EV Solutions — Nationwid
 
 Fast, compliant smart charger installations backed by certified OZEV, NICEIC and NAPIT engineers, with grant savings available on eligible installs.
 
-### Standard Installation Package — £540 (inc. VAT) per chargepoint
+### Standard Installation Package — £499 (inc. VAT) per chargepoint, was £540
 
 The package includes:
 
@@ -34,7 +34,7 @@ The standard package covers most typical home installs. If your setup needs more
 
 | Specification / Boundary | Unit Price (inc. VAT) |
 |---|---|
-| Includes 1m cable, 3m trunking, SPD, labour and 5-year NAPIT guarantee | £540.00 |
+| Includes 1m cable, 3m trunking, SPD, labour and 5-year NAPIT guarantee | £499.00 (was £540.00) |
 | Pre-installation home inspection by a certified electrician | £120.00 inc. VAT |
 | EV Ultra / armoured cable exceeding the 1m standard allowance | £15.00 / metre inc. VAT |
 | Extra trunking beyond the 3m allowance | £8.00 / metre — inc. VAT |

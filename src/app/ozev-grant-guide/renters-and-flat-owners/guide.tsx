@@ -36,7 +36,7 @@ import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 const scheme = getGrantScheme("renters-and-flat-owners")!;
 
 // Fixed standard installation rate — not user-editable.
-const LABOUR_COST = 450;
+const LABOUR_COST = 415.83;
 
 type Answers = { property: string | null; parking: string | null; ev: string | null };
 

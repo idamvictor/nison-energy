@@ -11,6 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { InstallFee } from "@/components/shared/sale-price";
 import { useCart, type CartItemOptions, type CartSnapshot } from "@/lib/cart/store";
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
@@ -70,7 +71,7 @@ export function QuickAddToCart({
       >
         {icon}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 p-1.5">
+      <DropdownMenuContent align="end" className="w-80 p-1.5">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Add to cart</DropdownMenuLabel>
           {installFee > 0 && (
@@ -78,8 +79,8 @@ export function QuickAddToCart({
               className="justify-between px-2.5 py-2"
               onClick={() => add(price + installFee, { ...cable, installation: "standard", installFee })}
             >
-              With installation
-              <span className="text-xs opacity-80">+{formatCurrency(installFee)}</span>
+              <span className="whitespace-nowrap">With installation</span>
+              <InstallFee fee={installFee} className="text-xs" />
             </DropdownMenuItem>
           )}
           <DropdownMenuItem

@@ -14,7 +14,7 @@ import { useWishlist } from "@/lib/wishlist/store";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/currency";
 import { saleOf } from "@/lib/catalog/sale";
-import { SaleBadge, WasPrice } from "@/components/shared/sale-price";
+import { InstallFee, SaleBadge, WasPrice } from "@/components/shared/sale-price";
 import { InstalmentsMessage } from "@/components/shared/instalments-message";
 
 const selectClass =
@@ -87,7 +87,7 @@ export function CommercialPurchasePanel({
 
   const installationLabel =
     installation === "standard"
-      ? `Standard installation (+${formatCurrency(installFee)})`
+      ? <span className="flex items-center gap-2">Standard installation <InstallFee fee={installFee} /></span>
       : installation === "none"
         ? "No installation (charger only)"
         : "Select";
@@ -194,7 +194,7 @@ export function CommercialPurchasePanel({
                   }}
                   className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
-                  Standard installation (+{formatCurrency(installFee)})
+                  <span className="flex items-center gap-2">Standard installation <InstallFee fee={installFee} /></span>
                   {installation === "standard" && <Check className="size-4 text-primary-ink" />}
                 </button>
                 <button

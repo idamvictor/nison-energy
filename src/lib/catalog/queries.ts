@@ -105,6 +105,7 @@ export function dbToAccessory(row: ProductRow): AccessoryProduct {
     compareAtPrice: toNumber(row.compareAtPrice),
     tags: row.tags,
     image: row.cardImage,
+    warranty: row.warranty ?? undefined,
     active: row.active,
     featured: row.featured,
   };
@@ -120,6 +121,7 @@ export function dbToSolar(row: ProductRow): SolarProduct {
     compareAtPrice: toNumber(row.compareAtPrice),
     tags: row.tags,
     image: row.cardImage,
+    warranty: row.warranty ?? undefined,
     active: row.active,
     featured: row.featured,
   };

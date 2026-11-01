@@ -139,6 +139,7 @@ export type AccessoryProduct = {
   compareAtPrice?: number;
   tags: string[];
   image: string;
+  warranty?: string;
   active?: boolean;
   featured?: boolean;
 };
@@ -155,6 +156,7 @@ export type SolarProduct = {
   compareAtPrice?: number;
   tags: string[];
   image: string;
+  warranty?: string;
   active?: boolean;
   featured?: boolean;
 };

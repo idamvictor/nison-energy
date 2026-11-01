@@ -21,6 +21,7 @@ import { formatCurrency } from "@/lib/currency";
 import { saleOf } from "@/lib/catalog/sale";
 import { SaleBadge, WasPrice } from "@/components/shared/sale-price";
 import { QuickAddToCart } from "@/components/shared/quick-add-to-cart";
+import { CardMeta } from "@/components/shared/card-meta";
 
 export function AccessoryProductCard({
   variants,
@@ -123,6 +124,7 @@ export function AccessoryProductCard({
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
+        <CardMeta warranty={product.warranty} tariffs={product.compatibleTariffs} />
         <p className="mt-auto text-2xl font-semibold text-foreground">
           {formatCurrency(product.price)}
           {sale && <WasPrice amount={sale.was} className="ml-2 text-base" />}

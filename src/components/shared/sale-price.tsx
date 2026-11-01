@@ -1,9 +1,9 @@
 import { formatCurrency } from "@/lib/currency";
-import { formatOff, type Sale } from "@/lib/catalog/sale";
+import { formatPercentOff, type Sale } from "@/lib/catalog/sale";
 import { installWas } from "@/lib/orders/installation-sale";
 import { cn } from "@/lib/utils";
 
-/** Red "£X off" pill (product image corner, price block). */
+/** Red "16% off" pill (product image corner, price block). */
 export function SaleBadge({ sale, className }: { sale: Sale; className?: string }) {
   return (
     <span
@@ -12,7 +12,7 @@ export function SaleBadge({ sale, className }: { sale: Sale; className?: string 
         className,
       )}
     >
-      {formatOff(sale.off)}
+      {formatPercentOff(sale.was, sale.was - sale.off)}
     </span>
   );
 }

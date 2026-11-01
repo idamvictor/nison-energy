@@ -81,7 +81,7 @@ export function AccessoryPurchasePanel({
         {sale && (
           <div className="mt-2 flex items-center gap-2">
             <WasPrice amount={total + saleOff} className="text-base" />
-            <SaleBadge sale={{ was: total + saleOff, off: saleOff }} />
+            <SaleBadge sale={sale} />
           </div>
         )}
       </div>

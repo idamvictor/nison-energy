@@ -43,7 +43,7 @@ import { ImageUploadField } from "@/components/shared/image-upload-field";
 import { DatasheetsField } from "@/components/admin/catalog/datasheet-upload-field";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth/client";
-import { formatOff } from "@/lib/catalog/sale";
+import { formatPercentOff } from "@/lib/catalog/sale";
 import { can } from "@/lib/auth/permissions";
 import {
   accessoryPhases,
@@ -987,7 +987,7 @@ function SaleFields({
           />
           <p className="text-xs font-normal text-muted-foreground">
             {salePrice.trim() !== "" && off > 0
-              ? `Shop shows the price slashed with "${formatOff(Math.round(off * 100) / 100)}".`
+              ? `Shop shows the price slashed with "${formatPercentOff(Number(normalPrice), Number(salePrice))}".`
               : "Sale price (inc. VAT) — must be lower than the price."}
           </p>
         </>

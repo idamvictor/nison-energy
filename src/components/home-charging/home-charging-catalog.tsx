@@ -28,6 +28,7 @@ import {
   groupedFacetCounts,
   groupedBucketCounts,
 } from "@/lib/catalog/variant-grouping";
+import { tariffOf, tariffSortOptions, type TariffSortValue } from "@/lib/catalog/tariff-options";
 
 const priceBuckets = [
   { key: "under-400", label: "Under £400", test: (p: number) => p < 400 },
@@ -42,7 +43,7 @@ const sortOptions = [
   { value: "price-desc", label: "Price: High to Low" },
 ] as const;
 
-type SortValue = (typeof sortOptions)[number]["value"];
+type SortValue = (typeof sortOptions)[number]["value"] | TariffSortValue;
 
 const filterKeys = [
   "brand",
@@ -100,8 +101,16 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
     [products]
   );
 
+  // Only offer a "Works with" tariff when at least one charger here has it.
+  const tariffChoices = useMemo(
+    () => tariffSortOptions.filter((o) => products.some((p) => p.compatibleTariffs?.includes(o.tariff))),
+    [products]
+  );
+
   const filtered = useMemo(() => {
+    const tariff = tariffOf(sort);
     let list = products.filter((p: Product) => {
+      if (tariff && !p.compatibleTariffs?.includes(tariff)) return false;
       if (brands.size > 0 && !brands.has(p.brand)) return false;
       if (connectionTypes.size > 0 && !connectionTypes.has(p.connectionType))
         return false;
@@ -263,6 +272,15 @@ export function HomeChargingCatalog({ products }: { products: Product[] }) {
                       {opt.label}
                     </option>
                   ))}
+                  {tariffChoices.length > 0 && (
+                    <optgroup label="Works with">
+                      {tariffChoices.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </select>
               </div>
             </div>

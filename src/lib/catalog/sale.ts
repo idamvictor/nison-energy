@@ -8,10 +8,8 @@ export function saleOf(price: number, compareAtPrice: number | null | undefined)
   return { was: compareAtPrice, off: Math.round((compareAtPrice - price) * 100) / 100 };
 }
 
-const whole = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
-const pence = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
-
-/** "£43 off" / "£43.50 off". */
-export function formatOff(amount: number): string {
-  return `${Number.isInteger(amount) ? whole.format(amount) : pence.format(amount)} off`;
+/** "16% off" — the saving as a whole percent of the "was" price (never below 1%). */
+export function formatPercentOff(was: number, price: number): string {
+  const percent = Math.max(1, Math.round(((was - price) / was) * 100));
+  return `${percent}% off`;
 }

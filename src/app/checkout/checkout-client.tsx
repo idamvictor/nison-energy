@@ -26,6 +26,7 @@ import {
   type PayDetails,
 } from "@/components/checkout/stripe-payment";
 import { SurveyNextStep } from "@/components/checkout/survey-next-step";
+import { AfterYouPay } from "@/components/checkout/after-you-pay";
 import { useCart, resolveCartItem, formatCartOptions } from "@/lib/cart/store";
 import { useCheckoutForm } from "@/lib/checkout/form-store";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -501,6 +502,7 @@ export function CheckoutClient({ extras, defaults }: { extras: CheckoutExtra[]; 
   // ── Final action (same checks for every method; PayPal/Klarna then redirect) ──
   const placeOrderArea = (
     <div className="flex flex-col gap-4">
+      {hasInstallation && <AfterYouPay />}
       {termsBox}
       {termsError && (
         <p role="alert" className="-mt-2 text-xs text-[#ffb4b4]">

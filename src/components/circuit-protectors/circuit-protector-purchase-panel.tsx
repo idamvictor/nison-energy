@@ -35,16 +35,17 @@ export function CircuitProtectorPurchasePanel({ product }: { product: CircuitPro
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border p-5">
       <div>
+        {/* Trade product: ex VAT first. */}
         <p className="text-3xl font-semibold text-foreground">
-          {formatCurrency(total)}
-          <span className="ml-1.5 text-sm font-normal text-muted-foreground">inc VAT</span>
+          {formatCurrency(totalExVat)}
+          <span className="ml-1.5 text-sm font-normal text-muted-foreground">ex VAT</span>
         </p>
         <p className="text-sm text-muted-foreground">
-          {formatCurrency(totalExVat)} <span>ex VAT</span>
+          {formatCurrency(total)} <span>inc VAT</span>
         </p>
         {sale && (
           <div className="mt-2 flex items-center gap-2">
-            <WasPrice amount={total + saleOff} className="text-base" />
+            <WasPrice amount={Math.round(((total + saleOff) / 1.2) * 100) / 100} className="text-base" />
             <SaleBadge sale={sale} />
           </div>
         )}

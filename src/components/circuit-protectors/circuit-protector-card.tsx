@@ -125,7 +125,7 @@ export function CircuitProtectorCard({
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
         <CardMeta warranty={product.warranty} />
-        <CardPrice price={product.price} sale={sale} />
+        <CardPrice price={product.price} sale={sale} trade />
       </CardContent>
       <CardFooter className="relative z-10 border-t-0 bg-transparent p-5 pt-3">
         <Button

@@ -2,20 +2,26 @@ import type { Sale } from "@/lib/catalog/sale";
 import { formatCurrency } from "@/lib/currency";
 import { WasPrice } from "@/components/shared/sale-price";
 
+const exVatOf = (incVat: number) => Math.round((incVat / 1.2) * 100) / 100;
+
 /**
- * A product card's price: the inc-VAT price large (with the slashed "was"
- * price while on sale) and the ex-VAT price smaller underneath, for trade
- * buyers. `mt-auto` keeps prices aligned along the bottom of a grid row.
+ * A product card's price, with the slashed "was" price while on sale.
+ * Consumer products lead with the inc-VAT price; `trade` products
+ * (accessories, circuit protection) lead with ex VAT, as trade buyers price
+ * jobs ex VAT. `mt-auto` keeps prices aligned along the bottom of a grid row.
  */
-export function CardPrice({ price, sale }: { price: number; sale?: Sale | null }) {
-  const exVat = Math.round((price / 1.2) * 100) / 100;
+export function CardPrice({ price, sale, trade = false }: { price: number; sale?: Sale | null; trade?: boolean }) {
+  const exVat = exVatOf(price);
   return (
     <div className="mt-auto">
       <p className="text-2xl font-semibold text-foreground">
-        {formatCurrency(price)}
-        {sale && <WasPrice amount={sale.was} className="ml-2 text-base" />}
+        {formatCurrency(trade ? exVat : price)}
+        {trade && <span className="ml-1.5 text-sm font-normal text-muted-foreground">Ex. VAT</span>}
+        {sale && <WasPrice amount={trade ? exVatOf(sale.was) : sale.was} className="ml-2 text-base" />}
       </p>
-      <p className="mt-0.5 text-sm text-muted-foreground">({formatCurrency(exVat)} Ex. VAT)</p>
+      <p className="mt-0.5 text-sm text-muted-foreground">
+        ({formatCurrency(trade ? price : exVat)} {trade ? "Inc. VAT" : "Ex. VAT"})
+      </p>
     </div>
   );
 }

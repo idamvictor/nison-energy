@@ -26,9 +26,12 @@ const MUTED = "#5b6b72";
 const PUBLIC_ORIGIN = SITE_URL.startsWith("http://localhost") ? "https://ocunioenergy.com" : SITE_URL;
 
 function emailLayout(opts: {
-  heading: string;
+  /** Omitted when the body opens with its own greeting (e.g. "Hi Sam,"). */
+  heading?: string;
   bodyHtml: string;
   cta?: { label: string; href: string };
+  /** false when the body ends with its own sign-off and company line. */
+  footer?: boolean;
 }): string {
   const cta = opts.cta
     ? `<tr><td style="padding:14px 0 4px">
@@ -47,17 +50,21 @@ function emailLayout(opts: {
           <img src="${PUBLIC_ORIGIN}/ocunio-energy-logo.png" alt="${COMPANY.tradingName}" height="36" style="display:block;height:36px;width:auto;border:0">
         </td></tr>
         <tr><td style="padding:28px">
-          <h1 style="margin:0 0 14px;font-size:20px;line-height:1.3;color:${INK}">${esc(opts.heading)}</h1>
+          ${opts.heading ? `<h1 style="margin:0 0 14px;font-size:20px;line-height:1.3;color:${INK}">${esc(opts.heading)}</h1>` : ""}
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.6;color:#33434a">
             ${opts.bodyHtml}
             ${cta}
           </table>
         </td></tr>
-        <tr><td style="padding:18px 28px;background:#f7fafb;border-top:1px solid #dbe5e9;font-size:12px;line-height:1.6;color:${MUTED}">
+        ${
+          opts.footer === false
+            ? ""
+            : `<tr><td style="padding:18px 28px;background:#f7fafb;border-top:1px solid #dbe5e9;font-size:12px;line-height:1.6;color:${MUTED}">
           Questions? Email <a href="mailto:${COMPANY.email}" style="color:${CYAN}">${COMPANY.email}</a> or
           <a href="${whatsappUrl()}" style="color:${CYAN}">message us on WhatsApp</a>.<br>
           ${COMPANY.legalName} trading as ${COMPANY.tradingName} · ${esc(COMPANY.registeredOffice)}
-        </td></tr>
+        </td></tr>`
+        }
       </table>
     </td></tr>
   </table>
@@ -328,65 +335,105 @@ function amountRow(label: string, value: string, strong = false): string {
   </tr>`;
 }
 
+/** A numbered step in the paid-order email: bold title line, then its sentence. */
+function step(title: string, body: string): string {
+  return row(`<strong style="color:${INK}">${title}</strong><br>${body}`);
+}
+
 /**
- * Paid online order: a branded invoice / receipt. The same invoice is attached
- * as a PDF (src/lib/pdf/order-invoice.ts).
+ * Paid online order confirmation, with the invoice as the order summary (the
+ * same invoice is attached as a PDF — src/lib/pdf/order-invoice.ts). Copy is
+ * the client's, word for word: one version for orders with installation, one
+ * for everything else (cables, circuit protection, etc.). It carries its own
+ * sign-off and company line, so the shared footer is left off.
  */
 export function customerInvoiceEmail(order: OrderEmailInput, invoice: InvoiceEmailInput): EmailContent {
   const needsSurvey = includesInstallation(order.items);
   const fee = order.deliveryFee ?? 0;
   const address = (lines: string[]) => lines.map(esc).join("<br>");
+  const whatsapp = "https://wa.me/447525567054";
+
+  const orderSummary = [
+    callout(
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a">
+         <tr><td style="padding:2px 0"><strong style="color:${INK}">Invoice</strong></td>
+             <td align="right" style="padding:2px 0">${esc(invoice.number)}</td></tr>
+         <tr><td style="padding:2px 0"><strong style="color:${INK}">Date</strong></td>
+             <td align="right" style="padding:2px 0">${invoiceDate(invoice.date)}</td></tr>
+         <tr><td style="padding:2px 0"><strong style="color:${INK}">Paid by</strong></td>
+             <td align="right" style="padding:2px 0">${esc(invoice.paymentMethod)}</td></tr>
+       </table>`,
+    ),
+    row(itemsTable(order.items)),
+    row(
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">
+         ${amountRow(deliveryLabelFor(needsPallet(order.items)), fee > 0 ? formatCurrency(fee) : "FREE")}
+         ${amountRow("Subtotal (ex VAT)", formatCurrency(invoice.net))}
+         ${amountRow("VAT @ 20%", formatCurrency(invoice.vat))}
+         ${amountRow("Total paid (inc VAT)", formatCurrency(invoice.gross), true)}
+       </table>`,
+    ),
+    row(
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a;margin-top:8px">
+         <tr>
+           <td valign="top" width="50%" style="padding:4px 8px 4px 0"><strong style="color:${INK}">Billing address</strong><br>${address(invoice.billTo)}</td>
+           <td valign="top" width="50%" style="padding:4px 0 4px 8px"><strong style="color:${INK}">${
+             needsSurvey ? "Delivery &amp; installation" : "Delivery address"
+           }</strong><br>${address(invoice.deliverTo)}</td>
+         </tr>
+       </table>`,
+    ),
+  ].join("");
+
+  const nextSteps = needsSurvey
+    ? [
+        row(`<strong style="color:${INK}">Here’s what happens from here:</strong>`),
+        step(
+          "1. Check your inbox.",
+          "Your order confirmation and receipt are on their way. If you can’t see them, check your spam folder.",
+        ),
+        step(
+          "2. We’ll arrange your survey.",
+          `Use ${link(OPENQUOTE_SURVEY_URL, "Open Quote")}, a virtual survey tool, to begin your home survey. Our engineer will review your submissions and confirm the best position for your charger and check whether any extra work is needed, so there are no surprises on the day.`,
+        ),
+        step(
+          "3. Installation day",
+          "We’ll book your installation within two weeks of the survey. Your engineer will fit and test the charger, set up the app, and show you how everything works.",
+        ),
+        step("4. Ongoing support", "After installation, our aftercare team is here to help with any questions."),
+        row(
+          `<em>Questions in the meantime?</em> ${link(whatsappUrl(), "Chat with us on WhatsApp")} · ${link(`mailto:${COMPANY.email}`, COMPANY.email)}`,
+        ),
+      ]
+    : [
+        row(`<strong style="color:${INK}">What happens next?</strong>`),
+        step("1. Delivery", "Your order will arrive by free tracked delivery within 1–3 days."),
+        step(
+          "2. Safety information",
+          "Chargers and circuit protection must be installed by a qualified electrician in line with BS 7671 wiring regulations.",
+        ),
+        step(
+          "3. Support",
+          `Questions about your product? Reply to this email or chat with us on WhatsApp: ${link(whatsapp, whatsapp)}`,
+        ),
+      ];
+
   return {
     subject: `Your invoice ${invoice.number} — order ${order.reference} (paid)`,
     html: emailLayout({
-      heading: `Thanks, ${esc(order.firstName)} — payment received`,
+      footer: false,
       bodyHtml: [
+        row(`Hi ${esc(order.firstName)},`),
+        row("Thank you for your order. We've received your payment, and your order is confirmed."),
+        row(`Order number: <strong>${esc(order.reference)}</strong>`),
+        orderSummary,
+        ...nextSteps,
+        row(`Thanks for choosing ${COMPANY.tradingName}.`),
+        row(`The ${COMPANY.tradingName} Team<br>${link(`mailto:${COMPANY.email}`, COMPANY.email)} | ${link("https://www.ocunioenergy.com", "www.ocunioenergy.com")}`),
         row(
-          `Your payment has gone through and your order is confirmed. Your invoice is below and attached
-           as a PDF for your records.`,
-        ),
-        callout(
-          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a">
-             <tr><td style="padding:2px 0"><strong style="color:${INK}">Invoice</strong></td>
-                 <td align="right" style="padding:2px 0">${esc(invoice.number)}</td></tr>
-             <tr><td style="padding:2px 0"><strong style="color:${INK}">Order</strong></td>
-                 <td align="right" style="padding:2px 0">${esc(order.reference)}</td></tr>
-             <tr><td style="padding:2px 0"><strong style="color:${INK}">Date</strong></td>
-                 <td align="right" style="padding:2px 0">${invoiceDate(invoice.date)}</td></tr>
-             <tr><td style="padding:2px 0"><strong style="color:${INK}">Paid by</strong></td>
-                 <td align="right" style="padding:2px 0">${esc(invoice.paymentMethod)}</td></tr>
-           </table>`,
-        ),
-        row(itemsTable(order.items)),
-        row(
-          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">
-             ${amountRow(deliveryLabelFor(needsPallet(order.items)), fee > 0 ? formatCurrency(fee) : "FREE")}
-             ${amountRow("Subtotal (ex VAT)", formatCurrency(invoice.net))}
-             ${amountRow("VAT @ 20%", formatCurrency(invoice.vat))}
-             ${amountRow("Total paid (inc VAT)", formatCurrency(invoice.gross), true)}
-           </table>`,
-        ),
-        row(
-          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#33434a;margin-top:8px">
-             <tr>
-               <td valign="top" width="50%" style="padding:4px 8px 4px 0"><strong style="color:${INK}">Billing address</strong><br>${address(invoice.billTo)}</td>
-               <td valign="top" width="50%" style="padding:4px 0 4px 8px"><strong style="color:${INK}">${
-                 needsSurvey ? "Delivery &amp; installation" : "Delivery address"
-               }</strong><br>${address(invoice.deliverTo)}</td>
-             </tr>
-           </table>`,
-        ),
-        row(
-          `A member of the team will be in touch to
-           ${needsSurvey ? "book your installation once your survey is in" : "arrange delivery"}.`,
-        ),
-        needsSurvey ? surveyCallout() : "",
-        row(
-          `<span style="font-size:12px;color:${MUTED}">All prices include VAT at 20%.
-           ${COMPANY.legalName} · VAT no. ${VAT_NUMBER} · Company no. ${COMPANY.companyNumber}</span>`,
+          `<span style="font-size:12px;color:${MUTED}">${COMPANY.tradingName} is a trading name of ${COMPANY.legalName}. Company Reg. No. ${COMPANY.companyNumber} | VAT No. ${VAT_NUMBER}</span>`,
         ),
       ].join(""),
-      cta: ordersCta(order),
     }),
   };
 }

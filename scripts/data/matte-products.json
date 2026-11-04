@@ -1,0 +1,137 @@
+{
+  "brand": "Matt:e",
+  "products": [
+    {
+      "name": "Single Phase Monitoring and Protection Device 32A RCBO for connection (Black)",
+      "sku": "SP-EVCP-R",
+      "exVat": 199.34,
+      "incVat": 239.21,
+      "colour": "Black",
+      "description": [
+        "The Matt:e SP-EVCP-R Single-Phase EV Connection Centre is a dedicated, fully compliant monitoring and protection unit engineered to safely link a single 32A electric vehicle charge point directly to an existing domestic PME earthing system. Featuring a built-in 32A double-pole Type A Curve C RCBO, the unit provides comprehensive circuit protection against overloads, short circuits, and residual current faults, delivering complete safety and compliance directly out of the box without requiring separate upstream RCD devices.",
+        "Powered by proprietary matt:e detection technology, the unit continuously monitors the incoming supply voltage and automatically isolates all poles—including the circuit protective conductor (CPC)—if an open PEN conductor fault occurs. This active protection facilitates strict compliance with BS 7671 wiring regulations while completely eliminating the need for independent earth electrodes or ground measuring rods. Installers save substantial labour time and project costs by avoiding disruptive groundwork and completely eliminating the hazardous risk of striking buried underground utilities.",
+        "Designed and built in the UK for domestic durability, the SP-EVCP-R is housed in a robust, powder-coated mild steel IP2X enclosure featuring a straightforward wire-in, wire-out terminal layout for fast and hassle-free commissioning. The compact unit accommodates generous cable entries and terminal capacities, supports optional CT-driven load curtailment to protect household supply limits, and comes backed by a 3-year manufacturer parts warranty for long-term reliability and peace of mind."
+      ],
+      "specs": [
+        {
+          "label": "Product Type",
+          "value": "Single-phase EV charge point connection unit with built-in PEN fault protection"
+        },
+        {
+          "label": "Load",
+          "value": "Suitable for 1 x 32A single-phase EV charge point"
+        },
+        {
+          "label": "Rated Current",
+          "value": "32A"
+        },
+        {
+          "label": "Supply",
+          "value": "230V, 50Hz, single-phase"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "Built-in double-pole Type A, Curve C, 32A RCBO (overload, short-circuit and residual current protection)"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Monitoring device disconnects all poles, including CPC, on a PEN or PME fault"
+        },
+        {
+          "label": "Earthing",
+          "value": "Connects to existing PME (TN-C-S) earthing, no earth electrodes required"
+        },
+        {
+          "label": "Terminal Capacity",
+          "value": "Input L/N 2.5–25mm²; earth 2.5–16mm²; output L/N 2.5–10mm²"
+        },
+        {
+          "label": "Connection",
+          "value": "Simple wire-in wire-out, suitable for direct connection to supply tails"
+        },
+        {
+          "label": "Installation & Compliance",
+          "value": "No groundworks, no risk of striking buried services; BS 7671:2018 Amendment 1 (2020), Regulation 722.411.4.1(iv); designed and built in the UK"
+        },
+        {
+          "label": "Enclosure & Dimensions",
+          "value": "Powder-coated mild steel, IP2X (indoor use); 169 x 182 x 111mm (H x W x D), approx. 3kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years (parts)"
+        }
+      ],
+      "gallery": [
+        "/api/media/uploads/3d7929eb-fb77-4e7e-944d-7d9c5840bd46.jpg"
+      ],
+      "featured": false
+    },
+    {
+      "name": "Matt:e SP-EVCP-T Single Phase 32A EV Voltage Monitor Protection Unit with Terminals",
+      "sku": "SP-EVCP-T",
+      "exVat": 187.97,
+      "incVat": 225.56,
+      "colour": "",
+      "description": [
+        "The Matt:e SP-EVCP-T Single-Phase EV Connection Centre is a dedicated, fully compliant monitoring and protection unit engineered to safely connect a single 32A electric vehicle charge point directly to an existing domestic PME earthing system. Powered by proprietary built-in matt:e technology, the unit continuously monitors the incoming supply voltage. It automatically disconnects all poles—including the circuit protective conductor (CPC)—if an open PEN conductor fault occurs, protecting both users and connected equipment from hazardous touch voltages.",
+        "Engineered to streamline EV charger installations and comply with BS 7671 Section 722 regulations, this unit removes the need for separate earth electrodes, ground measuring rods, or disruptive trenching. By eliminating the requirement to install earth rods into the ground, electricians significantly reduce labour time, project costs, and the serious safety risk of striking buried underground utility services during installation.",
+        "Designed and built in the UK for long-term domestic reliability, the SP-EVCP-T is housed in a robust, powder-coated mild steel IP2X enclosure featuring a simplified wire-in, wire-out terminal block configuration for clean, straightforward connection. The compact unit accommodates generous cable entries, supports optional CT-driven load curtailment to automatically isolate the charge point if total household electrical consumption exceeds capacity, and is backed by a standard 3-year manufacturer parts warranty for dependable peace of mind."
+      ],
+      "specs": [
+        {
+          "label": "Product Type",
+          "value": "Single-phase EV charge point connection unit with built-in PEN fault protection (monitoring and protection device with terminals)"
+        },
+        {
+          "label": "Load",
+          "value": "Suitable for 1 x 32A single-phase EV charge point"
+        },
+        {
+          "label": "Rated Current",
+          "value": "32A maximum load"
+        },
+        {
+          "label": "Supply",
+          "value": "230V nominal, 50Hz, single-phase"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "Terminals only, no RCBO included (RCBO must be provided separately)"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Monitoring device disconnects all poles, including CPC, on a fault"
+        },
+        {
+          "label": "Earthing",
+          "value": "Connects to the existing PME earthing facility; no earth electrodes required"
+        },
+        {
+          "label": "Terminal Capacity",
+          "value": "6.0 mm²"
+        },
+        {
+          "label": "Connection",
+          "value": "Simple wire-in, wire-out, cable entry at the bottom (2 x 20 mm)"
+        },
+        {
+          "label": "Installation & Compliance",
+          "value": "No groundworks, no risk of striking buried services; BS 7671:2018 Amendment 1 (2020), Regulation 722.411.4.1(iv); designed and built in the UK"
+        },
+        {
+          "label": "Enclosure & Dimensions",
+          "value": "Powder-coated mild steel, IP2X (indoor use); 169 x 182 x 111 mm (H x W x D), approx. 3 kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years (parts)"
+        }
+      ],
+      "gallery": [
+        "/api/media/uploads/90de3eb0-6ab4-45ca-9a16-a8a07b4e363e.jpg"
+      ],
+      "featured": true
+    }
+  ]
+}

@@ -20,7 +20,14 @@ const sortOptions = [
 
 type SortValue = (typeof sortOptions)[number]["value"];
 
-const filterKeys = CIRCUIT_PROTECTOR_FILTERS.map((f) => f.key);
+// Brand comes from the product itself (like the other catalogues); the rest
+// from Product.filters.
+const filterKeys = ["brand", ...CIRCUIT_PROTECTOR_FILTERS.map((f) => f.key)];
+
+/** A product's values for one filter key. */
+function valuesOf(product: CircuitProtectorProduct, key: string): string[] {
+  return key === "brand" ? [product.brand] : (product.filters[key] ?? []);
+}
 
 /**
  * Every filter's ticked values, read from / written to the URL (one query
@@ -78,7 +85,7 @@ function useCircuitFilterParams(): [
 function matches(product: CircuitProtectorProduct, selected: Record<string, Set<string>>, skipKey?: string) {
   return filterKeys.every((key) => {
     if (key === skipKey || selected[key].size === 0) return true;
-    return (product.filters[key] ?? []).some((v) => selected[key].has(v));
+    return valuesOf(product, key).some((v) => selected[key].has(v));
   });
 }
 
@@ -100,19 +107,22 @@ export function CircuitProtectorCatalog({ products }: { products: CircuitProtect
   // filters' ticks, so shoppers can see what's left before they click.
   const groups = useMemo(
     () =>
-      CIRCUIT_PROTECTOR_FILTERS.map((def) => {
+      [
+        { key: "brand", title: "Brand", values: [...new Set(products.map((p) => p.brand))].sort((a, b) => a.localeCompare(b)) },
+        ...CIRCUIT_PROTECTOR_FILTERS,
+      ].map((def) => {
         const pool = products.filter((p) => matches(p, selected, def.key));
         const items = (def.values as readonly string[])
           .map((value) => ({
             value,
             label: value,
-            count: pool.filter((p) => (p.filters[def.key] ?? []).includes(value)).length,
+            count: pool.filter((p) => valuesOf(p, def.key).includes(value)).length,
           }))
           // Hide values no product has (unless ticked), so nothing shows 0 forever.
           .filter(
             (item) =>
               selected[def.key].has(item.value) ||
-              products.some((p) => (p.filters[def.key] ?? []).includes(item.value)),
+              products.some((p) => valuesOf(p, def.key).includes(item.value)),
           );
         return { def, items };
       }).filter((g) => g.items.length > 0),

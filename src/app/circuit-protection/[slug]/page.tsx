@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Clock } from "lucide-react";
 
 import { getCircuitProtectorCatalog, getProductRow, dbToCircuitProtector, dbToDetail } from "@/lib/catalog/queries";
 import { getDatasheetNames, warmDatasheet } from "@/lib/media/queries";
 import { adminRoute } from "@/lib/catalog/types";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
 import { deliveryPolicyMarkdown, returnsPolicyMarkdown } from "@/lib/content/legal";
+import { brandDispatchNote } from "@/lib/content/brand-notes";
 import { SiteHeader } from "@/components/shared/site-header";
 import { TrustBar } from "@/components/shared/trust-bar";
 import { SiteFooter } from "@/components/shared/site-footer";
@@ -102,6 +103,12 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
                 </div>
                 {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
                 <FreeDeliveryBadge warranty={detail.warranty} />
+                {brandDispatchNote[product.brand] && (
+                  <p className="mt-2.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Clock className="size-4 shrink-0" aria-hidden />
+                    {brandDispatchNote[product.brand]}
+                  </p>
+                )}
               </div>
 
               {product.tags.length > 0 && (

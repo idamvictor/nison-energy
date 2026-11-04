@@ -15,6 +15,7 @@ import {
   Zap,
   Sun,
   ShieldCheck,
+  Plug,
   PoundSterling,
 } from "lucide-react";
 
@@ -44,6 +45,7 @@ const catalogLinks = [
   { href: "/admin/accessories", label: "Accessories", icon: Cable },
   { href: "/admin/solar-panels", label: "Solar Panels", icon: Sun },
   { href: "/admin/circuit-protection", label: "Circuit Protection", icon: ShieldCheck },
+  { href: "/admin/cables", label: "Cables", icon: Plug },
   { href: "/admin/prices", label: "Price list", icon: PoundSterling, permission: "prices.manage" },
 ] as { href: string; label: string; icon: typeof Zap; permission?: Permission }[];
 

@@ -3,7 +3,7 @@
 // maps a row to the view types below.
 
 // ─── Category / routing ────────────────────────────────────────────────────
-export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar" | "CircuitProtection";
+export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar" | "CircuitProtection" | "Cable";
 
 export const productCategories: ProductCategory[] = [
   "Residential",
@@ -11,6 +11,7 @@ export const productCategories: ProductCategory[] = [
   "Accessory",
   "Solar",
   "CircuitProtection",
+  "Cable",
 ];
 
 // The storefront route + cart-category string for each catalog category.
@@ -20,6 +21,7 @@ export const categoryRoute: Record<ProductCategory, string> = {
   Accessory: "/accessories",
   Solar: "/solar-panels",
   CircuitProtection: "/circuit-protection",
+  Cable: "/cables",
 };
 
 // The admin edit route for each catalog category — same `[slug]` param as
@@ -30,6 +32,7 @@ export const adminRoute: Record<ProductCategory, string> = {
   Accessory: "/admin/accessories",
   Solar: "/admin/solar-panels",
   CircuitProtection: "/admin/circuit-protection",
+  Cable: "/admin/cables",
 };
 
 /** Which images the admin media library shows: one product section, or blog covers. */
@@ -41,6 +44,7 @@ export const mediaScopeLabel: Record<MediaScope, string> = {
   Accessory: "Accessories",
   Solar: "Solar Panels",
   CircuitProtection: "Circuit Protection",
+  Cable: "Cables",
   blog: "Blog",
 };
 
@@ -48,7 +52,7 @@ export function isMediaScope(value: string | null): value is MediaScope {
   return value === "blog" || productCategories.includes(value as ProductCategory);
 }
 
-export type CartCategory = "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors";
+export type CartCategory = "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors" | "cables";
 
 export const categoryToCart: Record<ProductCategory, CartCategory> = {
   Residential: "residential",
@@ -56,6 +60,7 @@ export const categoryToCart: Record<ProductCategory, CartCategory> = {
   Accessory: "accessories",
   Solar: "solar",
   CircuitProtection: "circuit-protectors",
+  Cable: "cables",
 };
 
 const cartRoute: Record<CartCategory, string> = {
@@ -64,6 +69,7 @@ const cartRoute: Record<CartCategory, string> = {
   accessories: "/accessories",
   solar: "/solar-panels",
   "circuit-protectors": "/circuit-protection",
+  cables: "/cables",
 };
 
 export function cartItemHref(category: CartCategory, id: string): string {
@@ -167,6 +173,31 @@ export type SolarProduct = {
 // filter values (see src/lib/catalog/circuit-protector-filters.ts).
 export type CircuitProtectorProduct = SolarProduct & { filters: Record<string, string[]> };
 
+// ─── Cables ────────────────────────────────────────────────────────────────
+// Meter tails and EV Ultra install kits (own "Cables" menu tab). A simple
+// price-only product like circuit protection. Meter tail packs share a
+// variantGroup; each pack is its own row with a length + tails (core) size.
+export const cableTypes = ["Meter Tails", "EV Ultra Install Kit"] as const;
+export type CableType = (typeof cableTypes)[number];
+
+/** URL value for each type (/cables?type=…). */
+export const cableTypeSlug: Record<CableType, string> = {
+  "Meter Tails": "meter-tails",
+  "EV Ultra Install Kit": "ev-ultra-install-kit",
+};
+
+export type CableProduct = SolarProduct & {
+  type: CableType;
+  /** Family title shown on the card / page (meter tails), else the name. */
+  family: string;
+  variantGroup?: string;
+  /** Meter tails: "1m", "2m"… */
+  length?: string;
+  /** Meter tails: "2 × 16mm²" / "2 × 25mm²". */
+  core?: string;
+  sku?: string;
+};
+
 // ─── Detail-page content ───────────────────────────────────────────────────
 /** One row of the spec table; `section` groups rows under a heading (e.g. "Panel"). */
 export type Spec = { label: string; value: string; section?: string };
@@ -216,7 +247,7 @@ export type ProductInput = {
   specs: Spec[];
   warranty: string | null;
   datasheets: string[];
-  /** Circuit protectors only: catalogue filter values by filter key. */
+  /** Circuit protectors: catalogue filter values by filter key. Cables: { type, length, core }. */
   filters?: Record<string, string[]>;
 };
 

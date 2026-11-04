@@ -59,8 +59,16 @@ const navLinks: NavLink[] = [
     href: "/accessories",
     label: "Accessories",
     children: [
-      { href: "/accessories", label: "Cables" },
+      { href: "/accessories", label: "Charging Cables" },
       { href: "/circuit-protection", label: "Circuit Protection" },
+    ],
+  },
+  {
+    href: "/cables",
+    label: "Cables",
+    children: [
+      { href: "/cables?type=meter-tails", label: "Meter Tails" },
+      { href: "/cables?type=ev-ultra-install-kit", label: "EV Ultra Install Kit" },
     ],
   },
   { href: "/solar-panels", label: "Solar Panels" },
@@ -78,8 +86,11 @@ function initialsOf(name?: string | null, email?: string | null) {
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const isActive = (href: string) =>
-    href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
+  // Query strings (e.g. /cables?type=…) don't affect which tab is active.
+  const isActive = (link: string) => {
+    const href = link.split("?")[0];
+    return href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
+  };
   // A dropdown item is active when any of its pages is.
   const isLinkActive = (link: NavLink) =>
     link.children ? link.children.some((child) => isActive(child.href)) : isActive(link.href);
@@ -120,7 +131,7 @@ export function SiteHeader() {
         className="h-0.75 w-full bg-linear-to-r from-primary via-primary to-accent"
       />
       <div className="mx-auto flex h-17 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
+        <Link href="/" className="flex shrink-0 items-center transition-opacity hover:opacity-80">
           <Image
             src="/ocunio-energy-logo.png"
             alt="Ocunio Energy"
@@ -131,7 +142,9 @@ export function SiteHeader() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 xl:flex">
+        {/* Eight items incl. two dropdowns: from 1360px they fit on one line beside
+            the logo and actions; narrower screens use the menu button. */}
+        <nav className="hidden items-center gap-4 min-[1360px]:flex">
           {navLinks.map((link) => {
             const active = isLinkActive(link);
             if (link.children) {
@@ -271,7 +284,7 @@ export function SiteHeader() {
           <Sheet>
             <SheetTrigger
               render={
-                <Button variant="outline" size="icon" className="xl:hidden" />
+                <Button variant="outline" size="icon" className="min-[1360px]:hidden" />
               }
             >
               <Menu className="size-5" />

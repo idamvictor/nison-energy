@@ -10,6 +10,7 @@ import {
   Zap,
   Sun,
   ShieldCheck,
+  Plug,
 } from "lucide-react";
 
 import { StatCard } from "@/components/admin/dashboard/stat-card";
@@ -182,6 +183,14 @@ export default async function AdminDashboardPage({
           icon={ShieldCheck}
           tone="primary"
           href="/admin/circuit-protection"
+        />
+        <StatCard
+          label="Cables"
+          value={productCounts.cable}
+          subtext="Meter tails, install kits"
+          icon={Plug}
+          tone="primary"
+          href="/admin/cables"
         />
       </div>
     </div>

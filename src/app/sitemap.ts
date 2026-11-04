@@ -8,6 +8,7 @@ import {
   getAccessoryCatalog,
   getSolarCatalog,
   getCircuitProtectorCatalog,
+  getCableCatalog,
 } from "@/lib/catalog/queries";
 import { grantSchemes } from "@/lib/content/grant-schemes";
 
@@ -22,6 +23,7 @@ const STATIC_PATHS = [
   "/accessories",
   "/solar-panels",
   "/circuit-protection",
+  "/cables",
   "/blog",
   "/ozev-grants",
   "/ozev-grant-guide",
@@ -39,13 +41,14 @@ const STATIC_PATHS = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, residential, commercial, accessories, solar, circuitProtectors] = await Promise.all([
+  const [posts, residential, commercial, accessories, solar, circuitProtectors, cables] = await Promise.all([
     getPublishedPosts(),
     getResidentialCatalog(),
     getCommercialCatalog(),
     getAccessoryCatalog(),
     getSolarCatalog(),
     getCircuitProtectorCatalog(),
+    getCableCatalog(),
   ]);
 
   const now = new Date();
@@ -71,6 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...accessories.map((p) => `/accessories/${p.id}`),
     ...solar.map((p) => `/solar-panels/${p.id}`),
     ...circuitProtectors.map((p) => `/circuit-protection/${p.id}`),
+    ...cables.map((p) => `/cables/${p.id}`),
   ].map((path) => ({ url: `${SITE_URL}${path}`, lastModified: now }));
 
   return [...staticEntries, ...grantEntries, ...postEntries, ...productEntries];

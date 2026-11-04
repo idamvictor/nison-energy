@@ -9,6 +9,7 @@ import {
   type CircuitProtectorFilters,
   cleanCircuitProtectorFilters,
 } from "@/lib/catalog/circuit-protector-filters";
+import { cableAttrsToFilters, readCableAttrs, type CableAttrs } from "@/lib/catalog/cable-attrs";
 import {
   DndContext,
   type DragEndEvent,
@@ -50,6 +51,8 @@ import {
   accessoryPhases,
   accessoryStyles,
   adminRoute,
+  cableTypes,
+  type CableType,
   categoryRoute,
   connectionTypes,
   type ProductCategory,
@@ -121,7 +124,7 @@ export function ProductForm({
   const isCharger = category === "Residential" || category === "Commercial";
   // Solar kits and circuit protectors: just a price (no install fee, cable
   // options or energy-tariff badges).
-  const isSimple = category === "Solar" || category === "CircuitProtection";
+  const isSimple = category === "Solar" || category === "CircuitProtection" || category === "Cable";
 
   const [slug, setSlug] = useState(row?.id ?? "");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -189,6 +192,9 @@ export function ProductForm({
   const [filters, setFilters] = useState<CircuitProtectorFilters>(() =>
     cleanCircuitProtectorFilters(row?.filters),
   );
+  // Cables: type / pack size (stored in filters) and the family title (tagline).
+  const [cableAttrs, setCableAttrs] = useState<CableAttrs>(() => readCableAttrs(row?.filters));
+  const [familyTitle, setFamilyTitle] = useState(category === "Cable" ? (row?.tagline ?? "") : "");
   const toggleFilter = (key: string, value: string) =>
     setFilters((prev) => {
       const current = prev[key] ?? [];
@@ -236,7 +242,7 @@ export function ProductForm({
       style: category === "Accessory" ? style || null : null,
       phase: category === "Accessory" ? phase || null : null,
       lengthOptions: category === "Accessory" ? fromCsv(lengthOptions) : [],
-      tagline: null,
+      tagline: category === "Cable" ? familyTitle.trim() || null : null,
       gallery: galleryImages,
       description: fromParas(description),
       features: fromLines(features),
@@ -251,6 +257,7 @@ export function ProductForm({
       warranty: warranty.trim() || null,
       datasheets,
       ...(category === "CircuitProtection" ? { filters } : {}),
+      ...(category === "Cable" ? { filters: cableAttrsToFilters(cableAttrs) } : {}),
     };
   }
 
@@ -706,6 +713,47 @@ export function ProductForm({
               locked={pricingLocked}
             />
             {priceNote}
+          </CardContent>
+        </Card>
+      )}
+
+      {category === "Cable" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Cable type &amp; pack size</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Type (Cables menu)">
+              <select
+                value={cableAttrs.type}
+                onChange={(e) => setCableAttrs((a) => ({ ...a, type: e.target.value as CableType }))}
+                className="h-9 w-full rounded-lg border border-input bg-background px-2.5 text-sm"
+              >
+                {cableTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Family title (shown on the card when sizes are grouped)">
+              <Input value={familyTitle} onChange={(e) => setFamilyTitle(e.target.value)} placeholder="e.g. Doncaster Cables Meter Tail Pack …" />
+            </Field>
+            <Field label="Length (meter tails, e.g. 1m)">
+              <Input
+                value={cableAttrs.length ?? ""}
+                onChange={(e) => setCableAttrs((a) => ({ ...a, length: e.target.value || undefined }))}
+              />
+            </Field>
+            <Field label="Tails size (meter tails, e.g. 2 × 16mm²)">
+              <Input
+                value={cableAttrs.core ?? ""}
+                onChange={(e) => setCableAttrs((a) => ({ ...a, core: e.target.value || undefined }))}
+              />
+            </Field>
+            <p className="text-xs text-muted-foreground sm:col-span-2">
+              Meter tail packs sharing a Variant group show as one card, with a length / tails picker and a price grid.
+            </p>
           </CardContent>
         </Card>
       )}

@@ -15,6 +15,7 @@ function pageTitle(pathname: string): string {
   if (pathname.startsWith("/admin/accessories")) return "Accessories";
   if (pathname.startsWith("/admin/solar-panels")) return "Solar Panels";
   if (pathname.startsWith("/admin/circuit-protection")) return "Circuit Protection";
+  if (pathname.startsWith("/admin/cables")) return "Cables";
   if (pathname.startsWith("/admin/prices")) return "Price list";
   if (pathname.startsWith("/admin/blog")) return "Blog";
   if (pathname.startsWith("/admin/leads")) return "Leads";

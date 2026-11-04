@@ -217,6 +217,7 @@ enum ProductCategory {
   Accessory
   Solar
   CircuitProtection
+  Cable
 }
 
 /// A blog article. `id` is the URL slug (caller-supplied, like `Product`).

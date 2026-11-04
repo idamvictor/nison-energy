@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/lib/wishlist/store";
 import type { Product } from "@/lib/catalog/types";
 import type { CommercialProduct } from "@/lib/catalog/types";
-import type { AccessoryProduct, CircuitProtectorProduct, SolarProduct } from "@/lib/catalog/types";
+import type { AccessoryProduct, CableProduct, CircuitProtectorProduct, SolarProduct } from "@/lib/catalog/types";
 import { ProductCard } from "@/components/shared/product-card";
 import { CommercialProductCard } from "@/components/workplace-charging/commercial-product-card";
 import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
 import { SolarProductCard } from "@/components/solar/solar-product-card";
 import { CircuitProtectorCard } from "@/components/circuit-protectors/circuit-protector-card";
+import { CableCard } from "@/components/cables/cable-card";
 
 export function AccountWishlist({
   residential,
@@ -20,12 +21,14 @@ export function AccountWishlist({
   accessories,
   solar,
   circuitProtectors,
+  cables,
 }: {
   residential: Product[];
   commercial: CommercialProduct[];
   accessories: AccessoryProduct[];
   solar: SolarProduct[];
   circuitProtectors: CircuitProtectorProduct[];
+  cables: CableProduct[];
 }) {
   const { items } = useWishlist();
 
@@ -35,6 +38,7 @@ export function AccountWishlist({
   const savedAccessories = accessories.filter((p) => savedIds.has(p.id));
   const savedSolar = solar.filter((p) => savedIds.has(p.id));
   const savedCircuitProtectors = circuitProtectors.filter((p) => savedIds.has(p.id));
+  const savedCables = cables.filter((p) => savedIds.has(p.id));
 
   if (items.length === 0) {
     return (
@@ -90,6 +94,13 @@ export function AccountWishlist({
         <WishlistSection title="Circuit Protection">
           {savedCircuitProtectors.map((product) => (
             <CircuitProtectorCard key={product.id} variants={[product]} />
+          ))}
+        </WishlistSection>
+      )}
+      {savedCables.length > 0 && (
+        <WishlistSection title="Cables">
+          {savedCables.map((product) => (
+            <CableCard key={product.id} variants={[product]} />
           ))}
         </WishlistSection>
       )}

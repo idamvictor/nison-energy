@@ -7,17 +7,19 @@ import {
   getAccessoryCatalog,
   getSolarCatalog,
   getCircuitProtectorCatalog,
+  getCableCatalog,
 } from "@/lib/catalog/queries";
 
 export const metadata: Metadata = { title: "Wishlist" };
 
 export default async function AccountWishlistPage() {
-  const [residential, commercial, accessories, solar, circuitProtectors] = await Promise.all([
+  const [residential, commercial, accessories, solar, circuitProtectors, cables] = await Promise.all([
     getResidentialCatalog(),
     getCommercialCatalog(),
     getAccessoryCatalog(),
     getSolarCatalog(),
     getCircuitProtectorCatalog(),
+    getCableCatalog(),
   ]);
   return (
     <AccountWishlist
@@ -26,6 +28,7 @@ export default async function AccountWishlistPage() {
       accessories={accessories}
       solar={solar}
       circuitProtectors={circuitProtectors}
+      cables={cables}
     />
   );
 }

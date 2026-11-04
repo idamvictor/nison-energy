@@ -13,6 +13,7 @@ import type {
   AccessoryProduct,
   SolarProduct,
   CircuitProtectorProduct,
+  CableProduct,
   CommercialProduct,
   Product,
   ProductCategory,
@@ -22,6 +23,7 @@ import type {
   WriteResult,
 } from "@/lib/catalog/types";
 import { cleanCircuitProtectorFilters } from "@/lib/catalog/circuit-protector-filters";
+import { cableAttrsToFilters, readCableAttrs } from "@/lib/catalog/cable-attrs";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { CACHE_TTL } from "@/lib/cache/config";
 
@@ -131,6 +133,18 @@ export function dbToCircuitProtector(row: ProductRow): CircuitProtectorProduct {
   return { ...dbToSolar(row), filters: cleanCircuitProtectorFilters(row.filters) };
 }
 
+/** Cables: a solar-shaped simple product plus its type / pack size (see cable-attrs.ts). */
+export function dbToCable(row: ProductRow): CableProduct {
+  const attrs = readCableAttrs(row.filters);
+  return {
+    ...dbToSolar(row),
+    ...attrs,
+    family: row.tagline?.trim() || row.name,
+    variantGroup: row.variantGroup ?? undefined,
+    sku: row.sku ?? undefined,
+  };
+}
+
 // Next.js Server -> Client Component props must be plain-serializable — a
 // Prisma Decimal is a class instance, not a plain object, so raw `ProductRow`
 // can't be passed straight into a "use client" component (e.g. ProductForm)
@@ -218,6 +232,14 @@ export const getSolarCatalog = cache(async (): Promise<SolarProduct[]> => {
   return rows.map(dbToSolar);
 });
 
+export const getCableCatalog = cache(async (): Promise<CableProduct[]> => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, category: "Cable" },
+    orderBy: catalogOrder,
+  });
+  return rows.map(dbToCable);
+});
+
 /** Circuit protectors share the solar kit shape (no installation, no variants). */
 export const getCircuitProtectorCatalog = cache(async (): Promise<CircuitProtectorProduct[]> => {
   const rows = await prisma.product.findMany({
@@ -299,6 +321,7 @@ export const getProductCounts = cache(
         accessory: count("Accessory"),
         solar: count("Solar"),
         circuitProtection: count("CircuitProtection"),
+        cable: count("Cable"),
       };
     },
     ["catalog-product-counts"],
@@ -376,6 +399,9 @@ function toData(input: ProductInput) {
     // Only circuit protectors have filters; other categories leave the column alone.
     ...(input.category === "CircuitProtection" && input.filters
       ? { filters: cleanCircuitProtectorFilters(input.filters) }
+      : {}),
+    ...(input.category === "Cable" && input.filters
+      ? { filters: cableAttrsToFilters(readCableAttrs(input.filters)) }
       : {}),
   };
 }

@@ -1,0 +1,289 @@
+{
+  "meterTails": {
+    "family": "Doncaster Cables Meter Tail Pack - 6181Y & 6491X Pre-Cut Wiring Solutions",
+    "description": [
+      "The Doncaster Cables Meter Tail Pack (2x 6181Y & 1x 6491X) is a pre-packaged, British-manufactured cable solution engineered for connecting electricity meters, main consumer units, and dedicated EV distribution boards. Manufactured in the UK using 100% renewable energy, each pack includes two double-insulated single-core 6181Y tails (Brown phase and Blue neutral with grey or coloured outer sheathing) paired with a 6491X green/yellow single-insulated earth conductor. Available in pre-cut 1m, 2m, 3m, and 5m lengths, these kits eliminate waste and reduce on-site prep time for electrical contractors and EV chargepoint installers.",
+      "Built to stringent BS 6004 Table 3 standards and fully BASEC approved, the double-insulated 6181Y cables feature plain annealed Class 1 or Class 2 copper conductors rated at 300/500V, insulated with Type TI1 PVC and protected by a robust Type 6 PVC outer sheath. The range covers core cross-sectional areas from 16mm² (7/1.70mm) up to 25mm² (7/2.14mm), alongside a dedicated ‘Easi-Fit’ 19-strand flexible conductor option (6181Y725F). This flexible construction substantially eases routing inside tight consumer units, meter enclosures, and surface trunking without sacrificing current-carrying capacity.",
+      "Designed for fixed installations across domestic and light commercial environments, the cables operate reliably across a temperature range of -15°C to 70°C with a minimum bending radius of 6 x overall diameter. Whether surface clipped, run in conduit, or enclosed in cable trunking in accordance with BS 7671 IET Wiring Regulations, the Doncaster Cables Meter Tail Pack delivers certified electrical compliance, rapid installation, and long-term durability."
+    ],
+    "specs": [
+      {
+        "label": "Product Type",
+        "value": "Pre-cut meter tail pack, standard or ‘easi-fit’ flexible conductors"
+      },
+      {
+        "label": "Cable Types",
+        "value": "2 x 6181Y (live/neutral) and 1 x 6491X (earth)"
+      },
+      {
+        "label": "Core Sizes",
+        "value": "16.0mm² or 25.0mm² (6181Y); 16.0mm² (6491X)"
+      },
+      {
+        "label": "Core Colours",
+        "value": "Blue/Grey, Brown/Grey and Green/Yellow"
+      },
+      {
+        "label": "Conductor",
+        "value": "Plain annealed copper, Class 2 to BS EN 60228"
+      },
+      {
+        "label": "Available Lengths",
+        "value": "1m, 2m, 3m and 5m packs"
+      },
+      {
+        "label": "Pack Contents",
+        "value": "Blue/Grey 6181Y x1 Brown/Grey 6181Y x 1 Green/Yellow 6491X x 1"
+      },
+      {
+        "label": "Current Rating",
+        "value": "Refer to Table 4D1A of BS 7671 IET Wiring Regulations"
+      },
+      {
+        "label": "Operating Temperature",
+        "value": "-15°C to 70°C"
+      },
+      {
+        "label": "Minimum Bending Radius",
+        "value": "6 x cable diameter"
+      },
+      {
+        "label": "Approvals",
+        "value": "BASEC approved"
+      },
+      {
+        "label": "Manufacture",
+        "value": "Made in the UK with 100% renewable energy"
+      }
+    ],
+    "gallery": [
+      "/api/media/uploads/43fa7e0b-599c-48a6-8e3d-8a440671708e.jpg",
+      "/api/media/uploads/73b7eef6-c9ba-4025-8308-4150a6b73d21.jpg",
+      "/api/media/uploads/f017e7ee-e8c4-4ce7-9660-07954b8e2b0e.jpg",
+      "/api/media/uploads/c9213148-e14a-4eb6-9ded-7347b6ba45f3.jpg",
+      "/api/media/uploads/d061e99e-56a4-4c29-8a4d-6f803b35c727.jpg"
+    ],
+    "sizes": [
+      {
+        "title": "1 Metre Meter Tail Pack – 2 × 16mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP116.0",
+        "exVat": 12.49,
+        "incVatDoc": 14.99,
+        "length": "1m",
+        "core": "2 × 16mm²"
+      },
+      {
+        "title": "1 Metre Meter Tail Pack – 2 × 25mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP125.0",
+        "exVat": 13.49,
+        "incVatDoc": 16.19,
+        "length": "1m",
+        "core": "2 × 25mm²"
+      },
+      {
+        "title": "2 Metre Meter Tail Pack – 2 × 16mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP216.0",
+        "exVat": 21.49,
+        "incVatDoc": 25.79,
+        "length": "2m",
+        "core": "2 × 16mm²"
+      },
+      {
+        "title": "2 Metre Meter Tail Pack – 2 × 25mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP225.0",
+        "exVat": 25.99,
+        "incVatDoc": 31.19,
+        "length": "2m",
+        "core": "2 × 25mm²"
+      },
+      {
+        "title": "3 Metre Meter Tail Pack – 2 × 16mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP316.0",
+        "exVat": 29.49,
+        "incVatDoc": 35.39,
+        "length": "3m",
+        "core": "2 × 16mm²"
+      },
+      {
+        "title": "3 Metre Meter Tail Pack – 2 × 25mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTPF325.0",
+        "exVat": 33.99,
+        "incVatDoc": 40.79,
+        "length": "3m",
+        "core": "2 × 25mm²"
+      },
+      {
+        "title": "5 Metre Meter Tail Pack – 2 × 16mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP516.0",
+        "exVat": 59.99,
+        "incVatDoc": 71.98,
+        "length": "5m",
+        "core": "2 × 16mm²"
+      },
+      {
+        "title": "5 Metre Meter Tail Pack – 2 × 25mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable",
+        "sku": "MTP525.0",
+        "exVat": 61.99,
+        "incVatDoc": 74.39,
+        "length": "5m",
+        "core": "2 × 25mm²"
+      }
+    ]
+  },
+  "kits": [
+    {
+      "name": "Tesla EV Installation Kit With PEN Protection",
+      "sku": "OCU-EV-KIT-PEN-10m",
+      "exVat": 198.9,
+      "incVat": 238.68,
+      "description": [
+        "The Ocunio Energy curated EV Installation Kit is an all-in-one trade installation bundle engineered specifically for domestic EV chargepoints that require upstream Open-PEN (Protective Earth Neutral) fault protection. Designed to save electrical contractors valuable time on site, this comprehensive pack consolidates every containment, connection, and circuit safeguarding component needed to deliver a fast, fully compliant single-phase EV charging installation from meter to wallbox.",
+        "At the core of the bundle is a dedicated EV Consumer Unit fitted with integrated PEN fault detection and a 40A Type A RCBO, providing robust overload, short-circuit, and 30mA AC/DC residual leakage protection. Built to fully satisfy BS 7671 18th Edition wiring regulations, the integrated O-PEN detection allows for direct connection to standard PME earthing systems without the costly, time-consuming need to drive ground earth rods or risk striking underground utility services.",
+        "The package includes 10 metres of coiled EV Ultra cable—combining mains power, data, and an enhanced Cat 5e FTP 4-pair screened network cable within a single double-sheathed construction for clean, interference-free hardwired internet, CT clamping, or smart meter integration. This is paired alongside a pre-cut 1 m tail pack comprising 2 × 25 mm² 6181Y double-insulated tails and 1 × 16 mm² 6491X earthing conductor, a heavy-duty single-pole terminal block set (brown, blue, and green), matching tails glands, and a 25 mm compression gland for weatherproof entry. To ensure professional surface mounting, the kit includes a pack of 25 fire-rated 15–18mm LINIAN SuperClips, enabling rapid, plug-and-screw-free containment that prevents premature cable collapse.",
+        "## Bundle Package Contents",
+        "- PEN Protection EV Consumer Unit: 40A Type A RCBO unit with built-in PME/PEN fault safeguarding (no earth rod required).",
+        "- EV Ultra Combined Cable: Doncaster Cables EV-Ultra® 6mm² 3-Core + Cat 5e Tuff-Sheath Cable – 10m Coil - EV-ULTRA3C6.0CAT5",
+        "- Pre-Cut Meter Tails Pack: 1 m kit containing 2 × 25 mm² 6181Y double-insulated tails (Brown/Blue) and 1 × 16 mm² 6491X green/yellow earthing cable.",
+        "- Single-pole terminal block kit: Dedicated phase (brown), neutral (blue), and earth (green) blocks.",
+        "- Cable Containment Fixings: Pack of 25 rapid-install, fire-rated LINIAN SuperClips (15–18mm).",
+        "- Enclosure Entry & Glands: Includes dedicated meter tails gland and a 25mm heavy-duty compression gland.",
+        "Important Installation Notice: All EV charger installations must strictly comply with current IET Wiring Regulations (BS 7671) and applicable UK building and electrical safety standards. Installation must be carried out by a certified, competent electrician."
+      ],
+      "features": [
+        "Single-phase trade installation bundle",
+        "40A Type A RCBO",
+        "Built-in PEN fault detection",
+        "No earth rod required",
+        "BS 7671 18th Edition compliant",
+        "10m coiled EV Ultra cable",
+        "1m pre-cut metre tails pack",
+        "Terminal blocks and glands included",
+        "25 fire-rated LINIAN SuperClips"
+      ],
+      "specs": [
+        {
+          "label": "Application",
+          "value": "Domestic single-phase EV chargepoints requiring upstream Open-PEN fault protection"
+        },
+        {
+          "label": "Consumer Unit",
+          "value": "EV consumer unit with integrated PEN fault detection and 40A Type A RCBO"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "Overload, short-circuit and 30mA AC/DC residual leakage protection"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671 18th Edition compliant"
+        },
+        {
+          "label": "Earthing",
+          "value": "Direct PME connection, no earth rod required"
+        },
+        {
+          "label": "EV Cable",
+          "value": "10m coiled EV Ultra combined power, data and 4-pair Cat 5e cable, supports hardwired CT monitoring"
+        },
+        {
+          "label": "Meter Tails",
+          "value": "1m pre-cut pack: 2 x 25mm² 6181Y double-insulated (brown/blue), 1 x 16mm² 6491X earthing (green/yellow)"
+        },
+        {
+          "label": "Terminal Blocks",
+          "value": "Single-pole set: phase (brown), neutral (blue), earth (green)"
+        },
+        {
+          "label": "Glands",
+          "value": "Meter tails gland and 25mm compression gland for weatherproof entry"
+        },
+        {
+          "label": "Cable Containment",
+          "value": "25 fire-rated LINIAN SuperClips, 15–18mm, plug-and-screw-free"
+        }
+      ],
+      "gallery": [
+        "/api/media/uploads/7637a99f-df70-46bf-8251-8ea895d2e8d1.jpg",
+        "/api/media/uploads/aa7aa540-0956-4f8c-b7e6-fd26a31439e1.jpg",
+        "/api/media/uploads/45d830b5-8466-4571-a1b2-a9e7c41501a3.jpg"
+      ]
+    },
+    {
+      "name": "Standard EV Installation Kit With Integrated Surge Protection Device",
+      "sku": "OCU-EV-KIT-SPD-10m",
+      "exVat": 149.39,
+      "incVat": 179.27,
+      "description": [
+        "The Ocunio Energy curated EV installation kit is an all-in-one trade bundle engineered to provide electrical contractors with a complete, fully compliant foundation for domestic EV chargepoint installations. Designed to streamline site prep and reduce sourcing time, this pack consolidates your primary distribution equipment, surge protection, premium combined cabling, and rapid 18th Edition fire-rated containment into a single convenient package.",
+        "At the heart of the bundle is the WCED 4-Way Metal EV Protection Unit (WMRC40BSP), pre-populated with a Type A 40A B-Curve RCBO and an integrated Type 2 Surge Protection Device (SPD). Housed in a non-combustible steel enclosure, this unit provides robust overload, short-circuit, and 30mA AC/DC leakage safeguarding, while shielding sensitive vehicle and charger electronics from harmful grid transient overvoltages in strict accordance with BS 7671 requirements.",
+        "To ensure rapid, tidy connectivity, the kit includes 10 metres of coiled EV Ultra cable—combining power, data, and a 4-pair Cat 5e network cable within a single rugged sheath to handle smart chargepoint connectivity and hardwired CT monitoring in one run. The kit is supported by a pre-cut 1m meter tails pack, a dedicated tails gland, two 25mm compression glands for IP-rated weatherproof entry, and a single-pole terminal block kit (brown, blue, and green). The bundle is rounded out with a 25-pack of 15–18mm LINIAN SuperClips, delivering fast, plug-free cable anchoring that prevents premature collapse in the event of a fire.",
+        "## Bundle Package Contents",
+        "- WCED 4-Way Metal Consumer Unit (WMRC40BSP): Complete with 40A Type A B-curve RCBO and built-in Surge Protection Device (SPD).",
+        "- EV Ultra Combined Cable: Doncaster Cables EV-Ultra® 6mm² 3 Core + Cat 5e Tuff-Sheath Cable – 10m Coil - EV-ULTRA3C6.0CAT5",
+        "- Pre-Cut Meter Tails Pack: 1m double-insulated tails kit for meter and distribution connection.",
+        "- Single-Pole Terminal Block Kit: Dedicated phase (brown), neutral (blue), and earth (green) blocks.",
+        "- Fire-Rated Cable Fixings: Pack of 25 rapid-install 15–18mm LINIAN SuperClips.",
+        "- Containment & Entry Glands: Includes dedicated meter tails gland and 2 × 25mm compression glands.",
+        "Important Installation Notice: All EV charger installations must strictly comply with current IET Wiring Regulations (BS 7671) and all applicable UK building and electrical safety standards. Installation must be carried out by a qualified and competent electrician."
+      ],
+      "features": [
+        "Domestic EV chargepoint trade bundle",
+        "4-way metal EV protection unit",
+        "40A Type A B-curve RCBO",
+        "Built-in Type 2 surge protection",
+        "BS 7671 18th Edition compliant",
+        "10m coiled EV Ultra cable",
+        "Includes 1m meter tails pack",
+        "Terminal blocks and glands included",
+        "25 fire-rated LINIAN SuperClips"
+      ],
+      "specs": [
+        {
+          "label": "Application",
+          "value": "Domestic EV chargepoint installations"
+        },
+        {
+          "label": "Consumer Unit",
+          "value": "WCED 4-way metal EV protection unit (WMRC40BSP), non-combustible steel enclosure"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "40A Type A B-curve RCBO, overload, short-circuit and 30mA AC/DC leakage protection"
+        },
+        {
+          "label": "Surge Protection",
+          "value": "Integrated Type 2 SPD"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671 18th Edition compliant"
+        },
+        {
+          "label": "EV Cable",
+          "value": "10m coiled EV Ultra combined power, data and 4-pair Cat 5e cable, supports hardwired CT monitoring"
+        },
+        {
+          "label": "Meter Tails",
+          "value": "1m pre-cut, double-insulated pack"
+        },
+        {
+          "label": "Terminal Blocks",
+          "value": "Single-pole set: phase (brown), neutral (blue), earth (green)"
+        },
+        {
+          "label": "Glands",
+          "value": "Meter tails gland and 2 x 25mm compression glands, IP-rated weatherproof entry"
+        },
+        {
+          "label": "Cable Containment",
+          "value": "25 fire-rated LINIAN SuperClips, 15–18mm, plug-free fixing"
+        }
+      ],
+      "gallery": [
+        "/api/media/uploads/63fce6d5-291b-4299-ae54-06af7e06d34f.jpg",
+        "/api/media/uploads/aa7aa540-0956-4f8c-b7e6-fd26a31439e1.jpg",
+        "/api/media/uploads/45d830b5-8466-4571-a1b2-a9e7c41501a3.jpg"
+      ]
+    }
+  ]
+}

@@ -26,7 +26,7 @@ export default async function AccessoriesPage() {
       <main className="flex-1">
         <PageHero
           align="left"
-          eyebrow="Cables & accessories"
+          eyebrow="Charging cables & accessories"
           title="Accessories"
           subtitle="Get more from your EV charging setup with our range of smart, practical and accessories."
         >

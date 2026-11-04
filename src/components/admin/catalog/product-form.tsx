@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductGallery } from "@/components/shared/product-gallery";
+import { isVideoUrl } from "@/lib/media/video";
 import { ImageUploadField } from "@/components/shared/image-upload-field";
 import { DatasheetsField } from "@/components/admin/catalog/datasheet-upload-field";
 import { cn } from "@/lib/utils";
@@ -410,7 +411,7 @@ export function ProductForm({
               }
             >
               <Plus />
-              Add gallery image
+              Add gallery image or YouTube video
             </Button>
           </div>
         </CardContent>
@@ -922,7 +923,8 @@ function SortableGalleryItem({
             ? "text-primary hover:text-primary"
             : "text-muted-foreground hover:text-primary"
         )}
-        disabled={!url.trim()}
+        // A YouTube video can sit in the gallery but can't be the card image.
+        disabled={!url.trim() || isVideoUrl(url)}
         onClick={onSetThumbnail}
         title={isThumbnail ? "Current thumbnail image" : "Set as thumbnail image"}
         aria-label={isThumbnail ? "Current thumbnail image" : "Set as thumbnail image"}

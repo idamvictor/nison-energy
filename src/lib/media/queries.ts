@@ -14,6 +14,7 @@ import {
 
 import { pgPool, prisma } from "@/lib/db";
 import type { MediaScope } from "@/lib/catalog/types";
+import { isVideoUrl } from "@/lib/media/video";
 import {
   DATASHEET_PREVIEW_TYPES,
   DATASHEET_URL_PREFIX,
@@ -612,7 +613,8 @@ export const getMediaLibrary = cache(async (scope: MediaScope): Promise<string[]
   const urls = new Set<string>();
   for (const p of products) {
     if (p.cardImage) urls.add(p.cardImage);
-    p.gallery.forEach((u) => urls.add(u));
+    // Gallery YouTube links aren't images — keep them out of the library grid.
+    p.gallery.forEach((u) => !isVideoUrl(u) && urls.add(u));
   }
   for (const post of posts) {
     if (post.coverImage) urls.add(post.coverImage);

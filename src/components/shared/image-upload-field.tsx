@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ImageOff, LibraryBig } from "lucide-react";
+import { ImageOff, LibraryBig, Play } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaLibraryDialog } from "@/components/shared/media-library-dialog";
 import type { MediaScope } from "@/lib/catalog/types";
+import { youtubeId, youtubeThumbnail } from "@/lib/media/video";
 
 /**
  * Drop-in replacement for a plain image-URL <Input>. Offers the existing
@@ -29,13 +30,22 @@ export function ImageUploadField({
   scope: MediaScope;
 }) {
   const [libraryOpen, setLibraryOpen] = useState(false);
+  // Gallery rows may hold a YouTube link — preview its still, not a broken image.
+  const videoId = value ? youtubeId(value) : null;
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-3">
         <div className="relative size-11 shrink-0 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
           {value ? (
-            <Image src={value} alt="" fill sizes="44px" className="object-cover" />
+            <>
+              <Image src={videoId ? youtubeThumbnail(videoId) : value} alt="" fill sizes="44px" className="object-cover" />
+              {videoId && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <Play className="size-3.5 fill-white text-white" />
+                </span>
+              )}
+            </>
           ) : (
             <div className="flex size-full items-center justify-center">
               <ImageOff className="size-4 text-muted-foreground" />
@@ -52,7 +62,7 @@ export function ImageUploadField({
               required
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="https://…"
+              placeholder="https://… (image, or a YouTube link in the gallery)"
               aria-label={label}
             />
           </TabsContent>

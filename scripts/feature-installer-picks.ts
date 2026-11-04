@@ -1,7 +1,7 @@
 /**
  * One-off: tick "Featured on home page" on the trade items the client's
  * review doc listed for the home page, so they show in the "For Installers"
- * section. Updates by SKU only — never creates products. Change the picks
+ * section (install kits + circuit protection). Updates by SKU only — never creates products. Change the picks
  * later with the admin's "Featured on home page" tick.
  *
  *   npx tsx scripts/feature-installer-picks.ts            # dry run
@@ -12,7 +12,14 @@ import "dotenv/config";
 import { prisma } from "../src/lib/db";
 
 const COMMIT = process.argv.includes("--commit");
-const SKUS = ["WMRC40BSP", "WMEPME08/SP", "SP-EVCP-R"];
+const SKUS = [
+  "WMRC40BSP",
+  "WMEPME08/SP",
+  "SP-EVCP-R",
+  "SP-EVCP-T",
+  "OCU-EV-KIT-SPD-10m",
+  "OCU-EV-KIT-PEN-10m",
+];
 
 async function main() {
   const rows = await prisma.product.findMany({

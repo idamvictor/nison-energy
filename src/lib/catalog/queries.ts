@@ -295,15 +295,15 @@ export const getBudgetChargers = cache(async (maxPrice = 400, limit = 6): Promis
   return onePerFamily(rows, limit).map(dbToResidential);
 });
 
-/** Home page "For Installers": featured circuit protection, then featured accessories. */
+/** Home page "For Installers": featured install kits (Cable), then featured circuit protection. */
 export const getInstallerPicks = cache(async (limit = 6) => {
   const rows = await prisma.product.findMany({
-    where: { active: true, featured: true, category: { in: ["CircuitProtection", "Accessory"] } },
+    where: { active: true, featured: true, category: { in: ["Cable", "CircuitProtection"] } },
     orderBy: catalogOrder,
   });
-  const circuit = rows.filter((r) => r.category === "CircuitProtection").slice(0, limit);
-  const accessories = rows.filter((r) => r.category === "Accessory").slice(0, limit - circuit.length);
-  return { circuit: circuit.map(dbToCircuitProtector), accessories: accessories.map(dbToAccessory) };
+  const kits = rows.filter((r) => r.category === "Cable").slice(0, limit);
+  const circuit = rows.filter((r) => r.category === "CircuitProtection").slice(0, limit - kits.length);
+  return { kits: kits.map(dbToCable), circuit: circuit.map(dbToCircuitProtector) };
 });
 
 export const getProductCounts = cache(

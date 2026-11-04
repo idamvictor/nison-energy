@@ -1,27 +1,27 @@
-import { AccessoryProductCard } from "@/components/accessories/accessory-product-card";
+import { CableCard } from "@/components/cables/cable-card";
 import { CircuitProtectorCard } from "@/components/circuit-protectors/circuit-protector-card";
 import { HomeProductSection } from "@/components/home/home-product-section";
 import { getInstallerPicks } from "@/lib/catalog/queries";
 
-/** Circuit protection and accessories ticked "Featured on home page" in the admin. */
+/** Install kits and circuit protection ticked "Featured on home page" in the admin. */
 export async function InstallerPicks() {
-  const { circuit, accessories } = await getInstallerPicks();
+  const { kits, circuit } = await getInstallerPicks();
 
   return (
     <HomeProductSection
       title="For Installers"
-      subtitle="Trade-grade circuit protection, cables and accessories for every install."
+      subtitle="Trade-grade EV install kits and circuit protection for every install."
       tone="tinted"
       links={[
         { href: "/circuit-protection", label: "Shop circuit protection" },
-        { href: "/accessories", label: "Shop accessories" },
+        { href: "/cables?type=ev-ultra-install-kit", label: "Shop install kits" },
       ]}
     >
+      {kits.map((product) => (
+        <CableCard key={product.id} variants={[product]} quickAdd />
+      ))}
       {circuit.map((product) => (
         <CircuitProtectorCard key={product.id} variants={[product]} quickAdd />
-      ))}
-      {accessories.map((product) => (
-        <AccessoryProductCard key={product.id} variants={[product]} quickAdd />
       ))}
     </HomeProductSection>
   );

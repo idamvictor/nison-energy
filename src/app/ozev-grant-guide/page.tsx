@@ -53,7 +53,7 @@ const steps: { title: string; copy: string }[] = [
   },
   {
     title: "Apply & get approved",
-    copy: "Submit your application on the government portal and, if approved, you'll receive an authorisation code for your grant.",
+    copy: "Submit your application on the government portal and, if approved, you'll receive an authorisation code for your grant. We'll take care of the rest and arrange your expert installation.",
   },
 ];
 

@@ -61,11 +61,6 @@ export function AfterYouPay() {
                 {index + 1}. {title}:
               </span>{" "}
               {body}
-              {highlight && (
-                <span className="ml-1.5 inline-flex items-center rounded-full bg-accent px-1.5 py-px align-middle text-[10px] font-semibold tracking-wide text-accent-foreground uppercase">
-                  Link by email
-                </span>
-              )}
             </p>
           </li>
         ))}

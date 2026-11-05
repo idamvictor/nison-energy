@@ -14,7 +14,7 @@ import { CACHE_TAGS } from "@/lib/cache/tags";
 import { categoryRoute, type ProductCategory } from "@/lib/catalog/types";
 import {
   MAX_PRICE,
-  incVatOf,
+  resolveChange,
   type AdminActionResult,
   type PriceChange,
   type PriceReviewResult,
@@ -65,27 +65,57 @@ export async function submitPriceReview(input: {
   }
   if (input.changes.length > 1000) return { ok: false, error: "Too many changes in one submission." };
 
+  const validAmount = (n: unknown) => {
+    const v = Number(n);
+    return Number.isFinite(v) && v > 0 && v <= MAX_PRICE && isPennies(v);
+  };
+  const cleaned: PriceChange[] = [];
   for (const c of input.changes) {
-    const ex = Number(c?.exVat);
-    if (typeof c?.productId !== "string" || !Number.isFinite(ex) || ex <= 0 || ex > MAX_PRICE || !isPennies(ex)) {
+    if (typeof c?.productId !== "string") return { ok: false, error: "Invalid change." };
+    const hasEx = c.exVat !== undefined && c.exVat !== null;
+    const hasSale = c.saleExVat !== undefined;
+    if (!hasEx && !hasSale) continue;
+    if ((hasEx && !validAmount(c.exVat)) || (hasSale && c.saleExVat !== null && !validAmount(c.saleExVat))) {
       return { ok: false, error: "Each new price must be a positive amount in pounds and pence." };
     }
+    cleaned.push({
+      productId: c.productId,
+      ...(hasEx ? { exVat: Number(c.exVat) } : {}),
+      ...(hasSale ? { saleExVat: c.saleExVat === null ? null : Number(c.saleExVat) } : {}),
+    });
   }
 
-  const ids = [...new Set(input.changes.map((c) => c.productId))];
-  const products = await prisma.product.findMany({ where: { id: { in: ids } }, select: { id: true, price: true } });
+  const ids = [...new Set(cleaned.map((c) => c.productId))];
+  const products = await prisma.product.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, name: true, price: true, compareAtPrice: true },
+  });
   const byId = new Map(products.map((p) => [p.id, p]));
 
   // Last entry per product wins; skip anything that isn't actually a change.
-  const latest = new Map(input.changes.map((c) => [c.productId, Number(c.exVat)]));
-  const proposals = [...latest.entries()].flatMap(([productId, exVat]) => {
+  const latest = new Map(cleaned.map((c) => [c.productId, c]));
+  const proposals = [];
+  for (const [productId, change] of latest) {
     const product = byId.get(productId);
-    if (!product) return [];
-    const current = product.price == null ? null : Number(product.price);
-    const proposed = incVatOf(exVat);
-    if (current != null && Math.abs(current - proposed) < 0.005) return [];
-    return [{ productId, currentPrice: current, proposedExVat: exVat, proposedPrice: proposed }];
-  });
+    if (!product) continue;
+    const row = {
+      price: product.price == null ? null : Number(product.price),
+      compareAtPrice: product.compareAtPrice == null ? null : Number(product.compareAtPrice),
+    };
+    const resolved = resolveChange(row, change);
+    if ("error" in resolved) return { ok: false, error: `${product.name}: ${resolved.error}` };
+    if (!resolved.changed) continue;
+    proposals.push({
+      productId,
+      currentPrice: row.price,
+      currentCompareAt: row.compareAtPrice,
+      proposedExVat: resolved.regularEx,
+      proposedPrice: resolved.regularInc,
+      proposedSaleExVat: resolved.saleEx,
+      proposedSalePrice: resolved.saleInc,
+      includesSale: true,
+    });
+  }
   if (proposals.length === 0) return { ok: false, error: "None of the prices changed." };
 
   const submission = await prisma.priceReviewSubmission.create({
@@ -132,8 +162,14 @@ export async function decidePriceSubmission(id: string, approveIds: string[]): P
       if (p.status !== "Pending") return [];
       if (approve.has(p.id)) {
         touched.add(p.product.category);
+        // New-style rows set the whole price state: a sale = price + "was" price.
+        const data = p.includesSale
+          ? p.proposedSalePrice != null
+            ? { price: p.proposedSalePrice, compareAtPrice: p.proposedPrice }
+            : { price: p.proposedPrice, compareAtPrice: null }
+          : { price: p.proposedPrice };
         return [
-          prisma.product.update({ where: { id: p.productId }, data: { price: p.proposedPrice } }),
+          prisma.product.update({ where: { id: p.productId }, data }),
           prisma.priceProposal.update({ where: { id: p.id }, data: { status: "Approved", decidedAt: now } }),
         ];
       }

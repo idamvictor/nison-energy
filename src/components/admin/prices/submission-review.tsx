@@ -11,9 +11,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { decidePriceSubmission } from "@/lib/pricing-review/actions";
-import { categoryLabels, exVatOf, type SubmissionDetail } from "@/lib/pricing-review/types";
+import { formatPercentOff } from "@/lib/catalog/sale";
+import { categoryLabels, exVatOf, regularOf, saleOfRow, type SubmissionDetail } from "@/lib/pricing-review/types";
 
 const money = (n: number | null) => (n == null ? "—" : formatCurrency(n));
+
+/** "£406.99 · 16% off", or "No sale". */
+function SaleCell({ regular, sale }: { regular: number | null; sale: number | null }) {
+  if (sale == null || regular == null) return <span className="text-muted-foreground">No sale</span>;
+  return (
+    <span className="tabular-nums">
+      {formatCurrency(sale)}
+      <span className="block text-xs font-medium text-accent-strong">{formatPercentOff(regular, sale)}</span>
+    </span>
+  );
+}
 
 function Diff({ from, to }: { from: number | null; to: number }) {
   if (from == null || from === 0) return <span className="text-muted-foreground">new price</span>;
@@ -107,13 +119,21 @@ export function SubmissionReview({ submission }: { submission: SubmissionDetail 
                   <TableHead className="text-right">New ex VAT</TableHead>
                   <TableHead className="text-right">New inc VAT</TableHead>
                   <TableHead className="text-right">Difference</TableHead>
+                  <TableHead className="text-right">Current sale</TableHead>
+                  <TableHead className="text-right">New sale</TableHead>
                   {done && <TableHead>Decision</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {submission.proposals.map((p) => {
                   const changedSince =
-                    p.status === "Pending" && (p.livePrice ?? null) !== (p.currentPrice ?? null);
+                    p.status === "Pending" &&
+                    ((p.livePrice ?? null) !== (p.currentPrice ?? null) ||
+                      (p.includesSale && (p.liveCompareAt ?? null) !== (p.currentCompareAt ?? null)));
+                  // New-style rows: "current" = the normal price (the "was" price when on sale).
+                  const before = { price: p.currentPrice, compareAtPrice: p.currentCompareAt };
+                  const currentRegular = p.includesSale ? regularOf(before) : p.currentPrice;
+                  const currentSale = p.includesSale ? saleOfRow(before) : null;
                   return (
                     <TableRow key={p.id}>
                       {!done && (
@@ -141,13 +161,27 @@ export function SubmissionReview({ submission }: { submission: SubmissionDetail 
                         )}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {p.currentPrice == null ? "—" : formatCurrency(exVatOf(p.currentPrice))}
+                        {currentRegular == null ? "—" : formatCurrency(exVatOf(currentRegular))}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{money(p.currentPrice)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{money(currentRegular)}</TableCell>
                       <TableCell className="text-right font-medium tabular-nums">{formatCurrency(p.proposedExVat)}</TableCell>
                       <TableCell className="text-right font-medium tabular-nums">{formatCurrency(p.proposedPrice)}</TableCell>
                       <TableCell className="text-right">
-                        <Diff from={p.currentPrice} to={p.proposedPrice} />
+                        {currentRegular != null && Math.abs(currentRegular - p.proposedPrice) < 0.005 ? (
+                          <span className="text-muted-foreground">unchanged</span>
+                        ) : (
+                          <Diff from={currentRegular} to={p.proposedPrice} />
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {p.includesSale ? <SaleCell regular={currentRegular} sale={currentSale} /> : <span className="text-muted-foreground">—</span>}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {p.includesSale ? (
+                          <SaleCell regular={p.proposedPrice} sale={p.proposedSalePrice} />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       {done && (
                         <TableCell className={p.status === "Approved" ? "text-success" : "text-muted-foreground"}>

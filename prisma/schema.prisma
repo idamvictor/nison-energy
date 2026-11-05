@@ -447,7 +447,11 @@ model PriceProposal {
   product       Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
   currentPrice  Decimal?              @db.Decimal(10, 2) // inc VAT, snapshot at submit
   proposedExVat Decimal               @db.Decimal(10, 2)
-  proposedPrice Decimal               @db.Decimal(10, 2) // inc VAT
+  proposedPrice Decimal               @db.Decimal(10, 2) // inc VAT (the regular price when includesSale)
+  currentCompareAt  Decimal?          @db.Decimal(10, 2) // snapshot at submit
+  proposedSaleExVat Decimal?          @db.Decimal(10, 2)
+  proposedSalePrice Decimal?          @db.Decimal(10, 2) // inc VAT; null = no sale
+  includesSale      Boolean           @default(false) // new-style row: sets price + compareAtPrice
   status        PriceProposalStatus   @default(Pending)
   decidedAt     DateTime?
 

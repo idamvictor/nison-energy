@@ -13,16 +13,16 @@ import type {
 } from "@/lib/pricing-review/types";
 
 const num = (d: { toString(): string } | null | undefined) => (d == null ? null : Number(d));
-const categoryOrder: ProductCategory[] = ["Residential", "Commercial", "Accessory", "Solar"];
+const categoryOrder: ProductCategory[] = ["Residential", "Commercial", "Accessory", "Solar", "CircuitProtection", "Cable"];
 
 /** Every product (active and inactive), grouped by category then shop order. */
 export const getPriceList = cache(async (): Promise<PriceRow[]> => {
   const rows = await prisma.product.findMany({
-    select: { id: true, category: true, name: true, sku: true, active: true, price: true },
+    select: { id: true, category: true, name: true, sku: true, active: true, price: true, compareAtPrice: true },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
   return rows
-    .map((r) => ({ ...r, price: num(r.price) }))
+    .map((r) => ({ ...r, price: num(r.price), compareAtPrice: num(r.compareAtPrice) }))
     .sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category));
 });
 
@@ -60,7 +60,7 @@ export async function getSubmission(id: string): Promise<SubmissionDetail | null
     where: { id },
     include: {
       proposals: {
-        include: { product: { select: { name: true, category: true, sku: true, price: true } } },
+        include: { product: { select: { name: true, category: true, sku: true, price: true, compareAtPrice: true } } },
       },
     },
   });
@@ -74,8 +74,13 @@ export async function getSubmission(id: string): Promise<SubmissionDetail | null
       sku: p.product.sku,
       currentPrice: num(p.currentPrice),
       livePrice: num(p.product.price),
+      currentCompareAt: num(p.currentCompareAt),
+      liveCompareAt: num(p.product.compareAtPrice),
       proposedExVat: Number(p.proposedExVat),
       proposedPrice: Number(p.proposedPrice),
+      proposedSaleExVat: num(p.proposedSaleExVat),
+      proposedSalePrice: num(p.proposedSalePrice),
+      includesSale: p.includesSale,
       status: p.status,
     }))
     .sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category) || a.name.localeCompare(b.name));

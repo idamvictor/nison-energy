@@ -10,10 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import { formatPercentOff } from "@/lib/catalog/sale";
 import { setPriceReviewOpen } from "@/lib/pricing-review/actions";
 import {
   categoryLabels,
   exVatOf,
+  regularOf,
+  saleOfRow,
   type PriceRow,
   type ReviewWindow,
   type SubmissionSummary,
@@ -28,19 +31,25 @@ const formatDate = (iso: string | null) =>
 function downloadCsv(rows: PriceRow[]) {
   const cell = (v: string) => `"${v.replace(/"/g, '""')}"`;
   const lines = [
-    ["Category", "Product", "SKU", "Price ex VAT", "Price inc VAT", "Status"].map(cell).join(","),
-    ...rows.map((r) =>
-      [
+    ["Category", "Product", "SKU", "Price ex VAT", "Price inc VAT", "Sale price inc VAT", "% off", "Status"]
+      .map(cell)
+      .join(","),
+    ...rows.map((r) => {
+      const regular = regularOf(r);
+      const sale = saleOfRow(r);
+      return [
         categoryLabels[r.category],
         r.name,
         r.sku ?? "",
-        r.price == null ? "Price on request" : exVatOf(r.price).toFixed(2),
-        r.price == null ? "Price on request" : r.price.toFixed(2),
+        regular == null ? "Price on request" : exVatOf(regular).toFixed(2),
+        regular == null ? "Price on request" : regular.toFixed(2),
+        sale == null ? "" : sale.toFixed(2),
+        sale == null || regular == null ? "" : formatPercentOff(regular, sale).replace(" off", ""),
         r.active ? "Active" : "Inactive",
       ]
         .map((v) => cell(String(v)))
-        .join(","),
-    ),
+        .join(",");
+    }),
   ];
   const url = URL.createObjectURL(new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" }));
   const a = document.createElement("a");
@@ -243,24 +252,39 @@ export function PriceListView({
                   <TableHead>SKU</TableHead>
                   <TableHead className="text-right">Price ex VAT</TableHead>
                   <TableHead className="text-right">Price inc VAT</TableHead>
+                  <TableHead className="text-right">Sale</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((r) => (
-                  <TableRow key={r.id} className={cn(!r.active && "text-muted-foreground")}>
-                    <TableCell className="whitespace-nowrap">{categoryLabels[r.category]}</TableCell>
-                    <TableCell className="max-w-md whitespace-normal">{r.name}</TableCell>
-                    <TableCell className="whitespace-nowrap">{r.sku ?? "—"}</TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {r.price == null ? "Price on request" : formatCurrency(exVatOf(r.price))}
-                    </TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">
-                      {r.price == null ? "—" : formatCurrency(r.price)}
-                    </TableCell>
-                    <TableCell>{r.active ? "Active" : "Inactive"}</TableCell>
-                  </TableRow>
-                ))}
+                {filtered.map((r) => {
+                  const regular = regularOf(r);
+                  const sale = saleOfRow(r);
+                  return (
+                    <TableRow key={r.id} className={cn(!r.active && "text-muted-foreground")}>
+                      <TableCell className="whitespace-nowrap">{categoryLabels[r.category]}</TableCell>
+                      <TableCell className="max-w-md whitespace-normal">{r.name}</TableCell>
+                      <TableCell className="whitespace-nowrap">{r.sku ?? "—"}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {regular == null ? "Price on request" : formatCurrency(exVatOf(regular))}
+                      </TableCell>
+                      <TableCell className="text-right font-medium tabular-nums">
+                        {regular == null ? "—" : formatCurrency(regular)}
+                      </TableCell>
+                      <TableCell className="text-right whitespace-nowrap tabular-nums">
+                        {sale == null || regular == null ? (
+                          <span className="text-muted-foreground">—</span>
+                        ) : (
+                          <>
+                            {formatCurrency(sale)}{" "}
+                            <span className="text-xs font-medium text-accent-strong">{formatPercentOff(regular, sale)}</span>
+                          </>
+                        )}
+                      </TableCell>
+                      <TableCell>{r.active ? "Active" : "Inactive"}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

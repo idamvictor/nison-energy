@@ -91,7 +91,6 @@ export function InstallationGallery() {
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
               Our Installations
             </h2>
-            <p className="mt-3 text-muted-foreground">Real chargers fitted by our OZEV-approved engineers.</p>
           </div>
         </Reveal>
 

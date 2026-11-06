@@ -20,7 +20,7 @@ const STEPS = [
   {
     icon: Truck,
     title: "Delivery",
-    body: "Your charger is dispatched by free tracked delivery and arrives in 1–3 days.",
+    body: "Your charger is dispatched by tracked delivery and arrives in 1–3 days.",
   },
   {
     icon: CalendarCheck,

@@ -10,7 +10,9 @@ export const brandLogos: Record<string, string> = {
   Hypervolt: "/api/media/uploads/65e334f7-d608-4cae-b8fd-46e2c400a2b8.png",
   "Matt:e": "/api/media/uploads/836a8521-c358-4987-bf3f-5bd031a1f785.webp",
   Indra: "/api/media/uploads/53a2b907-c35a-4de6-9c8c-e9361637e565.png",
-  Myenergi: "/api/media/uploads/32368d18-737f-4509-9341-367252cacc47.png",
+  // Our own products (the EV Ultra install kits) — same logo as the site header.
+  "Ocunio Energy": "/ocunio-energy-logo.png",
+  Myenergi:"/api/media/uploads/32368d18-737f-4509-9341-367252cacc47.png",
   Ohme: "/api/media/uploads/540822e8-6503-4bd5-ae7e-60787bfc1fb3.png",
   "Pod Point": "/api/media/uploads/58c1de3b-1d64-4c1e-86c8-ba54d5aee463.png",
   Rolec: "/api/media/uploads/fb67b1a1-c36a-442e-9036-194e445269c0.png",

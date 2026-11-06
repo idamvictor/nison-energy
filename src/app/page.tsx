@@ -37,10 +37,10 @@ export default function Home() {
         <OctopusChargers />
         <BudgetChargers />
         <InstallerPicks />
+        <InstallationGallery />
         <CategoryCards />
         <TrustedInstallers />
         <LatestBlog limit={3} />
-        <InstallationGallery />
         <FaqSection
           categories={orderingDeliveryFaq}
           title="Ordering & Delivery"

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 import {
@@ -79,6 +79,8 @@ export default async function CommercialProductDetailPage({
   const { slug } = await params;
   const row = await getProductRow(slug);
 
+  // A charger moved to Residential keeps working at its old link.
+  if (row?.category === "Residential" && row.active) permanentRedirect(`/home-charging/${row.id}`);
   if (!row || row.category !== "Commercial" || !row.active) notFound();
 
   const product = dbToCommercial(row);

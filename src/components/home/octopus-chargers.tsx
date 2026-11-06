@@ -13,7 +13,7 @@ export async function OctopusChargers() {
       links={[{ href: "/home-charging", label: "View all residential chargers" }]}
     >
       {products.map((product) => (
-        <ProductCard key={product.id} variants={[product]} quickAdd />
+        <ProductCard key={product.id} variants={[product]} quickAdd ozevCta />
       ))}
     </HomeProductSection>
   );

@@ -23,7 +23,7 @@ export default async function CablesPage() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <PageHero align="left" eyebrow="Trade" title="Cables" />
+        <PageHero align="left" eyebrow="Trade Counter" title="Cables" />
         <Suspense fallback={null}>
           <CablesCatalog products={products} />
         </Suspense>

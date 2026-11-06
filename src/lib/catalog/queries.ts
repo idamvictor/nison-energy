@@ -26,6 +26,7 @@ import { cleanCircuitProtectorFilters } from "@/lib/catalog/circuit-protector-fi
 import { cableAttrsToFilters, readCableAttrs } from "@/lib/catalog/cable-attrs";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { CACHE_TTL } from "@/lib/cache/config";
+import { BUDGET_HIDDEN_IDS, BUDGET_PREFERRED_IDS } from "@/lib/content/home-picks";
 
 // ─── Row → view-type mappers ────────────────────────────────────────────────
 
@@ -286,24 +287,51 @@ export const getTariffChargers = cache(async (tariff: string, limit = 6): Promis
   return onePerFamily(rows, limit).map(dbToResidential);
 });
 
-/** Home page: residential chargers under `maxPrice` (inc VAT), cheapest first, one per family. */
+/**
+ * Home page: residential chargers under `maxPrice` (inc VAT), cheapest first,
+ * one per family — minus BUDGET_HIDDEN_IDS, and using a family's
+ * BUDGET_PREFERRED_IDS variant instead of its cheapest one.
+ */
 export const getBudgetChargers = cache(async (maxPrice = 400, limit = 6): Promise<Product[]> => {
   const rows = await prisma.product.findMany({
-    where: { active: true, category: "Residential", price: { lt: maxPrice } },
+    where: { active: true, category: "Residential", price: { lt: maxPrice }, id: { notIn: BUDGET_HIDDEN_IDS } },
     orderBy: [{ price: "asc" }, { name: "asc" }],
   });
-  return onePerFamily(rows, limit).map(dbToResidential);
+  const familyOf = (row: ProductRow) => row.variantGroup ?? row.id;
+  const preferredFamilies = new Set(rows.filter((r) => BUDGET_PREFERRED_IDS.includes(r.id)).map(familyOf));
+  const candidates = rows.filter((r) => !preferredFamilies.has(familyOf(r)) || BUDGET_PREFERRED_IDS.includes(r.id));
+  return onePerFamily(candidates, limit).map(dbToResidential);
 });
 
-/** Home page "For Installers": featured install kits (Cable), then featured circuit protection. */
+/**
+ * Accessories shown in the home "For Installers" section. Listed by SKU (not
+ * the Featured tick) because featured accessories like the Wottz/Zev cables
+ * belong elsewhere — add a SKU here to show another accessory.
+ */
+const INSTALLER_ACCESSORY_SKUS = ["04CP9051000MS"];
+
+/** Home page "For Installers": featured install kits (Cable), the listed accessories, then featured circuit protection. */
 export const getInstallerPicks = cache(async (limit = 6) => {
   const rows = await prisma.product.findMany({
-    where: { active: true, featured: true, category: { in: ["Cable", "CircuitProtection"] } },
+    where: {
+      active: true,
+      OR: [
+        { featured: true, category: { in: ["Cable", "CircuitProtection"] } },
+        { category: "Accessory", sku: { in: INSTALLER_ACCESSORY_SKUS } },
+      ],
+    },
     orderBy: catalogOrder,
   });
   const kits = rows.filter((r) => r.category === "Cable").slice(0, limit);
-  const circuit = rows.filter((r) => r.category === "CircuitProtection").slice(0, limit - kits.length);
-  return { kits: kits.map(dbToCable), circuit: circuit.map(dbToCircuitProtector) };
+  const accessories = rows.filter((r) => r.category === "Accessory").slice(0, limit - kits.length);
+  const circuit = rows
+    .filter((r) => r.category === "CircuitProtection")
+    .slice(0, limit - kits.length - accessories.length);
+  return {
+    kits: kits.map(dbToCable),
+    accessories: accessories.map(dbToAccessory),
+    circuit: circuit.map(dbToCircuitProtector),
+  };
 });
 
 export const getProductCounts = cache(

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeCheck,
   Building2,
   Home,
   ShieldCheck,
@@ -99,17 +98,6 @@ export default function OzevGrantGuideSelectorPage() {
               </ol>
             </div>
 
-            <Reveal delay={200}>
-              <div className="mt-6 flex w-full items-center gap-4 rounded-2xl border border-primary/30 bg-card px-5 py-4 shadow-md sm:px-6">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-success/12 text-success">
-                  <BadgeCheck aria-hidden className="size-5.5" />
-                </span>
-                <p className="font-semibold text-foreground sm:text-base">
-                  Once your grant has been approved, we&apos;ll send you a link to make
-                  your purchase using your approved grant amount.
-                </p>
-              </div>
-            </Reveal>
           </div>
         </section>
 

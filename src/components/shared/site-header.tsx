@@ -60,15 +60,15 @@ const navLinks: NavLink[] = [
     label: "Accessories",
     children: [
       { href: "/accessories", label: "Charging Cables" },
-      { href: "/circuit-protection", label: "Circuit Protection" },
     ],
   },
   {
     href: "/cables",
-    label: "Cables",
+    label: "Trade Counter",
     children: [
       { href: "/cables?type=meter-tails", label: "Meter Tails" },
       { href: "/cables?type=ev-ultra-install-kit", label: "EV Ultra Install Kit" },
+      { href: "/circuit-protection", label: "Circuit Protection" },
     ],
   },
   { href: "/solar-panels", label: "Solar Panels" },
@@ -144,7 +144,7 @@ export function SiteHeader() {
 
         {/* Eight items incl. two dropdowns: from 1360px they fit on one line beside
             the logo and actions; narrower screens use the menu button. */}
-        <nav className="hidden items-center gap-4 min-[1360px]:flex">
+        <nav className="hidden items-center gap-3 min-[1360px]:flex min-[1440px]:gap-4">
           {navLinks.map((link) => {
             const active = isLinkActive(link);
             if (link.children) {

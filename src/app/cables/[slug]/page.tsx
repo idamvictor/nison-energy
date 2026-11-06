@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { AlertTriangle, ChevronRight } from "lucide-react";
 
 import { getCableCatalog, getProductRow, dbToCable, dbToDetail } from "@/lib/catalog/queries";
 import { getDatasheetNames, warmDatasheet } from "@/lib/media/queries";
@@ -158,6 +158,12 @@ export default async function CableDetailPage({ params }: { params: Promise<{ sl
                 {isFamily && <p className="mt-2 text-base font-medium text-foreground">{product.name}</p>}
                 {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
                 <FreeDeliveryBadge warranty={detail.warranty} />
+                {product.type === "EV Ultra Install Kit" && (
+                  <p className="mt-3 flex items-start gap-2 rounded-lg border border-accent-strong/40 bg-accent/10 px-3 py-2 text-sm font-semibold text-foreground">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0 text-accent-strong" aria-hidden />
+                    For use by qualified and competent electrical installers only.
+                  </p>
+                )}
               </div>
 
               <CablePurchasePanel product={product} siblings={siblings} />

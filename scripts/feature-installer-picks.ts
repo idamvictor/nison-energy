@@ -18,8 +18,9 @@ const SKUS = [
   "SP-EVCP-R",
   "SP-EVCP-T",
   "OCU-EV-KIT-SPD-10m",
-  "OCU-EV-KIT-PEN-10m",
 ];
+// Taken off the section (the Stormguard cable channel replaced it).
+const UNFEATURE = ["OCU-EV-KIT-PEN-10m"];
 
 async function main() {
   const rows = await prisma.product.findMany({
@@ -36,6 +37,8 @@ async function main() {
   }
   const { count } = await prisma.product.updateMany({ where: { sku: { in: SKUS } }, data: { featured: true } });
   console.log(`Featured ${count} products.`);
+  const off = await prisma.product.updateMany({ where: { sku: { in: UNFEATURE } }, data: { featured: false } });
+  console.log(`Unfeatured ${off.count} products (${UNFEATURE.join(", ")}).`);
 }
 
 main()

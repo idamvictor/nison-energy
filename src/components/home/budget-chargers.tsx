@@ -13,7 +13,7 @@ export async function BudgetChargers() {
       links={[{ href: "/home-charging?price=under-400", label: "View all under £400" }]}
     >
       {products.map((product) => (
-        <ProductCard key={product.id} variants={[product]} quickAdd />
+        <ProductCard key={product.id} variants={[product]} quickAdd ozevCta />
       ))}
     </HomeProductSection>
   );

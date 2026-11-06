@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, GitCompare, Heart } from "lucide-react";
+import { ArrowRight, Check, CreditCard, GitCompare, Heart } from "lucide-react";
 
 import {
   Card,
@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/lib/catalog/types";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import { tagClass } from "@/components/shared/product-tag";
 import { useWishlist } from "@/lib/wishlist/store";
 import { saleOf } from "@/lib/catalog/sale";
@@ -28,12 +29,15 @@ export function ProductCard({
   compareIds,
   onToggleCompare,
   quickAdd,
+  ozevCta,
 }: {
   variants: Product[];
   compareIds?: string[];
   onToggleCompare?: (id: string) => void;
   /** Homepage featured cards: a cart icon beside the wishlist heart. */
   quickAdd?: boolean;
+  /** Homepage cards: "Charger & Install with OZEV grant" button + Klarna line. */
+  ozevCta?: boolean;
 }) {
   const product = variants.reduce((a, b) => (b.price < a.price ? b : a));
   const sale = saleOf(product.price, product.compareAtPrice);
@@ -128,7 +132,7 @@ export function ProductCard({
         <CardMeta warranty={product.warranty} tariffs={product.compatibleTariffs} />
         <CardPrice price={product.price} sale={sale} />
       </CardContent>
-      <CardFooter className="relative z-10 border-t-0 bg-transparent p-5 pt-3">
+      <CardFooter className="relative z-10 flex-col items-stretch gap-3 border-t-0 bg-transparent p-5 pt-3">
         <Button
           variant="outline"
           size="lg"
@@ -139,6 +143,25 @@ export function ProductCard({
           View Details
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-accent" />
         </Button>
+        {ozevCta && (
+          <>
+            <Button
+              size="lg"
+              nativeButton={false}
+              className="w-full"
+              render={<Link href="/ozev-grant-guide" />}
+            >
+              Charger &amp; Install with OZEV grant &rarr;
+            </Button>
+            <Link
+              href={href}
+              className="flex items-start gap-2 text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
+            >
+              <CreditCard className="size-4 shrink-0" />
+              Or 3 payments of {formatCurrency(Math.round((product.price / 3) * 100) / 100)} with Klarna / PayPal
+            </Link>
+          </>
+        )}
       </CardFooter>
     </Card>
   );

@@ -24,7 +24,7 @@ export default async function CircuitProtectorsPage() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <PageHero align="left" eyebrow="Accessories" title="Circuit Protection">
+        <PageHero align="left" eyebrow="Trade Counter" title="Circuit Protection">
           <p className="mt-3 max-w-2xl text-lg font-semibold text-white">
             Complete EV Install Essentials from Circuit Protection to Cable
           </p>

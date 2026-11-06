@@ -3,7 +3,9 @@
 // Used in place of the plain brand text on product detail pages and in the
 // Brand filter sidebar — see src/components/shared/brand-logo.tsx.
 export const brandLogos: Record<string, string> = {
-  Easee: "/api/media/uploads/a61d7ddf-77f2-47fb-b47e-5e6b7c40773f.png",
+  // Meter tail packs — same logo as the home page partner strip.
+  "Doncaster Cables": "/api/media/uploads/f5f7704f-c032-4280-a237-bb5fe0d255a2.webp",
+  Easee:"/api/media/uploads/a61d7ddf-77f2-47fb-b47e-5e6b7c40773f.png",
   Evec: "/api/media/uploads/28d12958-fcc6-4c3c-a8a8-e2ce0e370066.png",
   FastAmps: "/api/media/uploads/5d5338cb-41d5-46a9-9793-d9a1bd217c60.png",
   Garo: "/api/media/uploads/87e62aa8-f5f0-424f-9f76-5f4cf90cc02c.png",

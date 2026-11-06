@@ -10,6 +10,16 @@ import { cn } from "@/lib/utils";
 const exVat = (incVat: number) => Math.round((incVat / 1.2) * 100) / 100;
 
 /**
+ * The whole pack, word for word from its title: "1 Metre Meter Tail Pack –
+ * 2 × 16mm² 6181Y Tails and 1 × 16mm² 6491X Earth Cable" → the part after
+ * the dash. The earth cable is part of every pack (and its price).
+ */
+function packLabel(p: CableProduct): string {
+  const match = p.name.match(/Meter Tail Pack\s*[–-]\s*(.+)$/);
+  return match ? match[1].trim() : (p.core ?? p.name);
+}
+
+/**
  * Meter tail packs: pick a length and a tails size, or tap a cell in the
  * "All packs" price grid. Each pack is its own product page, so a choice
  * switches the URL (like the colour / length pickers elsewhere).
@@ -21,6 +31,11 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
   );
   const cores = [...new Set(siblings.map((p) => p.core).filter((v): v is string => !!v))].sort();
   const find = (length?: string, core?: string) => siblings.find((p) => p.length === length && p.core === core);
+  // One full label per pack (same wording at every length).
+  const labelOf = (core: string) => {
+    const p = siblings.find((s) => s.core === core);
+    return p ? packLabel(p) : core;
+  };
 
   const go = (target?: CableProduct) => {
     if (target && target.id !== product.id) router.replace(`/cables/${target.id}`, { scroll: false });
@@ -55,7 +70,7 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
       </fieldset>
 
       <fieldset>
-        <legend className="text-sm font-medium text-foreground">Tails</legend>
+        <legend className="text-sm font-medium text-foreground">Meter Tail Pack</legend>
         <div className="mt-2 grid grid-cols-2 gap-2">
           {cores.map((core) => {
             const active = core === product.core;
@@ -66,12 +81,11 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
                 aria-pressed={active}
                 onClick={() => pickCore(core)}
                 className={cn(
-                  "flex flex-col items-start rounded-xl px-3.5 py-2.5 text-left ring-1 transition-all",
+                  "flex items-start rounded-xl px-3.5 py-2.5 text-left ring-1 transition-all",
                   active ? "bg-accent/10 ring-2 ring-accent" : "bg-background ring-border hover:ring-foreground/30",
                 )}
               >
-                <span className="text-sm font-semibold text-foreground">{core} 6181Y</span>
-                <span className="text-xs text-muted-foreground">+ 1 × 16mm² 6491X earth</span>
+                <span className="text-sm leading-snug font-semibold text-foreground">{labelOf(core)}</span>
               </button>
             );
           })}
@@ -86,8 +100,8 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
               <tr>
                 <th scope="col" className="w-[22%] px-3 py-2 text-left font-medium">Length</th>
                 {cores.map((core) => (
-                  <th key={core} scope="col" className="px-2 py-2 text-left font-medium">
-                    {core}
+                  <th key={core} scope="col" className="px-2 py-2 text-left align-bottom leading-snug font-medium">
+                    {labelOf(core)}
                   </th>
                 ))}
               </tr>
@@ -108,7 +122,7 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
                             type="button"
                             onClick={() => go(pack)}
                             aria-pressed={active}
-                            aria-label={`${length}, ${core}: ${formatCurrency(exVat(pack.price))} ex VAT`}
+                            aria-label={`${length}, ${labelOf(core)}: ${formatCurrency(exVat(pack.price))} ex VAT`}
                             className={cn(
                               "flex w-full flex-col items-start rounded-lg px-2 py-1.5 text-left transition-colors",
                               active
@@ -132,7 +146,7 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
             </tbody>
           </table>
         </div>
-        <p className="mt-1.5 text-xs text-muted-foreground">Prices ex VAT per pack. Tap any price to choose that pack.</p>
+        <p className="mt-1.5 text-xs text-muted-foreground">Prices ex VAT per pack (tails and earth cable together). Tap any price to choose that pack.</p>
       </div>
     </div>
   );

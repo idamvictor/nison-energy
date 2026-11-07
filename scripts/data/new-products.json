@@ -1,0 +1,1015 @@
+{
+  "source": "C:UsersUserDownloadsNew Products.docx",
+  "logos": {
+    "NexBlue": "image23.jpeg",
+    "NRG Charge": "image43.png"
+  },
+  "products": [
+    {
+      "category": "Commercial",
+      "brand": "Easee",
+      "connectionType": "Untethered",
+      "powerOutput": "22kW",
+      "name": "Easee Charge Pro Untethered EV Charger 7.4kW–22kW with MID Metering & V2G",
+      "sku": "10263",
+      "price": "954",
+      "description": [
+        "The Easee Charge Pro is an advanced, commercial-grade smart EV charger supplied by Ocunio, engineered to power workplaces, apartment buildings, hotels, retail sites, and public car parks. Delivering versatile AC charging up to 22kW, it supports single-phase supply from 1.4kW to 7.4kW (6A–32A), 3-phase TN grids up to 22kW, and 3-phase IT systems up to 12.7kW. The charger actively optimizes power distribution through automatic current adjustments, dynamic phase balancing, and solar charging compatibility when paired with the Easee Equalizer. Positioned at the cutting edge of energy transition technology, it is fully V2G-ready (Vehicle-to-Grid) to future-proof commercial fleet and property investments.",
+        "Designed for transparent billing and compliance, the unit features an integrated MID Class B certified energy meter, ensuring revenue-grade accuracy for driver reimbursement, tenant sub-metering, and public pay-to-charge transactions. Drivers and site operators benefit from multiple access tiers—including an integrated RFID/NFC reader, Bluetooth, and cloud management via the user-friendly Easee App for live session monitoring, cable locking, and consumption tracking.",
+        "Engineered with an open ecosystem, the Easee Charge Pro includes built-in 4G cellular, Wi-Fi, and Easee LinkRF local communication, offering seamless OCPP 1.6J integration (with forward readiness for OCPP 2.X) across more than 500 Charge Point Operator (CPO) platforms. Built to endure punishing environments, its Scandinavian enclosure is certified to IP54 weather resistance and IK10 mechanical impact standards. Comprehensive safety includes integrated Type A RCD protection with RDC-DD residual DC detection, continuous thermal sensing, and full compliance with UK Smart Charge Point Regulations. Compatible with the plug-and-play Easee Ready docking backplate, it allows effortless circuit sharing and scalable infrastructure expansion without costly electrical upgrades."
+      ],
+      "features": [
+        "Multiphase 7kW-22kW EV charger",
+        "Universal Type 2 socket",
+        "Integrated MID meter for billing",
+        "EaseeLink local load balancing",
+        "Automatic queuing system",
+        "OCPP compliant for integration",
+        "Easee app and control portal",
+        "WiFi, 4G & Bluetooth connectivity",
+        "Built-in RFID/NFC reader",
+        "Lockable charging cable",
+        "IP54 and IK10 rated",
+        "Warranty: 5 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power",
+          "value": "Multiphase, 7kW-22kW"
+        },
+        {
+          "label": "Connector",
+          "value": "Universal Type 2 socket"
+        },
+        {
+          "label": "Metering",
+          "value": "Integrated MID meter for accurate energy readings and transparent billing"
+        },
+        {
+          "label": "Load Management",
+          "value": "EaseeLink local load and phase balancing, dynamic load and phase balancing for optimised energy use, automatic queuing system"
+        },
+        {
+          "label": "Integration",
+          "value": "OCPP compliance for seamless integration with management systems"
+        },
+        {
+          "label": "App & Software",
+          "value": "Easee app and control portal for managing the charger, accessing reports and viewing charge status; safe, future-proof design with software updates"
+        },
+        {
+          "label": "Connectivity",
+          "value": "WiFi, 4G & Bluetooth"
+        },
+        {
+          "label": "Access & Security",
+          "value": "Built-in RFID/NFC reader for access control, lockable charging cable"
+        },
+        {
+          "label": "Protection & Rating",
+          "value": "Built-in AC & DC RCD protection, overload protection, IP54, IK10"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "256 x 193 x 106mm (H x W x D), 1.6kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "5 years"
+        }
+      ],
+      "gallery": [
+        "image2.jpeg",
+        "image3.jpeg",
+        "image4.jpeg",
+        "image5.jpeg"
+      ],
+      "tariffs": [],
+      "warranty": "5 years",
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "Easee",
+      "connectionType": "Untethered",
+      "powerOutput": "7.4kW",
+      "name": "Easee One 7.4kW Socket EV Charger With Charging Cable & U-Hook",
+      "sku": "10530",
+      "price": "697.20",
+      "description": [
+        "The Easee One 7.4kW Smart EV Charger Bundle is an ultra-compact, intelligent charging solution supplied by Ocunio, engineered to deliver fast, reliable single-phase charging for domestic homes and light commercial premises. Measuring just H256 × W193 × D106mm and protected by an IP54-rated weatherproof casing, this wallbox seamlessly blends into any outdoor or indoor environment while delivering up to 7.4kW charging capacity—safely locked and secured via a robust locking mechanism across both socket and tethered configurations. The bundle includes a heavy-duty 5m Type 2 charging cable and a dedicated U-hook to keep your driveway neat, safe, and hazard-free.",
+        "Designed to maximize installation safety while reducing electrical groundwork costs, the Easee One features integrated O-PEN fault protection—fully eliminating the disruption and expense of installing an external earth electrode or ground rod. Enhanced electrical safeguarding is reinforced with built-in Type B RCD protection alongside hardware-level anti-tamper security, advanced cybersecurity protocols, and automated overload management. For multi-vehicle households or workplaces, the system dynamically balances available power across connected units, maximizing throughput without overloading main supply fuses.",
+        "Everyday charging intelligence is driven by an integrated 4G eSIM featuring a lifetime free subscription, paired with Wi-Fi and Bluetooth local connectivity. Through the companion Easee App, users can track energy usage, schedule off-peak tariffs, lock charging leads, and manage access via the built-in RFID reader. Even during complete broadband or cellular network dropouts, the system's offline Bluetooth functionality guarantees uninterrupted, manual charging control whenever you need it."
+      ],
+      "features": [
+        "5m cable, U-hook included",
+        "O-PEN protection, no earth rod",
+        "RCD Type-B protection",
+        "Anti-tamper design, improved cyber security",
+        "Integrated RFID reader, app enabled",
+        "Inbuilt 4G eSIM, lifetime free",
+        "Offline Bluetooth mode during outages",
+        "Automatic simultaneous multi-vehicle charging",
+        "IP54 weatherproof, OZEV grant approved",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Rate",
+          "value": "7.4kW, single phase"
+        },
+        {
+          "label": "Connector",
+          "value": "Socket, via locking mechanism"
+        },
+        {
+          "label": "Cable",
+          "value": "5m single-phase charging cable and U-hook included"
+        },
+        {
+          "label": "Earthing & Protection",
+          "value": "Integrated O-PEN protection (built-in earthing, no earth rod required), RCD Type-B protection"
+        },
+        {
+          "label": "Security",
+          "value": "Anti-tamper, improved cyber security, integrated RFID reader"
+        },
+        {
+          "label": "Connectivity",
+          "value": "Inbuilt eSIM (4G) with lifetime free subscription; offline mode continues charging via Bluetooth during WiFi/4G outages"
+        },
+        {
+          "label": "Load Management & Control",
+          "value": "Simultaneous charging, with available power distributed automatically and dynamically between vehicles; app enabled"
+        },
+        {
+          "label": "Design & Rating",
+          "value": "Black, accessory faceplates in anthracite, white, red or blue (sold separately), IP54, 256 x 193 x 106mm (H x W x D), 1.5kg"
+        },
+        {
+          "label": "Approvals",
+          "value": "OZEV grant approved"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years (from day of installation)"
+        }
+      ],
+      "gallery": [
+        "image6.png",
+        "image7.png",
+        "image8.png",
+        "image9.jpeg",
+        "image10.png",
+        "image11.png",
+        "image12.jpeg"
+      ],
+      "tariffs": [],
+      "warranty": "3 years",
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "VCHRGD",
+      "connectionType": "Untethered",
+      "powerOutput": "7.4kW",
+      "name": "VCHRGD Seven 7.4kW Untethered EV Charger",
+      "sku": "E007SUH-01",
+      "price": "381.60",
+      "description": [
+        "The VCHRGD Seven Untethered is a sleek, intelligent 7kW single-phase AC chargepoint supplied by Ocunio, engineered specifically for domestic homes and light commercial installations requiring discrete, uncluttered wall mounting. Featuring a universal Mode 3 Type 2 charging socket, its untethered configuration allows drivers to connect any charging lead length to suit diverse driveway layouts and vehicle parking orientations—storing the cable neatly out of sight between sessions. Housed within a compact 340 × 200 × 129mm enclosure with an IP55 weatherproof rating, it delivers versatile wall or pedestal mounting engineered to endure outdoor British weather year-round.",
+        "Designed for streamlined electrical compliance and lower installation costs, the VCHRGD Seven incorporates built-in Open-PEN fault detection, fully eliminating the need for costly external earth rods or disruptive groundworks. Comprehensive user safety is reinforced with integrated 30mA Type A AC and 6mA DC residual earth leakage protection, alongside multi-tier current adjustment configurable from 6A to 32A to suit domestic supply headroom. For properties with constrained grid capacity, the unit supports active dynamic load management to protect main service cut-out fuses during simultaneous domestic power draws.",
+        "Everyday charging intelligence is driven by integrated dual-band Wi-Fi and Bluetooth connectivity, backed by a built-in RFID card reader for quick tap-and-charge local driver authentication. Through the companion smartphone app, users can easily schedule off-peak tariff charging, monitor real-time output, lock the socket, and run remote diagnostics. Furthermore, with open-protocol OCPP 1.6 compatibility, the VCHRGD Seven integrates effortlessly into third-party back-office management platforms for smart home energy platforms and fleet reporting."
+      ],
+      "features": [
+        "VCHRGD SEVEN 7kW EV charger",
+        "Adjustable 6A–32A charging current",
+        "Built-in PEN fault detection",
+        "AC/DC earth leakage protection",
+        "Type 2 socket, untethered",
+        "Wall or pedestal mounting",
+        "WiFi, Bluetooth, RFID, OCPP 1.6",
+        "App control, dynamic load management",
+        "IP55 weatherproof, matte black",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power",
+          "value": "7kW / 32A, adjustable current 6A–32A, Mode 3"
+        },
+        {
+          "label": "Electrical Supply",
+          "value": "Single phase, 230V AC, 50/60Hz, standby power <2.5W"
+        },
+        {
+          "label": "PEN Fault Detection",
+          "value": "Built in"
+        },
+        {
+          "label": "Earth Leakage Protection",
+          "value": "AC 30mA + DC 6mA"
+        },
+        {
+          "label": "Additional Protection",
+          "value": "Over/under voltage, over-temperature, earth leakage, unconnected PE and welding detection"
+        },
+        {
+          "label": "Connector & Cable",
+          "value": "Type 2 socket, charging cable not permanently attached"
+        },
+        {
+          "label": "Dimensions & Mounting",
+          "value": "340 x 200 x 129mm (H x W x D), wall or pedestal mounting"
+        },
+        {
+          "label": "Weather Rating",
+          "value": "IP55"
+        },
+        {
+          "label": "Smart Connectivity",
+          "value": "WiFi, Bluetooth, OCPP 1.6"
+        },
+        {
+          "label": "Control & Access",
+          "value": "RFID, app control, dynamic load management"
+        },
+        {
+          "label": "Colour & SKU",
+          "value": "Matte black, SKU E007SUH-01"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years"
+        }
+      ],
+      "gallery": [
+        "image15.png",
+        "image16.png",
+        "image17.png",
+        "image18.png",
+        "image19.png"
+      ],
+      "tariffs": [
+        "Octopus Energy"
+      ],
+      "warranty": "3 years",
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "VCHRGD",
+      "connectionType": "Tethered",
+      "powerOutput": "7.4kW",
+      "cableLength": "5m",
+      "name": "VCHRGD Seven 7.4kW Tethered EV Charger",
+      "sku": "E007STH-01",
+      "price": "381.60",
+      "description": [
+        "The VCHRGD Seven Tethered is a sleek, intelligent 7kW single-phase AC chargepoint supplied by Ocunio, engineered specifically for domestic homes and light commercial installations where everyday convenience is paramount. Featuring a permanently attached 5m Mode 3 Type 2 charging cable, it streamlines daily charging routines—allowing drivers to park, unholster the connector, and plug directly into their vehicle without needing to retrieve or untangle a separate charging lead. Housed within a compact 340 × 200 × 129mm enclosure with an IP55 weatherproof rating, it delivers versatile wall or pedestal mounting engineered to endure outdoor British weather year-round.",
+        "Designed for straightforward electrical compliance and reduced installation costs, the VCHRGD Seven incorporates built-in Open-PEN fault detection, fully eliminating the expense and disruption of driving an external earth rod. Comprehensive user and circuit safety is reinforced with integrated 30mA Type A AC and 6mA DC residual earth leakage protection, alongside multi-tier current adjustment configurable from 6A to 32A to match available domestic supply headroom. For properties with high electrical demand, the unit supports active dynamic load management to protect main service cut-out fuses during simultaneous household appliance use.",
+        "Everyday charging intelligence is driven by integrated dual-band Wi-Fi and Bluetooth connectivity, backed by a built-in RFID card reader for quick tap-and-charge local driver authorization. Through the companion smartphone app, users can easily schedule off-peak tariff charging, monitor real-time output, control access permissions, and run remote diagnostics. Furthermore, with open-protocol OCPP 1.6 compatibility, the VCHRGD Seven integrates effortlessly into third-party chargepoint management software and smart energy platforms."
+      ],
+      "features": [
+        "VCHRGD SEVEN 7kW EV charger",
+        "5m tethered Type 2 cable",
+        "Adjustable 6A–32A charging current",
+        "Built-in PEN fault detection",
+        "AC/DC earth leakage protection",
+        "Wall or pedestal mounting",
+        "WiFi, Bluetooth, RFID, OCPP 1.6",
+        "App control, dynamic load management",
+        "IP55 weatherproof, matte black",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power",
+          "value": "7kW / 32A, adjustable current 6A–32A, Mode 3"
+        },
+        {
+          "label": "Electrical Supply",
+          "value": "Single phase, 230V AC, 50/60Hz, standby power <2.5W"
+        },
+        {
+          "label": "PEN Fault Detection",
+          "value": "Built in"
+        },
+        {
+          "label": "Earth Leakage Protection",
+          "value": "AC 30mA + DC 6mA"
+        },
+        {
+          "label": "Additional Protection",
+          "value": "Over/under voltage, over-temperature, earth leakage, unconnected PE and welding detection"
+        },
+        {
+          "label": "Connector & Cable",
+          "value": "Type 2 tethered, 5m cable length"
+        },
+        {
+          "label": "Dimensions & Mounting",
+          "value": "340 x 200 x 129mm (H x W x D), wall or pedestal mounting"
+        },
+        {
+          "label": "Weather Rating",
+          "value": "IP55"
+        },
+        {
+          "label": "Smart Connectivity",
+          "value": "WiFi, Bluetooth, OCPP 1.6"
+        },
+        {
+          "label": "Control & Access",
+          "value": "RFID, app control, dynamic load management"
+        },
+        {
+          "label": "Colour & SKU",
+          "value": "Matte black, SKU E007STH-01"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years"
+        }
+      ],
+      "gallery": [
+        "image20.png",
+        "image21.jpeg",
+        "image22.jpeg"
+      ],
+      "tariffs": [
+        "Octopus Energy"
+      ],
+      "warranty": "3 years",
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "NexBlue",
+      "connectionType": "Untethered",
+      "powerOutput": "7.4kW",
+      "name": "NexBlue Point 2 Socket 7kW EV Charger V2G",
+      "sku": "NB2670B-BLACK",
+      "price": "480",
+      "description": [
+        "The NexBlue Point 2 is a compact, future-ready 7.4kW AC smart EV charger supplied by Ocunio, engineered to deliver intelligent home and workplace charging across all UK grid systems (TN-C-S, TN-C, TN-S, and TT). Featuring a universal Mode 3 Type 2 socket and dynamic current adaptation from 1.4kW to 7.4kW (6A to 32A single-phase), it allows drivers to use their preferred cable length while providing a clean, minimalist aesthetic on any wall or post mounting. Designed for the next generation of e-mobility, the Point 2 is fully ready for ISO 15118, Vehicle-to-Grid (V2G) bidirectional power, and automated Plug & Charge.",
+        "Engineered to maximize safety and lower installation costs, the unit incorporates built-in Open-PEN fault protection, eliminating the need for costly external earth rods or disruptive groundworks. Electrical safeguarding is driven by more than 30 integrated smart sensors, including 30mA Type A AC protection, 6mA DC residual detection, ground-fault protection, and continuous thermal monitoring. Every unit comes complete with an included wired CT clamp, providing automated smart load balancing out of the box to safeguard the main household cut-out fuse while maximizing power throughput.",
+        "Everyday charging intelligence and connectivity are seamless, powered by triple-redundancy communications including 4G eSIM, Wi-Fi, Ethernet, and Bluetooth alongside local radio frequency. Drivers can optimize energy expenses through the myNexBlue App, utilizing the EcoPilot mode to automatically align charging with cheap off-peak smart energy tariffs or harness free self-generated solar energy via solar surplus charging. Multi-tier access is supported via RFID, NFC, AutoCharge, or open Plug & Play. Certified by TÜV Rheinland and backed by a comprehensive 5-year warranty, the NexBlue Point 2 supports Local OCPP 1.6-J and 2.0.1 with dedicated partner APIs, enabling rapid 4-minute commissioning via one-tap NFC."
+      ],
+      "features": [
+        "Type 2 socket, electronic lock",
+        "EcoPilot smart tariff charging",
+        "Solar surplus charging",
+        "myNexBlue app and portal",
+        "App, RFID NFC, AutoCharge start",
+        "Ethernet, WiFi, 4G, Bluetooth",
+        "Built-in PEN-fault protection",
+        "Wired CT for load balancing",
+        "IP54 and IK10 rated",
+        "Warranty: 5 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power",
+          "value": "7.4kW"
+        },
+        {
+          "label": "Connector",
+          "value": "Type 2 socket with electronic lock and permanent lock option"
+        },
+        {
+          "label": "Smart Charging & Tariff",
+          "value": "EcoPilot smart tariff charging to help reduce charging costs; solar surplus charging for better use of renewable energy"
+        },
+        {
+          "label": "App & Control",
+          "value": "myNexBlue app and portal for scheduling, monitoring and charging history; start modes include app, RFID NFC, Plug & Play and AutoCharge"
+        },
+        {
+          "label": "Connectivity",
+          "value": "Ethernet, WiFi, 4G eSIM, Bluetooth and local radio"
+        },
+        {
+          "label": "Protection",
+          "value": "Built-in PEN-fault protection, 6mA DC RDC-DD and 30mA AC protection"
+        },
+        {
+          "label": "Load Management",
+          "value": "Wired CT included for smart load balancing"
+        },
+        {
+          "label": "Ingress & Impact Rating",
+          "value": "IP54, IK10"
+        },
+        {
+          "label": "Integration & Future-Readiness",
+          "value": "ISO 15118 ready for V2G and Plug & Charge; local OCPP 1.6-J and 2.0.1 compatible"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "235 x 230 x 107mm (H x W x D), 2.1kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "5 years"
+        }
+      ],
+      "gallery": [
+        "image25.jpeg",
+        "image26.png",
+        "image27.jpeg",
+        "image28.jpeg",
+        "image29.png",
+        "image30.jpeg"
+      ],
+      "tariffs": [
+        "Octopus Energy",
+        "OVO Energy"
+      ],
+      "warranty": "5 years",
+      "video": "https://www.youtube.com/embed/TL7bzl3EOB8"
+    },
+    {
+      "category": "Commercial",
+      "brand": "NexBlue",
+      "connectionType": "Untethered",
+      "powerOutput": "22kW",
+      "name": "NexBlue BLACK Edge Untethered 1.4-22KW EV Charger Type 2 Socket Single & 3 Phase (NB2620A-BLACK) IP54 – Black",
+      "sku": "NB2620A-BLACK",
+      "price": "571",
+      "description": [
+        "The NexBlue Edge is a high-performance, intelligent AC EV charger supplied by Ocunio, engineered to deliver adaptive charging from 1.4kW up to 22kW across domestic properties, light commercial premises, and workplace fleets. Supporting both single-phase (up to 7.4kW / 32A) and three-phase supplies (up to 22kW / 32A), it offers universal compatibility across all UK grid earthing configurations, including TN-C-S, TN-C, TN-S, and TT. Equipped with a universal Mode 3 Type 2 socket, it provides drivers with complete flexibility over cable choice while maintaining a modern, clutter-free installation on any wall or mounting pedestal.",
+        "Engineered for rapid deployment and maximum site safety, the NexBlue Edge incorporates integrated Open-PEN fault protection, eliminating the labor, disruption, and civil costs of driving external ground earth rods. The unit features comprehensive electrical safeguarding, including 6mA DC residual detection (RDC-DD), 30mA AC protection, over/under voltage detection, overload control, and active thermal management. Housed in an IP54-rated, IK08 impact-resistant, UV-stabilized enclosure certified by SGS and TÜV, the system is designed around a modular backplate that enables a rapid 4-minute installation time, making it the ideal scalable platform for multi-point commercial rollouts.",
+        "Everyday charging intelligence is driven by always-on connectivity, combining Wi-Fi, built-in 4G eSIM, Bluetooth (BLE), and local radio frequency (Nexus RF) for over-the-air firmware updates and remote management. Through the myNexBlue App and Portal, operators and drivers can schedule sessions around low-cost off-peak tariffs, review energy history, and authenticate charging via RFID, NFC, app control, or open Plug & Play. When paired with the optional NexBlue Zen sensor, the unit unlocks active dynamic load balancing to safeguard supply cut-out fuses, alongside solar surplus charging to harness free self-generated renewable energy. Fully compliant with UK Smart Charge Point Regulations and equipped with Local OCPP 1.6-J compatibility, the NexBlue Edge integrates effortlessly into commercial billing networks and energy-management back-offices."
+      ],
+      "features": [
+        "22kW smart untethered EV charger",
+        "Adaptive 1.4-22kW, single/three-phase",
+        "Type 2 socket, untethered",
+        "NexBlue Zen load balancing",
+        "Solar surplus charging",
+        "Off-peak tariff scheduling",
+        "myNexBlue app and portal",
+        "App, RFID, NFC start modes",
+        "WiFi, 4G eSIM, BLE connectivity",
+        "Local OCPP 1.6-J support",
+        "Integrated PEN-fault protection",
+        "IP54, IK08, UV resistant",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power",
+          "value": "Adaptive 1.4-22kW, single-phase and three-phase use"
+        },
+        {
+          "label": "Connector",
+          "value": "Type 2 socket, untethered"
+        },
+        {
+          "label": "Load Management",
+          "value": "Dynamic load balancing with NexBlue Zen to help protect the electrical supply"
+        },
+        {
+          "label": "Solar & Tariff",
+          "value": "Solar surplus charging with NexBlue Zen; off-peak scheduling to support lower-cost charging with energy tariffs"
+        },
+        {
+          "label": "App & Control",
+          "value": "myNexBlue app and portal for monitoring, configuration and charging control; start modes include app, RFID, NFC, Plug & Play and NexBlue user portal"
+        },
+        {
+          "label": "Connectivity",
+          "value": "WiFi, 4G eSIM, BLE and Nexus RF for OTA updates and smart control; local OCPP 1.6-J support for platform integration"
+        },
+        {
+          "label": "PEN-Fault Protection",
+          "value": "Integrated, for 1-phase and 3-phase installations"
+        },
+        {
+          "label": "Protection & Rating",
+          "value": "Built-in 6mA DC RDC-DD with 30mA AC protection (external Type A RCD required), IP54, IK08, UV resistant"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "235 x 230 x 130mm (H x W x D), 1.9kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years"
+        }
+      ],
+      "gallery": [
+        "image25.jpeg",
+        "image26.png",
+        "image31.jpeg",
+        "image32.png",
+        "image33.png",
+        "image34.jpeg"
+      ],
+      "tariffs": [
+        "Octopus Energy",
+        "OVO Energy"
+      ],
+      "warranty": "3 years",
+      "video": null
+    },
+    {
+      "category": "Commercial",
+      "brand": "NexBlue",
+      "connectionType": "Untethered",
+      "powerOutput": "22kW",
+      "name": "NexBlue Delta Max 22KW EV Charger Type 2 Socket Single / 3 Phase Untethered NB2620E Mid Meter -V2G",
+      "sku": "NB2620E-BLACK",
+      "price": "682.80",
+      "description": [
+        "The NexBlue Delta Max is an advanced, commercial-grade 22kW AC smart EV charger supplied by Ocunio, engineered specifically for high-demand workplace fleets, multi-occupancy residential developments, hospitality destinations, and shared commercial car parks. Delivering adaptive output from 1.4kW to 22kW across single-phase (up to 7.4kW / 32A) and three-phase supplies (up to 22kW / 32A), it offers universal compatibility across all UK earthing networks (TN-C-S, TN-C, TN-S, and TT). The universal Mode 3 Type 2 socket is fitted with an electronic locking mechanism to ensure secure, uninterrupted charging sessions across varying cable lengths.",
+        "Engineered for revenue-grade transparency and seamless billing, the Delta Max features integrated MID-compliant energy metering (Class B), providing certified energy measurement for tenant sub-metering, company vehicle reimbursement, and public pay-to-charge operations. Driver interaction is streamlined by a clear built-in OLED display that communicates live charging speed, delivered kWh, and operational status directly at the unit. Everyday charging control is fully versatile, offering driver authentication via RFID cards, NFC, AutoCharge, open Plug & Play, or the myNexBlue App and User Portal.",
+        "Built for scalable infrastructure rollouts, the charger incorporates an RFID-enabled backplate and NFC one-tap commissioning, enabling contractors to complete installations in as little as 4 minutes. When paired with NexBlue Zen, the system unlocks dynamic local and cloud-based load balancing alongside phase balancing to distribute site power safely across multiple charging units without risking substation or fuse overloads. Site managers can remotely supervise clusters, monitor operational uptime, and export commercial billing reports via the NexBlue Partner Portal.",
+        "The Delta Max delivers comprehensive safety and grid compliance, featuring built-in Open-PEN fault detection to eliminate the cost and disruption of driving ground earth rods. Full circuit safeguarding is maintained through integrated 6mA DC residual detection (RDC-DD), 30mA AC leakage protection, ground-fault monitoring, and over 40 thermal and overload sensors. Encased in an IP54-rated, IK10 impact-resistant housing, the unit maintains constant cloud connectivity via Ethernet, Wi-Fi, built-in 4G eSIM, Bluetooth, and local radio frequency. Backed by TÜV Rheinland CE certification and a 5-year warranty, the NexBlue Delta Max is fully compliant with Local OCPP 1.6-J and 2.0.1 and comes fully hardware-ready for ISO 15118, V2G bidirectional energy transfer, and automated Plug & Charge."
+      ],
+      "features": [
+        "22kW commercial smart EV charger",
+        "Adaptive 1.4-22kW, single/three-phase",
+        "Type 2 socket, electronic lock",
+        "MID Class B energy metering",
+        "OLED display for live data",
+        "App, RFID NFC, AutoCharge start",
+        "NexBlue Zen load balancing",
+        "Ethernet, WiFi, 4G, Bluetooth",
+        "Built-in PEN-fault protection",
+        "IP54 and IK10 rated",
+        "ISO 15118 and OCPP ready",
+        "Warranty: 5 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power",
+          "value": "Adaptive 1.4-22kW, single-phase and three-phase use"
+        },
+        {
+          "label": "Connector",
+          "value": "Type 2 socket with electronic lock and permanent lock option"
+        },
+        {
+          "label": "Metering",
+          "value": "MID Class B energy metering for accurate and transparent billing"
+        },
+        {
+          "label": "Display",
+          "value": "OLED display for real-time charging data at the charger"
+        },
+        {
+          "label": "App & Start Modes",
+          "value": "myNexBlue app, RFID NFC, Plug & Play, AutoCharge and user portal"
+        },
+        {
+          "label": "Load Management",
+          "value": "Dynamic local/cloud load and phase balancing with NexBlue Zen for scalable site charging; smart multi-level load management to help prevent infrastructure overload"
+        },
+        {
+          "label": "Connectivity",
+          "value": "Ethernet, WiFi, 4G eSIM, Bluetooth and local radio"
+        },
+        {
+          "label": "Protection",
+          "value": "Built-in PEN-fault protection, 6mA DC RDC-DD and 30mA AC protection"
+        },
+        {
+          "label": "Ingress & Impact Rating",
+          "value": "IP54, IK10"
+        },
+        {
+          "label": "Integration & Future-Readiness",
+          "value": "ISO 15118 ready for V2G and Plug & Charge; local OCPP 1.6-J and 2.0.1 compatible"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "235 x 230 x 107mm (H x W x D), 2.3kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "5 years"
+        }
+      ],
+      "gallery": [
+        "image35.jpeg",
+        "image36.png",
+        "image37.jpeg",
+        "image38.png",
+        "image39.jpeg"
+      ],
+      "tariffs": [
+        "Octopus Energy",
+        "OVO Energy"
+      ],
+      "warranty": "5 years",
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "NexBlue",
+      "connectionType": "Tethered",
+      "powerOutput": "7.4kW",
+      "cableLength": "7.5m",
+      "name": "Nexblue Point 2 Tethered 7.4kW EV Charger, Type 2 7.5m Black IP54 – V2G",
+      "sku": "NB2677B- Black",
+      "price": "553.20",
+      "description": [
+        "The NexBlue Point 2 Tethered is an intelligent, high-performance 7.4kW single-phase AC smart EV charger supplied by Ocunio, engineered to streamline everyday charging for UK homes and light commercial premises. Featuring a permanently attached 7.5m Mode 3 Type 2 charging lead and an integrated cable management hook, it delivers maximum parking convenience—allowing drivers to simply unholster and plug directly into their vehicle without the hassle of untangling or retrieving a separate cable from the boot. Offering adaptive power delivery from 1.4kW to 7.4kW (6A to 32A), the Point 2 provides universal compatibility across all UK grid earthing arrangements, including TN-C-S, TN-C, TN-S, and TT. Built for long-term technological resilience, the unit is fully hardware-ready for ISO 15118, Vehicle-to-Grid (V2G) bidirectional charging, and automated Plug & Charge.",
+        "Designed to eliminate costly civils work and simplify BS 7671 compliance, the charger features built-in Open-PEN fault protection, removing the requirement to drive an external ground earth rod or risk striking buried utility services. Comprehensive electrical safeguarding is backed by over 30 smart sensors, delivering integrated 30mA Type A AC protection, 6mA DC residual detection (RDC-DD), ground-fault monitoring, and active thermal management. Every unit comes complete with an included wired CT clamp, providing automated dynamic load balancing right out of the box to safeguard the main household cut-out fuse while maximizing power throughput.",
+        "Everyday charging intelligence is driven by always-on, multi-channel connectivity via Ethernet, Wi-Fi, built-in 4G eSIM, and Bluetooth. Through the myNexBlue App and Portal, drivers can schedule charging around cheap off-peak smart energy tariffs or harness free self-generated renewable power using solar surplus charging. Seamless driver access is supported via RFID, NFC, AutoCharge, or open Plug & Play. Backed by TÜV Rheinland CE certification and a 5-year warranty, the NexBlue Point 2 Tethered supports Local OCPP 1.6-J and 2.0.1 with dedicated partner APIs, enabling rapid 4-minute commissioning via one-tap NFC."
+      ],
+      "features": [
+        "7.4kW single-phase EV charger",
+        "7.5m tethered cable, hook included",
+        "O-PEN protection, no earth rod",
+        "RCD Type-B protection",
+        "V2G ready",
+        "Integrated RFID reader, app enabled",
+        "Ethernet, WiFi or 4G eSIM",
+        "Lifetime free 4G subscription",
+        "Offline Bluetooth mode during outages",
+        "IP54 rated, OZEV approved",
+        "Warranty: 5 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Rate",
+          "value": "7.4kW, single phase"
+        },
+        {
+          "label": "Connector & Cable",
+          "value": "Tethered, 7.5m cable, cable hook included"
+        },
+        {
+          "label": "Earthing & Protection",
+          "value": "Integrated O-PEN protection (built-in earthing, no earth rod required), RCD Type-B protection"
+        },
+        {
+          "label": "V2G",
+          "value": "V2G ready"
+        },
+        {
+          "label": "Access & Security",
+          "value": "Integrated RFID reader, enhanced cyber security"
+        },
+        {
+          "label": "Connectivity",
+          "value": "Ethernet, WiFi or 4G eSIM; inbuilt eSIM (4G) with lifetime free subscription; offline mode continues charging via NexBlue Bluetooth during WiFi/4G outages"
+        },
+        {
+          "label": "Colour",
+          "value": "Black"
+        },
+        {
+          "label": "App & Approvals",
+          "value": "App enabled, OZEV grant approved"
+        },
+        {
+          "label": "Build, Rating & Dimensions",
+          "value": "Plastic, IP54, 235 x 230 x 107mm (H x W x D), 2.1kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "5 years (from day of installation)"
+        }
+      ],
+      "gallery": [
+        "image40.jpeg",
+        "image41.jpeg",
+        "image42.png"
+      ],
+      "tariffs": [
+        "Octopus Energy",
+        "OVO Energy"
+      ],
+      "warranty": "5 years",
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "NRG Charge",
+      "connectionType": "Untethered",
+      "powerOutput": "7kW",
+      "name": "NRG VELOX 7kW EV Charger Type 2 Socket WIFI RFID – Black",
+      "sku": "7kw NON 4G unit",
+      "price": "354",
+      "description": [
+        "The NRG Charge NRG-7KW is a smart, robust 7kW single-phase AC electric vehicle charger supplied by Ocunio, engineered for high-efficiency domestic home charging and light commercial installations. Featuring an untethered universal Mode 3 Type 2 socket, it provides drivers with total versatility over charging cable length while ensuring a modern, streamlined finish on any external wall or pedestal mounting. Designed with a contractor-first modular architecture, the unit separates the wiring base box from the main charging head—allowing electricians to complete fixed cable terminations first and facilitating quick head swaps for future maintenance without disturbing site wiring.",
+        "Engineered to eliminate disruptive groundworks and costly earth electrodes, the NRG Charge incorporates Open PEN protection fully certified to BS 7671:2018 + A1:2020, providing verified safety compliance directly from PME supplies. Comprehensive electrical protection is reinforced by OPDD certification, overcurrent safeguards, under/over-voltage monitoring, ground-fault protection, thermal shutdown, and tamper-proof security. Housed in a durable IK10 impact-rated enclosure, it is designed to withstand severe knocks and harsh weather across residential driveways and commercial parking environments. Advanced hardware-level security is backed by IEC/ISO 18031 cybersecure encryption, protecting cryptographic keys and user transaction data against digital vulnerabilities.",
+        "Everyday charging intelligence is driven by integrated Wi-Fi, Bluetooth, and hardwired LAN connectivity, ensuring reliable network uptime regardless of site layout. Through the NRG Charge app, users can easily schedule charging to align with cheaper off-peak electricity tariffs, manage access control, and track active sessions, while two included RFID key fobs offer instant tap-to-charge authentication. Furthermore, the system is fully renewable-ready: with a second current transformer (CT) clamp installed, the charger automatically detects surplus domestic solar generation and diverts clean, free energy directly into the vehicle rather than exporting it back to the grid."
+      ],
+      "features": [],
+      "specs": [],
+      "gallery": [
+        "image44.jpeg",
+        "image45.jpeg",
+        "image46.jpeg",
+        "image47.jpeg",
+        "image48.png"
+      ],
+      "tariffs": [],
+      "warranty": null,
+      "video": null
+    },
+    {
+      "category": "Residential",
+      "brand": "NRG Charge",
+      "connectionType": "Untethered",
+      "powerOutput": "7kW",
+      "name": "NRG Charge Velox 7kW EV Charger Type 2 Socket 4G - Black",
+      "sku": "7kw-4G-unit",
+      "price": "420",
+      "description": [
+        "The NRG Charge NRG-7KW-4G is a high-performance, single-phase 7kW AC smart EV charger supplied by Ocunio, engineered to deliver dependable, connected charging for domestic residences, shared residential drives, and commercial premises. Featuring a universal Mode 3 Type 2 socket, its untethered configuration gives drivers complete freedom over charging cable selection while keeping outdoor walls neat and clutter-free. Developed with an installer-first modular architecture, the unit separates the wiring base box from the main charging head—allowing electricians to complete fixed cable terminations first and facilitating quick head replacements for ongoing maintenance without disturbing the permanent site wiring.",
+        "Engineered to streamline installation compliance, the NRG Charge incorporates built-in Open PEN protection certified to BS 7671:2018 + A1:2020, eliminating the disruption, time, and civil expense of driving external earth rods. Robust multi-level electrical safeguarding includes certified OPDD protection, overcurrent detection, under/over-voltage monitoring, ground-fault safety, active thermal shutdown, and tamper-proof security. Encased in an ultra-durable IK10-rated enclosure, the charger provides exceptional protection against mechanical impacts and harsh outdoor weather. Sensitive operational and customer data are safeguarded by ISO/IEC 18031 cybersecure encryption, ensuring cryptographic-grade protection for keys and digital communications.",
+        "The unit features an upgraded connectivity suite, integrating 4G cellular, Wi-Fi, hardwired LAN, and Bluetooth to guarantee continuous cloud access regardless of home broadband strength or parking layout. Through the NRG Charge app, users can easily schedule off-peak charging sessions, adjust parameters, and review power consumption, while two included RFID key fobs deliver immediate tap-to-charge authorization. Furthermore, the system is fully renewable-ready: with a second current transformer (CT) installed, the charger actively monitors household microgeneration to divert surplus solar output directly into the vehicle rather than exporting it back to the grid."
+      ],
+      "features": [
+        "NRG Charge smart EV charger",
+        "NRG Charge app control",
+        "Two RFID key fobs included",
+        "RFID, plug and charge, app",
+        "Bluetooth, LAN, 4G, WiFi",
+        "Intelligent solar charging, optional CT",
+        "Dynamic load balancing, master-to-slave",
+        "Certified open PEN protection",
+        "Cybersecure, tamper-proof design",
+        "Modular design, IK10 enclosure",
+        "Warranty: 5 years"
+      ],
+      "specs": [
+        {
+          "label": "App & Control",
+          "value": "NRG Charge app for access control, start/stop and scheduled charging"
+        },
+        {
+          "label": "Access",
+          "value": "2 x RFID key fobs included for tap-to-charge access"
+        },
+        {
+          "label": "Charging Modes",
+          "value": "RFID, plug and charge, app"
+        },
+        {
+          "label": "Connectivity",
+          "value": "Bluetooth, LAN, 4G and WiFi"
+        },
+        {
+          "label": "Solar Charging",
+          "value": "Intelligent solar charging via optional second current transformer"
+        },
+        {
+          "label": "Load Balancing",
+          "value": "Dynamic load balancing via current transformer hub, master-to-slave"
+        },
+        {
+          "label": "Protection & Security",
+          "value": "Open PEN protection certified to BS 7671:2018 + A1:2020; certified protection: OPDD, over current, under/over voltage, ground fault, thermal shutdown, tamper proof; cybersecure, encrypted to IEC 18031"
+        },
+        {
+          "label": "Design & Build",
+          "value": "Load balancing included via free-issued current sensor; modular design with separate base box for fast replacement; durable IK10 rated enclosure"
+        },
+        {
+          "label": "Warranty",
+          "value": "5 years"
+        }
+      ],
+      "gallery": [
+        "image44.jpeg",
+        "image45.jpeg",
+        "image46.jpeg",
+        "image47.jpeg",
+        "image48.png"
+      ],
+      "tariffs": [],
+      "warranty": "5 years",
+      "video": null
+    },
+    {
+      "category": "Commercial",
+      "brand": "NRG Charge",
+      "connectionType": "Untethered",
+      "powerOutput": "22kW",
+      "name": "NRG Charge Velox 22kW EV Charger Type 2 Socket 4G - Black",
+      "sku": "NRG-22KW-4G",
+      "price": "522",
+      "description": [
+        "The NRG Charge NRG-22KW-4G is a high-power, three-phase 22kW AC smart EV charger supplied by Ocunio, engineered for high-demand residential properties, workplaces, fleet depots, and commercial parking sites. Equipped with a universal Mode 3 Type 2 socket, its untethered configuration gives drivers complete freedom over charging cable selection while keeping wall mountings discreet and tidy. Developed with an installer-first modular architecture, the unit separates the wiring base box from the main charging head—allowing electrical contractors to complete heavy-gauge cable terminations first and facilitating rapid head swaps for ongoing maintenance without disturbing permanent site wiring.",
+        "Designed to simplify three-phase electrical compliance, the charger features integrated Open PEN protection certified to BS 7671:2018 + A1:2020, eliminating the disruption, labor, and civil costs of driving external ground earth rods. Comprehensive safety systems include certified OPDD protection, overcurrent safeguarding, under/over-voltage monitoring, ground-fault safety, thermal shutdown, and tamper-proof protection. Housed in an ultra-rugged IK10 impact-resistant enclosure, the unit is built to withstand heavy mechanical knocks and demanding UK weather conditions. Hardware and operational communications are reinforced by ISO/IEC 18031 cybersecure encryption, delivering cryptographic security for access keys and network data.",
+        "To guarantee reliable uptime across sprawling commercial sites or remote parking bays, the unit incorporates an extensive communication suite featuring built-in 4G cellular, Wi-Fi, hardwired LAN, and Bluetooth. Through the NRG Charge app, site operators and drivers can schedule charging sessions around lower-cost off-peak tariffs, manage access permissions, and track energy usage, while two included RFID key fobs offer instant tap-to-charge authorization. Furthermore, the system is fully renewable-ready: when paired with a second current transformer (CT), the charger actively detects surplus solar generation and diverts clean, free energy directly into the vehicle rather than exporting it back to the grid."
+      ],
+      "features": [
+        "NRG Charge smart EV charger",
+        "NRG Charge app control",
+        "Two RFID key fobs included",
+        "RFID, plug and charge, app",
+        "Bluetooth, LAN, 4G, WiFi",
+        "Intelligent solar charging, optional CT",
+        "Dynamic load balancing, master-to-slave",
+        "Certified open PEN protection",
+        "Cybersecure, tamper-proof design",
+        "Modular design, IK10 enclosure",
+        "Warranty: 5 years"
+      ],
+      "specs": [
+        {
+          "label": "App & Control",
+          "value": "NRG Charge app for access control, start/stop and scheduled charging"
+        },
+        {
+          "label": "Access",
+          "value": "2 x RFID key fobs included for tap-to-charge access"
+        },
+        {
+          "label": "Charging Modes",
+          "value": "RFID, plug and charge, app"
+        },
+        {
+          "label": "Connectivity",
+          "value": "Bluetooth, LAN, 4G and WiFi"
+        },
+        {
+          "label": "Solar Charging",
+          "value": "Intelligent solar charging via optional second current transformer"
+        },
+        {
+          "label": "Load Balancing",
+          "value": "Dynamic load balancing via current transformer hub, master-to-slave"
+        },
+        {
+          "label": "Protection & Security",
+          "value": "Open PEN protection certified to BS 7671:2018 + A1:2020; certified protection: OPDD, over current, under/over voltage, ground fault, thermal shutdown, tamper proof; cybersecure, encrypted to IEC 18031"
+        },
+        {
+          "label": "Design & Build",
+          "value": "Load balancing included via free-issued current sensor; modular design with separate base box for fast replacement; durable IK10 rated enclosure"
+        },
+        {
+          "label": "Warranty",
+          "value": "5 years"
+        }
+      ],
+      "gallery": [
+        "image44.jpeg",
+        "image45.jpeg",
+        "image46.jpeg",
+        "image47.jpeg",
+        "image48.png"
+      ],
+      "tariffs": [],
+      "warranty": "5 years",
+      "video": null
+    }
+  ],
+  "indraLux": {
+    "title": "Indra 7.4kW Smart LUX Type 2 EV Charger Tethered Cable",
+    "description": [
+      "The Indra Smart LUX is a premium, wall-mounted 7.4kW single-phase AC smart chargepoint supplied by Ocunio, engineered specifically for space-constrained residential driveways, tight garages, and commercial parking bays. Recognised as the slimmest EV charger on the market at just under 80mm deep (measuring 306 × 201 × 78mm), its discreet, low-profile form factor mounts flush to walls without intruding into narrow vehicle paths. The tethered architecture features a permanently integrated Type 2 charging cable—available in convenient 6m or 10m lengths—paired with an intuitive colour-changing LED sequence that clearly displays live charger status at a glance without needing to check your smartphone.",
+      "Built to endure punishing outdoor environments, the Indra Smart LUX boasts an industry-leading IP67 dustproof and waterproof rating backed by robust IK10 impact resistance, ensuring absolute resilience against torrential rain, dust, and physical knocks. Complete electrical safety is integrated within the casing, featuring advanced Open-PEN fault detection to remove the disruption and civil expense of driving external earth electrodes, alongside 6mA DC residual leakage detection to fully satisfy BS 7671 18th Edition wiring standards. Incorporating patented PESTs technology (protecting against simultaneous contact, touch voltage, and earthing faults), the charger delivers unmatched operational reliability and industry-leading charging uptime.",
+      "Everyday charging intelligence is driven by seamless cloud connectivity and full compatibility with all UK smart energy tariffs. Through the Indra App, users can track analytics and automate scheduling to charge during the lowest-cost off-peak electricity windows. For homes equipped with photovoltaic systems, the unit's dedicated solar mode automatically harnesses surplus domestic solar generation to power vehicles with 100% free renewable energy rather than exporting it back to the grid. Supported by an industry-leading 3-year manufacturer warranty, the Indra Smart LUX combines luxury aesthetics, market-leading thinness, and cutting-edge energy management."
+    ],
+    "features": [
+      "6m or 10m cable options",
+      "6mA DC leakage, PME protection",
+      "WiFi, Bluetooth; Ethernet, 4G optional",
+      "OCPP 1.6 compatible",
+      "Solar mode included",
+      "App, RFID, QR code access",
+      "IP67 weatherproof, cable storage hook",
+      "Black, stone, grey, white",
+      "Warranty: 3 years standard"
+    ],
+    "specs": [
+      {
+        "label": "Charging Rate",
+        "value": "7.4kW (32A, single phase)"
+      },
+      {
+        "label": "Connector & Cable",
+        "value": "Tethered, 6m or 10m cable, cable storage hook included"
+      },
+      {
+        "label": "Protection",
+        "value": "6mA DC leakage detection, PME fault protection"
+      },
+      {
+        "label": "Connectivity",
+        "value": "WiFi & Bluetooth (standard), Ethernet & 4G (optional), OCPP 1.6"
+      },
+      {
+        "label": "Solar",
+        "value": "Solar mode"
+      },
+      {
+        "label": "Authorisation",
+        "value": "App, RFID, QR code"
+      },
+      {
+        "label": "Weather Rating",
+        "value": "IP67"
+      },
+      {
+        "label": "Weight",
+        "value": "3.6kg–4.7kg"
+      },
+      {
+        "label": "Colours",
+        "value": "Black, malvern stone, grey and white"
+      },
+      {
+        "label": "Material, Dimensions & Certification",
+        "value": "Polycarbonate, 306 x 201 x 78mm (H x W x D), CE certified"
+      },
+      {
+        "label": "Warranty",
+        "value": "Standard 3 years (extra 2 years optional, purchased directly from Indra)"
+      }
+    ],
+    "warranty": "3 years standard",
+    "variants": [
+      {
+        "sku": "SMNFGT2BL403",
+        "colour": "Black",
+        "cableLength": "6m",
+        "price": "558",
+        "gallery": [
+          "image52.png",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2GY406",
+        "colour": "Grey",
+        "cableLength": "6m",
+        "price": "558",
+        "gallery": [
+          "image53.jpeg",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2GY405",
+        "colour": "Malvern Stone",
+        "cableLength": "6m",
+        "price": "558",
+        "gallery": [
+          "image51.jpeg",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2WH404",
+        "colour": "White",
+        "cableLength": "6m",
+        "price": "558",
+        "gallery": [
+          "image50.jpeg",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2BL404",
+        "colour": "Black",
+        "cableLength": "10m",
+        "price": "618",
+        "gallery": [
+          "image52.png",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2GY408",
+        "colour": "Grey",
+        "cableLength": "10m",
+        "price": "618",
+        "gallery": [
+          "image53.jpeg",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2GY407",
+        "colour": "Malvern Stone",
+        "cableLength": "10m",
+        "price": "618",
+        "gallery": [
+          "image51.jpeg",
+          "image54.jpeg"
+        ]
+      },
+      {
+        "sku": "SMNFGT2WH405",
+        "colour": "White",
+        "cableLength": "10m",
+        "price": "618",
+        "gallery": [
+          "image50.jpeg",
+          "image54.jpeg"
+        ]
+      }
+    ]
+  }
+}

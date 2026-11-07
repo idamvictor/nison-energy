@@ -14,6 +14,8 @@ export const brandLogos: Record<string, string> = {
   Indra: "/api/media/uploads/53a2b907-c35a-4de6-9c8c-e9361637e565.png",
   // Our own products (the EV Ultra install kits) — same logo as the site header.
   "Ocunio Energy": "/ocunio-energy-logo.png",
+  NexBlue: "/api/media/uploads/ba7e3da8-d939-4685-9756-2927efd9347e.jpg",
+  "NRG Charge": "/api/media/uploads/243a2124-5eeb-480a-9dbf-418b6e491e5b.jpg",
   Myenergi:"/api/media/uploads/32368d18-737f-4509-9341-367252cacc47.png",
   Ohme: "/api/media/uploads/540822e8-6503-4bd5-ae7e-60787bfc1fb3.png",
   "Pod Point": "/api/media/uploads/58c1de3b-1d64-4c1e-86c8-ba54d5aee463.png",

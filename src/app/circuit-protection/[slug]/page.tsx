@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ChevronRight, Clock } from "lucide-react";
 
 import { getCircuitProtectorCatalog, getProductRow, dbToCircuitProtector, dbToDetail } from "@/lib/catalog/queries";
 import { getDatasheetNames, warmDatasheet } from "@/lib/media/queries";
-import { adminRoute } from "@/lib/catalog/types";
+import { adminRoute, categoryRoute } from "@/lib/catalog/types";
 import { AdminEditLink } from "@/components/shared/admin-edit-link";
 import { deliveryPolicyMarkdown, returnsPolicyMarkdown } from "@/lib/content/legal";
 import { brandDispatchNote } from "@/lib/content/brand-notes";
@@ -58,6 +58,11 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
   const { slug } = await params;
   const row = await getProductRow(slug);
 
+  // A product moved to another category (e.g. the sockets → Accessories) keeps
+  // working at its old link.
+  if (row && row.active && row.category !== "CircuitProtection") {
+    permanentRedirect(`${categoryRoute[row.category]}/${row.id}`);
+  }
   if (!row || row.category !== "CircuitProtection" || !row.active) notFound();
 
   const product = dbToCircuitProtector(row);

@@ -36,6 +36,17 @@ async function main() {
     data: { category: "Accessory" },
   });
   console.log(`Moved ${count} product(s) to Accessories.`);
+
+  // Show them at the end of the accessories grid (2-Gang, then 1-Gang).
+  const last = await prisma.product.aggregate({
+    where: { category: "Accessory", sku: { notIn: SKUS } },
+    _max: { sortOrder: true },
+  });
+  const base = (last._max.sortOrder ?? 0) + 1;
+  for (const [i, sku] of SKUS.entries()) {
+    await prisma.product.updateMany({ where: { sku, category: "Accessory" }, data: { sortOrder: base + i } });
+    console.log(`${sku} sortOrder → ${base + i}`);
+  }
 }
 
 main()

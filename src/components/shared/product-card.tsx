@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, CreditCard, GitCompare, Heart } from "lucide-react";
+import { ArrowRight, Check, GitCompare, Heart } from "lucide-react";
 
 import {
   Card,
@@ -23,6 +23,7 @@ import { SaleBadge } from "@/components/shared/sale-price";
 import { QuickAddToCart } from "@/components/shared/quick-add-to-cart";
 import { CardMeta } from "@/components/shared/card-meta";
 import { CardPrice } from "@/components/shared/card-price";
+import { KlarnaLogo, PayPalLogo } from "@/components/checkout/payment-logos";
 
 export function ProductCard({
   variants,
@@ -145,20 +146,24 @@ export function ProductCard({
         </Button>
         {ozevCta && (
           <>
+            {/* Secondary action: kept quiet so "View Details" / add to cart stay the main ones. */}
             <Button
+              variant="ghost"
               size="lg"
               nativeButton={false}
-              className="w-full"
+              className="w-full border border-primary/25 bg-primary/5 font-medium text-primary-ink hover:bg-primary/10 hover:text-primary-ink"
               render={<Link href="/ozev-grant-guide" />}
             >
-              Charger &amp; Install with OZEV grant &rarr;
+              Buy Charger &amp; Install with OZEV grant &rarr;
             </Button>
             <Link
               href={href}
-              className="flex items-start gap-2 text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
+              className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
             >
-              <CreditCard className="size-4 shrink-0" />
-              Or 3 payments of {formatCurrency(Math.round((product.price / 3) * 100) / 100)} with Klarna / PayPal
+              Or 3 payments of {formatCurrency(Math.round((product.price / 3) * 100) / 100)} with
+              <KlarnaLogo className="h-5" />
+              /
+              <PayPalLogo compact />
             </Link>
           </>
         )}

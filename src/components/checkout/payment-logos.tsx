@@ -21,11 +21,12 @@ export function GooglePayLogo({ className }: { className?: string }) {
   return <BrandIcon icon={siGooglepay} className={cn("h-11", className)} color="#3c4043" />;
 }
 
-export function PayPalLogo({ className }: { className?: string }) {
+/** PayPal mark + two-blue wordmark. `compact` sizes it for small text lines (e.g. product cards). */
+export function PayPalLogo({ className, compact = false }: { className?: string; compact?: boolean }) {
   return (
-    <span role="img" aria-label="PayPal" className={cn("inline-flex items-center gap-1", className)}>
-      <BrandIcon icon={siPaypal} className="h-5" />
-      <span aria-hidden className="text-[17px] font-bold tracking-tight italic">
+    <span role="img" aria-label="PayPal" className={cn("inline-flex items-center", compact ? "gap-0.5" : "gap-1", className)}>
+      <BrandIcon icon={siPaypal} className={compact ? "h-3.5" : "h-5"} />
+      <span aria-hidden className={cn("font-bold tracking-tight italic", compact ? "text-[13px]" : "text-[17px]")}>
         <span className="text-[#003087]">Pay</span>
         <span className="text-[#009cde]">Pal</span>
       </span>

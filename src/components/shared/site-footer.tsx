@@ -171,9 +171,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <p className="max-w-2xl text-xs leading-relaxed text-white/50">
             Nison Limited, trading as Ocunio Energy. Registered in England
-            and Wales No.16371062. Registered office 71-75 Shelton Street
-            Covent Garden London United Kingdom WC2 9JQ. VAT Number:
-            495472057.
+            and Wales No.16371062. VAT Number: 495472057.
             <br />
             Copyright © {new Date().getFullYear()}. All rights reserved.
           </p>

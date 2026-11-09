@@ -188,7 +188,14 @@ export function dbToDetail(row: ProductRow): ProductDetail {
   return {
     tagline: row.tagline ?? "",
     sku: row.sku ?? undefined,
-    gallery: row.gallery.length > 0 ? row.gallery : [row.cardImage],
+    // The admin's starred "thumbnail" (cardImage) opens the product page too:
+    // move it to the front; the other pictures keep their saved order.
+    gallery:
+      row.gallery.length === 0
+        ? [row.cardImage]
+        : row.gallery.includes(row.cardImage)
+          ? [row.cardImage, ...row.gallery.filter((g) => g !== row.cardImage)]
+          : row.gallery,
     description: row.description,
     features: row.features.filter((f) => f !== "FREE DELIVERY"),
     specs: row.sku ? [{ label: "SKU", value: row.sku }, ...specs] : specs,

@@ -67,7 +67,7 @@ const navLinks: NavLink[] = [
     label: "Trade Counter",
     children: [
       { href: "/cables?type=meter-tails", label: "Cables" },
-      { href: "/cables?type=ev-ultra-install-kit", label: "EV Ultra" },
+      { href: "/cables?type=ev-ultra-install-kit", label: "EV Ultra Install Kit" },
       { href: "/circuit-protection", label: "Circuit Protection" },
     ],
   },

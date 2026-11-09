@@ -25,6 +25,18 @@ const nextConfig: NextConfig = {
       { source: "/circuit-protectors", destination: "/circuit-protection", permanent: true },
       { source: "/circuit-protectors/:slug", destination: "/circuit-protection/:slug", permanent: true },
       { source: "/admin/circuit-protectors/:path*", destination: "/admin/circuit-protection/:path*", permanent: true },
+      // The two old waEV listings were replaced by the client's corrected ones
+      // (scripts/replace-waev-products.ts); send old links to the tethered EV1i.
+      {
+        source: "/home-charging/waev-charge-ev1i-smart-solar-7-4kw-charger-tethered-5m-with-wifi-lan-black",
+        destination: "/home-charging/waev-charge-tethered-7-4kw-5m-solar-ev-charger",
+        permanent: true,
+      },
+      {
+        source: "/home-charging/waev-charge-ev-smart-7-4kw-charger-tethered-with-wifi-black",
+        destination: "/home-charging/waev-charge-tethered-7-4kw-5m-solar-ev-charger",
+        permanent: true,
+      },
     ];
   },
   experimental: {

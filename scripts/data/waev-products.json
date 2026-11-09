@@ -1,0 +1,151 @@
+{
+  "source": "C:UsersUserDownloadsNew Products (1).docx — end of document (waEV correction)",
+  "replaces": [
+    "WAEVEV17WIFI",
+    "WAEVEV1i7WIFIS"
+  ],
+  "products": [
+    {
+      "docTitle": "waEV-charge EV1s Smart Type Socket 7.4kW Charger –",
+      "sku": "WAEVEV1S7WIFIS",
+      "price": "399",
+      "description": [
+        "The waEV-charge EV1s is a versatile, intelligent AC smart EV charger from Ocunio, designed to deliver seamless home and commercial vehicle charging without cable-length restrictions. With an untethered universal Mode 3 Type 2 socket, it lets drivers choose their preferred lead length while keeping a clean, minimalist look on any wall or mounting pedestal. Available in both 7.4kW single-phase and 22kW three-phase power configurations, the EV1s is compatible with all plug-in vehicle brands and offers flexible mounting via a direct wall fixing or an optional bespoke, heavy-duty installation pedestal.",
+        "Designed to significantly reduce civils and electrical preparation costs, the EV1s incorporates built-in Open-PEN fault protection, eliminating the disruption and expense of driving external earth electrodes. The unit is certified to the latest EVSCP regulations and comes equipped with an included wired CT clamp for dynamic load balancing to protect site main fuses. Drivers and property managers benefit from an integrated smart lock feature that prevents unauthorised socket access, reinforced by waEV-card RFID security with two pre-paired keycards included as standard for instant tap-to-charge operation.",
+        "Everyday charging intelligence is powered by the waEV-smart platform, enabling automated scheduling to take advantage of low-cost off-peak energy tariffs, detailed charging statistics, and full solar surplus integration to charge vehicles directly from domestic photovoltaic generation. Connectivity is fully future-proofed with Wi-Fi, Bluetooth, and hardwired LAN built in, alongside a 4G-ready architecture (SIM required). Fully approved for OZEV EVHS and WCS grant funding and supported by open OCPP 1.6J compliance for managed commercial networks, the waEV-charge EV1s is backed by a comprehensive 3-year warranty."
+      ],
+      "features": [
+        "Scheduled charging, green tariff integration",
+        "Energy monitoring and analytics",
+        "Solar charging integration",
+        "RFID secure charging, two cards",
+        "EVHS, WCS, OZEV approved",
+        "EVSCP regulations compliant",
+        "OCPP 1.6J, future proofed",
+        "WiFi, Bluetooth, LAN, 4G ready",
+        "PEN protection, no earth rod",
+        "Compatible with all EV brands",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Smart Platform",
+          "value": "Powered by waEV-smart: scheduled charging, green tariff integration, energy monitoring/analytics, solar charging integration"
+        },
+        {
+          "label": "Access",
+          "value": "waEV-card RFID secure charging (2 x waEV-cards included)"
+        },
+        {
+          "label": "Approvals & Compliance",
+          "value": "EVHS & WCS, OZEV approved; compliant with the most recent EVSCP regulations"
+        },
+        {
+          "label": "Integration",
+          "value": "OCPP 1.6J (future proofed for managed and commercial charging)"
+        },
+        {
+          "label": "Connectivity",
+          "value": "WiFi, Bluetooth and LAN; 4G ready (SIM required)"
+        },
+        {
+          "label": "Protection, Compatibility & Accessories",
+          "value": "PEN protection (no earth rod required); compatible with all plug-in vehicle brands; CT clamp included"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years"
+        }
+      ],
+      "gallery": [
+        "image59.png",
+        "image60.png",
+        "image61.png"
+      ],
+      "warranty": "3 years",
+      "name": "waEV-charge EV1s Smart Type Socket 7.4kW Charger",
+      "connectionType": "Untethered",
+      "powerOutput": "7.4kW"
+    },
+    {
+      "docTitle": "waEV-Charge Tethered 7.4kW 5m Solar EV Charger",
+      "sku": "WAEVEV1I7WIFIS",
+      "price": "438",
+      "description": [
+        "The waEV-charge EV1i is a premium, single-phase 7.4kW AC smart EV charger supplied by Ocunio, engineered to deliver a seamless, dependable plug-and-charge experience for domestic homes, landlords, and residential housing developments. Equipped with a permanently attached 5m Mode 3 Type 2 charging lead and a practical integrated holster, it eliminates the daily friction of retrieving loose cables from the car boot—allowing drivers to simply unholster and plug directly into their vehicle. Housed in a discreet, modern enclosure rated to IP65 dust and water resistance, the EV1i offers superior protection against severe UK weather for long-lasting outdoor wall installations.",
+        "Designed to minimise installation time and ground disruption, the unit incorporates built-in Open-PEN fault protection, fully removing the requirement to drive an external ground earth rod. Electrical safeguarding is reinforced with integrated 6mA DC residual leakage detection (RDC-DD) to satisfy BS 7671 standards, while an included wired CT clamp enables automated dynamic load balancing right out of the box to prevent main fuse overloads. For heightened physical and digital security, the unit features RFID access control—supplied with two waEV-cards included for secure tap-and-charge authorisation—alongside smart app locking to protect against unauthorized usage.",
+        "Everyday charging intelligence is powered by the ev.energy smart platform, enabling automatic scheduling to take full advantage of low-cost off-peak electricity tariffs, track energy consumption analytics, and integrate with compatible solar PV setups for cleaner charging. Reliable communication is maintained across Wi-Fi and Bluetooth connectivity, with open OCPP 1.6J compliance ensuring seamless integration into wider managed charging ecosystems. Fully OZEV grant-approved and backed by a comprehensive 3-year manufacturer warranty, the waEV EV1i delivers intelligent, future-ready charging at home."
+      ],
+      "features": [
+        "5m tethered Type 2 cable",
+        "Solar integration with compatible systems",
+        "ev.energy smart app compatible",
+        "WiFi, Bluetooth and LAN",
+        "RFID access, two cards included",
+        "Dynamic load balancing, CT clamp",
+        "Built-in PEN and DC protection",
+        "IP65 weatherproof, OZEV approved",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Charging Power & Mode",
+          "value": "Up to 7.4kW (32A, single phase), Mode 3 (EN 61851-1) compliant"
+        },
+        {
+          "label": "Cable",
+          "value": "5m tethered IEC 62196 Type 2 charging cable"
+        },
+        {
+          "label": "Solar",
+          "value": "Solar integration with compatible systems"
+        },
+        {
+          "label": "Smart App",
+          "value": "Compatible with the ev.energy smart charging app, smartphone connectivity"
+        },
+        {
+          "label": "Connectivity",
+          "value": "WiFi, Bluetooth and LAN, OCPP 1.6J compatible"
+        },
+        {
+          "label": "Load Management",
+          "value": "Dynamic load balancing, CT clamp included"
+        },
+        {
+          "label": "Protection",
+          "value": "Built-in PEN fault protection, integrated 6mA DC protection (RDC-DD)"
+        },
+        {
+          "label": "Weather Rating",
+          "value": "IP65"
+        },
+        {
+          "label": "Dimensions",
+          "value": "361 x 250 x 100mm, compact design"
+        },
+        {
+          "label": "Approvals",
+          "value": "OZEV grant approved"
+        },
+        {
+          "label": "App & Access",
+          "value": "Compatible with the waEV smart app, RFID secure charging, RFID waEV-Card authentication (2 cards included)"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years manufacturer warranty"
+        }
+      ],
+      "gallery": [
+        "image62.png",
+        "image63.jpeg"
+      ],
+      "warranty": "3 years",
+      "name": "waEV-Charge Tethered 7.4kW 5m Solar EV Charger",
+      "connectionType": "Tethered",
+      "powerOutput": "7.4kW",
+      "cableLength": "5m"
+    }
+  ]
+}

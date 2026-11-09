@@ -161,9 +161,12 @@ export function ProductCard({
               className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
             >
               Or 3 payments of {formatCurrency(Math.round((product.price / 3) * 100) / 100)} with
-              <KlarnaLogo className="h-5" />
-              /
-              <PayPalLogo compact />
+              {/* The two logos wrap together, never with a stray "/". */}
+              <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                <KlarnaLogo className="h-5" />
+                /
+                <PayPalLogo compact />
+              </span>
             </Link>
           </>
         )}

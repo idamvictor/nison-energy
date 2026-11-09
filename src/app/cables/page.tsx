@@ -23,7 +23,12 @@ export default async function CablesPage() {
       <SiteHeader />
       <TrustBar />
       <main className="flex-1">
-        <PageHero align="left" eyebrow="Trade Counter" title="Cables" />
+        <PageHero
+          align="left"
+          eyebrow="Trade Counter"
+          title="Cables"
+          subtitle="EV Ultra SWA and Tuff cables from Doncaster cables, meter tails, and complete install kits, used by our own engineers and stocked for the trade."
+        />
         <Suspense fallback={null}>
           <CablesCatalog products={products} />
         </Suspense>

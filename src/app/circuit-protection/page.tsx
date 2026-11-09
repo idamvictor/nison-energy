@@ -26,14 +26,11 @@ export default async function CircuitProtectorsPage() {
       <main className="flex-1">
         <PageHero align="left" eyebrow="Trade Counter" title="Circuit Protection">
           <p className="mt-3 max-w-2xl text-lg font-semibold text-white">
-            Complete EV Install Essentials from Circuit Protection to Cable
+            Genuine Matt:e and Whitecliffe for EV, heat pump and solar installs.
           </p>
           <p className="mt-2 max-w-2xl text-white/70">
-            Stock up on everything your jobs demand. As an authorised reseller for Whitecliffe, Matt:e, Doncaster
-            Cables, and other industry leaders, Ocunio Energy delivers trade-grade circuit protection (Type A RCBOs,
-            SPDs, PME fault detection, DC isolators), genuine EV Ultra cables, LINIAN clips, glands, and all-in-one home
-            installation kits. Fast, reliable gear to keep every domestic and commercial install safe, compliant, and
-            straightforward.
+            As an authorised Matt:e and Whitecliffe reseller, we supply genuine RCBOs, SPDs, PME fault detection, DC
+            isolators and consumer units, backed by full warranty and fast UK delivery.
           </p>
         </PageHero>
         <Suspense fallback={null}>

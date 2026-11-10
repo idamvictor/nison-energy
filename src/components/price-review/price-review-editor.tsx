@@ -37,7 +37,8 @@ function parsePrice(raw: string): number | null {
 export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [sales, setSales] = useState<Record<string, string>>({});
-  const [ended, setEnded] = useState<Record<string, boolean>>({});
+  // Sale switch per product, only for rows the person flipped (default = on sale today).
+  const [saleOn, setSaleOn] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ProductCategory | "all">("all");
   const [showSubmit, setShowSubmit] = useState(false);
@@ -59,7 +60,18 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
         /* eslint-disable react-hooks/set-state-in-effect -- one-off restore from localStorage */
         setInputs((isNew ? draft.prices : draft) as Record<string, string>);
         setSales((isNew ? (draft.sales ?? {}) : {}) as Record<string, string>);
-        setEnded((isNew ? (draft.ended ?? {}) : {}) as Record<string, boolean>);
+        if (isNew && draft.saleOn && typeof draft.saleOn === "object") {
+          setSaleOn(draft.saleOn as Record<string, boolean>);
+        } else if (isNew && draft.ended && typeof draft.ended === "object") {
+          // Older drafts had "End sale" flags → switched off.
+          setSaleOn(
+            Object.fromEntries(
+              Object.entries(draft.ended as Record<string, boolean>)
+                .filter(([, v]) => v)
+                .map(([id]) => [id, false]),
+            ),
+          );
+        }
         /* eslint-enable react-hooks/set-state-in-effect */
       }
     } catch {
@@ -68,32 +80,41 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
   }, []);
   useEffect(() => {
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ prices: inputs, sales, ended }));
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ prices: inputs, sales, saleOn }));
     } catch {
       // ignore
     }
-  }, [inputs, sales, ended]);
+  }, [inputs, sales, saleOn]);
 
   const byId = useMemo(() => new Map(rows.map((r) => [r.id, r])), [rows]);
+  /** Is the Sale switch on for this row? Starts on for products already on sale. */
+  const isSaleOn = (row: PriceRow) => saleOn[row.id] ?? saleOfRow(row) != null;
 
   // A change = a valid new normal and/or sale price that differs from today's.
   const { changes, invalid } = useMemo(() => {
     const changes: PriceChange[] = [];
     const invalid = new Map<string, string>();
-    const ids = new Set([...Object.keys(inputs), ...Object.keys(sales), ...Object.keys(ended)]);
+    const ids = new Set([...Object.keys(inputs), ...Object.keys(sales), ...Object.keys(saleOn)]);
     for (const id of ids) {
       const row = byId.get(id);
       if (!row) continue;
+      const wasOnSale = saleOfRow(row) != null;
+      const on = saleOn[id] ?? wasOnSale;
       const ex = parsePrice(inputs[id] ?? "");
-      const sale = ended[id] ? null : parsePrice(sales[id] ?? "");
+      const sale = on ? parsePrice(sales[id] ?? "") : null;
       if (Number.isNaN(ex) || Number.isNaN(sale)) {
         invalid.set(id, "Not a valid amount");
+        continue;
+      }
+      if (on && !wasOnSale && sale === null) {
+        invalid.set(id, "Enter a sale price");
         continue;
       }
       const change: PriceChange = {
         productId: id,
         ...(ex !== null ? { exVat: ex } : {}),
-        ...(ended[id] ? { saleExVat: null } : sale !== null ? { saleExVat: sale } : {}),
+        // Switched off → end the sale; a typed price → start / change it.
+        ...(!on ? (wasOnSale ? { saleExVat: null } : {}) : sale !== null ? { saleExVat: sale } : {}),
       };
       if (change.exVat === undefined && change.saleExVat === undefined) continue;
       const resolved = resolveChange(row, change);
@@ -101,7 +122,7 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
       else if (resolved.changed) changes.push(change);
     }
     return { changes, invalid };
-  }, [inputs, sales, ended, byId]);
+  }, [inputs, sales, saleOn, byId]);
   const changedIds = new Set(changes.map((c) => c.productId));
 
   const filtered = useMemo(() => {
@@ -130,7 +151,7 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
       }
       setInputs({});
       setSales({});
-      setEnded({});
+      setSaleOn({});
       setSubmitted(res.count);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -161,8 +182,9 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
           change. The inc VAT price is calculated for you. Nothing changes on the website until it&apos;s approved.
         </p>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          To put a product on sale, type a <strong className="text-foreground">sale ex VAT</strong> price — the % off is
-          calculated for you. Leave it blank to keep any current sale as it is.
+          To put a product on sale, switch <strong className="text-foreground">Sale</strong> on and type a{" "}
+          <strong className="text-foreground">sale ex VAT</strong> price — the % off is calculated for you. Switch it off
+          to end a current sale.
         </p>
       </div>
 
@@ -217,20 +239,21 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
                   const ex = parsePrice(raw);
                   const saleRaw = sales[r.id] ?? "";
                   const saleEx = parsePrice(saleRaw);
-                  const isEnded = !!ended[r.id];
+                  const on = isSaleOn(r);
                   const bad = invalid.has(r.id);
                   const changed = changedIds.has(r.id);
                   const regular = regularOf(r);
                   const currentSale = saleOfRow(r);
                   // Live preview of the final prices (today's when left blank).
                   const newRegularInc = ex !== null && !Number.isNaN(ex) ? incVatOf(ex) : regular;
-                  const newSaleInc = isEnded
+                  const newSaleInc = !on
                     ? null
                     : saleEx !== null && !Number.isNaN(saleEx)
                       ? incVatOf(saleEx)
                       : currentSale;
+                  const saleEnded = !on && currentSale != null;
                   // Show the sale preview when it's being set, or when a new normal price changes its % off.
-                  const saleTouched = isEnded || saleEx !== null || (ex !== null && currentSale != null);
+                  const saleTouched = saleEnded || (on && saleEx !== null) || (ex !== null && currentSale != null);
                   return (
                     <tr
                       key={r.id}
@@ -287,33 +310,52 @@ export function PriceReviewEditor({ rows }: { rows: PriceRow[] }) {
                         {ex !== null && !Number.isNaN(ex) ? formatCurrency(incVatOf(ex)) : "—"}
                       </td>
                       <td className="px-3 py-1.5 text-right">
-                        <div className="relative ml-auto w-32">
-                          <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground">£</span>
-                          <Input
-                            inputMode="decimal"
-                            value={isEnded ? "" : saleRaw}
-                            disabled={isEnded}
-                            onChange={(e) => setSales((prev) => ({ ...prev, [r.id]: e.target.value }))}
-                            placeholder={isEnded ? "Sale ended" : currentSale != null ? exVatOf(currentSale).toFixed(2) : "No sale"}
-                            aria-label={`Sale ex VAT price for ${r.name}`}
-                            aria-invalid={bad || undefined}
-                            className="bg-background pl-6 text-right tabular-nums"
-                          />
-                        </div>
-                        {(currentSale != null || isEnded) && (
+                        <div className="ml-auto flex w-max items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => setEnded((prev) => ({ ...prev, [r.id]: !prev[r.id] }))}
-                            className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                            role="switch"
+                            aria-checked={on}
+                            aria-label={`Sale for ${r.name}`}
+                            onClick={(e) => {
+                              const next = !on;
+                              setSaleOn((prev) => ({ ...prev, [r.id]: next }));
+                              if (next) {
+                                const input = e.currentTarget.parentElement?.querySelector("input");
+                                setTimeout(() => input?.focus(), 0);
+                              }
+                            }}
+                            className={cn(
+                              "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
+                              on ? "bg-accent-strong" : "bg-foreground/20",
+                            )}
                           >
-                            {isEnded ? "Undo end sale" : "End sale"}
+                            <span
+                              className={cn(
+                                "inline-block size-4 rounded-full bg-white shadow transition-transform",
+                                on ? "translate-x-4.5" : "translate-x-0.5",
+                              )}
+                            />
                           </button>
-                        )}
+                          <div className="relative w-32">
+                            <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground">£</span>
+                            <Input
+                              inputMode="decimal"
+                              value={on ? saleRaw : ""}
+                              disabled={!on}
+                              onChange={(e) => setSales((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                              placeholder={!on ? "No sale" : currentSale != null ? exVatOf(currentSale).toFixed(2) : "0.00"}
+                              aria-label={`Sale ex VAT price for ${r.name}`}
+                              aria-invalid={bad || undefined}
+                              className="bg-background pl-6 text-right tabular-nums"
+                            />
+                          </div>
+                        </div>
+                        <span className="mt-1 block text-xs text-muted-foreground">{on ? "On sale" : "No sale"}</span>
                       </td>
                       <td className="px-4 py-2.5 text-right whitespace-nowrap tabular-nums" aria-live="polite">
                         {bad ? (
                           <span className="text-xs font-medium whitespace-normal text-destructive">{invalid.get(r.id)}</span>
-                        ) : isEnded ? (
+                        ) : saleEnded ? (
                           <span className={cn(changed && "font-semibold text-foreground")}>No sale</span>
                         ) : saleTouched && newSaleInc != null && newRegularInc != null ? (
                           <>

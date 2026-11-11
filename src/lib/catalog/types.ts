@@ -177,13 +177,14 @@ export type CircuitProtectorProduct = SolarProduct & { filters: Record<string, s
 // Meter tails and EV Ultra install kits (own "Cables" menu tab). A simple
 // price-only product like circuit protection. Meter tail packs share a
 // variantGroup; each pack is its own row with a length + tails (core) size.
-export const cableTypes = ["Meter Tails", "EV Ultra Install Kit"] as const;
+export const cableTypes = ["Meter Tails", "EV Ultra Install Kit", "Cable Management"] as const;
 export type CableType = (typeof cableTypes)[number];
 
 /** URL value for each type (/cables?type=…). */
 export const cableTypeSlug: Record<CableType, string> = {
   "Meter Tails": "meter-tails",
   "EV Ultra Install Kit": "ev-ultra-install-kit",
+  "Cable Management": "cable-management",
 };
 
 export type CableProduct = SolarProduct & {

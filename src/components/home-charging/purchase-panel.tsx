@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { keepScrollOnNextNav } from "@/components/shared/scroll-manager";
 import { ArrowRight, Check, ChevronDown, Heart, Zap } from "lucide-react";
 
 import type { Product } from "@/lib/catalog/types";
@@ -126,7 +127,7 @@ export function PurchasePanel({
               const candidates = sameConnectionSiblings.filter((p) => p.colour === e.target.value);
               const match =
                 candidates.find((p) => p.cableLength === product.cableLength) ?? candidates[0];
-              if (match) router.push(`/home-charging/${match.id}`, { scroll: false });
+              if (match) { keepScrollOnNextNav(); router.push(`/home-charging/${match.id}`, { scroll: false }); }
             }}
             className={selectClass}
           >
@@ -144,9 +145,10 @@ export function PurchasePanel({
             Cable length
             <select
               value={product.id}
-              onChange={(e) =>
-                router.push(`/home-charging/${e.target.value}`, { scroll: false })
-              }
+              onChange={(e) => {
+                keepScrollOnNextNav();
+                router.push(`/home-charging/${e.target.value}`, { scroll: false });
+              }}
               className={selectClass}
             >
               {lengthSiblings.map((p) => (
@@ -159,7 +161,7 @@ export function PurchasePanel({
         )}
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
-          Add Installation
+          Need installation?
           <div ref={installRef} className="relative scroll-mt-28">
             <button
               type="button"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { keepScrollOnNextNav } from "@/components/shared/scroll-manager";
 import { Check, Heart } from "lucide-react";
 
 import type { AccessoryProduct } from "@/lib/catalog/types";
@@ -104,7 +105,7 @@ export function AccessoryPurchasePanel({
                 sameStyle.find((p) => p.lengthOptions[0] === product.lengthOptions[0]) ??
                 sameStyle[0] ??
                 candidates[0];
-              if (match) router.push(`/accessories/${match.id}`, { scroll: false });
+              if (match) { keepScrollOnNextNav(); router.push(`/accessories/${match.id}`, { scroll: false }); }
             }}
             className={selectClass}
           >
@@ -121,9 +122,10 @@ export function AccessoryPurchasePanel({
             Length
             <select
               value={product.id}
-              onChange={(e) =>
-                router.push(`/accessories/${e.target.value}`, { scroll: false })
-              }
+              onChange={(e) => {
+                keepScrollOnNextNav();
+                router.push(`/accessories/${e.target.value}`, { scroll: false });
+              }}
               className={selectClass}
             >
               {lengthSiblings.map((p) => (

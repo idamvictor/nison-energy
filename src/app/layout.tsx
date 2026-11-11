@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteLoader } from "@/components/shared/site-loader";
 import { AppHydration } from "@/components/shared/app-hydration";
+import { ScrollManager } from "@/components/shared/scroll-manager";
 import { CartSheet } from "@/components/shared/cart-sheet";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 import { PaymentPreconnect } from "@/components/shared/payment-preconnect";
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <PaymentPreconnect />
         <SiteLoader />
         <AppHydration />
+        <ScrollManager />
         <CartSheet />
         <WhatsAppButton />
         {children}

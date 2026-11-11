@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { keepScrollOnNextNav } from "@/components/shared/scroll-manager";
 import { ArrowRight, Check, ChevronDown, Heart, Zap } from "lucide-react";
 
 import type { CommercialProduct } from "@/lib/catalog/types";
@@ -130,7 +131,7 @@ export function CommercialPurchasePanel({
                 ) ??
                 candidates.find((p) => p.connectionType === product.connectionType) ??
                 candidates[0];
-              if (match) router.push(`/workplace-charging/${match.id}`, { scroll: false });
+              if (match) { keepScrollOnNextNav(); router.push(`/workplace-charging/${match.id}`, { scroll: false }); }
             }}
             className={selectClass}
           >
@@ -148,9 +149,10 @@ export function CommercialPurchasePanel({
             Cable length
             <select
               value={product.id}
-              onChange={(e) =>
-                router.push(`/workplace-charging/${e.target.value}`, { scroll: false })
-              }
+              onChange={(e) => {
+                keepScrollOnNextNav();
+                router.push(`/workplace-charging/${e.target.value}`, { scroll: false });
+              }}
               className={selectClass}
             >
               {lengthSiblings.map((p) => (
@@ -163,7 +165,7 @@ export function CommercialPurchasePanel({
         )}
 
         <div className="flex flex-col gap-1.5 text-sm font-medium text-foreground sm:col-span-2">
-          Add Installation
+          Need installation?
           <div ref={installRef} className="relative scroll-mt-28">
             <button
               type="button"

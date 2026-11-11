@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { keepScrollOnNextNav } from "@/components/shared/scroll-manager";
 
 import type { CableProduct } from "@/lib/catalog/types";
 import { lengthValue } from "@/lib/catalog/cable-attrs";
@@ -38,7 +39,10 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
   };
 
   const go = (target?: CableProduct) => {
-    if (target && target.id !== product.id) router.replace(`/cables/${target.id}`, { scroll: false });
+    if (target && target.id !== product.id) {
+      keepScrollOnNextNav();
+      router.replace(`/cables/${target.id}`, { scroll: false });
+    }
   };
   // Changing one axis keeps the other where that pack exists.
   const pickLength = (length: string) => go(find(length, product.core) ?? siblings.find((p) => p.length === length));

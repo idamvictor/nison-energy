@@ -31,6 +31,8 @@ export const brandLogos: Record<string, string> = {
   VCHRGD: "/api/media/uploads/b5833c1f-9104-4cc8-88ac-07d990e62785.png",
   Vestel: "/api/media/uploads/6f7f94d8-9f77-405b-bfa9-2ee920a5cdde.jpg",
   "waEV-charge": "/api/media/uploads/fb61a7d3-f8ea-485a-aa8c-8b055480397d.png",
+  // Same logo; the Mounts & Posts pedestal keeps the client doc's spelling.
+  "WA-EV Charge": "/api/media/uploads/fb61a7d3-f8ea-485a-aa8c-8b055480397d.png",
   // WCED products are Whitecliffe's circuit protection range, so they carry
   // the Whitecliffe logo.
   WCED: "/api/media/uploads/a309e648-2df5-4148-947f-b4ac80477647.webp",

@@ -124,7 +124,12 @@ export function ProductForm({
   const isCharger = category === "Residential" || category === "Commercial";
   // Solar kits and circuit protectors: just a price (no install fee, cable
   // options or energy-tariff badges).
-  const isSimple = category === "Solar" || category === "CircuitProtection" || category === "Cable";
+  const isSimple =
+    category === "Solar" ||
+    category === "CircuitProtection" ||
+    category === "Cable" ||
+    category === "Cover" ||
+    category === "Mount";
 
   const [slug, setSlug] = useState(row?.id ?? "");
   const [slugTouched, setSlugTouched] = useState(false);

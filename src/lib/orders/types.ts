@@ -18,7 +18,7 @@ export const orderStatuses: OrderStatus[] = [
 
 export type OrderLineInput = {
   productId: string;
-  category: "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors" | "cables" | "extra";
+  category: "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors" | "cables" | "covers" | "mounts" | "extra";
   name: string;
   unitPrice: number | null;
   quantity: number;

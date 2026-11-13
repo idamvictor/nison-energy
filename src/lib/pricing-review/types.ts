@@ -21,6 +21,8 @@ export const categoryLabels: Record<ProductCategory, string> = {
   Solar: "Solar panels",
   CircuitProtection: "Circuit protectors",
   Cable: "Cables",
+  Cover: "Covers",
+  Mount: "Mounts & posts",
 };
 
 /** One product on the price list (admin + the client review page). */

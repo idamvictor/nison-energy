@@ -1,0 +1,515 @@
+{
+  "source": "Posts and Mounts.docx",
+  "note": "Copy is word for word from the doc. price = cost price x 1.2 (inc VAT), per the user.",
+  "products": [
+    {
+      "category": "Cover",
+      "name": "NRG Charge Front Fascia (Pearl White)",
+      "brand": "NRG Charge",
+      "sku": "Fascia - Pure white",
+      "cost": "13.00",
+      "colour": "Pearl White",
+      "variantGroup": "nrg-charge-front-fascia",
+      "images": [
+        "image2.jpeg"
+      ],
+      "description": [
+        "A clip-on pearl white fascia that changes the look of an NRG Charge charger in seconds. Homeowners can match the charger to doors, cladding or brickwork at minimal cost."
+      ],
+      "features": [
+        "Clip-on design — no tools required",
+        "Fits all NRG Charge EV chargers",
+        "Weather-resistant construction",
+        "Range: Pure White, Anthracite Grey, Sapphire Blue, Sage Green"
+      ],
+      "specs": []
+    },
+    {
+      "category": "Cover",
+      "name": "NRG Charge Front Fascia (Anthracite Grey)",
+      "brand": "NRG Charge",
+      "sku": "Fascia - Anthracite Grey",
+      "cost": "13.00",
+      "colour": "Anthracite Grey",
+      "variantGroup": "nrg-charge-front-fascia",
+      "images": [
+        "image3.jpeg"
+      ],
+      "description": [
+        "A clip-on anthracite grey fascia that changes the look of an NRG Charge charger in seconds. Homeowners can match the charger to doors, cladding or brickwork at minimal cost."
+      ],
+      "features": [
+        "Clip-on design — no tools required",
+        "Fits all NRG Charge EV chargers",
+        "Weather-resistant construction",
+        "Range: Pure White, Anthracite Grey, Sapphire Blue, Sage Green"
+      ],
+      "specs": []
+    },
+    {
+      "category": "Cover",
+      "name": "NRG Charge Front Fascia (Sapphire Blue)",
+      "brand": "NRG Charge",
+      "sku": "Fascia - Sapphire Blue",
+      "cost": "13.00",
+      "colour": "Sapphire Blue",
+      "variantGroup": "nrg-charge-front-fascia",
+      "images": [
+        "image4.jpeg"
+      ],
+      "description": [
+        "A clip-on sapphire blue fascia that changes the look of an NRG Charge charger in seconds. Homeowners can match the charger to doors, cladding or brickwork at minimal cost."
+      ],
+      "features": [
+        "Clip-on design — no tools required",
+        "Fits all NRG Charge EV chargers",
+        "Weather-resistant construction",
+        "Range: Pure White, Anthracite Grey, Sapphire Blue, Sage Green"
+      ],
+      "specs": []
+    },
+    {
+      "category": "Cover",
+      "name": "NRG Charge Front Fascia (Sage Green)",
+      "brand": "NRG Charge",
+      "sku": "Fascia - Sage green",
+      "cost": "13.00",
+      "colour": "Sage Green",
+      "variantGroup": "nrg-charge-front-fascia",
+      "images": [
+        "image5.jpeg"
+      ],
+      "description": [
+        "A clip-on sage green fascia that changes the look of an NRG Charge charger in seconds. Homeowners can match the charger to doors, cladding or brickwork at minimal cost."
+      ],
+      "features": [
+        "Clip-on design — no tools required",
+        "Fits all NRG Charge EV chargers",
+        "Weather-resistant construction",
+        "Range: Pure White, Anthracite Grey, Sapphire Blue, Sage Green"
+      ],
+      "specs": []
+    },
+    {
+      "category": "Mount",
+      "name": "Pod Point Solo 3 Freestanding Mount (Single)",
+      "brand": "Pod Point",
+      "sku": "PP-A-210051-1",
+      "cost": "285.00",
+      "colour": "Black",
+      "warranty": "3 years",
+      "images": [
+        "image7.png",
+        "image8.png"
+      ],
+      "description": [
+        "A galvanised-steel stand that mounts one Solo 3 charger where wall mounting is impractical. The supply cable runs up through the core for a clean finish on driveways and car parks."
+      ],
+      "features": [
+        "Holds one Solo 3 / 3S charger, socketed or tethered",
+        "Supply cable fed through base and core",
+        "4 base mounting points; base plate included",
+        "3-year warranty"
+      ],
+      "specs": [
+        {
+          "label": "Electrical",
+          "value": "Passive — N/A",
+          "section": "Electrical"
+        },
+        {
+          "label": "Dimensions",
+          "value": "H 1400 × W 298 × D 200 mm",
+          "section": "Physical"
+        },
+        {
+          "label": "Weight",
+          "value": "11 kg",
+          "section": "Physical"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Galvanised steel; black powder coat RAL 9005, smooth matte",
+          "section": "Physical"
+        }
+      ]
+    },
+    {
+      "category": "Mount",
+      "name": "WA-EV Charge Value Square Pedestal with Plinth",
+      "brand": "WA-EV Charge",
+      "sku": "VCP-M-SQ-P-SC-WAEV",
+      "cost": "144.80",
+      "colour": "Black",
+      "images": [
+        "image17.jpeg"
+      ],
+      "description": [
+        "A UK-made square steel pedestal that bolts to a concrete plinth to carry a WA-EV charger. It suits driveways and car parks where wall mounting isn't possible."
+      ],
+      "features": [
+        "60 × 60 mm square section, 1300 mm high",
+        "200 × 200 × 8 mm base plate for plinth fixing",
+        "Cable entries at bottom, back and side",
+        "Supplied with M10 through bolts, bolt covers and stainless charger screws"
+      ],
+      "specs": [
+        {
+          "label": "Electrical",
+          "value": "Passive — N/A"
+        },
+        {
+          "label": "Height",
+          "value": "1300 mm"
+        },
+        {
+          "label": "Section",
+          "value": "60 × 60 × 2 mm SHS"
+        },
+        {
+          "label": "Base plate",
+          "value": "200 × 200 × 8 mm"
+        },
+        {
+          "label": "Weight",
+          "value": "Approx. 10 kg"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Carbon steel, zinc primed; satin black powder coat"
+        }
+      ]
+    },
+    {
+      "category": "Accessory",
+      "name": "Pod Point EV Charging Cable 7kW Type 2 - 5m (Black)",
+      "brand": "Pod Point",
+      "sku": "PP-E-180234-1",
+      "cost": "163.00",
+      "colour": "Black",
+      "length": "5m",
+      "variantGroup": "pod-point-ev-charging-cable-7kw-type-2",
+      "images": [
+        "image9.jpeg"
+      ],
+      "description": [
+        "Pod Point's universal Type 2 cable for socketed home chargers and public AC posts. The 5 m length suits most driveways."
+      ],
+      "features": [
+        "Type 2 to Type 2, single-phase 7 kW",
+        "IP54 rated",
+        "Black"
+      ],
+      "specs": [
+        {
+          "label": "Max current",
+          "value": "30 A"
+        },
+        {
+          "label": "Power rating",
+          "value": "7 kW"
+        },
+        {
+          "label": "Phase count",
+          "value": "Single-phase"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Black"
+        },
+        {
+          "label": "Cable length",
+          "value": "5 m"
+        },
+        {
+          "label": "IP rating",
+          "value": "IP54"
+        }
+      ]
+    },
+    {
+      "category": "Accessory",
+      "name": "Pod Point EV Charging Cable 7kW Type 2 - 10m (Black)",
+      "brand": "Pod Point",
+      "sku": "PP-E-180235-1",
+      "cost": "198.00",
+      "colour": "Black",
+      "length": "10m",
+      "variantGroup": "pod-point-ev-charging-cable-7kw-type-2",
+      "images": [
+        "image9.jpeg"
+      ],
+      "description": [
+        "A 10 m version of Pod Point's Type 2 cable for longer reaches, such as kerbside parking or vehicles with rear charge ports. It suits socketed chargers on single-phase supplies."
+      ],
+      "features": [
+        "Type 2 to Type 2, 7 kW",
+        "10 m length for longer reaches",
+        "Pairs with Pod Point cable bag"
+      ],
+      "specs": [
+        {
+          "label": "Power rating",
+          "value": "7 kW"
+        },
+        {
+          "label": "Phase count",
+          "value": "Single"
+        },
+        {
+          "label": "Colour",
+          "value": "Black"
+        },
+        {
+          "label": "Cable length",
+          "value": "10 m"
+        },
+        {
+          "label": "IP rating",
+          "value": "IP54"
+        }
+      ]
+    },
+    {
+      "category": "Accessory",
+      "name": "Sync Energy EV Charging Cable 32A 7kW Type 2 EVC22325SL Single Phase – 5m",
+      "brand": "Sync Energy",
+      "sku": "EVC22325SL",
+      "cost": "80.00",
+      "colour": "Black",
+      "length": "5m",
+      "warranty": "3 years",
+      "variantGroup": "sync-energy-ev-charging-cable-32a-7kw-type-2",
+      "images": [
+        "image12.png",
+        "image13.jpeg"
+      ],
+      "description": [
+        "A Mode 3 Type 2 cable from BG SyncEV for socketed home chargers and public AC posts. The 5 m length suits most driveways."
+      ],
+      "features": [
+        "Single-phase 16 A or 32 A, up to 7.4 kW",
+        "IP65 connected, IP55 with end cap",
+        "H07BZ5-F 3 × 6 mm² + 1 × 0.5 mm² conductor",
+        "3-year warranty"
+      ],
+      "specs": [
+        {
+          "label": "Voltage",
+          "value": "250 V~"
+        },
+        {
+          "label": "Max current",
+          "value": "16 A or 32 A"
+        },
+        {
+          "label": "Power rating",
+          "value": "7.4 kW"
+        },
+        {
+          "label": "Phase count",
+          "value": "Single-phase"
+        },
+        {
+          "label": "Conductor",
+          "value": "H07BZ5-F 3 × 6 mm² + 1 × 0.5 mm²"
+        },
+        {
+          "label": "Weight",
+          "value": "2.4 kg"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Black"
+        },
+        {
+          "label": "Cable length",
+          "value": "5 m"
+        },
+        {
+          "label": "IP rating",
+          "value": "IP65 connected; IP55 with end cap"
+        },
+        {
+          "label": "Operating temperature",
+          "value": "−25 to +50 °C"
+        },
+        {
+          "label": "Standards / certifications",
+          "value": "EN 50620; IEC 62196-2"
+        }
+      ]
+    },
+    {
+      "category": "Accessory",
+      "name": "Sync Energy EV Charging Cable 32A 7kW Type 2 EVC22328SL Single Phase 8m",
+      "brand": "Sync Energy",
+      "sku": "EVC22328SL",
+      "cost": "99.00",
+      "colour": "Black",
+      "length": "8m",
+      "warranty": "3 years",
+      "variantGroup": "sync-energy-ev-charging-cable-32a-7kw-type-2",
+      "images": [
+        "image14.jpeg",
+        "image13.jpeg"
+      ],
+      "description": [
+        "A Mode 3 Type 2 cable from BG SyncEV for socketed home chargers and public AC posts. The 8 m length covers vehicles parked nose-in or with rear ports."
+      ],
+      "features": [
+        "Single-phase 16 A or 32 A, up to 7.4 kW",
+        "IP65 connected, IP55 with end cap",
+        "H07BZ5-F 3 × 6 mm² + 1 × 0.5 mm² conductor",
+        "3-year warranty"
+      ],
+      "specs": [
+        {
+          "label": "Voltage",
+          "value": "250 V~"
+        },
+        {
+          "label": "Max current",
+          "value": "16 A or 32 A"
+        },
+        {
+          "label": "Power rating",
+          "value": "7.4 kW"
+        },
+        {
+          "label": "Phase count",
+          "value": "Single-phase"
+        },
+        {
+          "label": "Conductor",
+          "value": "H07BZ5-F 3 × 6 mm² + 1 × 0.5 mm²"
+        },
+        {
+          "label": "Weight",
+          "value": "3.3 kg"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Black"
+        },
+        {
+          "label": "Cable length",
+          "value": "8 m"
+        },
+        {
+          "label": "IP rating",
+          "value": "IP65 connected; IP55 with end cap"
+        },
+        {
+          "label": "Operating temperature",
+          "value": "−25 to +50 °C"
+        },
+        {
+          "label": "Standards / certifications",
+          "value": "EN 50620; IEC 62196-2"
+        }
+      ]
+    },
+    {
+      "category": "Accessory",
+      "name": "Sync Energy EV Charging Cable 32A 7kW Type 2 EVC223210SL Single Phase 10m",
+      "brand": "Sync Energy",
+      "sku": "EVC223210SL-01",
+      "cost": "118.00",
+      "colour": "Black",
+      "length": "10m",
+      "warranty": "3 years",
+      "variantGroup": "sync-energy-ev-charging-cable-32a-7kw-type-2",
+      "images": [
+        "image15.jpeg",
+        "image13.jpeg"
+      ],
+      "description": [
+        "A Mode 3 Type 2 cable from BG SyncEV for socketed home chargers and public AC posts. The 10 m length gives maximum reach for kerbside or awkward bays."
+      ],
+      "features": [
+        "Single-phase 16 A or 32 A, up to 7.4 kW",
+        "IP65 connected, IP55 with end cap",
+        "H07BZ5-F 3 × 6 mm² + 1 × 0.5 mm² conductor",
+        "3-year warranty"
+      ],
+      "specs": [
+        {
+          "label": "Voltage",
+          "value": "250 V~"
+        },
+        {
+          "label": "Max current",
+          "value": "16 A or 32 A"
+        },
+        {
+          "label": "Power rating",
+          "value": "7.4 kW"
+        },
+        {
+          "label": "Phase count",
+          "value": "Single-phase"
+        },
+        {
+          "label": "Conductor",
+          "value": "H07BZ5-F 3 × 6 mm² + 1 × 0.5 mm²"
+        },
+        {
+          "label": "Weight",
+          "value": "3.8 kg"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Black"
+        },
+        {
+          "label": "Cable length",
+          "value": "10 m"
+        },
+        {
+          "label": "IP rating",
+          "value": "IP65 connected; IP55 with end cap"
+        },
+        {
+          "label": "Operating temperature",
+          "value": "−25 to +50 °C"
+        },
+        {
+          "label": "Standards / certifications",
+          "value": "EN 50620; IEC 62196-2"
+        }
+      ]
+    },
+    {
+      "category": "Cable",
+      "name": "Pod Point Cable Bag (For 5 m & 10 m Cables)",
+      "brand": "Pod Point",
+      "sku": "PP-P-190058-1",
+      "cost": "22.00",
+      "colour": "Black",
+      "images": [
+        "image10.png"
+      ],
+      "description": [
+        "A storage bag that keeps a portable charging cable clean and tidy in the boot or garage. Sized for Pod Point 5 m and 10 m cables."
+      ],
+      "features": [
+        "Fits 5 m or 10 m Pod Point cables",
+        "Black",
+        "Cable not included"
+      ],
+      "specs": [
+        {
+          "label": "Electrical",
+          "value": "Non-electrical",
+          "section": "Electrical"
+        },
+        {
+          "label": "Material / finish",
+          "value": "Black; material Not Specified",
+          "section": "Electrical"
+        }
+      ]
+    }
+  ]
+}

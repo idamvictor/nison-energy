@@ -11,6 +11,8 @@ import {
   Sun,
   ShieldCheck,
   Plug,
+  Palette,
+  SignpostBig,
 } from "lucide-react";
 
 import { StatCard } from "@/components/admin/dashboard/stat-card";
@@ -191,6 +193,22 @@ export default async function AdminDashboardPage({
           icon={Plug}
           tone="primary"
           href="/admin/cables"
+        />
+        <StatCard
+          label="Covers"
+          value={productCounts.cover}
+          subtext="Charger fascias"
+          icon={Palette}
+          tone="primary"
+          href="/admin/covers"
+        />
+        <StatCard
+          label="Mounts & Posts"
+          value={productCounts.mount}
+          subtext="Freestanding posts, pedestals"
+          icon={SignpostBig}
+          tone="primary"
+          href="/admin/mounts-and-posts"
         />
       </div>
     </div>

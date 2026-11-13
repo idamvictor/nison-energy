@@ -17,6 +17,8 @@ import {
   Sun,
   ShieldCheck,
   Plug,
+  Palette,
+  SignpostBig,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -74,6 +76,8 @@ const meta: Record<
   Solar: { title: "Solar Panels", noun: "solar panel kits", icon: Sun, admin: "/admin/solar-panels" },
   CircuitProtection: { title: "Circuit Protection", noun: "circuit protection products", icon: ShieldCheck, admin: "/admin/circuit-protection" },
   Cable: { title: "Cables", noun: "meter tails and install kits", icon: Plug, admin: "/admin/cables" },
+  Cover: { title: "Covers", noun: "charger covers", icon: Palette, admin: "/admin/covers" },
+  Mount: { title: "Mounts & Posts", noun: "mounts and posts", icon: SignpostBig, admin: "/admin/mounts-and-posts" },
 };
 
 export function ProductsView({

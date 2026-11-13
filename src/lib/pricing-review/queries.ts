@@ -13,7 +13,7 @@ import type {
 } from "@/lib/pricing-review/types";
 
 const num = (d: { toString(): string } | null | undefined) => (d == null ? null : Number(d));
-const categoryOrder: ProductCategory[] = ["Residential", "Commercial", "Accessory", "Solar", "CircuitProtection", "Cable"];
+const categoryOrder: ProductCategory[] = ["Residential", "Commercial", "Accessory", "Solar", "CircuitProtection", "Cable", "Cover", "Mount"];
 
 /** Every product (active and inactive), grouped by category then shop order. */
 export const getPriceList = cache(async (): Promise<PriceRow[]> => {

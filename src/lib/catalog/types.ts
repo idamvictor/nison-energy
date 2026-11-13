@@ -3,7 +3,7 @@
 // maps a row to the view types below.
 
 // ─── Category / routing ────────────────────────────────────────────────────
-export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar" | "CircuitProtection" | "Cable";
+export type ProductCategory = "Residential" | "Commercial" | "Accessory" | "Solar" | "CircuitProtection" | "Cable" | "Cover" | "Mount";
 
 export const productCategories: ProductCategory[] = [
   "Residential",
@@ -12,6 +12,8 @@ export const productCategories: ProductCategory[] = [
   "Solar",
   "CircuitProtection",
   "Cable",
+  "Cover",
+  "Mount",
 ];
 
 // The storefront route + cart-category string for each catalog category.
@@ -22,6 +24,8 @@ export const categoryRoute: Record<ProductCategory, string> = {
   Solar: "/solar-panels",
   CircuitProtection: "/circuit-protection",
   Cable: "/cables",
+  Cover: "/covers",
+  Mount: "/mounts-and-posts",
 };
 
 // The admin edit route for each catalog category — same `[slug]` param as
@@ -33,6 +37,8 @@ export const adminRoute: Record<ProductCategory, string> = {
   Solar: "/admin/solar-panels",
   CircuitProtection: "/admin/circuit-protection",
   Cable: "/admin/cables",
+  Cover: "/admin/covers",
+  Mount: "/admin/mounts-and-posts",
 };
 
 /** Which images the admin media library shows: one product section, or blog covers. */
@@ -45,6 +51,8 @@ export const mediaScopeLabel: Record<MediaScope, string> = {
   Solar: "Solar Panels",
   CircuitProtection: "Circuit Protection",
   Cable: "Cables",
+  Cover: "Covers",
+  Mount: "Mounts & Posts",
   blog: "Blog",
 };
 
@@ -52,7 +60,7 @@ export function isMediaScope(value: string | null): value is MediaScope {
   return value === "blog" || productCategories.includes(value as ProductCategory);
 }
 
-export type CartCategory = "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors" | "cables";
+export type CartCategory = "residential" | "commercial" | "accessories" | "solar" | "circuit-protectors" | "cables" | "covers" | "mounts";
 
 export const categoryToCart: Record<ProductCategory, CartCategory> = {
   Residential: "residential",
@@ -61,6 +69,8 @@ export const categoryToCart: Record<ProductCategory, CartCategory> = {
   Solar: "solar",
   CircuitProtection: "circuit-protectors",
   Cable: "cables",
+  Cover: "covers",
+  Mount: "mounts",
 };
 
 const cartRoute: Record<CartCategory, string> = {
@@ -70,6 +80,8 @@ const cartRoute: Record<CartCategory, string> = {
   solar: "/solar-panels",
   "circuit-protectors": "/circuit-protection",
   cables: "/cables",
+  covers: "/covers",
+  mounts: "/mounts-and-posts",
 };
 
 export function cartItemHref(category: CartCategory, id: string): string {
@@ -255,3 +267,15 @@ export type ProductInput = {
 export type WriteResult =
   | { ok: true; id: string }
   | { ok: false; error: string };
+
+// ─── Covers / Mounts & Posts ───────────────────────────────────────────────
+// Charger fascias (Accessories ▸ Covers) and freestanding posts / pedestals
+// (Accessories ▸ Mounts & Posts). Simple price-only products; colour variants
+// of one item (the fascias) share a variantGroup.
+export type HardwareCategory = Extract<ProductCategory, "Cover" | "Mount">;
+
+export type HardwareProduct = SolarProduct & {
+  category: HardwareCategory;
+  variantGroup?: string;
+  sku?: string;
+};

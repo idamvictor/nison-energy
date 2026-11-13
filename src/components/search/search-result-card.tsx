@@ -22,6 +22,8 @@ const categoryLabel: Record<SearchResult["category"], string> = {
   Solar: "Solar",
   CircuitProtection: "Circuit Protection",
   Cable: "Cables",
+  Cover: "Covers",
+  Mount: "Mounts & Posts",
 };
 
 export function SearchResultCard({ result }: { result: SearchResult }) {

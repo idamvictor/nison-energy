@@ -14,6 +14,8 @@ import type {
   SolarProduct,
   CircuitProtectorProduct,
   CableProduct,
+  HardwareCategory,
+  HardwareProduct,
   CommercialProduct,
   Product,
   ProductCategory,
@@ -146,6 +148,16 @@ export function dbToCable(row: ProductRow): CableProduct {
   };
 }
 
+/** Covers / Mounts & Posts: a solar-shaped simple product; colour variants share a variantGroup. */
+export function dbToHardware(row: ProductRow): HardwareProduct {
+  return {
+    ...dbToSolar(row),
+    category: row.category === "Mount" ? "Mount" : "Cover",
+    variantGroup: row.variantGroup ?? undefined,
+    sku: row.sku ?? undefined,
+  };
+}
+
 // Next.js Server -> Client Component props must be plain-serializable — a
 // Prisma Decimal is a class instance, not a plain object, so raw `ProductRow`
 // can't be passed straight into a "use client" component (e.g. ProductForm)
@@ -257,6 +269,14 @@ export const getCircuitProtectorCatalog = cache(async (): Promise<CircuitProtect
   return rows.map(dbToCircuitProtector);
 });
 
+export const getHardwareCatalog = cache(async (category: HardwareCategory): Promise<HardwareProduct[]> => {
+  const rows = await prisma.product.findMany({
+    where: { active: true, category },
+    orderBy: catalogOrder,
+  });
+  return rows.map(dbToHardware);
+});
+
 export const getProductRow = cache((id: string) =>
   prisma.product.findUnique({ where: { id } }),
 );
@@ -357,6 +377,8 @@ export const getProductCounts = cache(
         solar: count("Solar"),
         circuitProtection: count("CircuitProtection"),
         cable: count("Cable"),
+        cover: count("Cover"),
+        mount: count("Mount"),
       };
     },
     ["catalog-product-counts"],

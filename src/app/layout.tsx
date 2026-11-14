@@ -10,9 +10,9 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Ocunio Energy | Premium EV Home Charging",
+  title: "Ocunio Energy | EV Charger Supply, Kits & UK Installation",
   description:
-    "Certified EV charger installation for home and workplace. Instant online quotes, expert installers, and OZEV grant support.",
+    "Shop smart EV chargers, compliant installation kits, and EV cables—or book certified UK installation for your home or workplace. Fast nationwide delivery.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

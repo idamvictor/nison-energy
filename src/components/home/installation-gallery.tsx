@@ -19,6 +19,7 @@ const PHOTOS = [
   { src: "/api/media/uploads/1779bb21-ce2a-406e-89be-e82c24858b98.jpg", alt: "Close-up of an installed Ohme charger" },
   { src: "/api/media/uploads/7664b423-3c52-4e00-94b9-3732df5ce147.jpg", alt: "Wall-mounted charger with a neat cable run to the ground" },
   { src: "/api/media/uploads/39256e47-b0fa-4dbf-b4a1-9afaab31bb7c.jpg", alt: "myenergi zappi charger fitted next to a downpipe" },
+  { src: "/api/media/uploads/9df45019-eab5-4d12-ad41-f0857f675ec3.jpg", alt: "Sync Energy charger installed on a rendered wall with the cable neatly clipped down to the ground" },
 ];
 
 /** Seconds each photo stays before the carousel moves on. */

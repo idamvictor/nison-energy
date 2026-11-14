@@ -16,6 +16,7 @@ import { SaleBadge } from "@/components/shared/sale-price";
 import { QuickAddToCart } from "@/components/shared/quick-add-to-cart";
 import { CardMeta } from "@/components/shared/card-meta";
 import { CardPrice } from "@/components/shared/card-price";
+import { ColourSwatchLinks } from "@/components/charger-accessories/colour-swatches";
 
 /**
  * A Covers / Mounts & Posts card. Colour variants of one item (the fascias)
@@ -89,11 +90,14 @@ export function HardwareCard({
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
-        {colours.length > 1 && (
-          <p className="text-sm text-muted-foreground">
-            {colours.length} colours: {colours.join(", ")}
-          </p>
-        )}
+        {colours.length > 1 &&
+          (product.category === "Cover" ? (
+            <ColourSwatchLinks variants={variants} currentId={product.id} />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {colours.length} colours: {colours.join(", ")}
+            </p>
+          ))}
         <CardMeta warranty={product.warranty} />
         <CardPrice price={product.price} sale={sale} trade />
       </CardContent>

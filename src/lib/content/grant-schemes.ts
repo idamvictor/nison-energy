@@ -19,6 +19,8 @@ export type GrantScheme = {
   applicationSteps?: string[];
   /** In-site guide for this scheme, when one exists. */
   moreInfoHref?: string;
+  /** The scheme's official GOV.UK page ("Learn more" on the details page). */
+  govUrl: string;
   resources: { label: string; href: string }[];
 };
 
@@ -40,6 +42,7 @@ const govResources = [
 export const grantSchemes: GrantScheme[] = [
   {
     slug: "renters-and-flat-owners",
+    govUrl: "https://www.find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-grant-for-renters-and-flat-owners-1",
     audience: "Renters & Flat Owners",
     title: "Electric Vehicle Chargepoint Grant for Renters and Flat Owners",
     tagline: "Live in a flat or rent your property? Save up to £500 with OZEV funding",
@@ -94,6 +97,7 @@ export const grantSchemes: GrantScheme[] = [
   },
   {
     slug: "residential-landlords",
+    govUrl: "https://www.find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-and-infrastructure-grants-for-landlords-1",
     audience: "Residential Landlords",
     title: "Electric Vehicle Chargepoint Grant for Residential Landlords",
     tagline: "Are you a residential landlord? Save up to £500 per socket with OZEV funding",
@@ -113,6 +117,7 @@ export const grantSchemes: GrantScheme[] = [
   },
   {
     slug: "workplace-charging-scheme",
+    govUrl: "https://www.find-government-grants.service.gov.uk/grants/workplace-charging-scheme-2",
     audience: "Businesses, Charities & Public Sector",
     title:
       "Workplace Charging Scheme Chargepoint Grant for Businesses, Charities and Public Sector",
@@ -148,6 +153,7 @@ export const grantSchemes: GrantScheme[] = [
   },
   {
     slug: "on-street-parking",
+    govUrl: "https://www.find-government-grants.service.gov.uk/grants/electric-vehicle-chargepoint-grant-for-households-with-on-street-parking-1",
     audience: "Households with On-Street Parking",
     title: "Electric Vehicle Chargepoint Grant for Households with On-Street Parking",
     tagline: "Got on-street parking? Save up to £500 with OZEV funding",
@@ -185,6 +191,7 @@ export const grantSchemes: GrantScheme[] = [
   },
   {
     slug: "education-institutions",
+    govUrl: "https://www.gov.uk/guidance/workplace-charging-scheme-for-state-funded-education-institutions",
     audience: "State-Funded Education Institutions",
     title: "Workplace Charging Scheme for State-Funded Education Institutions",
     tagline: "Are you a state-funded school or education institution? Save up to £2,000 per socket with OZEV funding",

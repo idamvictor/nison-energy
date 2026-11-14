@@ -16,6 +16,7 @@ import { saleOf } from "@/lib/catalog/sale";
 import { SaleBadge, WasPrice } from "@/components/shared/sale-price";
 import { InstalmentsMessage } from "@/components/shared/instalments-message";
 import { keepScrollOnNextNav } from "@/components/shared/scroll-manager";
+import { ColourSwatchPicker } from "@/components/charger-accessories/colour-swatches";
 
 const selectClass =
   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -68,7 +69,11 @@ export function HardwarePurchasePanel({
         )}
       </div>
 
-      {hasColours && (
+      {hasColours && product.category === "Cover" && (
+        <ColourSwatchPicker variants={siblings} currentId={product.id} />
+      )}
+
+      {hasColours && product.category !== "Cover" && (
         <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
           Colour
           <select

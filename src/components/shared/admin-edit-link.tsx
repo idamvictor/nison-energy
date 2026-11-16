@@ -8,7 +8,7 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { can } from "@/lib/auth/permissions";
 
 /**
- * Small "Edit" link shown next to a product title, admin-only. Deliberately
+ * Small "Edit" link shown next to a product title, Super admin only. Deliberately
  * a client component reading session via authClient.useSession() (same
  * pattern as site-header.tsx) rather than a server-side getCurrentUser()
  * check on the page itself — that would pull in headers() and force the
@@ -19,7 +19,7 @@ export function AdminEditLink({ href }: { href: string }) {
   // The server never has the session, so render nothing until hydrated —
   // otherwise a cached client session makes the first render differ (hydration error).
   const hydrated = useHydrated();
-  if (!hydrated || !can(session?.user.role, "products.edit")) return null;
+  if (!hydrated || !can(session?.user.role, "products.storefrontEdit")) return null;
 
   return (
     <Link

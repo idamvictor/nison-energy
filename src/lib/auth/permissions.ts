@@ -22,6 +22,7 @@ export type Permission =
   | "products.edit"
   | "products.delete"
   | "products.pricing"
+  | "products.storefrontEdit"
   | "blog.edit"
   | "leads.edit"
   | "orders.edit"
@@ -41,6 +42,8 @@ const PERMISSIONS: Record<Permission, TeamRole[]> = {
   "products.edit": ALL,
   "products.delete": ALL,
   "products.pricing": ADMINS,
+  // The "Edit" shortcut beside the title on storefront product pages.
+  "products.storefrontEdit": ["superadmin"],
   "blog.edit": ALL,
   "leads.edit": ALL,
   "orders.edit": ALL,

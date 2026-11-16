@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, Heart } from "lucide-react";
+
+import { keepScrollOnNextNav } from "@/components/shared/scroll-manager";
 
 import type { CircuitProtectorProduct } from "@/lib/catalog/types";
 import { Button } from "@/components/ui/button";
@@ -15,8 +18,26 @@ import { saleOf } from "@/lib/catalog/sale";
 import { SaleBadge, WasPrice } from "@/components/shared/sale-price";
 import { InstalmentsMessage } from "@/components/shared/instalments-message";
 
-/** Circuit protectors: one fixed unit per product — no colour, length or installation choice. */
-export function CircuitProtectorPurchasePanel({ product }: { product: CircuitProtectorProduct }) {
+const selectClass =
+  "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+
+const ratingOf = (p: CircuitProtectorProduct) => p.filters.current?.[0] ?? p.name;
+
+/**
+ * Circuit protectors: one fixed unit per product, no installation choice. When
+ * a product comes in several ratings (same variantGroup), a Rating picker
+ * swaps to that rating's page in place.
+ */
+export function CircuitProtectorPurchasePanel({
+  product,
+  siblings = [product],
+}: {
+  product: CircuitProtectorProduct;
+  /** Every rating in the same variantGroup, including this one. */
+  siblings?: CircuitProtectorProduct[];
+}) {
+  const router = useRouter();
+  const ratings = [...siblings].sort((a, b) => parseFloat(ratingOf(a)) - parseFloat(ratingOf(b)));
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCart((s) => s.addItem);
@@ -50,6 +71,26 @@ export function CircuitProtectorPurchasePanel({ product }: { product: CircuitPro
           </div>
         )}
       </div>
+
+      {ratings.length > 1 && (
+        <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+          Rating
+          <select
+            value={product.id}
+            onChange={(e) => {
+              keepScrollOnNextNav();
+              router.push(`/circuit-protection/${e.target.value}`, { scroll: false });
+            }}
+            className={selectClass}
+          >
+            {ratings.map((p) => (
+              <option key={p.id} value={p.id}>
+                {ratingOf(p)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <div>
         <p className="text-sm font-medium text-foreground">Quantity</p>

@@ -183,7 +183,11 @@ export type SolarProduct = {
 // Consumer units, RCBO kits, isolators… (under Accessories in the menu): no
 // installation option and no variants. A solar kit's shape plus the catalogue
 // filter values (see src/lib/catalog/circuit-protector-filters.ts).
-export type CircuitProtectorProduct = SolarProduct & { filters: Record<string, string[]> };
+export type CircuitProtectorProduct = SolarProduct & {
+  filters: Record<string, string[]>;
+  /** Ratings of one product (e.g. 60A / 80A / 100A) share a variantGroup: one card, a Rating picker. */
+  variantGroup?: string;
+};
 
 // ─── Cables ────────────────────────────────────────────────────────────────
 // Meter tails and EV Ultra install kits (own "Cables" menu tab). A simple

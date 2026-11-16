@@ -133,7 +133,11 @@ export function dbToSolar(row: ProductRow): SolarProduct {
 }
 
 export function dbToCircuitProtector(row: ProductRow): CircuitProtectorProduct {
-  return { ...dbToSolar(row), filters: cleanCircuitProtectorFilters(row.filters) };
+  return {
+    ...dbToSolar(row),
+    filters: cleanCircuitProtectorFilters(row.filters),
+    variantGroup: row.variantGroup ?? undefined,
+  };
 }
 
 /** Cables: a solar-shaped simple product plus its type / pack size (see cable-attrs.ts). */

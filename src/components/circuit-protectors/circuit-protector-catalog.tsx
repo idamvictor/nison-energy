@@ -103,6 +103,16 @@ export function CircuitProtectorCatalog({ products }: { products: CircuitProtect
     return [...list].sort((a, b) => (sort === "price-asc" ? a.price - b.price : b.price - a.price));
   }, [products, selected, sort]);
 
+  // Ratings of one product (same variantGroup) show as one card.
+  const cards = useMemo(() => {
+    const byKey = new Map<string, CircuitProtectorProduct[]>();
+    for (const p of filtered) {
+      const key = p.variantGroup || p.id;
+      byKey.set(key, [...(byKey.get(key) ?? []), p]);
+    }
+    return [...byKey.values()];
+  }, [filtered]);
+
   // Each value's count is how many products it would show given the other
   // filters' ticks, so shoppers can see what's left before they click.
   const groups = useMemo(
@@ -168,7 +178,7 @@ export function CircuitProtectorCatalog({ products }: { products: CircuitProtect
           <div id="catalog-results" className="min-w-0 flex-1 scroll-mt-24">
             <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
               <p className="text-sm text-muted-foreground">
-                {filtered.length} {filtered.length === 1 ? "product" : "products"}
+                {cards.length} {cards.length === 1 ? "product" : "products"}
               </p>
               <div className="flex items-center gap-2">
                 {groups.length > 0 && (
@@ -200,10 +210,10 @@ export function CircuitProtectorCatalog({ products }: { products: CircuitProtect
               </div>
             </div>
 
-            {filtered.length > 0 ? (
+            {cards.length > 0 ? (
               <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
-                {filtered.map((product) => (
-                  <CircuitProtectorCard key={product.id} variants={[product]} />
+                {cards.map((group) => (
+                  <CircuitProtectorCard key={group[0].variantGroup || group[0].id} variants={group} />
                 ))}
               </div>
             ) : products.length > 0 ? (

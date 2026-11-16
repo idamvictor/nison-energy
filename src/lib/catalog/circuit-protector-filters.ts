@@ -33,7 +33,7 @@ export const CIRCUIT_PROTECTOR_FILTERS = [
     ],
   },
   { key: "supply", title: "Supply", values: ["Single-Phase", "Three-Phase", "Universal"] },
-  { key: "current", title: "Current Rating", values: ["13A", "20A", "32A", "40A", "100A", "125A"] },
+  { key: "current", title: "Current Rating", values: ["13A", "20A", "32A", "40A", "60A", "63A", "80A", "100A", "125A"] },
   { key: "installation", title: "Installation", values: ["Indoor", "Outdoor / Weatherproof"] },
   { key: "curve", title: "Tripping Curve", values: ["B Curve", "C Curve"] },
   { key: "rcdType", title: "RCD / RCBO Type", values: ["Type A", "Type B", "Type B HP"] },

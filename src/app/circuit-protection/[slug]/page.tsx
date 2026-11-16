@@ -72,7 +72,16 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
   const datasheetNames = await getDatasheetNames(detail.datasheets);
 
   const catalog = await getCircuitProtectorCatalog();
-  const similar = catalog.filter((p) => p.id !== product.id).slice(0, 3);
+  const inGroup = (p: (typeof catalog)[number]) =>
+    product.variantGroup ? p.variantGroup === product.variantGroup : p.id === product.id;
+  // Other ratings of this product (Rating picker), then one card per other product.
+  const siblings = catalog.filter(inGroup);
+  const similar = [
+    ...catalog
+      .filter((p) => !inGroup(p))
+      .reduce((m, p) => m.set(p.variantGroup || p.id, [...(m.get(p.variantGroup || p.id) ?? []), p]), new Map<string, typeof catalog>())
+      .values(),
+  ].slice(0, 3);
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -126,7 +135,7 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
                 </div>
               )}
 
-              <CircuitProtectorPurchasePanel product={product} />
+              <CircuitProtectorPurchasePanel product={product} siblings={siblings} />
             </div>
           </div>
         </section>
@@ -200,8 +209,8 @@ export default async function CircuitProtectorDetailPage({ params }: { params: P
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
               <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground">Similar Products</h2>
               <div className="mt-8 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-                {similar.map((p) => (
-                  <CircuitProtectorCard key={p.id} variants={[p]} />
+                {similar.map((group) => (
+                  <CircuitProtectorCard key={group[0].variantGroup || group[0].id} variants={group} />
                 ))}
               </div>
             </div>

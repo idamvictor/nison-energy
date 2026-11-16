@@ -1,0 +1,1608 @@
+{
+  "source": "Matte.docx",
+  "brand": "Matt:e",
+  "note": "Text extracted programmatically from the doc (word for word). Price: exVat as in the doc; stored inc VAT = exVat x 1.2. One row per rating for MTE/A 3P (40A/100A) and SP-ICxx (60/80/100A).",
+  "products": [
+    {
+      "name": "Matt:e Single Phase PEN Fault Protection and 40 or 100A MCB (Component only)",
+      "exVat": "120.00",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e Single Phase PEN Fault Protection Unit (SKU: MTE/A 11-100M1A 3P) is a dedicated, single-connection O-PEN isolation and circuit protection enclosure supplied by Ocunio, engineered specifically to simplify BS 7671 compliance for single-phase EV chargepoints installed on PME (Protective Multiple Earthing) networks. Incorporating Matt:e’s patented O-PEN® technology, the unit continuously monitors the incoming supply and automatically disconnects all poles—including live, neutral, and the circuit protective conductor (CPC)—in the event of a broken or open PEN conductor fault, eliminating the need to drive external earth electrodes or risk striking buried utility services.",
+        "Designed for versatile domestic and light commercial integration, the unit is equipped with a heavy-duty 40A or 100A single-pole-plus-neutral/3-pole switching MCB (dependent on variant configuration), providing robust overcurrent and short-circuit safeguarding alongside complete electrical isolation. Housed in a durable, compact mild steel enclosure, it facilitates fast, tidy wall mounting adjacent to consumer units or dedicated EV distribution boards without requiring complex civil works or time-consuming earth resistance testing.",
+        "Engineered to meet the strict requirements of BS 7671:2018+A2:2022 (Regulation 722.411.4.1), this standalone unit provides an immediate, reliable earthing solution for EV chargers that lack built-in PEN fault detection, ensuring contractors can deliver fast, fully compliant installations with complete peace of mind."
+      ],
+      "features": [],
+      "specs": [
+        {
+          "label": "Standard",
+          "value": "BS EN 60898-1, BS EN 63024, IET:01, 2024 M1a"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "Poles",
+          "value": "1P+N+PE"
+        },
+        {
+          "label": "Rated Current",
+          "value": "1~100A"
+        },
+        {
+          "label": "Voltage & Frequency",
+          "value": "Rated voltage Ue 230V, rated insulation voltage Ui 500V, rated working frequency 50Hz, rated impact resistance voltage Uimp 6kV"
+        },
+        {
+          "label": "Short Circuit Ratings",
+          "value": "Rated short circuit capacity Icn 10kA (IEC/EN 60898); rated limit short circuit breaking ability Icu 25kA (IEC/EN 60947-2); rated running short circuit breaking capability Ics 75% Icn (IEC/EN 60947-2)"
+        },
+        {
+          "label": "Overvoltage & Pollution",
+          "value": "Overvoltage class IV, pollution level 3"
+        },
+        {
+          "label": "Tripping Characteristics",
+          "value": "C (5In~10)"
+        },
+        {
+          "label": "Operating Temperature",
+          "value": "-25°C to +40°C (ambient air)"
+        },
+        {
+          "label": "Life & Protection Grade",
+          "value": "Mechanical life 20,000; electrical life 10,000; IP2X (circuit breaker body); IP41 indoor / IP44 outdoor (installed in distribution box)"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year"
+        }
+      ],
+      "images": [
+        "image2.png"
+      ],
+      "docImagesAfterTable": [
+        "image1",
+        "image2"
+      ],
+      "sku": "MTE/A 11-100M1A 3P 40A",
+      "idSuffix": "40a",
+      "variantGroup": "matte-mte-a-11-100m1a-3p",
+      "filters": {
+        "type": [
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "40A"
+        ],
+        "curve": [
+          "C Curve"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e Single Phase PEN Fault Protection and 40 or 100A MCB (Component only)",
+      "exVat": "120.00",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e Single Phase PEN Fault Protection Unit (SKU: MTE/A 11-100M1A 3P) is a dedicated, single-connection O-PEN isolation and circuit protection enclosure supplied by Ocunio, engineered specifically to simplify BS 7671 compliance for single-phase EV chargepoints installed on PME (Protective Multiple Earthing) networks. Incorporating Matt:e’s patented O-PEN® technology, the unit continuously monitors the incoming supply and automatically disconnects all poles—including live, neutral, and the circuit protective conductor (CPC)—in the event of a broken or open PEN conductor fault, eliminating the need to drive external earth electrodes or risk striking buried utility services.",
+        "Designed for versatile domestic and light commercial integration, the unit is equipped with a heavy-duty 40A or 100A single-pole-plus-neutral/3-pole switching MCB (dependent on variant configuration), providing robust overcurrent and short-circuit safeguarding alongside complete electrical isolation. Housed in a durable, compact mild steel enclosure, it facilitates fast, tidy wall mounting adjacent to consumer units or dedicated EV distribution boards without requiring complex civil works or time-consuming earth resistance testing.",
+        "Engineered to meet the strict requirements of BS 7671:2018+A2:2022 (Regulation 722.411.4.1), this standalone unit provides an immediate, reliable earthing solution for EV chargers that lack built-in PEN fault detection, ensuring contractors can deliver fast, fully compliant installations with complete peace of mind."
+      ],
+      "features": [],
+      "specs": [
+        {
+          "label": "Standard",
+          "value": "BS EN 60898-1, BS EN 63024, IET:01, 2024 M1a"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "Poles",
+          "value": "1P+N+PE"
+        },
+        {
+          "label": "Rated Current",
+          "value": "1~100A"
+        },
+        {
+          "label": "Voltage & Frequency",
+          "value": "Rated voltage Ue 230V, rated insulation voltage Ui 500V, rated working frequency 50Hz, rated impact resistance voltage Uimp 6kV"
+        },
+        {
+          "label": "Short Circuit Ratings",
+          "value": "Rated short circuit capacity Icn 10kA (IEC/EN 60898); rated limit short circuit breaking ability Icu 25kA (IEC/EN 60947-2); rated running short circuit breaking capability Ics 75% Icn (IEC/EN 60947-2)"
+        },
+        {
+          "label": "Overvoltage & Pollution",
+          "value": "Overvoltage class IV, pollution level 3"
+        },
+        {
+          "label": "Tripping Characteristics",
+          "value": "C (5In~10)"
+        },
+        {
+          "label": "Operating Temperature",
+          "value": "-25°C to +40°C (ambient air)"
+        },
+        {
+          "label": "Life & Protection Grade",
+          "value": "Mechanical life 20,000; electrical life 10,000; IP2X (circuit breaker body); IP41 indoor / IP44 outdoor (installed in distribution box)"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year"
+        }
+      ],
+      "images": [
+        "image2.png"
+      ],
+      "docImagesAfterTable": [
+        "image1",
+        "image2"
+      ],
+      "sku": "MTE/A 11-100M1A 3P 100A",
+      "idSuffix": "100a",
+      "variantGroup": "matte-mte-a-11-100m1a-3p",
+      "filters": {
+        "type": [
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "100A"
+        ],
+        "curve": [
+          "C Curve"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "matt:e MTE/A11-100M1A 5P 100A 5 pole MCB with built-in PEN fault protection",
+      "exVat": "198.00",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e MTE/A11-100M1A 5P is a compact, DIN-rail mounted 100A 5-pole Miniature Circuit Breaker (MCB) with integrated Open-PEN fault protection supplied by Ocunio, engineered specifically for three-phase EV chargepoints, feeder pillars, and bespoke commercial distribution boards. Incorporating Matt:e’s patented O-PEN® technology, this single-device solution continuously monitors the incoming PME supply and simultaneously isolates all five poles—L1, L2, L3, Neutral, and Earth (CPC)—in the event of a broken or open PEN conductor fault, completely eliminating the cost and civil disruption of installing external earth electrodes.",
+        "Designed to streamline panel building and reduce switchgear footprint, the unit features a heavy-duty 100A C-curve tripping characteristic alongside simple wire-in, wire-out terminals—removing the need for separate bulky contactors or external monitoring relays. To maximize site uptime and operational flexibility, the device includes a selectable manual or auto-reset function dedicated exclusively to PEN fault recovery, while standard MCB overcurrent or short-circuit trips remain strictly manual-reset for complete electrical safety.",
+        "Engineered to meet the strict requirements of BS 7671:2018+A2:2022 (Regulation 722.411.4.1), the Matt:e MTE/A11-100M1A 5P provides electrical contractors and panel builders with a space-saving, cost-effective compliance solution for three-phase EV infrastructure."
+      ],
+      "features": [
+        "Three-phase PEN fault protection MCB",
+        "400V rated voltage, 50Hz",
+        "1–100A rated current",
+        "10kA short circuit capacity",
+        "Type C tripping characteristic",
+        "UKCA and CE certified",
+        "IP2X body, IP41/IP44 enclosed",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Standard",
+          "value": "BS EN 60898-1, BS EN 63024, IET:01 2024 M1a"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "Poles",
+          "value": "1P+N+PE (as shown on datasheet)"
+        },
+        {
+          "label": "Rated Current",
+          "value": "1~100A"
+        },
+        {
+          "label": "Voltage & Frequency",
+          "value": "Rated voltage Ue 400V, rated insulation voltage Ui 500V, rated working frequency 50Hz, rated impact resistance voltage Uimp 6kV"
+        },
+        {
+          "label": "Short Circuit Ratings",
+          "value": "Rated short circuit capacity Icn 10kA (IEC/EN 60898); rated limit short circuit breaking ability Icu 25kA (IEC/EN 60947-2); rated running short circuit breaking capability Ics 75% Icn (IEC/EN 60947-2)"
+        },
+        {
+          "label": "Overvoltage & Pollution",
+          "value": "Overvoltage class IV, pollution level 3"
+        },
+        {
+          "label": "Tripping Characteristics",
+          "value": "C (5In~10)"
+        },
+        {
+          "label": "Operating Temperature",
+          "value": "-25°C to +40°C (ambient air)"
+        },
+        {
+          "label": "Life & Protection Grade",
+          "value": "Mechanical life 20,000; electrical life 10,000; IP2X (circuit breaker body); IP41 indoor / IP44 outdoor (installed in distribution box)"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year"
+        }
+      ],
+      "images": [
+        "image3.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image3"
+      ],
+      "sku": "MTE/A11-100M1A 5P",
+      "filters": {
+        "type": [
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "100A"
+        ],
+        "curve": [
+          "C Curve"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e SP-R-SPD Single-phase Automatic Reset unit PEN Protection DP Type A RCBO and Type 2 SPD",
+      "exVat": "258.25",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e SP-R-SPD is a complete, single-phase EV connection and protection unit supplied by Ocunio, engineered to provide a simple, compliant installation centre for domestic and light commercial 7.4kW EV chargepoints. Incorporating Matt:e’s patented built-in PEN fault protection with automatic reset, the unit allows direct connection to existing TN-C-S (PME) earthing systems without the need for external earth electrodes—eliminating costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver total circuit safeguarding in a single enclosure, the SP-R-SPD comes pre-populated with a 40A Type A RCBO for reliable overload, short-circuit, and residual current protection, alongside a Type 2 Surge Protection Device (SPD) to shield sensitive vehicle and charger electronics from transient voltage spikes. Featuring a contractor-friendly, simple wire-in, wire-out terminal layout inside a durable mild steel housing, it significantly reduces on-site installation time while ensuring a clean, professional finish.",
+        "Engineered specifically to facilitate compliance with BS 7671:2018 Amendment 2:2022 (Regulation 722.411.4.1 (iv)), this all-in-one protection centre provides electrical contractors with a dependable, regulation-ready solution backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "matt:e SP-R-SPD protection unit",
+        "Built-in PEN fault protection",
+        "No earth electrodes required",
+        "40A Type A RCBO included",
+        "Integrated Type 2 surge protection",
+        "BS 7671 18th Edition compliant",
+        "Simple wire-in, wire-out connection",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Single-phase voltage monitoring and protection unit"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Built-in matt:e PEN fault protection; automatically isolates the supply during a PEN fault and restores power automatically once safe network conditions return; no earth electrodes required"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "40A Type A RCBO included; overcurrent, short-circuit and 30mA residual current protection for single-phase loads up to 7.4kW"
+        },
+        {
+          "label": "Surge Protection",
+          "value": "Integrated Type 2 SPD protects the EV chargepoint and connected vehicle from transient overvoltages and power surges"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A2:2022, Regulation 722.411.4.1 (iv), for EV installations on PME supplies"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; no disruptive civils work or buried service risk"
+        },
+        {
+          "label": "Electrical",
+          "value": "Nominal input 230V, 50Hz, single-phase; max load 7.4kW; terminal capacity: in L/N 2.5–25mm², out L/N 2.5–10mm²"
+        },
+        {
+          "label": "Enclosure & Rating",
+          "value": "Mild steel, IP2X"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "225 x 275 x 85mm (H x W x D), approx. 5kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year from date of purchase, limited to replacement of faulty components only"
+        }
+      ],
+      "images": [
+        "image4.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image4"
+      ],
+      "sku": "SP-R-SPD",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "40A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e Single-Phase Automatic Reset PEN Protection Unit with Load Curtailment & Type 2 SPD – 60A / 80A / 100A",
+      "exVat": "234.49",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e SP-ICxx-SPD (available in SP-IC60-SPD, SP-IC80-SPD, and SP-IC100-SPD variants) is a dedicated, single-phase EV connection and protection unit supplied by Ocunio, engineered to deliver a compliant, straightforward single connection centre for domestic and light commercial chargepoint installations up to 7.4kW. Incorporating Matt:e’s built-in PEN fault protection, the unit allows direct connection to existing TN-C-S earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to protect property supplies with constrained capacity, the SP-ICxx-SPD series integrates intelligent load curtailment in line with BS 7671:2018 Amendment 2:2022 Regulation 722.311.20. The unit continuously monitors total household consumption, automatically isolating the EV chargepoint from the supply whenever household demand rises above the pre-set threshold (60A, 80A, or 100A, selected at the time of order) and automatically restoring power once overall electrical demand falls back within safe levels.",
+        "Alongside built-in overcurrent safeguarding, every enclosure comes pre-populated with a Type 2 Surge Protection Device (SPD) to shield sensitive vehicle and charger electronics from transient voltage spikes. Featuring a contractor-friendly, simple wire-in, wire-out connection layout inside a UK-designed and manufactured housing, this unit facilitates full compliance with BS 7671:2018+A2:2022 Regulation 722.411.4.1 (iv) and is backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "matt:e SP-IC-SPD protection unit",
+        "Built-in PEN fault protection",
+        "No earth electrodes required",
+        "Load curtailment: 60A, 80A, 100A",
+        "Integrated Type 2 surge protection",
+        "Overcurrent protection up to 7.4kW",
+        "BS 7671 18th Edition compliant",
+        "Simple wire-in, wire-out connection",
+        "UK designed and manufactured",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Single-phase automatic reset PEN fault protection with load curtailment and Type 2 SPD; single-phase voltage monitoring and protection unit"
+        },
+        {
+          "label": "Models",
+          "value": "SP-IC60-SPD (60A), SP-IC80-SPD (80A), SP-IC100-SPD (100A)"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Built-in matt:e PEN fault protection; allows safe connection to existing TN-C-S supplies; no earth electrodes required, reducing civils disruption and buried service risks"
+        },
+        {
+          "label": "Load Curtailment",
+          "value": "Isolates the charger when household load exceeds the chosen limit (60A, 80A or 100A) and restores power automatically when demand drops; complies with Regulation 722.311.20"
+        },
+        {
+          "label": "Surge & Overcurrent Protection",
+          "value": "Integrated Type 2 SPD and overcurrent protection for EV chargepoint installations up to 7.4kW against transient overvoltages and overcurrent events"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A2:2022, Regulations 722.411.4.1 (iv) and 722.311.20"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; straightforward internal terminal configuration speeds up on-site installation"
+        },
+        {
+          "label": "Electrical",
+          "value": "Nominal input 230V, 50Hz, single-phase; max load 7.4kW; terminal capacity: in L/N 2.5–25mm², out L/N 2.5–10mm²"
+        },
+        {
+          "label": "Enclosure & Rating",
+          "value": "Mild steel, IP2X"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "225 x 275 x 85mm (H x W x D), approx. 5kg"
+        },
+        {
+          "label": "Origin",
+          "value": "UK designed and manufactured"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year from date of purchase, limited to replacement of faulty components only"
+        }
+      ],
+      "images": [
+        "image5.png"
+      ],
+      "docImagesAfterTable": [
+        "image5"
+      ],
+      "sku": "SP-IC60-SPD",
+      "idSuffix": "60a",
+      "variantGroup": "matte-sp-ic-spd",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "60A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection",
+          "Load Balancing"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e Single-Phase Automatic Reset PEN Protection Unit with Load Curtailment & Type 2 SPD – 60A / 80A / 100A",
+      "exVat": "234.49",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e SP-ICxx-SPD (available in SP-IC60-SPD, SP-IC80-SPD, and SP-IC100-SPD variants) is a dedicated, single-phase EV connection and protection unit supplied by Ocunio, engineered to deliver a compliant, straightforward single connection centre for domestic and light commercial chargepoint installations up to 7.4kW. Incorporating Matt:e’s built-in PEN fault protection, the unit allows direct connection to existing TN-C-S earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to protect property supplies with constrained capacity, the SP-ICxx-SPD series integrates intelligent load curtailment in line with BS 7671:2018 Amendment 2:2022 Regulation 722.311.20. The unit continuously monitors total household consumption, automatically isolating the EV chargepoint from the supply whenever household demand rises above the pre-set threshold (60A, 80A, or 100A, selected at the time of order) and automatically restoring power once overall electrical demand falls back within safe levels.",
+        "Alongside built-in overcurrent safeguarding, every enclosure comes pre-populated with a Type 2 Surge Protection Device (SPD) to shield sensitive vehicle and charger electronics from transient voltage spikes. Featuring a contractor-friendly, simple wire-in, wire-out connection layout inside a UK-designed and manufactured housing, this unit facilitates full compliance with BS 7671:2018+A2:2022 Regulation 722.411.4.1 (iv) and is backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "matt:e SP-IC-SPD protection unit",
+        "Built-in PEN fault protection",
+        "No earth electrodes required",
+        "Load curtailment: 60A, 80A, 100A",
+        "Integrated Type 2 surge protection",
+        "Overcurrent protection up to 7.4kW",
+        "BS 7671 18th Edition compliant",
+        "Simple wire-in, wire-out connection",
+        "UK designed and manufactured",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Single-phase automatic reset PEN fault protection with load curtailment and Type 2 SPD; single-phase voltage monitoring and protection unit"
+        },
+        {
+          "label": "Models",
+          "value": "SP-IC60-SPD (60A), SP-IC80-SPD (80A), SP-IC100-SPD (100A)"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Built-in matt:e PEN fault protection; allows safe connection to existing TN-C-S supplies; no earth electrodes required, reducing civils disruption and buried service risks"
+        },
+        {
+          "label": "Load Curtailment",
+          "value": "Isolates the charger when household load exceeds the chosen limit (60A, 80A or 100A) and restores power automatically when demand drops; complies with Regulation 722.311.20"
+        },
+        {
+          "label": "Surge & Overcurrent Protection",
+          "value": "Integrated Type 2 SPD and overcurrent protection for EV chargepoint installations up to 7.4kW against transient overvoltages and overcurrent events"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A2:2022, Regulations 722.411.4.1 (iv) and 722.311.20"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; straightforward internal terminal configuration speeds up on-site installation"
+        },
+        {
+          "label": "Electrical",
+          "value": "Nominal input 230V, 50Hz, single-phase; max load 7.4kW; terminal capacity: in L/N 2.5–25mm², out L/N 2.5–10mm²"
+        },
+        {
+          "label": "Enclosure & Rating",
+          "value": "Mild steel, IP2X"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "225 x 275 x 85mm (H x W x D), approx. 5kg"
+        },
+        {
+          "label": "Origin",
+          "value": "UK designed and manufactured"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year from date of purchase, limited to replacement of faulty components only"
+        }
+      ],
+      "images": [
+        "image5.png"
+      ],
+      "docImagesAfterTable": [
+        "image5"
+      ],
+      "sku": "SP-IC80-SPD",
+      "idSuffix": "80a",
+      "variantGroup": "matte-sp-ic-spd",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "80A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection",
+          "Load Balancing"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e Single-Phase Automatic Reset PEN Protection Unit with Load Curtailment & Type 2 SPD – 60A / 80A / 100A",
+      "exVat": "234.49",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e SP-ICxx-SPD (available in SP-IC60-SPD, SP-IC80-SPD, and SP-IC100-SPD variants) is a dedicated, single-phase EV connection and protection unit supplied by Ocunio, engineered to deliver a compliant, straightforward single connection centre for domestic and light commercial chargepoint installations up to 7.4kW. Incorporating Matt:e’s built-in PEN fault protection, the unit allows direct connection to existing TN-C-S earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to protect property supplies with constrained capacity, the SP-ICxx-SPD series integrates intelligent load curtailment in line with BS 7671:2018 Amendment 2:2022 Regulation 722.311.20. The unit continuously monitors total household consumption, automatically isolating the EV chargepoint from the supply whenever household demand rises above the pre-set threshold (60A, 80A, or 100A, selected at the time of order) and automatically restoring power once overall electrical demand falls back within safe levels.",
+        "Alongside built-in overcurrent safeguarding, every enclosure comes pre-populated with a Type 2 Surge Protection Device (SPD) to shield sensitive vehicle and charger electronics from transient voltage spikes. Featuring a contractor-friendly, simple wire-in, wire-out connection layout inside a UK-designed and manufactured housing, this unit facilitates full compliance with BS 7671:2018+A2:2022 Regulation 722.411.4.1 (iv) and is backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "matt:e SP-IC-SPD protection unit",
+        "Built-in PEN fault protection",
+        "No earth electrodes required",
+        "Load curtailment: 60A, 80A, 100A",
+        "Integrated Type 2 surge protection",
+        "Overcurrent protection up to 7.4kW",
+        "BS 7671 18th Edition compliant",
+        "Simple wire-in, wire-out connection",
+        "UK designed and manufactured",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Single-phase automatic reset PEN fault protection with load curtailment and Type 2 SPD; single-phase voltage monitoring and protection unit"
+        },
+        {
+          "label": "Models",
+          "value": "SP-IC60-SPD (60A), SP-IC80-SPD (80A), SP-IC100-SPD (100A)"
+        },
+        {
+          "label": "Certification",
+          "value": "UKCA, CE"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Built-in matt:e PEN fault protection; allows safe connection to existing TN-C-S supplies; no earth electrodes required, reducing civils disruption and buried service risks"
+        },
+        {
+          "label": "Load Curtailment",
+          "value": "Isolates the charger when household load exceeds the chosen limit (60A, 80A or 100A) and restores power automatically when demand drops; complies with Regulation 722.311.20"
+        },
+        {
+          "label": "Surge & Overcurrent Protection",
+          "value": "Integrated Type 2 SPD and overcurrent protection for EV chargepoint installations up to 7.4kW against transient overvoltages and overcurrent events"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A2:2022, Regulations 722.411.4.1 (iv) and 722.311.20"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; straightforward internal terminal configuration speeds up on-site installation"
+        },
+        {
+          "label": "Electrical",
+          "value": "Nominal input 230V, 50Hz, single-phase; max load 7.4kW; terminal capacity: in L/N 2.5–25mm², out L/N 2.5–10mm²"
+        },
+        {
+          "label": "Enclosure & Rating",
+          "value": "Mild steel, IP2X"
+        },
+        {
+          "label": "Dimensions & Weight",
+          "value": "225 x 275 x 85mm (H x W x D), approx. 5kg"
+        },
+        {
+          "label": "Origin",
+          "value": "UK designed and manufactured"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year from date of purchase, limited to replacement of faulty components only"
+        }
+      ],
+      "images": [
+        "image5.png"
+      ],
+      "docImagesAfterTable": [
+        "image5"
+      ],
+      "sku": "SP-IC100-SPD",
+      "idSuffix": "100a",
+      "variantGroup": "matte-sp-ic-spd",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "100A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection",
+          "Load Balancing"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e 40A EV Distribution Board with PEN Fault Protection 40A Type A RCBO and Type 2 SPD",
+      "exVat": "320.50",
+      "warranty": "3 years",
+      "description": [
+        "The Matt:e SP-M1b3t-R-SPD is a dedicated, pre-wired single-phase connection and protection centre supplied by Ocunio, engineered specifically for installing one 7.4kW EV chargepoint on domestic and light commercial properties. Incorporating next-generation IET:01:2024 Category M1b3t PEN fault protection, the unit continuously supervises supply voltage (184V to 262.2V window) and protective conductor current (tripping at the 21mA threshold), simultaneously disconnecting Line, Neutral, and Earth (PE) in the event of a fault. This integral protection allows safe, direct connection to existing PME (TN-C-S) earthing facilities without requiring separate earth electrodes—eliminating costly groundworks and buried service risks.",
+        "Designed to deliver total circuit safeguarding in a single compact unit, the SP-M1b3t-R-SPD comes pre-populated with a 40A 30mA Type A RCBO for dedicated overload, short-circuit, and residual current protection, paired with a Type 1+2 Surge Protection Device (SPD) to shield sensitive vehicle and charger electronics from lightning and transient overvoltage surges. While a complete grid power interruption triggers automatic reconnection after a 20-second stability check, any detected PEN, voltage, or protective conductor fault requires manual inspection and reset for maximum user safety.",
+        "Housed in a durable, top-hinged IP41 indoor-rated mild steel enclosure (302 × 235 × 124mm), it provides a neat, regulation-ready termination point ideal for garages, utility rooms, cross-pavement setups, and Vehicle-to-Grid (V2G) installations. Engineered to facilitate full compliance with BS 7671:2018+A2:2022 (Regulation 722.411.4.1 (iv)) and IET:01:2024, it enables electrical contractors to complete installations quickly, cleanly, and safely."
+      ],
+      "features": [
+        "matt:e PEN fault protection unit",
+        "Built-in PEN fault protection",
+        "No earth electrodes required",
+        "40A Type A RCBO pre-fitted",
+        "Integrated Type 1+2 surge protection",
+        "Pre-wired IP41 indoor enclosure",
+        "Smart reset after grid outage",
+        "18th Edition and V2G ready",
+        "Warranty: 3 years"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Pre-wired single-way PEN fault protection unit with 40A RCBO and integrated surge protection, for one 7.4kW EV circuit"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Monitors voltage (184V–262.2V) and CPC current (21mA trip); isolates L, N and PE on a fault; allows direct PME connection with no earth electrodes (IET:01:2024 M1b3t)"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "40A 30mA Type A DP RCBO (C-curve) pre-fitted; overcurrent, short-circuit and residual current protection; 1 outgoing way"
+        },
+        {
+          "label": "Surge Protection",
+          "value": "Integrated Type 1+2 SPD protects the chargepoint and connected EV from lightning surges and switching transients"
+        },
+        {
+          "label": "Reset Logic",
+          "value": "Restores power automatically 20 seconds after a standard grid outage; manual reset required after a detected electrical or PEN fault"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A2:2022, Regulation 722.411.4.1 (iv); suitable for domestic driveways, cross-pavement charging and V2G applications"
+        },
+        {
+          "label": "Enclosure",
+          "value": "Grey powder-coated mild steel, top-hinged door, surface mounted, IP41 (indoor use in garages, cupboards and utility spaces)"
+        },
+        {
+          "label": "Protection Type",
+          "value": "Type A RCD; surge protection fitted"
+        },
+        {
+          "label": "Electrical",
+          "value": "230V, 50Hz, 40A rated"
+        },
+        {
+          "label": "Size & Classification",
+          "value": "302 x 235 x 124mm (H x W x D), 5kg; UNSPSC 39121110; supplied individually (each)"
+        },
+        {
+          "label": "Warranty",
+          "value": "3 years"
+        }
+      ],
+      "images": [
+        "image6.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image6"
+      ],
+      "sku": "SP-M1b3t-R-SPD",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection",
+          "Distribution Boards"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "40A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "curve": [
+          "C Curve"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e EV Distribution Board with PEN Fault Protection 40A Type A RCBO and Type 2 SPD – IP65",
+      "exVat": "282.50",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e IP-M1b3t-R-SPD is a rugged, weatherproof single-phase connection and protection centre supplied by Ocunio, engineered specifically to provide a simple, dedicated connection point for one 7.4kW EV chargepoint. Incorporating next-generation IET:01:2024 Category M1b3t PEN fault protection, the unit continuously monitors supply voltage (184V to 262.2V AC) and protective conductor current (tripping at the 21mA threshold), simultaneously disconnecting Line, Neutral, and Earth (PE) in the event of a fault. This built-in safeguarding permits direct connection to an existing PME (TN-C-S) earthing facility without installing external earth electrodes—avoiding disruptive groundworks and reducing the risk of striking buried utility services.",
+        "Designed to deliver comprehensive circuit safeguarding in a single unit, the enclosure comes pre-populated with a 40A 30mA Type A RCBO (Type C curve) for dedicated overload, short-circuit, and residual current protection, paired with an integrated Type 2 Surge Protection Device (SPD) to defend sensitive vehicle and charger electronics against transient overvoltages. Featuring a contractor-friendly, simple wire-in, wire-out terminal arrangement, it automatically reconnects 20 seconds after a standard grid power outage while requiring manual inspection and reset following any detected PEN or electrical fault.",
+        "Housed in a durable, halogen-free IP65 weatherproof and IK08 impact-rated thermoplastic/polycarbonate enclosure (270 × 250 × 160mm), the IP-M1b3t-R-SPD is purpose-built for external walls, domestic driveways, and achieving compliance in cross-pavement and Vehicle-to-Everything (V2X) installations. Engineered to facilitate full compliance with BS 7671:2018+A2:2022 (Regulation 722.411.4.1 (iv)) and IET:01:2024, it is UKCA and CE marked and backed by a 1-year manufacturer warranty."
+      ],
+      "features": [
+        "matt:e PEN fault protection unit",
+        "Built-in PEN fault protection",
+        "No earth electrodes required",
+        "40A Type A RCBO included",
+        "Integrated Type 2 surge protection",
+        "Weatherproof IP65 and IK08 enclosure",
+        "Ideal for cross-pavement charging",
+        "Simple wire-in, wire-out connection",
+        "18th Edition compliant",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Pre-wired PEN fault protection unit with 40A RCBO and Type 2 SPD, for one 7.4kW single-phase EV chargepoint"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Continuously monitors voltage (184V–262.2V) and CPC current (21mA trip); isolates L, N and PE on a fault; enables PME-connected charging without earth electrodes (IET:01:2024 M1b3t)"
+        },
+        {
+          "label": "Circuit & Surge Protection",
+          "value": "40A C-curve 30mA Type A RCBO and Type 2 surge protective device in a single pre-wired enclosure"
+        },
+        {
+          "label": "Enclosure",
+          "value": "Halogen-free polycarbonate, 270 x 250 x 160mm; IP65 and IK08; suitable for external wall mounting in harsh UK outdoor environments"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection for one 7.4kW single-phase chargepoint; no earth rod or buried service risk; suited to cross-pavement and V2X setups"
+        },
+        {
+          "label": "Standards & Certification",
+          "value": "UKCA and CE; BS 7671:2018+A2:2022, Regulation 722.411.4.1 (iv)"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year"
+        }
+      ],
+      "images": [
+        "image7.png"
+      ],
+      "docImagesAfterTable": [
+        "image7"
+      ],
+      "sku": "IP-M1b3t-R-SPD",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection",
+          "Distribution Boards"
+        ],
+        "application": [
+          "EV Charging"
+        ],
+        "supply": [
+          "Single-Phase"
+        ],
+        "current": [
+          "40A"
+        ],
+        "installation": [
+          "Outdoor / Weatherproof"
+        ],
+        "curve": [
+          "C Curve"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e ARD-1-32-TP-R-SPD Three-Phase EV Connection Centre | 5-Pole Auto-Reset O-PEN® Isolator with 32A Type A RCBO & Type 2 SPD",
+      "exVat": "1146.60",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e ARD-1-32-TP-R-SPD is a dedicated, three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant installations for 1 × 32A TPN (22kW) EV chargepoints on commercial, workplace, and light industrial sites. Incorporating Matt:e’s patented built-in O-PEN® technology and a unique 5-pole auto-reset isolator, the unit continuously monitors incoming supply conditions and disconnects all phases, neutral, and earth upon detecting a PEN or phase-loss fault—then automatically restores power once normal supply conditions return. This eliminates the requirement for external earth electrodes, reducing disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver comprehensive circuit safeguarding in a single pre-wired unit, the enclosure comes equipped with a 32A 4-pole Type A RCBO for reliable overload, short-circuit, and residual current protection, alongside an integrated Type 2 Surge Protection Device (SPD) to defend sensitive vehicle and charger electronics against transient overvoltages. Featuring a contractor-friendly, simple wire-in, wire-out connection layout inside a robust mild steel IP4X enclosure (550 × 360 × 120mm), it significantly cuts installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018+A2:2022 (Regulation 722.411.4.1 (iii)), this all-in-one three-phase connection centre minimizes site downtime without manual intervention and is backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "PEN fault protection enclosure",
+        "Built-in PEN fault protection",
+        "32A current rating",
+        "Single way, one chargepoint",
+        "Black powder-coated mild steel",
+        "IP4X wall-mounted enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Single-way PEN fault protection enclosure for one chargepoint"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Yes"
+        },
+        {
+          "label": "Current Rating",
+          "value": "32A; 1 way; 1 chargepoint"
+        },
+        {
+          "label": "Enclosure",
+          "value": "Black powder-coated mild steel; wall mounted; IP4X"
+        },
+        {
+          "label": "Voltage & Weight",
+          "value": "415V rated; 11.5kg"
+        },
+        {
+          "label": "Size & Classification",
+          "value": "550 x 360 x 120mm (H x W x D); UNSPSC 39121110; supplied individually (each)"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year"
+        }
+      ],
+      "images": [
+        "image9.jpeg"
+      ],
+      "docImagesAfterTable": [],
+      "sku": "ARD-1-32-TP-R-SPD",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "32A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e ARD-2-32-TP-R-SPD Three-Phase EV Connection Centre | 5-Pole Auto-Reset O-PEN® Isolator with 2 × 32A TPN Type A RCBOs & Type 2 SPD",
+      "exVat": "1243.48",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e ARD-2-32-TP-R-SPD is a dedicated, three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant multi-charger installations for 2 × 32A TPN (22kW) EV chargepoints across commercial workplaces, fleets, and shared parking sites. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a unique 5-pole auto-reset isolator, the unit continuously monitors incoming supply conditions and simultaneously disconnects all phases, neutral, and earth upon detecting a PEN or phase-loss fault—automatically restoring power to the loads once normal supply conditions return. This eliminates the requirement for external earth electrodes, reducing disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver comprehensive circuit safeguarding for dual three-phase outlets in a single pre-wired unit, the enclosure comes equipped with 2 × 32A TPN (4-pole) Type A RCBOs for dedicated overload, short-circuit, and residual current protection, alongside an integrated Type 2 Surge Protection Device (SPD) to defend sensitive vehicle and charger electronics against transient overvoltages. Featuring a contractor-friendly, simple wire-in, wire-out connection layout inside a robust powder-coated mild steel IP4X enclosure (550 × 360 × 120mm, 25mm² terminal capacity), it significantly cuts installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018+A2:2022 (Regulation 722.411.4.1 (iii)), this all-in-one three-phase connection centre minimizes site downtime without manual intervention and is backed by a standard 1-year parts warranty"
+      ],
+      "features": [
+        "Built-in O-PEN® protection",
+        "No earth electrodes required",
+        "Two 32A Type A RCBOs",
+        "Integrated Type 2 surge protection",
+        "Automatic reset 5-pole isolator",
+        "Wire-in, wire-out connection",
+        "BS 7671 18th Edition compliant",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Three-phase EV connection centre with O-PEN®, automatic reset 5-pole isolator, 2 x 32A TPN Type A RCBOs and Type 2 SPD"
+        },
+        {
+          "label": "O-PEN® Protection",
+          "value": "Connects EV chargepoints to PME earthing without earth electrodes; reduces groundworks and buried service risk"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "2 x 32A TPN Type A RCBOs; overcurrent, short-circuit and residual current protection, including pulsating DC"
+        },
+        {
+          "label": "Reset",
+          "value": "5-pole isolator restores supply automatically after a PEN fault clears"
+        },
+        {
+          "label": "Surge Protection",
+          "value": "Integrated Type 2 SPD protects connected chargers from voltage spikes and surges"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A2:2022, Regulation 722.411.4.1 (iii)"
+        },
+        {
+          "label": "Electrical",
+          "value": "400V, 50Hz three-phase; max load 63A per phase; cable entry top and bottom"
+        },
+        {
+          "label": "Terminals & Enclosure",
+          "value": "25mm² terminal capacity; powder-coated mild steel; IP4X"
+        },
+        {
+          "label": "Size & Weight",
+          "value": "550 x 360 x 120mm (H x W x D), approx. 7kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year from date of purchase, covering defective components only; labour, travel and mileage excluded"
+        }
+      ],
+      "images": [
+        "image8.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image8",
+        "image9"
+      ],
+      "sku": "ARD-2-32-TP-R-SPD",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection",
+          "Distribution Boards"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "32A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e ARD-1-63-TP-SPD Three-Phase EV Connection Centre | 5-Pole Auto-Reset O-PEN® Isolator with Type 2 SPD (Up to 63A)",
+      "exVat": "895.00",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e ARD-1-63-TP-SPD is a high-capacity, three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant installations for 1 × 63A TPN EV charging loads or sub-distribution feeder circuits on commercial, fleet, and industrial premises. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a unique 5-pole auto-reset isolator, the unit continuously monitors incoming supply conditions and simultaneously disconnects all phases, neutral, and earth upon detecting a PEN or phase-loss fault—automatically restoring power to the load once normal supply conditions return. This eliminates the requirement for external earth electrodes, reducing disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver robust upstream surge protection without integrated outgoing RCBOs (making it ideal for feeding downstream EV distribution boards or chargepoints with internal residual current protection), the unit comes complete with an integrated Type 2 Surge Protection Device (SPD) to defend sensitive vehicle and charger electronics against transient overvoltages. Featuring a contractor-friendly, simple wire-in, wire-out connection layout inside a durable mild steel IP4X enclosure (380 × 300 × 120mm, 25mm² terminal capacity), it significantly cuts installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018+A2:2022 (Regulation 722.411.4.1 (iii)), this high-current three-phase connection centre minimizes site downtime without manual intervention and is backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "Built-in PEN fault protection",
+        "63A current rating",
+        "Single way, one chargepoint",
+        "Black powder-coated mild steel",
+        "IP4X wall-mounted enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Single-way PEN fault protection enclosure for one chargepoint"
+        },
+        {
+          "label": "PEN Fault Protection",
+          "value": "Yes"
+        },
+        {
+          "label": "Current Rating",
+          "value": "63A; 1 way; 1 chargepoint"
+        },
+        {
+          "label": "Enclosure",
+          "value": "Black powder-coated mild steel; wall mounted; IP4X"
+        },
+        {
+          "label": "Approvals",
+          "value": "Not OCPP compliant"
+        },
+        {
+          "label": "Voltage & Weight",
+          "value": "415V rated; 11.5kg"
+        },
+        {
+          "label": "Size & Classification",
+          "value": "380 x 300 x 120mm (H x W x D); UNSPSC 39121110; supplied individually (each)"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year"
+        }
+      ],
+      "images": [
+        "image10.jpeg",
+        "image11.jpeg",
+        "image12.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image10",
+        "image11",
+        "image12"
+      ],
+      "sku": "ARD-1-63-TP-SPD",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "63A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "features": [
+          "Surge Protection",
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e ARD-6-32-R Three-Phase EV Connection Unit | 5-Pole Auto-Reset O-PEN® Isolator with 6 × 32A DP Type A RCBOs",
+      "exVat": "1154.78",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e ARD-6-32-R is a multi-way, three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant multi-charger installations for 6 × 32A single-phase (7.4kW) EV chargepoints across commercial workplaces, residential developments, and shared parking sites. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a unique 5-pole auto-reset device, the unit continuously monitors incoming 400V 50Hz supply conditions and simultaneously disconnects all phases, neutral, and earth upon detecting a PEN or phase-loss fault—automatically restoring power to the loads once normal supply conditions return. This eliminates the requirement for external earth electrodes, reducing disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver comprehensive circuit safeguarding for six independent single-phase outlets in a single pre-wired distribution unit, the enclosure comes equipped with 6 × 32A double-pole (DP) Type A RCBOs for dedicated overload, short-circuit, and residual current protection. Rated for a maximum load of 63A per phase with 25mm² terminal capacity and top-and-bottom cable entry facilities, its contractor-friendly, simple wire-in, wire-out connection layout inside a robust powder-coated mild steel IP4X enclosure (550 × 360 × 120mm, ~7kg) significantly reduces on-site installation time while ensuring a clean, professional finish.",
+        "Designed and manufactured in the UK to facilitate full compliance with BS 7671:2018 Amendment 1, 2020 (Regulation 722.411.4.1.(iii)), this all-in-one three-phase connection centre minimizes site downtime without manual intervention and is backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "matt:e ARD-6-32-R connection centre",
+        "Built-in O-PEN® technology",
+        "No earth electrodes required",
+        "Six 32A single-phase loads",
+        "Type A RCBOs included",
+        "Phase loss protection",
+        "Automatic reset 5-pole device",
+        "Simple wire-in, wire-out connection",
+        "IP4X mild steel enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Three-phase connection unit with 6 x 32A single-phase loads, complete with Type A RCBOs"
+        },
+        {
+          "label": "O-PEN® Protection",
+          "value": "Connects EV chargepoints to PME earthing without earth electrodes; reduces groundworks and the risk of striking buried services"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "6 x 32A single-phase loads with Type A RCBOs; phase loss protection"
+        },
+        {
+          "label": "Reset",
+          "value": "5-pole auto reset device restores power to the load once the fault has cleared"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A1:2020, Regulation 722.411.4.1 (iii)"
+        },
+        {
+          "label": "Electrical",
+          "value": "400V, 50Hz; max load 63A per phase; cable entry top and bottom"
+        },
+        {
+          "label": "Terminals & Enclosure",
+          "value": "25mm² terminal capacity; powder-coated mild steel; IP4X"
+        },
+        {
+          "label": "Size & Weight",
+          "value": "550 x 360 x 120mm (H x W x D), approx. 7kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year (standard parts warranty)"
+        }
+      ],
+      "images": [
+        "image13.jpeg",
+        "image14.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image13",
+        "image14"
+      ],
+      "sku": "ARD-6-32-R",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection",
+          "Distribution Boards"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "32A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e EVU-1-32-TP-R Three-Phase EV Connection Unit (SKU: EVU-1-32-TP-R) | Built-In O-PEN® Protection with 1 × 32A 4-Pole Type A RCBO",
+      "exVat": "678.92",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e EVU-1-32-TP-R is a simple, dedicated three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to streamline compliant installations for a single 32A TPN (22kW) EV chargepoint across commercial workplaces, fleets, and light industrial premises. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a 5-pole mains isolator featuring a manually resettable shunt trip, the unit continuously monitors incoming 400V 50Hz supply conditions and simultaneously disconnects all poles—including the circuit protective conductor (CPC)—in the event of a fault. This enables safe, direct connection to existing PME earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver complete circuit safeguarding in a single pre-wired distribution centre, the EVU-1-32-TP-R comes equipped with 1 × 32A 4-pole (TPN) Type A RCBO for dedicated overload, short-circuit, and residual current protection, alongside integrated phase-loss protection. Rated for a maximum load of 32A with 25.0mm² terminal capacity and top-and-bottom cable entry facilities, its contractor-friendly, simple wire-in, wire-out connection layout inside a robust powder-coated mild steel IP4X enclosure (380 × 300 × 120mm, ~7kg) significantly reduces on-site installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018 Amendment 1, 2020 (Regulation 722.411.4.1.(iii)), this dedicated three-phase connection centre offers electrical contractors a reliable, regulation-ready solution backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "Built-in O-PEN® technology",
+        "No earth electrodes required",
+        "32A four-pole Type A RCBO",
+        "Phase loss protection",
+        "Simple wire-in, wire-out connection",
+        "IP4X mild steel enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Three-phase connection unit with 1 x 4 pole 32A Type A RCBO"
+        },
+        {
+          "label": "O-PEN® Protection",
+          "value": "Connects EV chargepoints to PME earthing without earth electrodes; reduces groundworks and the risk of striking buried services"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "1 x 32A TPN Type A RCBO; phase loss protection"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A1:2020, Regulation 722.411.4.1 (iii)"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; cable entry top and bottom"
+        },
+        {
+          "label": "Electrical",
+          "value": "400V, 50Hz; max load 32A"
+        },
+        {
+          "label": "Terminals & Enclosure",
+          "value": "25mm² terminal capacity; powder-coated mild steel; IP4X"
+        },
+        {
+          "label": "Size & Weight",
+          "value": "380 x 300 x 120mm (H x W x D), approx. 7kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year (standard parts warranty)"
+        }
+      ],
+      "images": [
+        "image15.jpeg",
+        "image16.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image15",
+        "image16"
+      ],
+      "sku": "EVU-1-32-TP-R",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "32A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e EVU-1-63-TP Three-Phase EV Connection Unit (SKU: EVU-1-63-TP) | Built-In O-PEN® Protection for 1 × 63A TPN Load",
+      "exVat": "624.39",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e EVU-1-63-TP is a high-capacity, dedicated three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant installations for 1 × 63A TPN EV charging loads or commercial sub-distribution feeder circuits. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a 5-pole mains isolator featuring a manually resettable shunt trip, the unit continuously monitors incoming 400V 50Hz supply conditions and simultaneously disconnects all poles—including the circuit protective conductor (CPC)—in the event of a fault. This enables safe, direct connection to existing PME earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed for straightforward upstream protection without integrated outgoing RCBOs (making it ideal for feeding high-power three-phase chargers or downstream EV distribution boards with internal residual current safeguarding), the unit includes built-in phase-loss protection. Rated for a maximum load of 63A with 25.0mm² terminal capacity and top-and-bottom cable entry facilities, its contractor-friendly, simple wire-in, wire-out connection layout inside a robust powder-coated mild steel IP4X enclosure (380 × 300 × 120mm, ~7kg) significantly reduces on-site installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018 Amendment 1, 2020 (Regulation 722.411.4.1.(iii)), this high-current three-phase connection centre offers electrical contractors a dependable, regulation-ready solution backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "Built-in O-PEN® technology",
+        "No earth electrodes required",
+        "Suitable for 1 x 63A TPN load",
+        "Phase loss protection",
+        "Simple wire-in, wire-out connection",
+        "IP4X mild steel enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Three-phase connection unit suitable for 1 x 63A TPN load"
+        },
+        {
+          "label": "O-PEN® Protection",
+          "value": "Connects EV chargepoints to PME earthing without earth electrodes; reduces groundworks and the risk of striking buried services"
+        },
+        {
+          "label": "Protection",
+          "value": "Phase loss protection; suitable for 1 x 63A TPN load"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A1:2020, Regulation 722.411.4.1 (iii)"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; cable entry top and bottom"
+        },
+        {
+          "label": "Electrical",
+          "value": "400V, 50Hz; max load 63A"
+        },
+        {
+          "label": "Terminals & Enclosure",
+          "value": "25mm² terminal capacity; powder-coated mild steel; IP4X"
+        },
+        {
+          "label": "Size & Weight",
+          "value": "380 x 300 x 120mm (H x W x D), approx. 7kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year (standard parts warranty)"
+        }
+      ],
+      "images": [
+        "image17.jpeg",
+        "image18.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image17",
+        "image18"
+      ],
+      "sku": "EVU-1-63-TP",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "63A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e EVU-3-32-R Three-Phase EV Connection Unit (SKU: EVU-3-32-R) | Built-In O-PEN® Protection with 3 × 32A DP Type A RCBOs",
+      "exVat": "673.30",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e EVU-3-32-R is a dedicated, three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant multi-charger installations for 3 × 32A single-phase (7.4kW) EV chargepoints balanced across a three-phase supply. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a 5-pole mains isolator featuring a manually resettable shunt trip, the unit continuously monitors incoming 400V 50Hz supply conditions and simultaneously disconnects all poles—including the circuit protective conductor (CPC)—in the event of a fault. This enables safe, direct connection to existing PME earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed to deliver complete circuit safeguarding for three independent single-phase outlets in a single pre-wired distribution centre, the EVU-3-32-R comes equipped with 3 × 32A double-pole (DP) Type A RCBOs for dedicated overload, short-circuit, and residual current protection, alongside integrated phase-loss protection. Rated for a maximum load of 32A per phase with 25.0mm² terminal capacity and top-and-bottom cable entry facilities, its contractor-friendly, simple wire-in, wire-out connection layout inside a robust powder-coated mild steel IP4X enclosure (380 × 300 × 120mm, ~7kg) significantly reduces on-site installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018 Amendment 1, 2020 (Regulation 722.411.4.1.(iii)), this three-phase connection centre offers electrical contractors a reliable, regulation-ready solution backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "Built-in O-PEN® technology",
+        "No earth electrodes required",
+        "Three 32A Type A RCBOs",
+        "Phase loss protection",
+        "Simple wire-in, wire-out connection",
+        "IP4X mild steel enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Three-phase connection unit with 3 x 2 pole 32A Type A RCBOs"
+        },
+        {
+          "label": "O-PEN® Protection",
+          "value": "Connects EV chargepoints to PME earthing without earth electrodes; reduces groundworks and the risk of striking buried services"
+        },
+        {
+          "label": "Circuit Protection",
+          "value": "3 x 32A DP Type A RCBOs; phase loss protection"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A1:2020, Regulation 722.411.4.1 (iii)"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; cable entry top and bottom"
+        },
+        {
+          "label": "Electrical",
+          "value": "400V, 50Hz; max load 32A per phase"
+        },
+        {
+          "label": "Terminals & Enclosure",
+          "value": "25mm² terminal capacity; powder-coated mild steel; IP4X"
+        },
+        {
+          "label": "Size & Weight",
+          "value": "380 x 300 x 120mm (H x W x D), approx. 7kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year (standard parts warranty)"
+        }
+      ],
+      "images": [
+        "image19.jpeg",
+        "image20.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image19",
+        "image20"
+      ],
+      "sku": "EVU-3-32-R",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection",
+          "Distribution Boards"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "32A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "rcdType": [
+          "Type A"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    },
+    {
+      "name": "Matt:e EVU-1-100-TP 100A Three-Phase EV Connection Unit (SKU: EVU-1-100-TP) | Built-In O-PEN® Protection for 1 × 100A TPN Load",
+      "exVat": "982.24",
+      "warranty": "1 year",
+      "description": [
+        "The Matt:e EVU-1-100-TP is a heavy-duty, dedicated three-phase EV connection and protection centre supplied by Ocunio, engineered specifically to simplify compliant installations for 1 × 100A TPN EV charging loads or high-capacity commercial sub-distribution feeder circuits. Incorporating Matt:e’s patented built-in O-PEN® technology paired with a 5-pole mains isolator featuring a manually resettable shunt trip, the unit continuously monitors incoming 400V 50Hz supply conditions and simultaneously disconnects all poles—including the circuit protective conductor (CPC)—in the event of a fault. This enables safe, direct connection to existing PME earthing facilities without requiring external earth electrodes—eliminating disruptive, costly groundworks and removing the risk of striking buried utility services.",
+        "Designed for straightforward upstream protection without integrated outgoing RCBOs (making it ideal for feeding high-power rapid chargers or downstream multi-way EV distribution boards with internal residual current safeguarding), the unit includes built-in phase-loss protection. Rated for a maximum load of 100A with heavy-duty 50mm² terminal capacity and top-and-bottom cable entry facilities, its contractor-friendly, simple wire-in, wire-out connection layout inside a robust powder-coated mild steel IP4X enclosure (550 × 360 × 120mm, ~7kg) significantly reduces on-site installation time while ensuring a clean, professional finish.",
+        "Designed and built in the UK to facilitate full compliance with BS 7671:2018 Amendment 1, 2020 (Regulation 722.411.4.1. (iii)), this high-current three-phase connection centre offers electrical contractors a dependable, regulation-ready solution backed by a standard 1-year parts warranty."
+      ],
+      "features": [
+        "matt:e EVU-1-100-TP connection centre",
+        "Built-in O-PEN® technology",
+        "No earth electrodes required",
+        "Suitable for 1 x 100A TPN load",
+        "Phase loss protection",
+        "Simple wire-in, wire-out connection",
+        "IP4X mild steel enclosure",
+        "Warranty: 1 year"
+      ],
+      "specs": [
+        {
+          "label": "Description",
+          "value": "Three-phase connection unit suitable for 1 x 100A TPN load"
+        },
+        {
+          "label": "O-PEN® Protection",
+          "value": "Connects EV chargepoints to PME earthing without earth electrodes; reduces groundworks and the risk of striking buried services"
+        },
+        {
+          "label": "Protection",
+          "value": "Phase loss protection; suitable for 1 x 100A TPN load"
+        },
+        {
+          "label": "Standards",
+          "value": "BS 7671:2018+A1:2020, Regulation 722.411.4.1 (iii)"
+        },
+        {
+          "label": "Installation",
+          "value": "Simple wire-in, wire-out connection; cable entry top and bottom"
+        },
+        {
+          "label": "Electrical",
+          "value": "400V, 50Hz; max load 100A"
+        },
+        {
+          "label": "Terminals & Enclosure",
+          "value": "50mm² terminal capacity; powder-coated mild steel; IP4X"
+        },
+        {
+          "label": "Size & Weight",
+          "value": "550 x 360 x 120mm (H x W x D), approx. 7kg"
+        },
+        {
+          "label": "Warranty",
+          "value": "1 year (standard parts warranty)"
+        }
+      ],
+      "images": [
+        "image21.jpeg",
+        "image22.jpeg",
+        "image23.jpeg"
+      ],
+      "docImagesAfterTable": [
+        "image21",
+        "image22",
+        "image23"
+      ],
+      "sku": "EVU-1-100-TP",
+      "filters": {
+        "type": [
+          "EV Charger Protection",
+          "PME Fault Detection"
+        ],
+        "application": [
+          "EV Charging",
+          "Commercial & Industrial"
+        ],
+        "supply": [
+          "Three-Phase"
+        ],
+        "current": [
+          "100A"
+        ],
+        "installation": [
+          "Indoor"
+        ],
+        "features": [
+          "PME Fault Detection"
+        ]
+      }
+    }
+  ]
+}

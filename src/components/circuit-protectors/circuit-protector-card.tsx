@@ -124,6 +124,11 @@ export function CircuitProtectorCard({
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 pt-5">
         <CardTitle className="text-lg leading-snug">{product.name}</CardTitle>
+        {variants.length > 1 && (
+          <p className="text-sm text-muted-foreground">
+            Ratings: {variants.map((v) => v.filters.current?.[0]).filter(Boolean).join(" · ")}
+          </p>
+        )}
         <CardMeta warranty={product.warranty} />
         <CardPrice price={product.price} sale={sale} trade />
       </CardContent>

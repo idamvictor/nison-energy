@@ -264,7 +264,7 @@ export async function updateOrderStatus(
     after(async () => {
       await sendEmail({
         to: order.email,
-        ...customerOrderStatusUpdate(order),
+        ...(await customerOrderStatusUpdate(order)),
       });
     });
   }

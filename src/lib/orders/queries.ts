@@ -313,7 +313,7 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
   after(async () => {
     await sendEmail({
       to: order.email,
-      ...customerOrderConfirmation(order),
+      ...(await customerOrderConfirmation(order)),
     });
     const staff = await getStaffEmails();
     await sendEmail({

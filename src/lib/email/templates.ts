@@ -5,6 +5,7 @@ import { formatCurrency } from "@/lib/currency";
 import { includesInstallation, installSplit } from "@/lib/orders/installation";
 import { OPENQUOTE_SURVEY_URL } from "@/lib/content/openquote";
 import { deliveryLabelFor, needsPallet } from "@/lib/orders/delivery";
+import type { TemplateCopy } from "@/lib/email/template-registry";
 
 function esc(value: string): string {
   return value
@@ -90,6 +91,49 @@ function money(amount: number | null): string {
   return amount == null ? "Quote on request" : formatCurrency(amount);
 }
 
+// ─── Editable copy (admin ▸ Email templates) ─────────────────────────────
+
+type Vars = Record<string, string>;
+
+const globalVars = (): Vars => ({
+  company: COMPANY.tradingName,
+  companyEmail: COMPANY.email,
+  whatsappUrl: whatsappUrl(),
+});
+
+const sub = (text: string, vars: Vars, encode: (v: string) => string) =>
+  text.replace(/\{(\w+)\}/g, (_, name: string) => encode(vars[name] ?? ""));
+
+/** Subject, heading, button text: placeholders only (the layout escapes headings/buttons itself). */
+function plain(text: string, vars: Vars): string {
+  return sub(text, vars, (v) => v);
+}
+
+/**
+ * Body text → email HTML: escapes the wording, then {placeholder},
+ * [link text](url), **bold**, *italic* and line breaks. Values are escaped;
+ * link URLs are used as given, the same as link().
+ */
+function rich(text: string, vars: Vars): string {
+  return esc(text)
+    .replace(
+      /\[([^\]]+)\]\(([^)\s]+)\)/g,
+      (_, label: string, href: string) =>
+        `<a href="${sub(href, vars, (v) => v)}" style="color:${CYAN};font-weight:600">${sub(label, vars, esc)}</a>`,
+    )
+    .replace(/\{(\w+)\}/g, (_, name: string) => esc(vars[name] ?? ""))
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/\n/g, "<br>");
+}
+
+/** A template's wording: the admin's saved edits over the defaults, unless the caller passes its own (preview). */
+async function copyFor(key: string, copy?: TemplateCopy): Promise<TemplateCopy> {
+  if (copy) return copy;
+  const { getTemplateCopy } = await import("@/lib/email/template-copy");
+  return getTemplateCopy(key);
+}
+
 // ─── Inputs ──────────────────────────────────────────────────────────────
 
 export type LeadEmailInput = {
@@ -164,47 +208,48 @@ export function staffLeadAlert(lead: LeadEmailInput): EmailContent {
   };
 }
 
-export function customerEnquiryAck(lead: LeadEmailInput): EmailContent {
+export async function customerEnquiryAck(lead: LeadEmailInput, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("enquiry-received", copy);
+  const v = {
+    ...globalVars(),
+    firstName: lead.firstName,
+    reasonForEnquiry: lead.reasonForEnquiry,
+    areaOfEnquiry: lead.areaOfEnquiry,
+  };
   return {
-    subject: "We've got your enquiry",
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: `Thanks, ${esc(lead.firstName)} — we've received your enquiry`,
-      bodyHtml: [
-        row(
-          `A member of the ${COMPANY.tradingName} team will be in touch shortly about your
-           <strong>${esc(lead.reasonForEnquiry)}</strong> enquiry for
-           <strong>${esc(lead.areaOfEnquiry)}</strong>.`,
-        ),
-        row(`If it's urgent, ${link(whatsappUrl(), "message us on WhatsApp")}.`),
-      ].join(""),
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.paragraph1, v)), row(rich(c.paragraph2, v))].join(""),
     }),
   };
 }
 
-const LEAD_STATUS_LINE: Record<string, string> = {
-  Contacted: "We've picked up your enquiry and a member of the team is in touch with you.",
-  Quoted: "We've prepared a quote for you — keep an eye on your inbox and messages.",
-  Won: "Great news — we're going ahead. We'll guide you through the next steps, including any OZEV grant paperwork.",
+/** The statuses that email the customer, and their copy field — "New" is the initial state and "Lost" isn't emailed. */
+const LEAD_STATUS_FIELD: Record<string, string> = {
+  Contacted: "statusContacted",
+  Quoted: "statusQuoted",
+  Won: "statusWon",
 };
 
-/** Customer-facing statuses only — "New" is the initial state and "Lost" isn't emailed. */
 export function isEmailableLeadStatus(status: string): boolean {
-  return status in LEAD_STATUS_LINE;
+  return status in LEAD_STATUS_FIELD;
 }
 
-export function customerEnquiryStatusUpdate(
+export async function customerEnquiryStatusUpdate(
   lead: Pick<LeadEmailInput, "firstName" | "areaOfEnquiry">,
   status: string,
-): EmailContent {
+  copy?: TemplateCopy,
+): Promise<EmailContent> {
+  const c = await copyFor("enquiry-update", copy);
+  const v = { ...globalVars(), firstName: lead.firstName, areaOfEnquiry: lead.areaOfEnquiry, status };
+  const line = c[LEAD_STATUS_FIELD[status]];
   return {
-    subject: `An update on your ${lead.areaOfEnquiry} enquiry`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: `Hi ${esc(lead.firstName)}, there's an update on your enquiry`,
-      bodyHtml: [
-        row(`Your enquiry about <strong>${esc(lead.areaOfEnquiry)}</strong> is now <strong>${esc(status)}</strong>.`),
-        row(LEAD_STATUS_LINE[status] ?? "There's an update on your enquiry."),
-      ].join(""),
-      cta: { label: "View your messages", href: `${PUBLIC_ORIGIN}/account/inbox` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.intro, v)), row(line ? rich(line, v) : "There's an update on your enquiry.")].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/account/inbox` },
     }),
   };
 }
@@ -249,57 +294,44 @@ function totalLine(order: OrderEmailInput): string {
 }
 
 /** Signed-in customers can open their orders; guests have no account, so offer WhatsApp. */
-function ordersCta(order: OrderEmailInput): { label: string; href: string } {
+function ordersCta(order: OrderEmailInput, c: TemplateCopy, v: Vars): { label: string; href: string } {
   return order.userId
-    ? { label: "View your orders", href: `${PUBLIC_ORIGIN}/account/orders` }
+    ? { label: plain(c.buttonAccount, v), href: `${PUBLIC_ORIGIN}/account/orders` }
     : {
-        label: "Message us on WhatsApp",
+        label: plain(c.buttonGuest, v),
         // Opens a chat with our number, pre-filled with the order reference.
         href: whatsappUrl(`Hi ${COMPANY.tradingName} 👋 I have a question about my order ${order.reference}.`),
       };
 }
 
-function surveyCallout(): string {
+function surveyCallout(c: TemplateCopy, v: Vars): string {
   return callout(
-    `<strong style="color:${INK}">Next step: complete your virtual survey</strong><br>
-     It takes about 5 minutes — a few photos and questions about where your charger is going.
-     Our team reviews it before booking your installation.<br>
-     ${link(OPENQUOTE_SURVEY_URL, "Start your survey →")}`,
+    `<strong style="color:${INK}">${esc(plain(c.surveyTitle, v))}</strong><br>
+     ${rich(c.surveyBody, v)}<br>
+     ${link(OPENQUOTE_SURVEY_URL, plain(c.surveyLink, v))}`,
   );
 }
 
-export function customerOrderConfirmation(
-  order: OrderEmailInput,
-  opts?: { paid?: boolean },
-): EmailContent {
+/** Order placed without online payment (paid orders get customerInvoiceEmail). */
+export async function customerOrderConfirmation(order: OrderEmailInput, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("order-received", copy);
+  const v = { ...globalVars(), firstName: order.firstName, orderReference: order.reference };
   const needsSurvey = includesInstallation(order.items);
   return {
-    subject: opts?.paid
-      ? `Payment received — order ${order.reference}`
-      : `Order ${order.reference} received`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: opts?.paid
-        ? `Thanks, ${esc(order.firstName)} — payment received`
-        : `Thanks, ${esc(order.firstName)} — we've got your order`,
+      heading: plain(c.heading, v),
       bodyHtml: [
-        row(`Your order reference is <strong>${esc(order.reference)}</strong>.`),
+        row(rich(c.referenceLine, v)),
         row(itemsTable(order.items)),
         totalLine(order),
         row(
           `<strong>Delivery &amp; installation address</strong><br>${esc(fullAddress(order))}`,
         ),
-        opts?.paid
-          ? row(
-              `Your payment has gone through. A member of the team will be in touch to
-               ${needsSurvey ? "book your installation once your survey is in" : "arrange delivery"}.`,
-            )
-          : row(
-              `No payment is taken online — a member of the team will be in touch to confirm
-               payment${needsSurvey ? " and book your installation" : " and arrange delivery"}.`,
-            ),
-        needsSurvey ? surveyCallout() : "",
+        row(rich(needsSurvey ? c.paymentInstall : c.paymentNoInstall, v)),
+        needsSurvey ? surveyCallout(c, v) : "",
       ].join(""),
-      cta: ordersCta(order),
+      cta: ordersCta(order, c, v),
     }),
   };
 }
@@ -347,11 +379,23 @@ function step(title: string, body: string): string {
  * for everything else (cables, circuit protection, etc.). It carries its own
  * sign-off and company line, so the shared footer is left off.
  */
-export function customerInvoiceEmail(order: OrderEmailInput, invoice: InvoiceEmailInput): EmailContent {
+export async function customerInvoiceEmail(
+  order: OrderEmailInput,
+  invoice: InvoiceEmailInput,
+  copy?: TemplateCopy,
+): Promise<EmailContent> {
+  const c = await copyFor("order-paid-invoice", copy);
+  const v = {
+    ...globalVars(),
+    firstName: order.firstName,
+    orderReference: order.reference,
+    invoiceNumber: invoice.number,
+    surveyUrl: OPENQUOTE_SURVEY_URL,
+  };
   const needsSurvey = includesInstallation(order.items);
   const fee = order.deliveryFee ?? 0;
   const address = (lines: string[]) => lines.map(esc).join("<br>");
-  const whatsapp = "https://wa.me/447525567054";
+  const title = (id: string) => `<strong style="color:${INK}">${esc(plain(c[id], v))}</strong>`;
 
   const orderSummary = [
     callout(
@@ -385,51 +429,24 @@ export function customerInvoiceEmail(order: OrderEmailInput, invoice: InvoiceEma
     ),
   ].join("");
 
+  const steps = (prefix: string, count: number) =>
+    Array.from({ length: count }, (_, i) => step(esc(plain(c[`${prefix}${i + 1}Title`], v)), rich(c[`${prefix}${i + 1}Body`], v)));
   const nextSteps = needsSurvey
-    ? [
-        row(`<strong style="color:${INK}">Here’s what happens from here:</strong>`),
-        step(
-          "1. Check your inbox.",
-          "Your order confirmation and receipt are on their way. If you can’t see them, check your spam folder.",
-        ),
-        step(
-          "2. We’ll arrange your survey.",
-          `Use ${link(OPENQUOTE_SURVEY_URL, "Open Quote")}, a virtual survey tool, to begin your home survey. Our engineer will review your submissions and confirm the best position for your charger and check whether any extra work is needed, so there are no surprises on the day.`,
-        ),
-        step(
-          "3. Installation day",
-          "We’ll book your installation within two weeks of the survey. Your engineer will fit and test the charger, set up the app, and show you how everything works.",
-        ),
-        step("4. Ongoing support", "After installation, our aftercare team is here to help with any questions."),
-        row(
-          `<em>Questions in the meantime?</em> ${link(whatsappUrl(), "Chat with us on WhatsApp")} · ${link(`mailto:${COMPANY.email}`, COMPANY.email)}`,
-        ),
-      ]
-    : [
-        row(`<strong style="color:${INK}">What happens next?</strong>`),
-        step("1. Delivery", "Your order will arrive by free tracked delivery within 1–3 days."),
-        step(
-          "2. Safety information",
-          "Chargers and circuit protection must be installed by a qualified electrician in line with BS 7671 wiring regulations.",
-        ),
-        step(
-          "3. Support",
-          `Questions about your product? Reply to this email or chat with us on WhatsApp: ${link(whatsapp, whatsapp)}`,
-        ),
-      ];
+    ? [row(title("installIntro")), ...steps("install", 4), row(rich(c.installQuestions, v))]
+    : [row(title("productsIntro")), ...steps("products", 3)];
 
   return {
-    subject: `Your invoice ${invoice.number} — order ${order.reference} (paid)`,
+    subject: plain(c.subject, v),
     html: emailLayout({
       footer: false,
       bodyHtml: [
-        row(`Hi ${esc(order.firstName)},`),
-        row("Thank you for your order. We've received your payment, and your order is confirmed."),
-        row(`Order number: <strong>${esc(order.reference)}</strong>`),
+        row(rich(c.greeting, v)),
+        row(rich(c.thanks, v)),
+        row(rich(c.orderNumberLine, v)),
         orderSummary,
         ...nextSteps,
-        row(`Thanks for choosing ${COMPANY.tradingName}.`),
-        row(`The ${COMPANY.tradingName} Team<br>${link(`mailto:${COMPANY.email}`, COMPANY.email)} | ${link("https://www.ocunioenergy.com", "www.ocunioenergy.com")}`),
+        row(rich(c.closing, v)),
+        row(rich(c.signOff, v)),
         row(
           `<span style="font-size:12px;color:${MUTED}">${COMPANY.tradingName} is a trading name of ${COMPANY.legalName}. Company Reg. No. ${COMPANY.companyNumber} | VAT No. ${VAT_NUMBER}</span>`,
         ),
@@ -466,45 +483,45 @@ export function staffOrderAlert(order: OrderEmailInput, opts?: { paymentMethod?:
   };
 }
 
-const STATUS_LINE: Record<string, string> = {
-  Confirmed: "We've confirmed your order and payment. Installation scheduling is next.",
-  Scheduled: "Your installation is being scheduled — we'll be in touch to confirm the date with you.",
-  Installed: "Your charger has been installed. Welcome to easier charging!",
-  Cancelled: "Your order has been cancelled. If this is unexpected, please get in touch.",
+const ORDER_STATUS_FIELD: Record<string, string> = {
+  Confirmed: "statusConfirmed",
+  Scheduled: "statusScheduled",
+  Installed: "statusInstalled",
+  Cancelled: "statusCancelled",
 };
 
-export function customerOrderStatusUpdate(order: OrderEmailInput): EmailContent {
+export async function customerOrderStatusUpdate(order: OrderEmailInput, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("order-status-update", copy);
+  const v = { ...globalVars(), orderReference: order.reference, status: order.status };
   return {
-    subject: `Order ${order.reference} is now ${order.status}`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: `Your order is now ${esc(order.status)}`,
+      heading: plain(c.heading, v),
       bodyHtml: [
-        row(`Order reference <strong>${esc(order.reference)}</strong>.`),
-        row(STATUS_LINE[order.status] ?? "There's an update on your order."),
+        row(rich(c.referenceLine, v)),
+        row(rich(c[ORDER_STATUS_FIELD[order.status]] ?? c.statusOther, v)),
         row(itemsTable(order.items)),
         totalLine(order),
       ].join(""),
-      cta: ordersCta(order),
+      cta: ordersCta(order, c, v),
     }),
   };
 }
 
-export function customerPaymentFailed(order: OrderEmailInput): EmailContent {
+export async function customerPaymentFailed(order: OrderEmailInput, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("payment-failed", copy);
+  const v = {
+    ...globalVars(),
+    firstName: order.firstName,
+    orderReference: order.reference,
+    total: formatCurrency(orderTotal(order)),
+  };
   return {
-    subject: `Your payment for order ${order.reference} didn't go through`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: `Hi ${esc(order.firstName)}, your payment didn't go through`,
-      bodyHtml: [
-        row(
-          `We couldn't take payment for your order <strong>${esc(order.reference)}</strong>
-           (${formatCurrency(orderTotal(order))}). No money has been taken.`,
-        ),
-        row(
-          `This is usually a declined card or a cancelled bank check. You can try again with the
-           same or a different card — or get in touch and we'll help.`,
-        ),
-      ].join(""),
-      cta: { label: "Try again", href: `${PUBLIC_ORIGIN}/checkout` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.paragraph1, v)), row(rich(c.paragraph2, v))].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/checkout` },
     }),
   };
 }
@@ -538,59 +555,50 @@ export type QuoteEmailInput = {
   rejectionReason?: string | null;
 };
 
-export function quoteApprovedEmail(quote: QuoteEmailInput): EmailContent {
+const quoteVars = (quote: QuoteEmailInput): Vars => ({
+  ...globalVars(),
+  schemeLabel: quote.schemeLabel,
+  quoteReference: quote.reference,
+});
+
+export async function quoteApprovedEmail(quote: QuoteEmailInput, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("quote-approved", copy);
+  const v = quoteVars(quote);
   return {
-    subject: `Your ${quote.schemeLabel} quote is ready`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: "Your quote has been approved",
-      bodyHtml: [
-        row(
-          `Your <strong>${esc(quote.schemeLabel)}</strong> quote (reference
-           <strong>${esc(quote.reference)}</strong>) has been reviewed and approved — you
-           can download it now.`,
-        ),
-      ].join(""),
-      cta: { label: "Download your quote", href: `${PUBLIC_ORIGIN}/account/quotes` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.paragraph1, v))].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/account/quotes` },
     }),
   };
 }
 
-export function quoteRejectedEmail(quote: QuoteEmailInput): EmailContent {
+export async function quoteRejectedEmail(quote: QuoteEmailInput, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("quote-needs-changes", copy);
+  const v = { ...quoteVars(quote), reason: quote.rejectionReason ?? "" };
   return {
-    subject: `Your ${quote.schemeLabel} quote needs changes`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: "Your quote needs a few changes",
-      bodyHtml: [
-        row(
-          `Your <strong>${esc(quote.schemeLabel)}</strong> quote (reference
-           <strong>${esc(quote.reference)}</strong>) couldn't be approved as submitted.`,
-        ),
-        quote.rejectionReason
-          ? row(`<strong>Reason:</strong> ${esc(quote.rejectionReason)}`)
-          : "",
-      ].join(""),
-      cta: { label: "View details", href: `${PUBLIC_ORIGIN}/account/quotes` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.paragraph1, v)), quote.rejectionReason ? row(rich(c.reasonLine, v)) : ""].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/account/quotes` },
     }),
   };
 }
 
-export function customerQuoteSubmitted(
+export async function customerQuoteSubmitted(
   quote: QuoteEmailInput & { firstName: string },
-): EmailContent {
+  copy?: TemplateCopy,
+): Promise<EmailContent> {
+  const c = await copyFor("quote-received", copy);
+  const v = { ...quoteVars(quote), firstName: quote.firstName || "there" };
   return {
-    subject: `We've received your ${quote.schemeLabel} quote`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: `Thanks, ${esc(quote.firstName || "there")} — your quote is with us`,
-      bodyHtml: [
-        row(
-          `Your <strong>${esc(quote.schemeLabel)}</strong> quote (reference
-           <strong>${esc(quote.reference)}</strong>) has been submitted for review.`,
-        ),
-        row(
-          "Our team checks every grant quote before it can be used in your application. We'll email you as soon as it's approved, or if anything needs changing.",
-        ),
-      ].join(""),
-      cta: { label: "View your quotes", href: `${PUBLIC_ORIGIN}/account/quotes` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.paragraph1, v)), row(rich(c.paragraph2, v))].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/account/quotes` },
     }),
   };
 }
@@ -665,60 +673,42 @@ export function teamInviteEmail(input: {
 
 // ─── Auth ────────────────────────────────────────────────────────────────
 
-export function passwordResetEmail(input: {
-  name: string;
-  url: string;
-}): EmailContent {
+/** The reset link (input.url) is always the button's destination — only the wording is editable. */
+export async function passwordResetEmail(input: { name: string; url: string }, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("password-reset", copy);
+  const v = { ...globalVars(), name: input.name || "there" };
   return {
-    subject: `Reset your ${COMPANY.tradingName} password`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: "Reset your password",
-      bodyHtml: [
-        row(`Hi ${esc(input.name || "there")},`),
-        row(
-          `We received a request to reset your password. This link expires in one hour.
-           If you didn't request it, you can safely ignore this email.`,
-        ),
-      ].join(""),
-      cta: { label: "Set a new password", href: input.url },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.greeting, v)), row(rich(c.paragraph1, v))].join(""),
+      cta: { label: plain(c.button, v), href: input.url },
     }),
   };
 }
 
-export function passwordChangedEmail(input: { name: string }): EmailContent {
+export async function passwordChangedEmail(input: { name: string }, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("password-changed", copy);
+  const v = { ...globalVars(), name: input.name || "there" };
   return {
-    subject: `Your ${COMPANY.tradingName} password was changed`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: "Your password was changed",
-      bodyHtml: [
-        row(`Hi ${esc(input.name || "there")},`),
-        row("The password for your account was just changed."),
-        row(
-          `If this was you, there's nothing else to do. If it wasn't, reset your password
-           straight away and ${link(whatsappUrl(), "let us know on WhatsApp")}.`,
-        ),
-      ].join(""),
-      cta: { label: "Reset password", href: `${PUBLIC_ORIGIN}/forgot-password` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.greeting, v)), row(rich(c.paragraph1, v)), row(rich(c.paragraph2, v))].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/forgot-password` },
     }),
   };
 }
 
-export function welcomeEmail(input: { name: string }): EmailContent {
+export async function welcomeEmail(input: { name: string }, copy?: TemplateCopy): Promise<EmailContent> {
+  const c = await copyFor("welcome", copy);
+  const v = { ...globalVars(), name: input.name || "there", grantGuideUrl: `${PUBLIC_ORIGIN}/ozev-grant-guide` };
   return {
-    subject: `Welcome to ${COMPANY.tradingName}`,
+    subject: plain(c.subject, v),
     html: emailLayout({
-      heading: `Welcome, ${esc(input.name || "there")}!`,
-      bodyHtml: [
-        row(
-          `Thanks for creating your ${COMPANY.tradingName} account. From your account you can
-           track orders, download grant quotes and keep your saved chargers.`,
-        ),
-        row(
-          `Thinking about an OZEV grant? ${link(`${PUBLIC_ORIGIN}/ozev-grant-guide`, "See how it works")} —
-           you could get up to £500 off your charger installation.`,
-        ),
-      ].join(""),
-      cta: { label: "Go to your account", href: `${PUBLIC_ORIGIN}/account` },
+      heading: plain(c.heading, v),
+      bodyHtml: [row(rich(c.paragraph1, v)), row(rich(c.paragraph2, v))].join(""),
+      cta: { label: plain(c.button, v), href: `${PUBLIC_ORIGIN}/account` },
     }),
   };
 }

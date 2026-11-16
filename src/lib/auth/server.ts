@@ -39,13 +39,13 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
-        ...passwordResetEmail({ name: user.name, url }),
+        ...(await passwordResetEmail({ name: user.name, url })),
       });
     },
     // Security notice once the reset completes — the only way a password
     // changes in this app.
     onPasswordReset: async ({ user }) => {
-      await sendEmail({ to: user.email, ...passwordChangedEmail({ name: user.name }) });
+      await sendEmail({ to: user.email, ...(await passwordChangedEmail({ name: user.name })) });
     },
   },
   databaseHooks: {
@@ -53,7 +53,7 @@ export const auth = betterAuth({
       create: {
         // Every new account (email/password or Google) gets a welcome email.
         after: async (user) => {
-          await sendEmail({ to: user.email, ...welcomeEmail({ name: user.name }) });
+          await sendEmail({ to: user.email, ...(await welcomeEmail({ name: user.name })) });
         },
       },
     },

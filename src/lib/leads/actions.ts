@@ -186,7 +186,7 @@ export async function updateLeadStatus(
   // Customer-facing statuses only (Contacted / Quoted / Won) — "Lost" stays internal.
   if (isEmailableLeadStatus(status)) {
     after(async () => {
-      await sendEmail({ to: lead.email, ...customerEnquiryStatusUpdate(lead, status) });
+      await sendEmail({ to: lead.email, ...(await customerEnquiryStatusUpdate(lead, status)) });
     });
   }
   revalidateLead(id);

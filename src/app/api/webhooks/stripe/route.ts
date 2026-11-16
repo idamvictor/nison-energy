@@ -139,7 +139,7 @@ async function markOrderFailed(session: Stripe.Checkout.Session) {
   const order = toOrderRecord(rawOrder);
 
   after(async () => {
-    await sendEmail({ to: order.email, ...customerPaymentFailed(order) });
+    await sendEmail({ to: order.email, ...(await customerPaymentFailed(order)) });
     const staff = await getStaffEmails();
     await sendEmail({ to: staff, replyTo: order.email, ...staffPaymentFailed(order) });
   });

@@ -31,7 +31,9 @@ export type Permission =
   | "users.view"
   | "team.manage"
   | "alerts.staff"
-  | "alerts.pricing";
+  | "alerts.pricing"
+  | "emails.view"
+  | "emails.edit";
 
 const ALL: TeamRole[] = ["superadmin", "admin", "staff"];
 const ADMINS: TeamRole[] = ["superadmin", "admin"];
@@ -53,6 +55,9 @@ const PERMISSIONS: Record<Permission, TeamRole[]> = {
   "team.manage": ADMINS,
   "alerts.staff": ALL,
   "alerts.pricing": ["superadmin"],
+  // Admin ▸ Email templates: Admins read & download, only the Super admin edits.
+  "emails.view": ADMINS,
+  "emails.edit": ["superadmin"],
 };
 
 export const roleLabels: Record<Role, string> = {

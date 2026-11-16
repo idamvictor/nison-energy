@@ -20,6 +20,7 @@ function pageTitle(pathname: string): string {
   if (pathname.startsWith("/admin/mounts-and-posts")) return "Mounts & Posts";
   if (pathname.startsWith("/admin/prices")) return "Price list";
   if (pathname.startsWith("/admin/blog")) return "Blog";
+  if (pathname.startsWith("/admin/email-templates")) return "Email templates";
   if (pathname.startsWith("/admin/leads")) return "Leads";
   if (pathname.startsWith("/admin/orders")) return "Orders";
   if (pathname.startsWith("/admin/users")) return "Users";

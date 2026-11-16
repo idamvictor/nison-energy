@@ -488,3 +488,13 @@ model StaffInvite {
 
   @@index([email])
 }
+
+/// Admin edits to the customer email wording (admin ▸ Email templates).
+/// `key` is a template key from src/lib/email/template-registry.ts; `fields`
+/// holds only the changed fields ({ fieldId: text }) — defaults live in code.
+model EmailTemplate {
+  key       String   @id
+  fields    Json     @default("{}")
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}

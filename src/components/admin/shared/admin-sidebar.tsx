@@ -9,6 +9,7 @@ import {
   FileText,
   Inbox,
   LayoutDashboard,
+  Mail,
   Newspaper,
   ShoppingBag,
   Users,
@@ -179,6 +180,18 @@ export function AdminSidebar({
                   <span>Blog</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {can(role, "emails.view") && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive("/admin/email-templates")}
+                    className={navItemClass(isActive("/admin/email-templates"))}
+                    render={<Link href="/admin/email-templates" />}
+                  >
+                    <Mail />
+                    <span>Email templates</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

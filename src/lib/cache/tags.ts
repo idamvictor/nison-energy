@@ -10,4 +10,5 @@ export const CACHE_TAGS = {
   quotes: "quotes",
   products: "products",
   notifications: "notifications",
+  emailTemplates: "email-templates",
 } as const;

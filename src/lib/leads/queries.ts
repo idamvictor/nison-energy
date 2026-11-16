@@ -175,7 +175,7 @@ export async function createLead(
     const staff = await getStaffEmails();
     const alert = staffLeadAlert(lead);
     await sendEmail({ to: staff, replyTo: lead.email, ...alert });
-    const ack = customerEnquiryAck(lead);
+    const ack = await customerEnquiryAck(lead);
     await sendEmail({ to: lead.email, ...ack });
   });
 

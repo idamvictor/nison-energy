@@ -124,11 +124,11 @@ export async function POST(request: Request) {
       });
       await sendEmail({
         to: user.email,
-        ...customerQuoteSubmitted({
+        ...(await customerQuoteSubmitted({
           reference: quote.reference,
           schemeLabel,
           firstName: user.name.split(" ")[0] ?? "",
-        }),
+        })),
       });
     });
   }

@@ -86,7 +86,7 @@ export async function sendPaidOrderEmails(order: OrderWithItems): Promise<void> 
   } catch (err) {
     console.error("[invoice] PDF generation failed:", err);
   }
-  await sendEmail({ to: order.email, ...customerInvoiceEmail(order, invoice), attachments });
+  await sendEmail({ to: order.email, ...(await customerInvoiceEmail(order, invoice)), attachments });
   const staff = await getStaffEmails();
   await sendEmail({
     to: staff,
@@ -180,7 +180,7 @@ export async function markSessionFailed(session: Stripe.Checkout.Session): Promi
   const order = await findOrder(session.id);
   if (!order) return;
   after(async () => {
-    await sendEmail({ to: order.email, ...customerPaymentFailed(order) });
+    await sendEmail({ to: order.email, ...(await customerPaymentFailed(order)) });
     const staff = await getStaffEmails();
     await sendEmail({ to: staff, replyTo: order.email, ...staffPaymentFailed(order) });
   });

@@ -62,7 +62,7 @@ export async function reviewQuote(
     after(async () => {
       await sendEmail({
         to: existing.user.email,
-        ...quoteApprovedEmail({ reference: quote.reference, schemeLabel }),
+        ...(await quoteApprovedEmail({ reference: quote.reference, schemeLabel })),
       });
     });
   } else {
@@ -76,11 +76,11 @@ export async function reviewQuote(
     after(async () => {
       await sendEmail({
         to: existing.user.email,
-        ...quoteRejectedEmail({
+        ...(await quoteRejectedEmail({
           reference: quote.reference,
           schemeLabel,
           rejectionReason,
-        }),
+        })),
       });
     });
   }

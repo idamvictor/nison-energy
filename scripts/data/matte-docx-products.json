@@ -4,7 +4,7 @@
   "note": "Text extracted programmatically from the doc (word for word). Price: exVat as in the doc; stored inc VAT = exVat x 1.2. One row per rating for MTE/A 3P (40A/100A) and SP-ICxx (60/80/100A).",
   "products": [
     {
-      "name": "Matt:e Single Phase PEN Fault Protection and 40 or 100A MCB (Component only)",
+      "name": "Matt:e MTE/A 11-100M1A 3P Single Phase PEN Fault Protection and 40 or 100A MCB",
       "exVat": "120.00",
       "warranty": "1 year",
       "description": [
@@ -91,7 +91,7 @@
       }
     },
     {
-      "name": "Matt:e Single Phase PEN Fault Protection and 40 or 100A MCB (Component only)",
+      "name": "Matt:e MTE/A 11-100M1A 3P Single Phase PEN Fault Protection and 40 or 100A MCB",
       "exVat": "120.00",
       "warranty": "1 year",
       "description": [
@@ -932,9 +932,7 @@
           "value": "1 year"
         }
       ],
-      "images": [
-        "image9.jpeg"
-      ],
+      "images": [],
       "docImagesAfterTable": [],
       "sku": "ARD-1-32-TP-R-SPD",
       "filters": {
@@ -962,7 +960,8 @@
           "Surge Protection",
           "PME Fault Detection"
         ]
-      }
+      },
+      "imagesNote": "No image in the doc - 3 photos supplied by the client on 2026-11-17 (scripts/fix-matte-ard-images-and-title.ts)"
     },
     {
       "name": "Matt:e ARD-2-32-TP-R-SPD Three-Phase EV Connection Centre | 5-Pole Auto-Reset O-PEN® Isolator with 2 × 32A TPN Type A RCBOs & Type 2 SPD",
@@ -1026,7 +1025,8 @@
         }
       ],
       "images": [
-        "image8.jpeg"
+        "image8.jpeg",
+        "image9.jpeg"
       ],
       "docImagesAfterTable": [
         "image8",

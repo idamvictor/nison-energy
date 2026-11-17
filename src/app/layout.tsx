@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { SiteLoader } from "@/components/shared/site-loader";
 import { AppHydration } from "@/components/shared/app-hydration";
 import { ScrollManager } from "@/components/shared/scroll-manager";
+import { GoogleAnalytics } from "@/components/shared/google-analytics";
+import { CookieBanner } from "@/components/shared/cookie-banner";
 import { CartSheet } from "@/components/shared/cart-sheet";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 import { PaymentPreconnect } from "@/components/shared/payment-preconnect";
@@ -23,6 +25,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteLoader />
         <AppHydration />
         <ScrollManager />
+        <GoogleAnalytics />
+        <CookieBanner />
         <CartSheet />
         <WhatsAppButton />
         {children}

@@ -416,7 +416,9 @@ We share information with trusted third parties only where necessary — for exa
 
 ## 5. Cookies
 
-We use cookies and similar technologies to keep the site working correctly and to understand how it's used. You can control cookies through your browser settings.
+We use cookies and similar technologies to keep the site working correctly and to understand how it's used. Essential cookies (for example, your basket and account sign-in) are always on.
+
+With your consent, we also use Google Analytics, a service provided by Google, to understand how visitors use the site — for example, which pages are viewed and how people arrive at the site. Google Analytics sets cookies only if you click "Accept" on our cookie banner; if you click "Reject", no analytics cookies are set. You can change your choice at any time using "Cookie settings" at the bottom of every page, and you can also control cookies through your browser settings.
 
 ## 6. How Long We Keep Your Information
 

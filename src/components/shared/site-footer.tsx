@@ -6,6 +6,7 @@ import { Mail } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { openCookieSettings } from "@/lib/analytics";
 import { COMPANY } from "@/lib/company";
 import { cn } from "@/lib/utils";
 import {
@@ -124,7 +125,17 @@ export function SiteFooter() {
 
           <FooterColumn title="Quick links" items={quickLinks} />
           <FooterColumn title="Products" items={productLinks} />
-          <FooterColumn title="Legal" items={legalLinks} />
+          <FooterColumn title="Legal" items={legalLinks}>
+            <li>
+              <button
+                type="button"
+                onClick={openCookieSettings}
+                className="text-sm text-white/60 transition-colors hover:text-white"
+              >
+                Cookie settings
+              </button>
+            </li>
+          </FooterColumn>
 
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-center rounded-xl border border-white/15 bg-white p-3">
@@ -200,9 +211,12 @@ export function SiteFooter() {
 function FooterColumn({
   title,
   items,
+  children,
 }: {
   title: string;
   items: { label: string; href: string }[];
+  /** Extra list items after the links (e.g. the Cookie settings button). */
+  children?: React.ReactNode;
 }) {
   return (
     <div>
@@ -220,6 +234,7 @@ function FooterColumn({
             </Link>
           </li>
         ))}
+        {children}
       </ul>
     </div>
   );

@@ -12,7 +12,10 @@ export function ProductGallery({
   name,
   thumbnailImage,
   onSelectThumbnail,
+  fit = "square",
 }: {
+  /** "wide": a landscape frame with little padding, for wide images (e.g. the install kits' "What's Included" banners). */
+  fit?: "square" | "wide";
   /** Image URLs — a YouTube link in the list is shown as a playable video. */
   images: string[];
   name: string;
@@ -33,7 +36,12 @@ export function ProductGallery({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="group relative aspect-square w-full overflow-hidden rounded-2xl bg-white ring-1 ring-border">
+      <div
+        className={cn(
+          "group relative w-full overflow-hidden rounded-2xl bg-white ring-1 ring-border",
+          fit === "wide" ? "aspect-8/5" : "aspect-square",
+        )}
+      >
         {activeVideo ? (
           playing ? (
             <iframe
@@ -72,7 +80,7 @@ export function ProductGallery({
             fill
             priority
             sizes="(min-width: 1024px) 45vw, 100vw"
-            className="object-contain p-10"
+            className={cn("object-contain", fit === "wide" ? "p-2" : "p-10")}
           />
         )}
 

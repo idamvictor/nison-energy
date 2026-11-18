@@ -143,7 +143,11 @@ export default async function CableDetailPage({ params }: { params: Promise<{ sl
 
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-            <ProductGallery images={detail.gallery} name={product.name} />
+            <ProductGallery
+              images={detail.gallery}
+              name={product.name}
+              fit={product.type === "EV Ultra Install Kit" ? "wide" : "square"}
+            />
 
             <div className="flex flex-col gap-6">
               <div>

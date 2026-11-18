@@ -47,7 +47,11 @@ export function CableCard({ variants, quickAdd }: { variants: CableProduct[]; qu
             alt={title}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
+            className={cn(
+              "object-contain transition-transform duration-300 group-hover:scale-105",
+              // The install kits' wide "What's Included" banners need the room to look full size.
+              product.type === "EV Ultra Install Kit" ? "p-1.5" : "p-6",
+            )}
           />
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             <Badge className="w-fit bg-foreground/85 text-background">{product.type}</Badge>

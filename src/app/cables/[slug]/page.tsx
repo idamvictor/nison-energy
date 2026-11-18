@@ -154,8 +154,10 @@ export default async function CableDetailPage({ params }: { params: Promise<{ sl
                   </h1>
                   <AdminEditLink href={`${adminRoute.Cable}/${product.id}`} />
                 </div>
-                {/* The selected pack's own title, word for word. */}
-                {isFamily && <p className="mt-2 text-base font-medium text-foreground">{product.name}</p>}
+                {/* Meter tails: the selected pack's own title, word for word (install kits show one title only). */}
+                {isFamily && product.type !== "EV Ultra Install Kit" && (
+                  <p className="mt-2 text-base font-medium text-foreground">{product.name}</p>
+                )}
                 {detail.sku && <p className="mt-1 text-sm text-muted-foreground">SKU: {detail.sku}</p>}
                 <FreeDeliveryBadge warranty={detail.warranty} />
                 {product.type === "EV Ultra Install Kit" && (

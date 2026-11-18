@@ -48,6 +48,41 @@ export function CableVariantPicker({ product, siblings }: { product: CableProduc
   const pickLength = (length: string) => go(find(length, product.core) ?? siblings.find((p) => p.length === length));
   const pickCore = (core: string) => go(find(product.length, core) ?? siblings.find((p) => p.core === core));
 
+  // Length-only families (e.g. the EV Ultra install kit in 5m–20m): just the
+  // lengths, each with its price.
+  if (cores.length === 0) {
+    return (
+      <fieldset>
+        <legend className="text-sm font-medium text-foreground">Cable length</legend>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {lengths.map((length) => {
+            const option = siblings.find((p) => p.length === length);
+            const active = option?.id === product.id;
+            return (
+              <button
+                key={length}
+                type="button"
+                aria-pressed={active}
+                onClick={() => go(option)}
+                className={cn(
+                  "flex flex-col items-start rounded-xl px-3.5 py-2.5 text-left ring-1 transition-all",
+                  active ? "bg-accent/10 ring-2 ring-accent" : "bg-background ring-border hover:ring-foreground/30",
+                )}
+              >
+                <span className="text-sm font-semibold text-foreground">{length}</span>
+                {option && (
+                  <span className="text-xs text-muted-foreground">
+                    {formatCurrency(exVat(option.price))} ex VAT
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <fieldset>

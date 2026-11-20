@@ -67,3 +67,11 @@ export const GA_INIT_SCRIPT = `
 `;
 
 export const GA_SRC = `https://www.googletagmanager.com/gtm.js?id=${GA_ID}`;
+
+/**
+ * Google Tag Manager container (advanced tracking, managed in Tag Manager).
+ * Loads alongside the GA tag above and shares GA_INIT_SCRIPT, so it starts
+ * with the same consent defaults.
+ */
+export const GTM_ID = "GTM-MV6KDZD4";
+export const GTM_SRC = `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`;

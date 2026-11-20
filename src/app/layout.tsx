@@ -8,6 +8,7 @@ import { CartSheet } from "@/components/shared/cart-sheet";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 import { PaymentPreconnect } from "@/components/shared/payment-preconnect";
 import { SITE_URL } from "@/lib/site";
+import { GA_INIT_SCRIPT, GA_SRC, GTM_SRC } from "@/lib/analytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
+      <head>
+        {/* Google tags, server-rendered in the <head> of every page. The init runs first so both start with consent denied. */}
+        <script id="google-tag-init" dangerouslySetInnerHTML={{ __html: GA_INIT_SCRIPT }} />
+        <script id="google-tag-manager" async src={GTM_SRC} />
+        <script id="google-tag" async src={GA_SRC} />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <PaymentPreconnect />
         <SiteLoader />
